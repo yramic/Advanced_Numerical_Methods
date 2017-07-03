@@ -2,9 +2,6 @@
 #include <cmath>
 #include <limits>
 
-Kernel::Kernel( double num ):
-    num_( num )
-{ }
 
 double Kernel::operator()( double x, double y ) {
 

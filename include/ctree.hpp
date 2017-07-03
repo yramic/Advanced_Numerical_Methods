@@ -1,53 +1,66 @@
-// header of the binary tree class
-#ifndef CTREE_H
-#define CTREE_H
+#ifndef CTREE_HPP
+#define CTREE_HPP
 
+#include <Eigen/Dense>
 #include <vector>
-#include "Eigen/Dense"
 #include "node.hpp"
 
-class ctree{
- public:
-  // constructors
-  // default constructor
- ctree(): root(NULL), X(0){ }
-  // constructor building a tree
-  ctree(std::vector<double> Xvec);
 
-  //deconstructor	
-  virtual ~ctree(){//if (root != NULL) delete root;
-  };
+class cTree
+{
+public:
 
-  // member access functions
-  const std::vector<double>& get_X() const{return X;}	
-  // returns the vector X
-  node* get_root(){return root;}
-  // returns a pointer to the root of the ctree	
+    // default constructor
+    cTree();
+    // constructor building a tree
+    cTree(std::vector<double> Xvec);
 
-  // public computation member functions
-  void add_V(int polynom_degree){V_recursion(root,polynom_degree);}		
-  // build the V-matrices for the nodes of the tree (contain evaluations of Chebyshew polynomials at the corresponding points)
-  void vc_mult(const Eigen::VectorXd& c_vec){c_recursion(root,c_vec);}	
-  // multiplication V*c restricted to the indices of each node of the tree, PRE: V already constructed
-  void near_far(double eta, ctree Ty){divide_tree(root,Ty.root,eta, Ty);}
-  // add lists of pointers to near and far field nodes to each node of the tree	
-  void make_fflist(std::vector<double>& xlist, std::vector<double>& ylist){rec_fflist(xlist,ylist, root);} 
-  // just for testing, makes lists with the boundaries of the bounding boxes
+    // destructor
+    virtual ~cTree() { }
 
- private:
-  // private member functions
-  void V_recursion(node* cluster, int polynom_degree);
-  // needed for member fcn "add_V(...)"
-  void c_recursion(node* cluster,const Eigen::VectorXd& c_vec);
-  // needed for member fcn "vc_mult(...)"
-  void divide_tree(node* xnode, node* ynode, double eta, ctree Ty);
-  // needed for member fcn "near_far(...)"
-  void rec_fflist(std::vector<double>& xlist, std::vector<double>& ylist, node* xnode);
-  // needed for member fcn "make_fflist(...)"
-  // members:
-  node* root; // pointer to the root of the tree
-  const std::vector<double> X; // vector associated to ctree
-  friend class node;
+    // returns the whole vector x_
+    Eigen::VectorXd getVals() const {
+        return x_;
+    }
+    // returns a pointer to root of cTree
+    node* get_root() {
+        return root;
+    }
+
+    // build V-matrices for nodes of the tree (contain evaluations of Chebyshew polynomials at corresponding points)
+    void add_V(unsigned deg) {
+        V_recursion(root, deg);
+    }
+    // product V*c restricted to the indices of each node of the tree, PRE: V already constructed
+    void vc_mult(const Eigen::VectorXd& c) {
+        c_recursion(root, c);
+    }
+    // add lists of pointers to near and far field nodes to each node of the tree
+    void near_far(double eta, cTree Ty) {
+        divide_tree(root, Ty.root, eta, Ty);
+    }
+    // just for testing, makes lists with the boundaries of the bounding boxes
+    void make_fflist(std::vector<double>& xlist, std::vector<double>& ylist){
+        rec_fflist(xlist, ylist, root);
+    }
+
+private:
+
+     // needed for "add_V(...)"
+    void V_recursion(node* cluster, int polynom_degree);
+
+    // needed for "vc_mult(...)"
+    void c_recursion(node* cluster, const Eigen::VectorXd& c_vec);
+
+    // needed for "near_far(...)"
+    void divide_tree(node* xnode, node* ynode, double eta, cTree Ty);
+
+    // needed for "make_fflist(...)"
+    void rec_fflist(std::vector<double>& xlist, std::vector<double>& ylist, node* xnode);
+
+    friend class node;
+    node* root; // pointer to root of the tree
+    const Eigen::VectorXd x_; // vector associated to cTree
 };
-#endif 
 
+#endif // CTREE_HPP
