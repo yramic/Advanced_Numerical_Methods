@@ -69,7 +69,7 @@ void LowRankApp::ff_contribution( Eigen::VectorXd& f, node* tx, int deg )
 
 
 // Compute near-field contribution
-void LowRankApp::nf_contribution( Eigen::VectorXd& f, node* tx, const Eigen::VectorXd& c_ )
+void LowRankApp::nf_contribution(Eigen::VectorXd& f, node* tx, const Eigen::VectorXd& c )
 {
     if(Tx != NULL) {
 
@@ -83,7 +83,7 @@ void LowRankApp::nf_contribution( Eigen::VectorXd& f, node* tx, const Eigen::Vec
             unsigned iyr = (**iter).right_ind(); // last index of current cluster in the near field
             for(unsigned i=ixl; i<=ixr; ++i) {
                 for(unsigned j=iyl; j<=iyr; ++j) {
-                    f(i) += kernel_(Tx_.getVals()[i], Ty_.getVals()[j]) * c_(j); // add near field contribution
+                    f(i) += kernel_(Tx_.getVals()[i], Ty_.getVals()[j]) * c(j); // add near field contribution
                 }
             }
         }
@@ -93,8 +93,8 @@ void LowRankApp::nf_contribution( Eigen::VectorXd& f, node* tx, const Eigen::Vec
             node* xr_c = (*tx).rightchild(); // pointer to right child of *tx
 
             // add contribution of leaves of *tx
-            nf_contribution(f, xl_c, c_);
-            nf_contribution(f, xr_c, c_);
+            nf_contribution(f, xl_c, c);
+            nf_contribution(f, xr_c, c);
         }
     }
 }

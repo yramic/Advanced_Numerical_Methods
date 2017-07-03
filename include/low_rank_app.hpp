@@ -23,7 +23,7 @@ private:
     void ff_contribution( Eigen::VectorXd& f, node* tx, int deg );
 
     // Compute near-field contribution
-    void nf_contribution( Eigen::VectorXd& f, node* tx, const Eigen::VectorXd& c_ );
+    void nf_contribution( Eigen::VectorXd& f, node* tx, const Eigen::VectorXd& c );
 
     Kernel kernel_;
     cTree Tx_;

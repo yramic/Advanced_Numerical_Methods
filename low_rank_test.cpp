@@ -13,8 +13,8 @@ int main() {
 
     std::cout << "Enter gridsize:" << std::endl;
     unsigned n; std::cin >> n;
-    Eigen::VectorXd x   = Eigen::VectorXd::LinSpaced(n, 0., (n-1)/n);
-    Eigen::VectorXd vec = Eigen::VectorXd::Random(n);
+    Eigen::VectorXd x = Eigen::VectorXd::LinSpaced(n, 0., (n-1)/n);
+    Eigen::VectorXd c = Eigen::VectorXd::Random(n);
 
     std::cout << "Enter admissibility constant:" << std::endl;
     double eta; std::cin >> eta;
@@ -22,18 +22,17 @@ int main() {
     std::cout << "Enter degree of interpolating polynomials:" << std::endl;
     double d; std::cin >> d;
 
-    double kernel_num = 1.;
+    Kernel G(1.);
 
     // Compute exact matrix-vector product
 
     time_t start1; time(&start1);
 
-    Kernel G(kernel_num);
     Eigen::MatrixXd M(n,n);
     for(int i=0; i<n; ++i)
         for(int j=0; j<n; ++j)
-            M(i,j) = G(x[i],x[j]);
-    Eigen::VectorXd out_exact = M*vec;
+            M(i,j) = G(x[i], x[j]);
+    Eigen::VectorXd f_exact = M * c;
 
     time_t end1; time(&end1);
     double time_diff1 = std::difftime(end1, start1);
@@ -42,9 +41,11 @@ int main() {
 
     time_t start2; time(&start2);
 
-    Eigen::VectorXd out_approx = mvProd(x, x, eta, kernel_num, d, vec);
+    LowRankApp lra(G, x, x);
+    Eigen::VectorXd f_approx = lra.mvProd(c, eta, d);
 
-//    Eigen::VectorXd vec = Eigen::VectorXd::Zero(n);
+//    Eigen::VectorXd c = Eigen::VectorXd::Zero(n);
+//    LowRankApp lra(G, x, x);
 //    Eigen::MatrixXd M_approx = Eigen::MatrixXd::Zero(n,n);
 //    Eigen::VectorXd err_inf(d+1), err_2(d+1);
 
@@ -52,7 +53,7 @@ int main() {
 //        for(unsigned i=0; i<nx; ++i) {
 
 //            x(i) = 1.;
-//            M_approx.col(i) = mvProd(x, x, eta, kernel_num, d, vec);
+//            M_approx.col(i) = lra.mvProd(c, eta, d);
 //            x(i) = 0.;
 //        }
 
@@ -65,7 +66,7 @@ int main() {
 
     // Compute approximation error
 
-    Eigen::VectorXd diff = out_exact - out_approx;
+    Eigen::VectorXd diff = f_exact - f_approx;
 
     std::cout << "Approximation error (l-inf norm): " << diff.lpNorm<Eigen::Infinity>() << std::endl
               << "Approximation error (l-2 norm): "   << diff.lpNorm<2>() << std::endl
