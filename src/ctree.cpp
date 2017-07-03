@@ -19,13 +19,13 @@ cTree::cTree(const Eigen::VectorXd& x):
 // build V-matrices for nodes of the tree (contain evaluations of Chebyshew polynomials at corresponding points)
 void cTree::V_recursion(node* cluster, unsigned deg)
 {
-    if((*cluster).lchild != NULL) {
+    if((*cluster).l_child_ != NULL) {
         // build V-matrix for *cluster
         (*cluster).fill_V(x_, deg);
         // recursively call the function for the left  child of *cluster
-        V_recursion((*cluster).lchild, deg);
+        V_recursion((*cluster).l_child_, deg);
         // recursively call the function for the right child of *cluster
-        V_recursion((*cluster).rchild, deg);
+        V_recursion((*cluster).r_child_, deg);
     }
 }
 
@@ -33,13 +33,13 @@ void cTree::V_recursion(node* cluster, unsigned deg)
 // product V*c restricted to the indices of each node of the tree. IMPO.: V should already be constructed!
 void cTree::c_recursion(node* cluster, const Eigen::VectorXd& c)
 {
-    if((*cluster).lchild != NULL) {
+    if((*cluster).l_child_ != NULL) {
         // do the multiplication V*c restricted to the indices beloning to the cluster of *cluster
-        (*cluster).V_c(c);
+        (*cluster).Vc(c);
         // call the function for the left child of *cluster
-        c_recursion((*cluster).lchild, c);
+        c_recursion((*cluster).l_child_, c);
         // same for the right child of *cluster
-        c_recursion((*cluster).rchild, c);
+        c_recursion((*cluster).r_child_, c);
     }
 }
 
@@ -48,21 +48,21 @@ void cTree::c_recursion(node* cluster, const Eigen::VectorXd& c)
 void cTree::divide_tree(node* xnode, node* ynode, double eta, cTree Ty)
 {
     // if *xnode or *ynode is a leaf, we add it to the near field
-    if((*xnode).lchild == NULL || (*ynode).lchild == NULL) {
+    if((*xnode).l_child_ == NULL || (*ynode).l_child_ == NULL) {
 
         (*xnode).push_nearf(ynode);
 
     } else { // if the cluster corresponding to *xnode and *ynode is admissible, we add ynode to the far field list of *xnode
 
-        if(is_admissible(x_[(*xnode).l_ind], x_[(*xnode).r_ind], (Ty.getVals())[(*ynode).l_ind], (Ty.getVals())[(*ynode).r_ind], eta)) {
+        if(is_admissible(x_[(*xnode).l_ind_], x_[(*xnode).r_ind_], (Ty.getVals())[(*ynode).l_ind_], (Ty.getVals())[(*ynode).r_ind_], eta)) {
 
             (*xnode).push_farf(ynode);
 
         } else { // we consider the children of *xnode and *ynode and check whether their clusters are admissible
-            divide_tree((*xnode).lchild, (*ynode).lchild, eta, Ty);
-            divide_tree((*xnode).rchild, (*ynode).lchild, eta, Ty);
-            divide_tree((*xnode).lchild, (*ynode).rchild, eta, Ty);
-            divide_tree((*xnode).rchild, (*ynode).rchild, eta, Ty);
+            divide_tree((*xnode).l_child_, (*ynode).l_child_, eta, Ty);
+            divide_tree((*xnode).r_child_, (*ynode).l_child_, eta, Ty);
+            divide_tree((*xnode).l_child_, (*ynode).r_child_, eta, Ty);
+            divide_tree((*xnode).r_child_, (*ynode).r_child_, eta, Ty);
         }
     }
 }
@@ -91,8 +91,8 @@ void cTree::rec_fflist(node* cluster, std::vector<double>& xlist, std::vector<do
         ylist.push_back(x_[iyl]); // gaensefuessli
         ylist.push_back(x_[iyr]); // normal gaensefuessli :-)
     }
-    if((*cluster).lchild!=0) { // *xnode is not a leaf, so we do the same for its children
-        rec_fflist((*cluster).lchild, xlist, ylist);
-        rec_fflist((*cluster).rchild, xlist, ylist);
+    if((*cluster).l_child_!=0) { // *xnode is not a leaf, so we do the same for its children
+        rec_fflist((*cluster).l_child_, xlist, ylist);
+        rec_fflist((*cluster).r_child_, xlist, ylist);
     }
 }

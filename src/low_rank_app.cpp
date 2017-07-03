@@ -55,7 +55,7 @@ void LowRankApp::ff_contribution( Eigen::VectorXd& f, node* tx, int deg )
             s += Xx * Vc; // add contribution of block **iter to s
         };
 
-        Eigen::MatrixXd Vx = (*tx).Vv(); // $V_{\sigma}$
+        Eigen::MatrixXd Vx = (*tx).getVv(); // $V_{\sigma}$
         f.segment(ixl, ixr-ixl+1) = f.segment(ixl, ixr-ixl+1) + Vx*s; // add contribution of far field to f_
 
         node* xl_c = (*tx).leftchild();  // pointer to left  child of *tx
