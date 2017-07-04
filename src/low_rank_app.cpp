@@ -48,7 +48,7 @@ void LowRankApp::ff_contribution( Eigen::VectorXd& f, Node* tx, unsigned deg )
 
             int iyl = (**iter).left_ind(); // start index of current cluster in the far field
             int iyr = (**iter).right_ind(); // last index of current cluster in the far field
-            BC sigma(Tx_.getVals()[ixl], Tx_.getVals()[ixr], Ty_.getVals()[iyl], Ty_.getVals()[iyr], deg, kernel_);
+            BlockCluster sigma(Tx_.getVals()[ixl], Tx_.getVals()[ixr], Ty_.getVals()[iyl], Ty_.getVals()[iyr], deg, kernel_);
             Eigen::MatrixXd Xx_ = sigma.get_matrix(); // matrix $X_{\sigma,\mu}$
             Eigen::VectorXd Vc = (**iter).get_Vc();
             // V*c restricted to the indices of **iter

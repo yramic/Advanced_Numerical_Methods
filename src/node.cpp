@@ -51,8 +51,8 @@ void Node::fill_V(const Eigen::VectorXd &x, unsigned deg)
         double xmin = x[l_ind_];
         double xmax = x[r_ind_];
         Cheby cp(xmin, xmax, deg);
-        Eigen::VectorXd t_k = cp.cheb_pts(); // Chebyshew points
-        Eigen::VectorXd omega = cp.get_omega();  // weights for Lagrange polynomials
+        Eigen::VectorXd t_k = cp.getNodes(); // Chebyshew points
+        Eigen::VectorXd omega = cp.getWghts();  // weights for Lagrange polynomials
         V_ = Eigen::MatrixXd::Constant(r_ind_-l_ind_+1, deg+1, 1);
 
         for(unsigned i=0; i<=r_ind_-l_ind_; ++i) {

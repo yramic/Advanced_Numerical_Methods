@@ -1,41 +1,41 @@
 #include "../include/cheby.hpp"
 #include <Eigen/Dense>
+#include <cmath>
 
 
-//  meaningful constructor
-Cheby::Cheby(double x_l, double x_r, unsigned degree_pol):
-    xl_(x_l), xr_(x_r), deg_(degree_pol), tk_(0), omega_(Eigen::VectorXd::Zero(degree_pol+1))
+// constructor
+Cheby::Cheby(double xl, double xr, unsigned deg):
+    xl_(xl), xr_(xr), deg_(deg), tk_(Eigen::VectorXd::Zero(deg+1)), wk_(Eigen::VectorXd::Zero(deg+1))
 {
-    double val = 0;
-    for(unsigned j=0; j<=deg_; ++j) { // calculate Chebyshew nodes
-        val = (xl_+xr_)/2 + (xr_-xl_)/2 * cos((2.*j+1)/(2*(deg_+1.))*M_PI);
-        tk_.push_back(val);
-    }
-    set_omega();
+    setNodes();
+    setWghts();
 }
 
 
-// define Chebyshev nodes
-void Cheby::set_chebpt()
+// compute Chebyshew nodes on domain [xl,xr]
+void Cheby::setNodes()
 {
-    double val = 0;
+    tk_ = Eigen::VectorXd::Zero(deg_+1);
     for(unsigned j=0; j<=deg_; ++j) {
-        val = (xl_+xr_)/2 + (xr_-xl_)/2 * cos((2.*j+1)/(2.*(deg_+1.))*M_PI);
-        tk_.push_back(val);
+
+        tk_(j) = (xl_+xr_)/2 + (xr_-xl_)/2 * cos((2.*j+1)/(2.*(deg_+1.))*M_PI);
     }
 }
 
 
-// calculate omega (factors for Langrange polynomials), PRE: Chebyshew points already computed
-void Cheby::set_omega()
+// compute weights of Lagrange polynomial
+void Cheby::setWghts()
 {
-    omega_ = Eigen::VectorXd::Zero(deg_+1);
+    wk_ = Eigen::VectorXd::Zero(deg_+1);
     for(unsigned j=0; j<=deg_; ++j) {
-        double hc = 1;
+
+        double hc = 1.;
         for(unsigned k=0; k<j; ++k)
-            hc *= tk_[j]-tk_[k];
+            hc *= tk_[j] - tk_[k];
+        // Skip "k == j"
         for(unsigned k=j+1; k<=deg_; ++k)
-            hc *= tk_[j]-tk_[k];
-        omega_(j) = 1./hc;
+            hc *= tk_[j] - tk_[k];
+
+        wk_(j) = 1./hc;
     }
 }
