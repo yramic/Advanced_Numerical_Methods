@@ -2,19 +2,28 @@
 #define KERNEL_HPP
 
 
+/**
+* \brief Kernel functor $\frac{num}{|x-y|}$ if $x != y$, else 0
+*/
 class Kernel
 {
 public:
 
-    Kernel( double num ):
-        num_( num )
+    /**
+    * \brief Constructor
+    */
+    Kernel(double num):
+        num_(num)
     { }
 
-    double operator()( double x, double y );
+    /**
+    * \brief Functor
+    */
+    double operator()(double x, double y);
 
 private:
 
-    double num_;
+    double num_; // numerator
 };
 
 #endif // KERNEL_HPP

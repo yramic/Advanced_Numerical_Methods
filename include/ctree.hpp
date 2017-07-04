@@ -3,64 +3,74 @@
 
 #include "node.hpp"
 #include <Eigen/Dense>
+#include <vector>
 
 
+/**
+* \brief Cluster tree class
+*/
 class cTree
 {
 public:
 
+    /**
+    * \brief Constructors
+    */
     // default constructor
     cTree():
-        root_(NULL), x_(0)
+        root_(NULL)
     { }
-    // constructor building a tree
+    // actual  constructor
     cTree(const Eigen::VectorXd& x);
 
-    // destructor
-    virtual ~cTree() { }
-
-    // returns the whole vector x_
+    /**
+    * \brief Getter
+    */
+    // return a pointer to node-root of "cTree"
+    Node* getRoot() const {
+        return root_;
+    }
+    // return the whole vector "x_"
     Eigen::VectorXd getVals() const {
         return x_;
     }
-    // returns a pointer to root of cTree
-    Node* get_root() {
-        return root_;
-    }
 
-    // build V-matrices for nodes of the tree (contain evaluations of Chebyshew polynomials at corresponding points)
-    void add_V(unsigned deg) {
-        V_recursion(root_, deg);
+    /**
+    * \brief Setters
+    */
+    // compute V-matrices for nodes of the tree (contains evaluations of Chebyshew polynomials at corresponding points)
+    void setV(unsigned deg) {
+        setV_recursion(root_, deg);
     }
-    // product V*c restricted to the indices of each node of the tree. IMPO.: V should already be constructed!
-    void vc_mult(const Eigen::VectorXd& c) {
-        c_recursion(root_, c);
+    // compute V*c restricted to node indices of the tree
+    void setVc(const Eigen::VectorXd& c) {
+        setVc_recursion(root_, c);
     }
-    // add lists of pointers to near and far field nodes to each node of the tree
-    void near_far(double eta, cTree Ty) {
-        divide_tree(root_, Ty.root_, eta, Ty);
+    // add pointers to near- and far-field nodes of the tree
+    void setNearFar(double eta, cTree Ty) {
+        setNearFar_recursion(root_, Ty.root_, eta, Ty);
     }
-    // just for testing, makes lists with the boundaries of the bounding boxes
-    void make_fflist(std::vector<double>& xlist, std::vector<double>& ylist) {
-        rec_fflist(root_, xlist, ylist);
+    // make lists with boundaries of bounding boxes (just for testing)
+    void setLists(std::vector<double>& xlist, std::vector<double>& ylist) {
+        setLists_recursion(root_, xlist, ylist);
     }
 
 private:
 
-    // needed for "add_V(...)"
-    void V_recursion(Node* cluster, unsigned deg);
+    /**
+    * \brief Recursions
+    */
+    // needed for "setV(...)"
+    void setV_recursion(Node* cluster, unsigned deg);
+    // needed for "setVc(...)"
+    void setVc_recursion(Node* cluster, const Eigen::VectorXd& c);
+    // needed for "setNearFar(...)"
+    void setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree Ty);
+    // needed for "setLists(...)"
+    void setLists_recursion(Node* cluster, std::vector<double>& xlist, std::vector<double>& ylist);
 
-    // needed for "vc_mult(...)"
-    void c_recursion(Node* cluster, const Eigen::VectorXd& c);
-
-    // needed for "near_far(...)"
-    void divide_tree(Node* xnode, Node* ynode, double eta, cTree Ty);
-
-    // needed for "make_fflist(...)"
-    void rec_fflist(Node* cluster, std::vector<double>& xlist, std::vector<double>& ylist);
-
-    Node* root_; // pointer to root of cTree
-    const Eigen::VectorXd x_; // vector associated to cTree
+    Node* root_; // pointer to node-root of "cTree"
+    const Eigen::VectorXd x_; // vector associated to "cTree"
     friend class Node;
 };
 

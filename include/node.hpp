@@ -22,7 +22,7 @@ public:
     Node():
         l_child_(NULL), r_child_(NULL), l_ind_(0), r_ind_(0), near_f_(0), far_f_(0)
     { }
-    // actual constructor: adds a tree below the node if left_index != right_index
+    // actual  constructor: adds a tree below the node if left_index != right_index
     Node(unsigned left_index, unsigned right_index);
 
     // destructor
@@ -48,8 +48,12 @@ public:
         return r_child_;
     }
     // return matrix $V_{\sigma}$, where $\sigma$ denotes the cluster
-    Eigen::MatrixXd getV() const {
-        return V_;
+    Eigen::MatrixXd getV_node() const {
+        return V_node_;
+    }
+    // return V*c restricted to node indices of the cluster
+    Eigen::VectorXd getVc_node() const {
+        return Vc_node_;
     }
     // return a list of pointers to the nodes belonging to the near field of the node
     vector_t getNearF() const {
@@ -65,9 +69,9 @@ public:
     */
     // build tree recursively
     void setLeaves();
-    // compute V-matrix of node
-    void setV(const Eigen::VectorXd& x, unsigned deg);
-    // compute V*c restricted to node indices
+    // compute V-matrix of cluster
+    void setV_node( const Eigen::VectorXd& x, unsigned deg);
+    // compute V*c restricted to node indices of the cluster
     void setVc_node(const Eigen::VectorXd& c);
     // add node pointer to near field list
     void push2NearF(Node* near_node){
@@ -84,11 +88,11 @@ private:
     Node* r_child_;	// right child of node
     unsigned l_ind_; // smallest index in cluster of node
     unsigned r_ind_; // largest  index in cluster of node
-    Eigen::MatrixXd V_; // $V_{\sigma}$, where $\sigma$ is the cluster of node
+    Eigen::MatrixXd V_node_; // $V_{\sigma}$, where $\sigma$ is the cluster of node
     Eigen::VectorXd Vc_node_; // $V_{\sigma}* c_{|\sigma}$, where $\sigma$ is the cluster of node
     vector_t near_f_; // list with pointers to nodes of the near field of the node
     vector_t  far_f_; // list with pointers to nodes of the  far field of the node
-    friend class ctree;
+    friend class cTree;
  };
 
 #endif // NODE_HPP

@@ -35,7 +35,7 @@ void Node::setLeaves()
 
 
 // compute V-matrix of node
-void Node::setV(const Eigen::VectorXd &x, unsigned deg)
+void Node::setV_node(const Eigen::VectorXd &x, unsigned deg)
 {
     if(r_ind_ - l_ind_ > 0) {
 
@@ -44,17 +44,17 @@ void Node::setV(const Eigen::VectorXd &x, unsigned deg)
         Cheby cb(xmin, xmax, deg);
         Eigen::VectorXd tk = cb.getNodes(); // Chebyshew nodes
         Eigen::VectorXd wk = cb.getWghts(); // weights of Lagrange polynomial
-        V_ = Eigen::MatrixXd::Constant(r_ind_-l_ind_+1, deg+1, 1);
+        V_node_ = Eigen::MatrixXd::Constant(r_ind_-l_ind_+1, deg+1, 1);
 
         for(unsigned i=0; i<=r_ind_-l_ind_; ++i) {
             for(unsigned j=0; j<=deg; ++j) {
                 for(unsigned k=0; k<j; ++k) {
-                    V_(i,j) = V_(i,j) * (x[i+l_ind_]-tk[k]);
+                    V_node_(i,j) = V_node_(i,j) * (x[i+l_ind_]-tk[k]);
                 }
                 for(unsigned k=j+1; k<=deg; ++k) {
-                    V_(i,j) = V_(i,j) * (x[i+l_ind_]-tk[k]);
+                    V_node_(i,j) = V_node_(i,j) * (x[i+l_ind_]-tk[k]);
                 }
-                V_(i,j) *= wk(j);
+                V_node_(i,j) *= wk(j);
             }
         }
     }
@@ -66,6 +66,6 @@ void Node::setVc_node(const Eigen::VectorXd& c)
 {
     if(r_ind_ - l_ind_ > 0) {
         Eigen::VectorXd c_seg = c.segment(l_ind_, r_ind_-l_ind_+1);
-        Vc_node_ = V_.transpose() * c_seg;
+        Vc_node_ = V_node_.transpose() * c_seg;
     }
 }
