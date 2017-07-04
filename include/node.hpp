@@ -1,9 +1,12 @@
 #ifndef NODE_HPP
 #define NODE_HPP
 
-#include "ctree.hpp"
 #include <Eigen/Dense>
 #include <vector>
+
+
+// forward declaration to avoid cross-referencing
+class cTree;
 
 
 /**

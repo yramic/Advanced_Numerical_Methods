@@ -1,9 +1,12 @@
 #ifndef CTREE_HPP
 #define CTREE_HPP
 
-#include "node.hpp"
 #include <Eigen/Dense>
 #include <vector>
+
+
+// forward declaration to avoid cross-referencing
+class Node;
 
 
 /**
