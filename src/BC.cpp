@@ -3,8 +3,8 @@
 
 // construct XX matrix
 void BC::fill_X() {
-  cheby C_ptx(x_l, x_r, deg);		
-  cheby C_pty(y_l, y_r, deg);
+  Cheby C_ptx(x_l, x_r, deg);		
+  Cheby C_pty(y_l, y_r, deg);
   // Chebyshew nodes in interval [x_l,x_r]
   const std::vector<double>& cheb_ptx = C_ptx.cheb_pts();
   // Chebyshew nodes in interval [y_l,y_r]

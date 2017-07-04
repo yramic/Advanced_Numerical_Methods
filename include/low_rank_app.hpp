@@ -20,10 +20,10 @@ public:
 private:
 
     // Compute far-field contribution
-    void ff_contribution( Eigen::VectorXd& f, node* tx, int deg );
+    void ff_contribution( Eigen::VectorXd& f, Node* tx, unsigned deg );
 
     // Compute near-field contribution
-    void nf_contribution( Eigen::VectorXd& f, node* tx, const Eigen::VectorXd& c );
+    void nf_contribution( Eigen::VectorXd& f, Node* tx, const Eigen::VectorXd& c );
 
     Kernel kernel_;
     cTree Tx_;

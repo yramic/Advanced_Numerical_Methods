@@ -15,7 +15,7 @@ class BC {
   // default constructors, creates empty instance with no information
  BC():XX(Eigen::MatrixXd::Zero(0,0)), x_l(0), x_r(0), y_l(0), y_r(0), deg(0), G_const(1) { }
   // constructor taking box arguments and the degree of Chebychev interpolant
-  BC(double xl, double xr, double yl, double yr, int degree,double K=1):
+  BC(double xl, double xr, double yl, double yr, unsigned degree,double K=1):
   XX(Eigen::MatrixXd::Zero(degree+1,degree+1)), x_l(xl), x_r(xr), y_l(yl), y_r(yr), deg(degree), G_const(K)
     { fill_X(); }
 
@@ -34,7 +34,7 @@ class BC {
   double x_r;		// right boundary of bounding box of *xcluster		
   double y_l;		// left boundary of bounding box of *ycluster		
   double y_r;		// right boundary of bounding box of *ycluster		
-  int deg;		// degree of interpolation polynomials
+  unsigned deg;		// degree of interpolation polynomials
   double G_const;	// constant for the kernel function, see file "kernel.hpp"
 };
 #endif 

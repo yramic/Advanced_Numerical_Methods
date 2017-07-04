@@ -2,40 +2,41 @@
 #define NODE_HPP
 
 
+#include "ctree.hpp"
 #include <Eigen/Dense>
 #include <cmath>
 #include <vector>
 
 
-class node
+class Node
 {
-    typedef std::vector<node*> vector_type;
+    typedef std::vector<Node*> vector_type;
 
 public:
   
     // default constructor
-    node():
-        l_child_(NULL), r_child_(NULL), l_ind_ (0), r_ind_ (0), V_(), c_node_(), near_f(0), far_f(0)
+    Node():
+        l_child_(NULL), r_child_(NULL), l_ind_ (0), r_ind_ (0), V_(), c_node_(), near_f_(0), far_f_(0)
     { }
     // single node constructor: adds a tree below the node if left_index != right_index
-    node(unsigned left_index, unsigned right_index):
-        l_child_(NULL), r_child_(NULL),l_ind_ (left_index), r_ind_ (right_index), V_(), c_node_(), near_f(0), far_f(0)
+    Node(unsigned left_index, unsigned right_index):
+        l_child_(NULL), r_child_(NULL),l_ind_ (left_index), r_ind_ (right_index), V_(), c_node_(), near_f_(0), far_f_(0)
     {
         add_leaf();
     }
 
     // tree node constructor
-    node(node* left_child, node* right_child, unsigned left_index, unsigned right_index):
-        l_child_(left_child), r_child_(right_child), l_ind_(left_index), r_ind_(right_index), V_(),c_node_(), near_f(0), far_f(0)
+    Node(Node* left_child, Node* right_child, unsigned left_index, unsigned right_index):
+        l_child_(left_child), r_child_(right_child), l_ind_(left_index), r_ind_(right_index), V_(),c_node_(), near_f_(0), far_f_(0)
     { }
 
     // tree node constructor with V matrix
-    node(node* left_child, node* right_child, unsigned left_index, unsigned right_index, Eigen::MatrixXd Vmatrix):
-        l_child_(left_child), r_child_(right_child), l_ind_(left_index), r_ind_(right_index), V_(Vmatrix),c_node_(), near_f(0), far_f(0)
+    Node(Node* left_child, Node* right_child, unsigned left_index, unsigned right_index, Eigen::MatrixXd Vmatrix):
+        l_child_(left_child), r_child_(right_child), l_ind_(left_index), r_ind_(right_index), V_(Vmatrix),c_node_(), near_f_(0), far_f_(0)
     { }
 
     // destructor
-    virtual ~node();
+    virtual ~Node();
 
     // returns index of leftmost  point in cluster of node
     unsigned left_ind() const {
@@ -46,11 +47,11 @@ public:
         return r_ind_;
     }
     // returns a pointer to the left  child of the node
-    node* leftchild() const {
+    Node* leftchild() const {
         return l_child_;
     }
     // returns a pointer to the right child of the node
-    node* rightchild() const {
+    Node* rightchild() const {
         return r_child_;
     }
     // returns the matrix $V_{\sigma}$, where $\sigma$ denotes the cluster
@@ -63,11 +64,11 @@ public:
 //    }
     // returns a list of pointers to the nodes belonging to near field of the node
     vector_type get_nearf() const {
-        return near_f;
+        return near_f_;
     }
     // returns a list of pointers to the nodes belonging to far field of the node
     vector_type get_farf() const {
-        return far_f;
+        return far_f_;
     }
 
 //    // set l_ind_ to "left"
@@ -90,27 +91,27 @@ public:
     // build tree (recursively), used in constructors of class ctree
     void add_leaf();
     // build V-matrices
-    void fill_V(const Eigen::VectorXd& x, int deg);
+    void fill_V(const Eigen::VectorXd& x, unsigned deg);
     // V*c restricted to node indices
     void Vc(const Eigen::VectorXd& c);
     // add node pointer to near field list
-    void push_nearf(node* near_node){near_f.push_back(near_node);}
+    void push_nearf(Node* near_node){near_f_.push_back(near_node);}
     // add pointer to node to far field list
-    void push_farf(node* far_node){far_f.push_back(far_node);}
+    void push_farf(Node* far_node){far_f_.push_back(far_node);}
   
 private:
 
-    void destroy_tree(node *leaf);
+    void destroy_tree(Node *leaf);
     void destroy_tree();
 
-    node* l_child_; // left child of node
-    node* r_child_;	// right child of node
+    Node* l_child_; // left child of node
+    Node* r_child_;	// right child of node
     unsigned l_ind_; // smallest index in cluster of node
     unsigned r_ind_; // largest index in cluster of node
     Eigen::MatrixXd V_; // $V_{\sigma}$ where $\sigma$ is the cluster of node
     Eigen::VectorXd c_node_; // $V_{\sigma}* c_{|\sigma}$ where $\sigma$ is the cluster of node
-    vector_type near_f; // list with pointers to nodes of the near field of the node
-    vector_type far_f; // list with pointers to nodes of the far field of the node
+    vector_type near_f_; // list with pointers to nodes of the near field of the node
+    vector_type  far_f_; // list with pointers to nodes of the far field of the node
     friend class ctree; // our friend and partner :-)
  };
 

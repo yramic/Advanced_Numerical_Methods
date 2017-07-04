@@ -34,7 +34,7 @@ Eigen::VectorXd LowRankApp::mvProd( const Eigen::VectorXd& c, double eta, unsign
 
 
 // Compute far-field contribution
-void LowRankApp::ff_contribution( Eigen::VectorXd& f, node* tx, int deg )
+void LowRankApp::ff_contribution( Eigen::VectorXd& f, Node* tx, unsigned deg )
 {
     if((*tx).leftchild() != NULL) {
 
@@ -43,8 +43,8 @@ void LowRankApp::ff_contribution( Eigen::VectorXd& f, node* tx, int deg )
         int ixr = (*tx).right_ind(); // last index of cluster *tx
 
         // Iterate over far field of *tx_root
-        std::vector<node*> ffx = (*tx).get_farf(); // far field of *tx_root
-        for(std::vector<node*>::iterator iter=ffx.begin(); iter!=ffx.end(); ++iter) {
+        std::vector<Node*> ffx = (*tx).get_farf(); // far field of *tx_root
+        for(std::vector<Node*>::iterator iter=ffx.begin(); iter!=ffx.end(); ++iter) {
 
             int iyl = (**iter).left_ind(); // start index of current cluster in the far field
             int iyr = (**iter).right_ind(); // last index of current cluster in the far field
@@ -58,8 +58,8 @@ void LowRankApp::ff_contribution( Eigen::VectorXd& f, node* tx, int deg )
         Eigen::MatrixXd Vx = (*tx).getVv(); // $V_{\sigma}$
         f.segment(ixl, ixr-ixl+1) = f.segment(ixl, ixr-ixl+1) + Vx*s; // add contribution of far field to f_
 
-        node* xl_c = (*tx).leftchild();  // pointer to left  child of *tx
-        node* xr_c = (*tx).rightchild(); // pointer to right child of *tx
+        Node* xl_c = (*tx).leftchild();  // pointer to left  child of *tx
+        Node* xr_c = (*tx).rightchild(); // pointer to right child of *tx
 
         // add contribution of leaves of *tx
         ff_contribution(f, xl_c, deg);
@@ -69,7 +69,7 @@ void LowRankApp::ff_contribution( Eigen::VectorXd& f, node* tx, int deg )
 
 
 // Compute near-field contribution
-void LowRankApp::nf_contribution(Eigen::VectorXd& f, node* tx, const Eigen::VectorXd& c )
+void LowRankApp::nf_contribution(Eigen::VectorXd& f, Node* tx, const Eigen::VectorXd& c )
 {
     if(Tx != NULL) {
 
@@ -77,8 +77,8 @@ void LowRankApp::nf_contribution(Eigen::VectorXd& f, node* tx, const Eigen::Vect
         unsigned ixr=(*tx).right_ind(); // last index of cluster *tx
 
         // Iterate over near field of *tx
-        std::vector<node*> nfx = (*tx).get_nearf(); // near field of *tx
-        for(std::vector<node*>::iterator iter=nfx.begin(); iter!=nfx.end(); ++iter) {
+        std::vector<Node*> nfx = (*tx).get_nearf(); // near field of *tx
+        for(std::vector<Node*>::iterator iter=nfx.begin(); iter!=nfx.end(); ++iter) {
             unsigned iyl = (**iter).left_ind(); // start index of current cluster in the near field
             unsigned iyr = (**iter).right_ind(); // last index of current cluster in the near field
             for(unsigned i=ixl; i<=ixr; ++i) {
@@ -88,9 +88,9 @@ void LowRankApp::nf_contribution(Eigen::VectorXd& f, node* tx, const Eigen::Vect
             }
         }
 
-        node* xl_c = (*tx).leftchild(); // pointer to left child of *tx
+        Node* xl_c = (*tx).leftchild(); // pointer to left child of *tx
         if(xl_c != NULL) { // if *tx is not a leaf
-            node* xr_c = (*tx).rightchild(); // pointer to right child of *tx
+            Node* xr_c = (*tx).rightchild(); // pointer to right child of *tx
 
             // add contribution of leaves of *tx
             nf_contribution(f, xl_c, c);

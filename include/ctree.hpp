@@ -25,7 +25,7 @@ public:
         return x_;
     }
     // returns a pointer to root of cTree
-    node* get_root() {
+    Node* get_root() {
         return root_;
     }
 
@@ -49,19 +49,20 @@ public:
 private:
 
     // needed for "add_V(...)"
-    void V_recursion(node* cluster, unsigned deg);
+    void V_recursion(Node* cluster, unsigned deg);
 
     // needed for "vc_mult(...)"
-    void c_recursion(node* cluster, const Eigen::VectorXd& c);
+    void c_recursion(Node* cluster, const Eigen::VectorXd& c);
 
     // needed for "near_far(...)"
-    void divide_tree(node* xnode, node* ynode, double eta, cTree Ty);
+    void divide_tree(Node* xnode, Node* ynode, double eta, cTree Ty);
 
     // needed for "make_fflist(...)"
-    void rec_fflist(node* cluster, std::vector<double>& xlist, std::vector<double>& ylist);
+    void rec_fflist(Node* cluster, std::vector<double>& xlist, std::vector<double>& ylist);
 
-    friend class node; node* root_; // pointer to root of cTree
+    Node* root_; // pointer to root of cTree
     const Eigen::VectorXd x_; // vector associated to cTree
+    friend class Node;
 };
 
 #endif // CTREE_HPP
