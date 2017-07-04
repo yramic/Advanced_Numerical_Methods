@@ -1,9 +1,8 @@
 #ifndef CTREE_HPP
 #define CTREE_HPP
 
-#include <Eigen/Dense>
-#include <vector>
 #include "node.hpp"
+#include <Eigen/Dense>
 
 
 class cTree

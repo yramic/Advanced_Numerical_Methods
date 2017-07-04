@@ -11,7 +11,7 @@ cTree::cTree(const Eigen::VectorXd& x):
     if(n > 1) { // build the tree
         root_ = new Node(0, n-1); // root is a node, leafs are added
     } else {
-        root_ = new Node(NULL,NULL,0,0);
+        root_ = new Node(0, 0);
         // if vector x has less than 2 elements, the tree consists of a single node
     }
 }
@@ -22,7 +22,7 @@ void cTree::V_recursion(Node* cluster, unsigned deg)
 {
     if((*cluster).l_child_ != NULL) {
         // build V-matrix for *cluster
-        (*cluster).fill_V(x_, deg);
+        (*cluster).setV(x_, deg);
         // recursively call the function for the left  child of *cluster
         V_recursion((*cluster).l_child_, deg);
         // recursively call the function for the right child of *cluster
@@ -36,7 +36,7 @@ void cTree::c_recursion(Node* cluster, const Eigen::VectorXd& c)
 {
     if((*cluster).l_child_ != NULL) {
         // do the multiplication V*c restricted to the indices beloning to the cluster of *cluster
-        (*cluster).Vc(c);
+        (*cluster).setVc_node(c);
         // call the function for the left child of *cluster
         c_recursion((*cluster).l_child_, c);
         // same for the right child of *cluster
@@ -51,13 +51,13 @@ void cTree::divide_tree(Node* xnode, Node* ynode, double eta, cTree Ty)
     // if *xnode or *ynode is a leaf, we add it to the near field
     if((*xnode).l_child_ == NULL || (*ynode).l_child_ == NULL) {
 
-        (*xnode).push_nearf(ynode);
+        (*xnode).push2NearF(ynode);
 
     } else { // if the cluster corresponding to *xnode and *ynode is admissible, we add ynode to the far field list of *xnode
 
         if(is_admissible(x_[(*xnode).l_ind_], x_[(*xnode).r_ind_], (Ty.getVals())[(*ynode).l_ind_], (Ty.getVals())[(*ynode).r_ind_], eta)) {
 
-            (*xnode).push_farf(ynode);
+            (*xnode).push2FarF(ynode);
 
         } else { // we consider the children of *xnode and *ynode and check whether their clusters are admissible
             divide_tree((*xnode).l_child_, (*ynode).l_child_, eta, Ty);
@@ -74,11 +74,11 @@ void cTree::divide_tree(Node* xnode, Node* ynode, double eta, cTree Ty)
 void cTree::rec_fflist(Node* cluster, std::vector<double>& xlist, std::vector<double>& ylist)
 {
     // list of pointers to the nodes of the far field
-    std::vector<Node*> ffx=(*cluster).get_farf();
+    std::vector<Node*> ffx=(*cluster).getFarF();
     // left  index of *xnode
-    unsigned ixl = (*cluster).left_ind();
+    unsigned ixl = (*cluster).getLInd();
     // right index of *xnode
-    unsigned ixr = (*cluster).right_ind();
+    unsigned ixr = (*cluster).getRInd();
 
     for(std::vector<Node*>::iterator iter=ffx.begin(); iter!=ffx.end(); ++iter) {
 
