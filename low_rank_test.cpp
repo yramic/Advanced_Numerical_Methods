@@ -12,14 +12,14 @@ int main() {
 
     std::cout << "Enter gridsize:" << std::endl;
     unsigned n; std::cin >> n;
-    Eigen::VectorXd x = Eigen::VectorXd::LinSpaced(n, 0., (n-1)/n);
+    Eigen::VectorXd x = Eigen::VectorXd::LinSpaced(n, 0., (n-1.)/n);
     Eigen::VectorXd c = Eigen::VectorXd::Random(n);
 
     std::cout << "Enter admissibility constant:" << std::endl;
     double eta; std::cin >> eta;
 
     std::cout << "Enter degree of interpolating polynomials:" << std::endl;
-    double d; std::cin >> d;
+    unsigned d; std::cin >> d;
 
     Kernel G(1.);
 
