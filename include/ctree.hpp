@@ -27,7 +27,7 @@ public:
     cTree(const Eigen::VectorXd& x);
 
     /**
-    * \brief Getter
+    * \brief Getters
     */
     // return a pointer to node-root of "cTree"
     Node* getRoot() const {

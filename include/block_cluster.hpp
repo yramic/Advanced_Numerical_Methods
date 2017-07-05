@@ -15,7 +15,7 @@ public:
     /**
     * \brief Constructor
     */
-    BlockCluster(double xl, double xr, double yl, double yr, unsigned deg_, Kernel G);
+    BlockCluster(double xl, double xr, double yl, double yr, unsigned deg, Kernel G);
 
     /**
     * \brief Getter

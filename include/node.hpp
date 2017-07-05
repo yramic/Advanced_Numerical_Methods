@@ -26,7 +26,7 @@ public:
         l_child_(NULL), r_child_(NULL), l_ind_(0), r_ind_(0), near_f_(0), far_f_(0)
     { }
     // actual  constructor: adds a tree below the node if left_index != right_index
-    Node(unsigned left_index, unsigned right_index);
+    Node(unsigned l_ind, unsigned r_ind);
 
     // destructor
     virtual ~Node();

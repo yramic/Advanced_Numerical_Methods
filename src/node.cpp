@@ -5,8 +5,8 @@
 
 
 // actual constructor: adds a tree below the node if left_index != right_index
-Node::Node(unsigned left_index, unsigned right_index):
-    l_child_(NULL), r_child_(NULL), l_ind_ (left_index), r_ind_(right_index), near_f_(0), far_f_(0)
+Node::Node(unsigned l_ind, unsigned r_ind):
+    l_child_(NULL), r_child_(NULL), l_ind_(l_ind), r_ind_(r_ind), near_f_(0), far_f_(0)
 {
     setLeaves();
 }
@@ -49,10 +49,11 @@ void Node::setV_node(const Eigen::VectorXd &x, unsigned deg)
         for(unsigned i=0; i<=r_ind_-l_ind_; ++i) {
             for(unsigned j=0; j<=deg; ++j) {
                 for(unsigned k=0; k<j; ++k) {
-                    V_node_(i,j) = V_node_(i,j) * (x[i+l_ind_]-tk[k]);
+                    V_node_(i,j) *= x[i+l_ind_] - tk[k];
                 }
+                // Skip "k == j"
                 for(unsigned k=j+1; k<=deg; ++k) {
-                    V_node_(i,j) = V_node_(i,j) * (x[i+l_ind_]-tk[k]);
+                    V_node_(i,j) *= x[i+l_ind_] - tk[k];
                 }
                 V_node_(i,j) *= wk(j);
             }
