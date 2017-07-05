@@ -23,9 +23,9 @@ public:
 
 private:
 
-    // compute far-field contribution
+    // compute far  field contribution
     void ff_contribution(Eigen::VectorXd& f, Node* tx, unsigned deg);
-    // compute near-field contribution
+    // compute near field contribution
     void nf_contribution(Eigen::VectorXd& f, Node* tx, const Eigen::VectorXd& c);
 
     Kernel kernel_; // kernel

@@ -4,7 +4,7 @@
 
 // constructor
 BlockCluster::BlockCluster(double xl, double xr, double yl, double yr, unsigned deg, Kernel G):
-    xl_(xl), xr_(xr), yl_(yl), yr_(yr), deg_(deg_), G_(G), X_(Eigen::MatrixXd::Zero(deg+1,deg+1))
+    xl_(xl), xr_(xr), yl_(yl), yr_(yr), deg_(deg), G_(G), X_(Eigen::MatrixXd::Zero(deg+1,deg+1))
 {
     setMatrix();
 }

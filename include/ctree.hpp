@@ -49,7 +49,7 @@ public:
     void setVc(const Eigen::VectorXd& c) {
         setVc_recursion(root_, c);
     }
-    // add pointers to near- and far-field nodes of the tree
+    // add pointers to near and far field nodes of the tree
     void setNearFar(double eta, cTree Ty) {
         setNearFar_recursion(root_, Ty.root_, eta, Ty);
     }

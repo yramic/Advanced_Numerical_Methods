@@ -21,10 +21,10 @@ Eigen::VectorXd LowRankApp::mvProd(const Eigen::VectorXd& c, double eta, unsigne
     // compute V*c restricted to node indices of the tree
     Ty_.setVc(c);
 
-    // add pointers to near- and far-field nodes of the tree
+    // add pointers to near and far field nodes of the tree
     Tx_.setNearFar(eta, Ty_);
 
-    // compute far-field contribution
+    // compute far field contribution
     Eigen::VectorXd f_approx = Eigen::VectorXd::Zero(c.size());
     ff_contribution(f_approx, Tx_.getRoot(), deg);
     // compute near-field contribution
@@ -34,12 +34,12 @@ Eigen::VectorXd LowRankApp::mvProd(const Eigen::VectorXd& c, double eta, unsigne
 }
 
 
-// compute far-field contribution
+// compute far field contribution
 void LowRankApp::ff_contribution(Eigen::VectorXd& f, Node* tx, unsigned deg)
 {
     if((*tx).getLChild() != NULL) {
 
-        Eigen::VectorXd s = Eigen::VectorXd::Zero(deg+1); // auxilary variable
+        Eigen::VectorXd XVc = Eigen::VectorXd::Zero(deg+1); // auxiliary variable
         int ixl = (*tx).getLInd(); // start index of cluster *tx
         int ixr = (*tx).getRInd(); // last  index of cluster *tx
 
@@ -49,15 +49,14 @@ void LowRankApp::ff_contribution(Eigen::VectorXd& f, Node* tx, unsigned deg)
 
             int iyl = (**iter).getLInd(); // start index of current cluster in the far field
             int iyr = (**iter).getRInd(); // last  index of current cluster in the far field
-            BlockCluster sigma(Tx_.getVals()[ixl], Tx_.getVals()[ixr], Ty_.getVals()[iyl], Ty_.getVals()[iyr], deg, kernel_);
-            Eigen::MatrixXd X = sigma.getMatrix(); // matrix $X_{\sigma,\mu}$
-            Eigen::VectorXd Vc = (**iter).getVc_node();
-            // V*c restricted to the indices of **iter
-            s += X * Vc; // add contribution of block **iter to "s"
+            BlockCluster X_(Tx_.getVals()[ixl], Tx_.getVals()[ixr], Ty_.getVals()[iyl], Ty_.getVals()[iyr], deg, kernel_);
+            Eigen::MatrixXd X = X_.getMatrix(); // matrix $X_{\sigma,\mu}$
+            Eigen::VectorXd Vc = (**iter).getVc_node(); // V*c restricted to the indices of **iter
+            XVc += X * Vc; // add contribution of block **iter to "s"
         };
 
         Eigen::MatrixXd Vx = (*tx).getV_node(); // $V_{\sigma}$
-        f.segment(ixl, ixr-ixl+1) += Vx * s; // add contribution of far field to "f"
+        f.segment(ixl, ixr-ixl+1) += Vx * XVc; // add contribution of far field to "f"
 
         Node* xl_c = (*tx).getLChild(); // pointer to left  child of *tx
         Node* xr_c = (*tx).getRChild(); // pointer to right child of *tx

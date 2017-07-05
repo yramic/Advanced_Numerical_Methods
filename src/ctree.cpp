@@ -47,22 +47,23 @@ void cTree::setVc_recursion(Node* cluster, const Eigen::VectorXd& c)
 }
 
 
-// add pointers to near- and far-field nodes of the tree
+// add pointers to near and far field nodes of the tree
 void cTree::setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree Ty)
 {
     // if *xnode or *ynode is a leaf, we add it to the near field
     if((*xnode).l_child_ == NULL || (*ynode).l_child_ == NULL) {
 
-        (*xnode).push2NearF(ynode);
+        (*xnode).near_f_.push_back(ynode);
 
-    } else { // if the cluster corresponding to *xnode and *ynode is admissible, we add *ynode to the far field list of *xnode
+    } else {
 
-        // check admissibility condition (eta):
+        // if the cluster corresponding to *xnode and *ynode is admissible, we add *ynode to the far field list of *xnode
         if(is_admissible(x_[(*xnode).l_ind_], x_[(*xnode).r_ind_], (Ty.getVals())[(*ynode).l_ind_], (Ty.getVals())[(*ynode).r_ind_], eta)) {
+            // the line above checks the admissibility condition (eta)
 
-            (*xnode).push2FarF(ynode);
+            (*xnode).far_f_.push_back(ynode);
 
-        } else { // we consider the children of *xnode and *ynode and check whether their clusters are admissible
+        } else { // else we consider the children of *xnode and *ynode and check whether their clusters are admissible
             setNearFar_recursion((*xnode).l_child_, (*ynode).l_child_, eta, Ty);
             setNearFar_recursion((*xnode).r_child_, (*ynode).l_child_, eta, Ty);
             setNearFar_recursion((*xnode).l_child_, (*ynode).r_child_, eta, Ty);

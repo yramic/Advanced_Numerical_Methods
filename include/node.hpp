@@ -76,14 +76,6 @@ public:
     void setV_node( const Eigen::VectorXd& x, unsigned deg);
     // compute V*c restricted to node indices of the cluster
     void setVc_node(const Eigen::VectorXd& c);
-    // add node pointer to near field list
-    void push2NearF(Node* near_node){
-        near_f_.push_back(near_node);
-    }
-    // add node pointer to  far field list
-    void push2FarF(Node* far_node){
-        far_f_.push_back(far_node);
-    }
   
 private:
 
