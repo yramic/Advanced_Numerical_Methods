@@ -1,9 +1,8 @@
 
-
 ## Library compilation
 
-Create a __build__ folder (could be here, for instance), create a folder and 
-proceed to use CMake there,i.e., type in a terminal:
+Create a __build__ folder (could be here, for instance), create a folder to 
+compile the library and proceed to use CMake there, i.e., type in a terminal:
 
     mkdir build
     cd build
@@ -14,23 +13,27 @@ proceed to use CMake there,i.e., type in a terminal:
     make install
     
 If the build folder is located here, then ```<PATH_TO_LIBRARY>``` is simply 
-```../../Library```.
+`../../Library`.
+
+
 
 ## Examples compilation
 
-__ Currently there is only a test inside the folder examples, but I plan to write 
-examples as soon as the implementation is done.__
+**Currently there is only a test inside the folder examples, but I plan to write 
+examples as soon as the implementation is done.**
 
 At the moment I am not using global variables in the CMake file and the following 
 structure is assumed:
-    .
+
+``` .
     |--build
        |-- lib
        |-- ex
+```
 
 Go to your existing __build__ folder (same as you used for the Library, see 
-directory tree above), create a folder and proceed to use CMake there,i.e., type 
-in a terminal:
+directory tree above), create a folder to compile the examples and proceed to 
+use CMake there, i.e., type in a terminal:
 
     cd build
     mkdir ex
@@ -39,7 +42,7 @@ in a terminal:
     make
     
 If the build folder is located here, then ```<PATH_TO_EXAMPLES>``` is simply 
-```../../Examples```.
+`../../Examples`.
 
 Note that you can create the build folder for Examples in a different location, 
 but then you will need to change the CMake file in order to link it to the 
