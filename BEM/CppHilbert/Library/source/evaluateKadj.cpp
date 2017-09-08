@@ -28,16 +28,14 @@ void evaluateKadj(Eigen::VectorXd &Kx, const Eigen::MatrixXd &coordinates,
                   const Eigen::MatrixXi &elements, const Eigen::VectorXd &gh,
                   const Eigen::MatrixXd &x, const Eigen::MatrixXd &n_x, double eta)
 {
-
-  int n_gauss_points=GAUSS_ORDER;
-  const double* q_points  = getGaussPoints(GAUSS_ORDER);
-  const double* q_weights = getGaussWeights(GAUSS_ORDER);
-
   int nX = x.rows();
-  int nE = elements.rows();
-  /* Initialize output vector */
+  // Initialize output vector
   Kx.resize(nX);
   Kx.setZero();
+
+  // Get quadrature points and weights
+  const double* qp  = getGaussPoints(GAUSS_ORDER);
+  const double* qw = getGaussWeights(GAUSS_ORDER);
 
   // traverse evaluation points
   for (int j=0;j<nX; ++j){
@@ -45,7 +43,7 @@ void evaluateKadj(Eigen::VectorXd &Kx, const Eigen::MatrixXd &coordinates,
     const Eigen::Vector2d& xj = x.row(j);
 
     //traverse elements
-    for (int i=0;i<nE;++i){
+    for (int i=0; i<elements.rows(); ++i){
       // get vertices indices and coordinates for Ei=[a,b]
       int aidx = elements(j,0);
       int bidx = elements(j,1);
@@ -62,27 +60,26 @@ void evaluateKadj(Eigen::VectorXd &Kx, const Eigen::MatrixXd &coordinates,
       double v_sqnorm = v.squaredNorm();
       double sqrdelta = sqrt(u_sqnorm*v_sqnorm - std::pow(u.dot(v),2));
 
-      /*Determine the normal vector*/
+      // Determine the normal vector
       Eigen::Vector2d n_vc;
       n_vc<< (0.5 * vc[1])/sqrt(u_sqnorm), -(0.5 * vc[0])/sqrt(u_sqnorm);
 
       double K_0 = 0;
 
-      /*Check if element is admissible*/
+      // Check if element is admissible
       double dist_x_Ej = distancePointToSegment(xj, a, b);
       if (sqrt(2*u_sqnorm) > eta*dist_x_Ej){ /* x and Ej are inadmissable. */
-        /*Compute the integrals analytically*/
+        // Compute the integrals analytically
 
         /* It is not safe to call dlp if u, v have the same length and
          * are linearly dependent. But fortunately, this is only the case
          * if the whole integral is 0.
          */
-
         if (sqrdelta > EPS * sqrt(u_sqnorm * v_sqnorm)){
-          double g_0m1 = dlp(0,u,v); /*Compute g_0^(-1)*/
-          double g_1m1 = dlp(1,u,v); /*Compute g_1^(-1)*/
+          double g_0m1 = dlp(0,u,v); /* g_0^(-1)*/
+          double g_1m1 = dlp(1,u,v); /* g_1^(-1)*/
 
-          /*Compute K_0*/
+          // Compute K_0
           K_0 = (n_x.row(j).dot(u)* g_1m1 + n_x.row(j).dot(v) * g_0m1);
           K_0 /= M_PI;
         }
@@ -92,13 +89,12 @@ void evaluateKadj(Eigen::VectorXd &Kx, const Eigen::MatrixXd &coordinates,
       }
 
       else{
-        /*Compute the integrals via quadrature rule*/
+        // Compute the integrals via quadrature rule
         K_0=0;
-        for (int k=0; k<n_gauss_points; ++k){
-          double contrib = n_x.row(j).dot(u*q_points[k]+v)/
-                          ((u_sqnorm*q_points[k]*q_points[k]
-                            + 2.*u.dot(v)*q_points[k] + v_sqnorm)*M_PI);
-          K_0 += q_weights[k] * contrib;
+        for (int k=0; k<GAUSS_ORDER; ++k){
+          double contrib = n_x.row(j).dot(u*qp[k]+v)/
+                          ((u_sqnorm*qp[k]*qp[k]+2.*u.dot(v)*qp[k]+v_sqnorm)*M_PI);
+          K_0 += qw[k] * contrib;
         }
       }
 

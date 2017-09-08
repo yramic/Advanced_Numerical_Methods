@@ -24,61 +24,63 @@ void evaluateK(Eigen::VectorXd& Kgx, const Eigen::MatrixXd& coordinates,
 {
   int nX = x.rows();
   int nE = elements.rows();
-  /* Initialize output vector */
+  // Initialize output vector
   Kgx.resize(nX);
   Kgx.setZero();
 
-  const double* gaussPoint  = getGaussPoints(GAUSS_ORDER);
-  const double* gaussWeight = getGaussWeights(GAUSS_ORDER);
+  // Get quadrature points and weights
+  const double* qp  = getGaussPoints(GAUSS_ORDER);
+  const double* qw = getGaussWeights(GAUSS_ORDER);
 
-  // auxiliary vector containing elements info.
+  // Auxiliary vector containing elements info.
   Eigen::VectorXd lengthE(nE);
   Eigen::MatrixXd mEl(nE,2);
   Eigen::MatrixXd dEl(nE,2);
   Eigen::MatrixXd nEl(nE,2);
 
-  // traverse the elements
+  // Traverse the elements
   for (int j = 0; j < nE; ++j){
-    // get vertices indices and coordinates for Ei=[a,b]
+    // Get vertices indices and coordinates for Ei=[a,b]
     const Eigen::Vector2d& a = coordinates.row(elements(j,0));
     const Eigen::Vector2d& b = coordinates.row(elements(j,1));
-    // fill the vectors
+    // Fill the vectors
     lengthE(j) = (b-a).norm();
     mEl.row(j)  = 0.5*(a+b);
     dEl.row(j)  = 0.5*(b-a);
     nEl.row(j)  = unitNormal(a,b) ;
   }
 
-  // traverse the evaluation points
+  // Traverse the evaluation points
   for (int i = 0; i < nX; ++i){
-      // save current point for readibility
+      // Save current point for readibility
       const Eigen::Vector2d& xi = x.row(i);
 
-    //traverse elements
+    // Traverse elements
     for (int j = 0; j < nE; ++j){
-      // get vertices indices and coordinates for Ei=[a,b]
+      // Get vertices indices and coordinates for Ei=[a,b]
       int aidx = elements(j,0);
       int bidx = elements(j,1);
       const Eigen::Vector2d& a = coordinates.row(aidx);
       const Eigen::Vector2d& b = coordinates.row(bidx);
 
-      // check admissibility
+      // Check admissibility
       double dist_xi_Ej = distancePointToSegment(xi, a, b);
       if (lengthE(j) <= dist_xi_Ej * eta){
-        // integrate
+        // Integrate
         double sum = 0.;
         for (int k = 0; k < GAUSS_ORDER; ++k){
-          // transform point
-          const Eigen::Vector2d& s = mEl.row(j) + gaussPoint[k]*dEl.row(j);
-          // add contribution
-          sum += gaussWeight[k] * (s-xi).dot(nEl.row(j))
-                                * (gh[aidx] + ((1+gaussPoint[k])*(gh[bidx]-gh[aidx])/2))
-                                / (s-xi).squaredNorm();
+          // Transform point
+          const Eigen::Vector2d& s = mEl.row(j) + qp[k]*dEl.row(j);
+          // Add contribution
+          sum += qw[k]*(s-xi).dot(nEl.row(j))
+                  *( gh[aidx] + ((1+qp[k])*(gh[bidx]-gh[aidx])/2) )
+                  / (s-xi).squaredNorm();
         }
 
         Kgx(i) -= lengthE(j) * sum;
       }
       else{
+        // Compute integral analitically
         const Eigen::Vector2d& aux = mEl.row(j)-xi.transpose();
         if( fabs(aux.dot(nEl.row(j))) > EPS ){
           double commonFactor = aux.dot(nEl.row(j)) * lengthE(j);
@@ -88,7 +90,7 @@ void evaluateK(Eigen::VectorXd& Kgx, const Eigen::MatrixXd& coordinates,
         }
       }
 
-    } //end for
+    } // end elements' for loop
 
     Kgx(i) /= 4. * M_PI;
   }

@@ -24,12 +24,13 @@ void evaluateV(Eigen::VectorXd& Vphi_x, const Eigen::MatrixXd &coordinates,
 {
   int nX = x.rows();
   int nE = elements.rows();
-  /* Initialize output vector */
+  // Initialize output vector
   Vphi_x.resize(nX);
   Vphi_x.setZero();
 
-  const double* gaussPoint  = getGaussPoints(GAUSS_ORDER);
-  const double* gaussWeight = getGaussWeights(GAUSS_ORDER);
+  // Get quadrature points and weights
+  const double* qp  = getGaussPoints(GAUSS_ORDER);
+  const double* qw = getGaussWeights(GAUSS_ORDER);
 
   /* For each boundary element Ej = [a,b], we calculate (a+b)/2
    * and (b-a)/2, because we need these vectors multiple times below.
@@ -65,8 +66,8 @@ void evaluateV(Eigen::VectorXd& Vphi_x, const Eigen::MatrixXd &coordinates,
         double sum = 0.;
         for (int k = 0; k < GAUSS_ORDER; ++k) {
             // transform point
-          const Eigen::Vector2d& s = mEl.row(j) + gaussPoint[k]*dEl.row(j);
-          sum += phi(j)*gaussWeight[k]*lengthE(j)*log((xi - s).squaredNorm());
+          const Eigen::Vector2d& s = mEl.row(j) + qp[k]*dEl.row(j);
+          sum += phi(j)*qw[k]*lengthE(j)*log((xi - s).squaredNorm());
         }
         Vphi_x(i) -= sum;
       }

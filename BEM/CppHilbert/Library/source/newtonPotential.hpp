@@ -23,16 +23,16 @@ extern "C" {
  *  The function computeNkj() is called for the computation of the
  *  corresponding matrix entry.
  *
- *  @param[out] N  nE x 3*nT matrix. nE is the number of elements of the
+ *  @param[out] N  (nE x 3*nT) matrix. nE is the number of elements of the
  *                 boundary \f$\Gamma\f$ and nT the number of triangles of the
  *                 domain mesh of \f$\Omega\f$.
- *  @param[in] coordinates  nC x 2 matrix containing the coordinates of the
+ *  @param[in] coordinates  (nC x 2) matrix containing the coordinates of the
  *                          vertices of the boundary mesh.
- *  @param[in] elements  nE x 2 matrix containing the indices of the vertices
+ *  @param[in] elements  (nE x 2) matrix containing the indices of the vertices
  *                       corresponding to each element of the boundary mesh.
- *  @param[in] vertices  nV x 3 matrix containing the coordinates of the
+ *  @param[in] vertices  (nV x 2) matrix containing the coordinates of the
  *                       vertices of the domain mesh.
- *  @param[in] triangles  nT x 3 matrix containing the indices of the vertices
+ *  @param[in] triangles  (nT x 3) matrix containing the indices of the vertices
  *                        conforming the triangles of the domain mesh.
  *  @param[in] eta  Admissibility constant. It is greater or equal than 0.
  */
