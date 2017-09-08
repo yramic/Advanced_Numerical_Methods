@@ -25,7 +25,7 @@ extern "C" {
  *
  *  @param[out] N  nE x 3*nT matrix. nE is the number of elements of the
  *                 boundary \f$\Gamma\f$ and nT the number of triangles of the
- *                 domain mesh of \f$\Omega\f$.
+ *                 domain mesh of \f$\Ommega\f$.
  *  @param[in] coordinates  nC x 2 matrix containing the coordinates of the
  *                          vertices of the boundary mesh.
  *  @param[in] elements  nE x 2 matrix containing the indices of the vertices
@@ -52,7 +52,7 @@ void computeN(Eigen::MatrixXd& N, const Eigen::MatrixXd& coordinates,
  *  @return The function returns the value of the discrete Newton potential,
  *   \f[ -\frac{1}{2\pi} \int_{Ek} \int_{Tj} \log{ \vert x-y \vert} dy ds_x.\f]
  */
-double computeNkj(const Eigen::Matrix2d& a,const Eigen::Matrix2d& b,
+double computeNkj(const Eigen::Vector2d &a, const Eigen::Vector2d& b,
                   const Eigen::MatrixXd& nodes, double eta);
 
 
@@ -67,8 +67,8 @@ double computeNkj(const Eigen::Matrix2d& a,const Eigen::Matrix2d& b,
  *  @return  The function returns the value
  *   \f[ -\frac{1}{2\pi} \int_{Ek} \int_{Tj} \log{ \vert x-y \vert} dy ds_x.\f]
  */
-double computeNkjSemiAnalyticSegment(const Eigen::Matrix2d& a,
-                                     const Eigen::Matrix2d& b,
+double computeNkjSemiAnalyticSegment(const Eigen::Vector2d &a,
+                                     const Eigen::Vector2d& b,
                                      const Eigen::MatrixXd& nodes);
 
 /**
@@ -86,8 +86,8 @@ double computeNkjSemiAnalyticSegment(const Eigen::Matrix2d& a,
  *  potential \f[ N_{kj} = -\frac{1}{2\pi} \int_{Ek} \int_{Tj} \log{ \vert x-y
  *  \vert} dy ds_x. \f]
  */
-double computeNkjAnalytic(const Eigen::Matrix2d& a,
-                          const Eigen::Matrix2d& b,
+double computeNkjAnalytic(const Eigen::Vector2d &a,
+                          const Eigen::Vector2d& b,
                           const Eigen::MatrixXd& nodes);
 
 
@@ -100,7 +100,7 @@ double computeNkjAnalytic(const Eigen::Matrix2d& a,
  *  @return  The function returns the newton-potential \f$ \int_{T} \log{
  *           \vert x-t \vert} dt \f$
  */
-double newtonPotential(const Eigen::MatrixXd& nodes, const Eigen::Matrix2d& x);
+double newtonPotential(const Eigen::MatrixXd& nodes, const Eigen::Vector2d& x);
 
 
 /**
@@ -118,7 +118,7 @@ double newtonPotential(const Eigen::MatrixXd& nodes, const Eigen::Matrix2d& x);
  *  integrateAtanInt(), but it is also used from within the function
  *  newtonPotential().
  */
-double evalAtanInt(const Eigen::MatrixXd& nodes, const Eigen::Matrix2d& x);
+double evalAtanInt(const Eigen::MatrixXd& nodes, const Eigen::Vector2d &x);
 
 /**
  *  Computes the integral and returns its value.
@@ -144,8 +144,8 @@ double innerAtanInt(double a, double b, double c, double xi);
  *  @param[in] nodes  Corner points of the domain mesh element Tk.
  *  @return  The function returns the value of the integral
  */
-double integrateAtanInt(const Eigen::Matrix2d& a,
-                        const Eigen::Matrix2d& b,
+double integrateAtanInt(const Eigen::Vector2d &a,
+                        const Eigen::Vector2d& b,
                         const Eigen::MatrixXd& nodes);
 #endif
 
