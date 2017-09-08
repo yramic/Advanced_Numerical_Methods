@@ -15,7 +15,7 @@
 #include "geometry.hpp"
 
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 double distancePointToSegment(const Eigen::Vector2d& p, const Eigen::Vector2d& a,
 			      const Eigen::Vector2d& b)
 {
@@ -45,7 +45,7 @@ double distancePointToSegment(const Eigen::Vector2d& p, const Eigen::Vector2d& a
   return r.norm();
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int ccw(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
 	const Eigen::Vector2d& x)
 {
@@ -76,7 +76,7 @@ int ccw(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
   }
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 double distanceSegmentToSegment(const Eigen::Vector2d& a,
 				const Eigen::Vector2d& b,
 				const Eigen::Vector2d& c,
@@ -115,3 +115,18 @@ double distanceSegmentToSegment(const Eigen::Vector2d& a,
   return best;
 }
 
+//-----------------------------------------------------------------------------
+Eigen::Vector2d unitNormal(const Eigen::Vector2d& a, const Eigen::Vector2d& b)
+{
+  Eigen::Vector2d n;
+  n << (b[1]-a[1]), -(b[0]-a[0]);
+  n /= (b-a).norm();
+  return n;
+}
+
+
+//-----------------------------------------------------------------------------
+double CrossProd2d(const Eigen::Vector2d& a, const Eigen::Vector2d& b)
+{
+    return a[0]*b[1] - a[1]*b[0];
+}

@@ -25,7 +25,7 @@ extern "C" {
  *
  *  @param[out] N  nE x 3*nT matrix. nE is the number of elements of the
  *                 boundary \f$\Gamma\f$ and nT the number of triangles of the
- *                 domain mesh of \f$\Ommega\f$.
+ *                 domain mesh of \f$\Omega\f$.
  *  @param[in] coordinates  nC x 2 matrix containing the coordinates of the
  *                          vertices of the boundary mesh.
  *  @param[in] elements  nE x 2 matrix containing the indices of the vertices

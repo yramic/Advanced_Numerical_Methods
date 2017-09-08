@@ -13,6 +13,7 @@
 #include "constants.hpp"
 #include "newtonPotential.hpp"
 
+//-----------------------------------------------------------------------------
 void computeN(Eigen::MatrixXd& N, const Eigen::MatrixXd& coordinates,
               const Eigen::MatrixXi& elements, const Eigen::MatrixXd& vertices,
               const Eigen::MatrixXi& triangles, double eta)
@@ -37,7 +38,7 @@ void computeN(Eigen::MatrixXd& N, const Eigen::MatrixXd& coordinates,
 }
 
 
-
+//-----------------------------------------------------------------------------
 double computeNkj(const Eigen::Vector2d &a, const Eigen::Vector2d &b,
                   const Eigen::MatrixXd &nodes, double eta)
 {
@@ -62,6 +63,7 @@ double computeNkj(const Eigen::Vector2d &a, const Eigen::Vector2d &b,
 }
 
 
+//-----------------------------------------------------------------------------
 double computeNkjSemiAnalyticSegment(const Eigen::Vector2d& a,
                                      const Eigen::Vector2d &b,
                                      const Eigen::MatrixXd& nodes)
@@ -80,7 +82,7 @@ double computeNkjSemiAnalyticSegment(const Eigen::Vector2d& a,
 }
 
 
-
+//-----------------------------------------------------------------------------
 double computeNkjSemiAnalyticTriangle(const Eigen::Vector2d& a,
                                       const Eigen::Vector2d& b,
                                       const Eigen::MatrixXd& nodes)
@@ -107,6 +109,7 @@ double computeNkjSemiAnalyticTriangle(const Eigen::Vector2d& a,
 }
 
 
+//-----------------------------------------------------------------------------
 double computeNkjAnalytic(const Eigen::Vector2d &a, const Eigen::Vector2d &b,
                           const Eigen::MatrixXd &nodes)
 {
@@ -149,6 +152,8 @@ double computeNkjAnalytic(const Eigen::Vector2d &a, const Eigen::Vector2d &b,
   return -0.5*volK*ret/M_PI;
 }
 
+
+//-----------------------------------------------------------------------------
 double newtonPotential(const Eigen::MatrixXd &nodes, const Eigen::Vector2d &x)
 {
   const Eigen::Vector2d& n1 = nodes.row(0);
@@ -178,6 +183,8 @@ double newtonPotential(const Eigen::MatrixXd &nodes, const Eigen::Vector2d &x)
   return result;
 }
 
+
+//-----------------------------------------------------------------------------
 double evalAtanInt(const Eigen::MatrixXd& nodes, const Eigen::Vector2d& x)
 {
   /* compute u and v */
@@ -204,6 +211,8 @@ double evalAtanInt(const Eigen::MatrixXd& nodes, const Eigen::Vector2d& x)
   return val;
 }
 
+
+//-----------------------------------------------------------------------------
 double innerAtanInt(double a, double b, double c, double xi)
 {
   double delta = 4*a*c-b*b;
@@ -232,6 +241,7 @@ double innerAtanInt(double a, double b, double c, double xi)
 }
 
 
+//-----------------------------------------------------------------------------
 double integrateAtanInt(const Eigen::Vector2d &a, const Eigen::Vector2d &b,
                         const Eigen::MatrixXd &nodes)
 {

@@ -25,7 +25,7 @@ extern "C" {
 }
 
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 double dlp(int k, const Eigen::Vector2d& p, const Eigen::Vector2d& q)
 {
   double a = p.squaredNorm();  /* a = <p,p> */
@@ -77,7 +77,7 @@ double dlp(int k, const Eigen::Vector2d& p, const Eigen::Vector2d& q)
 }
 
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void computeKij(double* I0, double* I1, double eta,
                 const Eigen::Vector2d& a, const Eigen::Vector2d& b,
 		const Eigen::Vector2d& c, const Eigen::Vector2d& d)
@@ -119,7 +119,7 @@ void computeKij(double* I0, double* I1, double eta,
 }
 
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void computeKijAnalytic(double* I0, double* I1, 
 			const Eigen::Vector2d& a, const Eigen::Vector2d& b,
 			const Eigen::Vector2d& c, const Eigen::Vector2d& d)
@@ -128,8 +128,7 @@ void computeKijAnalytic(double* I0, double* I1,
   double hi = (b-a).squaredNorm(); /* hi = norm(b-a)^2 */
   double hj = (d-c).squaredNorm(); /* hj = norm(d-c)^2 */
 
-  Eigen::Vector2d n; /* normal vector */
-  n << (d[1]-c[1])/sqrt(hj) , -(d[0]-c[0])/sqrt(hj);
+  Eigen::Vector2d n = unitNormal(c,d); /* normal vector */
   
   Eigen::Vector2d u = a-b; 
   Eigen::Vector2d v = d-c;
@@ -140,7 +139,7 @@ void computeKijAnalytic(double* I0, double* I1,
   double dot_wpu_n = (w+u).dot(n);
   double dot_wmu_n = (w-u).dot(n);
 
-  double det = u[0]*v[1]-u[1]*v[0];
+  double det = CrossProd2d(u,v);
   
   double lambda=0.0, mu=0.0;
   if (fabs(det) <= EPS*sqrt(hi*hj))  /* u,v linearly dependent */
@@ -169,8 +168,8 @@ void computeKijAnalytic(double* I0, double* I1,
     }
     else
     {
-      mu     = (w[0]*v[1]-w[1]*v[0])/det;
-      lambda = (u[0]*w[1]-u[1]*w[0])/det;
+      mu     = CrossProd2d(w,v)/det;
+      lambda = CrossProd2d(u,w)/det;
      
       *I0 = (mu+1)*dot_wpu_n*dlp(0,v,w+u) - (mu-1)*dot_wmu_n*dlp(0,v,w-u)
             + (lambda+1)*( dot_u_n*dlp(1,u,w+v) + dot_w_n*dlp(0,u,w+v) )
@@ -186,7 +185,7 @@ void computeKijAnalytic(double* I0, double* I1,
 }
 
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void computeKijSwappedAnalytic(double* I0, double* I1, 
                                const Eigen::Vector2d& a, const Eigen::Vector2d& b,
                                const Eigen::Vector2d& c, const Eigen::Vector2d& d)
@@ -207,7 +206,7 @@ void computeKijSwappedAnalytic(double* I0, double* I1,
   double dot_wpv_n = (w+u).dot(n); /* dot_wpu_n=<w+u,n> */
   double dot_wmv_n = (w-v).dot(n);
 
-  double det = u[0]*v[1]-u[1]*v[0];
+  double det = CrossProd2d(u,v);
   
   double lambda=0.0, mu=0.0;
   if(fabs(det)<=EPS*sqrt(hi*hj))   /* u,v linearly dependent */
@@ -240,8 +239,8 @@ void computeKijSwappedAnalytic(double* I0, double* I1,
     }
     else
     {
-      mu     = (w[0]*v[1]-w[1]*v[0])/det;
-      lambda = (u[0]*w[1]-u[1]*w[0])/det;
+      mu     = CrossProd2d(w,v)/det;
+      lambda = CrossProd2d(u,w)/det;
      
       *I0 =   (mu+1)*(dot_v_n*dlp(1,v,w+u) + dot_w_n*dlp(0,v,w+u))
             - (mu-1)*(dot_v_n*dlp(1,v,w-u) + dot_w_n*dlp(0,v,w-u))
@@ -258,6 +257,7 @@ void computeKijSwappedAnalytic(double* I0, double* I1,
 }
 
 
+//-----------------------------------------------------------------------------
 void computeKijSemianalytic(double* I0, double* I1, 
                             const Eigen::Vector2d& a, const Eigen::Vector2d& b,
                             const Eigen::Vector2d& c, const Eigen::Vector2d& d)
@@ -270,8 +270,7 @@ void computeKijSemianalytic(double* I0, double* I1,
   const double* gauss_weight = getGaussWeights(order);
   const double* gauss_point  = getGaussPoints(order);
 
-  Eigen::Vector2d n; /* normal vector */
-  n << (d[1]-c[1])/sqrt(hj) , -(d[0]-c[0])/sqrt(hj);
+  Eigen::Vector2d n = unitNormal(c,d);
 
   Eigen::Vector2d u = a-b;
   Eigen::Vector2d v = d-c;
@@ -293,9 +292,13 @@ void computeKijSemianalytic(double* I0, double* I1,
   *I1 = -0.125*sqrt(hi*hj)*I1tmp/M_PI;
 }
 
+
+//-----------------------------------------------------------------------------
 void computeKijSwappedSemianalytic(double* I0, double* I1, 
-                                   const Eigen::Vector2d& a, const Eigen::Vector2d& b,
-                                   const Eigen::Vector2d& c, const Eigen::Vector2d& d)
+                                   const Eigen::Vector2d& a,
+                                   const Eigen::Vector2d& b,
+                                   const Eigen::Vector2d& c,
+                                   const Eigen::Vector2d& d)
 {
   double hi = (b-a).squaredNorm(); /* hi = norm(b-a)^2 */
   double hj = (d-c).squaredNorm(); /* hj = norm(d-c)^2 */
@@ -305,8 +308,7 @@ void computeKijSwappedSemianalytic(double* I0, double* I1,
   const double* gauss_weight = getGaussWeights(order);
   const double* gauss_point  = getGaussPoints(order);
 
-  Eigen::Vector2d n; /* normal vector */
-  n << (d[1]-c[1])/sqrt(hj) , -(d[0]-c[0])/sqrt(hj);
+  Eigen::Vector2d n = unitNormal(c,d); /* normal vector */
 
   Eigen::Vector2d u = d-c;
   Eigen::Vector2d v = a-b;

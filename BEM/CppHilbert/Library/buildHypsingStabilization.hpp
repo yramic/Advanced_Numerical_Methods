@@ -1,47 +1,39 @@
-function S = buildHypsingStabilization(coordinates,elements)
-%BUILDHYPSINGSTABILIZATION   Stabilization matrix for the hypersingular IE.
-%   S = BUILDHYPSINGSTABILIZATION(COORDINATES,ELEMENTS) assembles the 
-%   stabilization matrix for the hypersingular IE and S1-elements.
-%               
-%   The hypersingular integral equation reads
-%
-%      W*u = (1/2-K')*phi
-%
-%   where phi is the known Neumann data for the solution u of
-%
-%      -Laplace(u) = f   in Omega
-%            du/dn = phi on Gamma = boundary(Omega).
-%
-%   The corresponding stiffness matrix W of the hypersingular integral 
-%   operator is usually built for S1 boundary elements. It therefore has a 
-%   non-trivial kernel. This function computes the stabilization matrix
-%
-%      Sjk = (int_Gamma zetaj ds) (int_Gamma zetak ds)
-%
-%   which may be used to obtain a discrete system
-%
-%      (W+S)*u = RHS
-%
-%   which now allows for a uniquely determined numerical solution of the 
-%   hypersingular integral equation.
-%
-%   COORDINATES gives the coordinates for all nodes on the boundary Gamma. 
-%   ELEMENTS describes the boundary elements.
+#include <Eigen/Dense>
 
-% (C) 2009-2013 HILBERT-Team '09, '10, '12, '13
-% support + bug report:  hilbert@asc.tuwien.ac.at
-%
-% Version: 3.1
+/**
+ *  Stabilization matrix for the hypersingular IE using S1-elements.
+ *
+ *  The hypersingular integral equation reads \f$ W u = (1/2-K') \phi \f$
+ *  where \f$\phi\f$ is the known Neumann data for the solution u of
+ *  \f[ -\Delta u = f  \qquad in \Omega \\
+ *      du/dn = \phi \qquad on \Gamma = \partial \Omega \f]
+ *
+ *  The corresponding stiffness matrix W of the hypersingular integral
+ *  operator is usually built for S1 boundary elements. It therefore has a
+ *  non-trivial kernel. This function computes the stabilization matrix
+ *  \f[ S_{jk} = (\int_{\Gamma} \phi_j ds) (\int_{\Gamma} \phi_k ds) \f]
+ *  which may be used to obtain a discrete system \f$ (W+S)u = RHS \f$,
+ *  which now allows for a uniquely determined numerical solution of the
+ *  hypersingular integral equation.
+ *
+ *  @param[out] S  (nC x nC) Stabilization matrix.
+ *  @param[in] coordinates  (nC x 2) matrix containing the coordinates of the
+ *                          vertices of the boundary mesh.
+ *  @param[in] elements  (nE x 2) matrix containing the indices of the vertices
+ *                       corresponding to each element of the boundary mesh.
+ */
+void buildHypsingStabilization(Eigen::MatrixXd& S, const Eigen::MatrixXd& coordinates,
+                               const Eigen::MatrixXi& elements)
+{
 
-nE = size(elements,1);
+  int nE = coordinates.rows();
+  Eigen::SparseMatrix<double> M(nE, nE);
+  computeM11(M, coordinates, elements);
+  Eigen::VectorXd aux(nE);
+  aux.setOnes();
+  Eigen::VectorXd c = M*aux;
 
-%*** compute local mesh-size
-h = sqrt(sum((coordinates(elements(:,1),:)...
-    -coordinates(elements(:,2),:)).^2,2));
+  S.resize(nC,nC);
+  S = c*c.transpose();
 
-%*** build vector with entries c(j) = int_Gamma hatfunction(j) ds
-c = 0.5*accumarray(reshape(elements,2*nE,1),[h;h]);
-
-%*** build stabilization matrix
-S = c*c';
-
+}
