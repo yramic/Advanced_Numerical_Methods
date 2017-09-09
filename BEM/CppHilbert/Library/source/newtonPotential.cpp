@@ -13,6 +13,7 @@
 #include "constants.hpp"
 #include "newtonPotential.hpp"
 
+//-----------------------------------------------------------------------------
 void computeN(Eigen::MatrixXd& N, const Eigen::MatrixXd& coordinates,
               const Eigen::MatrixXi& elements, const Eigen::MatrixXd& vertices,
               const Eigen::MatrixXi& triangles, double eta)
@@ -20,7 +21,7 @@ void computeN(Eigen::MatrixXd& N, const Eigen::MatrixXd& coordinates,
   int nT = triangles.rows();
   int nE = elements.rows();
   N.resize(nE,nT);
-  Eigen::MatrixXd nodes(3,3);
+  Eigen::MatrixXd nodes(3,2);
 
   for( int j=0;j<nT; ++j) { /*  running over triangles */
     nodes << vertices.row(triangles(j,0)),
@@ -28,9 +29,6 @@ void computeN(Eigen::MatrixXd& N, const Eigen::MatrixXd& coordinates,
              vertices.row(triangles(j,2));
 
     for( int k=0; k<nE; ++k) { /* running over boundary elements */
-      aidx = (int) elements[k]-1;
-      bidx = (int) elements[k+nE]-1;
-
       const Eigen::Vector2d& a = coordinates.row(elements(k,0));
       const Eigen::Vector2d& b = coordinates.row(elements(k,1));
 
@@ -40,23 +38,23 @@ void computeN(Eigen::MatrixXd& N, const Eigen::MatrixXd& coordinates,
 }
 
 
-double computeNkj(const Eigen::Matrix2d &a, const Eigen::Matrix2d &b,
+//-----------------------------------------------------------------------------
+double computeNkj(const Eigen::Vector2d &a, const Eigen::Vector2d &b,
                   const Eigen::MatrixXd &nodes, double eta)
 {
-  double diam = 0.;
+  double distET = distanceSegmentToSegment(a, b, nodes.row(0), nodes.row(1));
   double tmp = distanceSegmentToSegment(a, b, nodes.row(0), nodes.row(2));
 
   if (tmp < distET)
     distET = tmp;
-  
-  tmp = distanceSegmentToSegment(a, b, nodes.row(0), nodes.row(1));
-  double tmp = distanceSegmentToSegment(a, b, nodes.row(1), nodes.row(2));
+
+  tmp = distanceSegmentToSegment(a, b, nodes.row(1), nodes.row(2));
 
   if (tmp < distET)
     distET = tmp;
-  
+
   double diam = (a-b).squaredNorm();
- 
+
   if (distET*eta >= diam) 	/* Semi-analytic */
      return computeNkjSemiAnalyticSegment(a,b,nodes);
 
@@ -65,8 +63,9 @@ double computeNkj(const Eigen::Matrix2d &a, const Eigen::Matrix2d &b,
 }
 
 
-double computeNkjSemiAnalyticSegment(const Eigen::Matrix2d& a,
-                                     const Eigen::Matrix2d& b,
+//-----------------------------------------------------------------------------
+double computeNkjSemiAnalyticSegment(const Eigen::Vector2d& a,
+                                     const Eigen::Vector2d &b,
                                      const Eigen::MatrixXd& nodes)
 {
   const double *gauss_points = getGaussPoints(GAUSS_ORDER);
@@ -83,8 +82,9 @@ double computeNkjSemiAnalyticSegment(const Eigen::Matrix2d& a,
 }
 
 
-double computeNkjSemiAnalyticTriangle(const Eigen::Matrix2d& a,
-                                      const Eigen::Matrix2d& b,
+//-----------------------------------------------------------------------------
+double computeNkjSemiAnalyticTriangle(const Eigen::Vector2d& a,
+                                      const Eigen::Vector2d& b,
                                       const Eigen::MatrixXd& nodes)
 {
   const int nr_gauss_points = 7;
@@ -99,8 +99,7 @@ double computeNkjSemiAnalyticTriangle(const Eigen::Matrix2d& a,
   double detFT = fabs((n2[0]-n1[0])*(n3[1]-n1[1])-(n3[0]-n1[0])*(n2[1]-n1[1]));
   double tmp=0.;
 
-  for (int i=0; i<nr_gauss_points; i++)
-  {
+  for (int i=0; i<nr_gauss_points; i++){
     Eigen::Vector2d aux1 = 0.5*(b-a);
     Eigen::Vector2d aux2 = 0.5*(b+a)-(n2-n1)*gp_x[i] - (n3-n1)*gp_y[i] - n1;
     tmp += gauss_weights[i]*slp(0,aux1,aux2);
@@ -110,7 +109,8 @@ double computeNkjSemiAnalyticTriangle(const Eigen::Matrix2d& a,
 }
 
 
-double computeNkjAnalytic(const Eigen::Matrix2d &a, const Eigen::Matrix2d &b,
+//-----------------------------------------------------------------------------
+double computeNkjAnalytic(const Eigen::Vector2d &a, const Eigen::Vector2d &b,
                           const Eigen::MatrixXd &nodes)
 {
   const Eigen::Vector2d& n1 = nodes.row(0);
@@ -152,20 +152,22 @@ double computeNkjAnalytic(const Eigen::Matrix2d &a, const Eigen::Matrix2d &b,
   return -0.5*volK*ret/M_PI;
 }
 
-double newtonPotential(const Eigen::MatrixXd &nodes, const Eigen::Matrix2d &x)
+
+//-----------------------------------------------------------------------------
+double newtonPotential(const Eigen::MatrixXd &nodes, const Eigen::Vector2d &x)
 {
   const Eigen::Vector2d& n1 = nodes.row(0);
   const Eigen::Vector2d& n2 = nodes.row(1);
   const Eigen::Vector2d& n3 = nodes.row(2);
-  
+
   double volT = 0.5*fabs((n2[0]-n1[0])*(n3[1]-n1[1])-(n3[0]-n1[0])*(n2[1]-n1[1]));
   const Eigen::Vector2d& u = n1 - n2;
   const Eigen::Vector2d& v = n1 - n3;
   const Eigen::Vector2d& w = x  - n1;
-  
-  double* slpA = slpIterative(1, (v-u)/2., w + (u+v)/2.);
-  double* slpB = slpIterative(1, v/2. , w + v/2.);
-  
+
+  Eigen::VectorXd slpA = slpIterative(1, (v-u)/2., w + (u+v)/2.);
+  Eigen::VectorXd slpB = slpIterative(1, v/2. , w + v/2.);
+
   double integralI = 0.25*(slpA[0]-slpA[1]);
 
   double integralII = u.dot(w)*slpA[0] + 0.5*u.dot(v)*(slpA[0]+slpA[1]);
@@ -177,55 +179,40 @@ double newtonPotential(const Eigen::MatrixXd &nodes, const Eigen::Matrix2d &x)
   double coeff = volT/(2.*u.squaredNorm());
   double result = volT*integralI + coeff*integralII -
                   coeff*integralIII - volT + coeff*atanint;
-  
-  free(slpA); free(slpB);
 
   return result;
 }
 
-double evalAtanInt(const Eigen::MatrixXd& nodes, const Eigen::Matrix2d& x) {
 
-  double u[2], v[2], w[2];
-  const double* gauss_point;
-  const double* gauss_wht;
-  double val=0., xi;
-  double valInner=0., uu, vv, u_dot_v;
-  double a,b,c;
-  int j;
-
-  gauss_point = getGaussPoints(GAUSS_ORDER);
-  gauss_wht   = getGaussWeights(GAUSS_ORDER);
-
+//-----------------------------------------------------------------------------
+double evalAtanInt(const Eigen::MatrixXd& nodes, const Eigen::Vector2d& x)
+{
   /* compute u and v */
-  u[0] = n1[0] - n2[0];
-  u[1] = n1[1] - n2[1];
-  v[0] = n1[0] - n3[0];
-  v[1] = n1[1] - n3[1];
-  uu = u[0]*u[0] + u[1]*u[1];
-  vv = v[0]*v[0] + v[1]*v[1];
-  u_dot_v = u[0]*v[0] + u[1]*v[1];
-
+  const Eigen::Vector2d& u = nodes.row(0) - nodes.row(1);
+  const Eigen::Vector2d& v = nodes.row(0) - nodes.row(2);
   /* compute w */
-  w[0] = x[0] - n1[0];
-  w[1] = x[1] - n1[1];
+  const Eigen::Vector2d& w = x  - nodes.row(0).transpose();
 
-  val=0.;
+  const double* gauss_point = getGaussPoints(GAUSS_ORDER);
+  const double* gauss_wht   = getGaussWeights(GAUSS_ORDER);
 
-  for ( j= 0; j<GAUSS_ORDER; ++j ){
+  double val=0.;
+  for (int j= 0; j<GAUSS_ORDER; ++j ){
     /* transformation of quadrature points from [-1,1] to [0,1] */
-    xi = (gauss_point[j]+1)*0.5;
+    double xi = (gauss_point[j]+1)*0.5;
 
-    a = uu;
-    b = 2*(u[0]*w[0]+u[1]*w[1]+xi*(u[0]*v[0]+u[1]*v[1]));
-    c = w[0]*w[0]+w[1]*w[1]+xi*xi*vv+2*xi*(w[0]*v[0]+w[1]*v[1]);
-
-    valInner = innerAtanInt(a,b,c,xi);
+    double a = u.squaredNorm();
+    double b = 2*(u.dot(w)+xi*u.dot(v));
+    double c = w.squaredNorm()+xi*xi*v.squaredNorm()+2*xi*w.dot(v);
+    double valInner = innerAtanInt(a,b,c,xi);
     val += gauss_wht[j]*valInner;
   }
 
   return val;
 }
 
+
+//-----------------------------------------------------------------------------
 double innerAtanInt(double a, double b, double c, double xi)
 {
   double delta = 4*a*c-b*b;
@@ -241,9 +228,9 @@ double innerAtanInt(double a, double b, double c, double xi)
     else {
       if ( st>1+EPS) {
         if (s < 0)
-	  valInner = deltaRoot*(atan( (s+t)/(1-st)) - M_PI);
+      valInner = deltaRoot*(atan( (s+t)/(1-st)) - M_PI);
         else
-	  valInner = deltaRoot*(atan( (s+t)/(1-st)) + M_PI);
+      valInner = deltaRoot*(atan( (s+t)/(1-st)) + M_PI);
       }
       else {
         valInner = deltaRoot*(atan(s) + atan(t));
@@ -254,42 +241,23 @@ double innerAtanInt(double a, double b, double c, double xi)
 }
 
 
-double integrateAtanInt(const Eigen::Matrix2d &a, const Eigen::Matrix2d &b,
+//-----------------------------------------------------------------------------
+double integrateAtanInt(const Eigen::Vector2d &a, const Eigen::Vector2d &b,
                         const Eigen::MatrixXd &nodes)
 {
-  double u[2], v[2];
-  const double* gauss_point;
-  const double* gauss_wht;
-  int k;
-  double sx[2], val=0.;
-  double valOuter=0., uu, vv, uxv;
+  const double* gauss_point = getGaussPoints(GAUSS_ORDER);
+  const double* gauss_wht   = getGaussWeights(GAUSS_ORDER);
 
-  gauss_point = getGaussPoints(GAUSS_ORDER);
-  gauss_wht   = getGaussWeights(GAUSS_ORDER);
-
-  /* compute u and v */
-  u[0] = nodes[0] - n2[0];
-  u[1] = nodes[1] - n2[1];
-  v[0] = nodes[0] - n3[0];
-  v[1] = nodes[1] - n3[1];
-  uu = u[0]*u[0] + u[1]*u[1];
-  vv = v[0]*v[0] + v[1]*v[1];
-  uxv = u[0]*v[0] + u[1]*v[1];
-
-  val=0.;
-
-  for ( k=0; k<GAUSS_ORDER; ++k )
-  {
+  double val = 0.;
+  for (int k=0; k<GAUSS_ORDER; ++k ){
     /* transformation of quadrature points from [-1,1] to [a,b] */
-    sx[0] = ((1-gauss_point[k])*a[0]+(1+gauss_point[k])*b[0])*0.5;
-    sx[1] = ((1-gauss_point[k])*a[1]+(1+gauss_point[k])*b[1])*0.5;
-
-    valOuter = evalAtanInt(nodes,n2,n3,sx);
+    const Eigen::Vector2d& sx = ((1-gauss_point[k])*a+(1+gauss_point[k])*b)*0.5;
+    double valOuter = evalAtanInt(nodes,sx);
 
     val += gauss_wht[k]*valOuter;
   }
-  
-  val = val*0.5*sqrt((a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]));
+
+  val = val*0.5*(a-b).norm();
   return val;
 }
 

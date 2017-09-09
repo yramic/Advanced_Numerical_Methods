@@ -25,11 +25,11 @@
  *  of boundary elements (Ei, Ej) and storing the result in V. It uses the
  *  symmetry of V to reduce the build time.
  *
- *  @param[out] V  nE x nE matrix. nC and nE are the number of coordinates and
+ *  @param[out] V  (nE x nE) matrix. nC and nE are the number of coordinates and
  *                 elements, respectively.
- *  @param[in] coordinates  nC x 2 matrix containing the coordinates of the
+ *  @param[in] coordinates  (nC x 2) matrix containing the coordinates of the
  *                          vertices of the boundary mesh.
- *  @param[in] elements  nE x 2 matrix containing the indices of the vertices
+ *  @param[in] elements  (nE x 2) matrix containing the indices of the vertices
  *                       corresponding to each element of the boundary mesh.
  *  @param[in] eta  Admissibility constant. It is greater or equal than 0.
  */

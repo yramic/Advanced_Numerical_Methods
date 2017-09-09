@@ -70,5 +70,21 @@ int ccw(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
 double distanceSegmentToSegment(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
 				const Eigen::Vector2d& c, const Eigen::Vector2d& d);
 
+/**
+ *  Computes the unit normal of [a,b]
+ *
+ *  @param[in] a,b 2d vectors containing the coordinates of these points.
+ *  @return  Normal vector.
+ */
+Eigen::Vector2d unitNormal(const Eigen::Vector2d& a, const Eigen::Vector2d& b);
+
+
+/**
+ *  Computes the 2D cross product of the vectors a and b
+ *
+ *  @param[in] a,b 2d vectors.
+ *  @return 2D cross product
+ */
+double CrossProd2d(const Eigen::Vector2d& a, const Eigen::Vector2d& b);
 
 #endif
