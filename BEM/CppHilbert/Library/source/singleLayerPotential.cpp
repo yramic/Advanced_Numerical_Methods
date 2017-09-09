@@ -27,6 +27,9 @@ double slp(int k, const Eigen::Vector2d& u, const Eigen::Vector2d& v)
 }
 
 //------------------------------------------------------------------------------
+// Computes the integrals I^(0)_k from Def. 2.2 in MAI08
+// using a recursion formula given in Lemma 2.2
+// returns all values for powers up to k in a vector
 Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
 			     const Eigen::Vector2d& v)
 {
@@ -47,7 +50,7 @@ Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
   else
     D = 0.;
   
-  /* The case k=0 */
+  /* The case k=0: pure logarithmic integrand */
   if (fabs(u[0]) < EPS && fabs(u[1]) < EPS) {
       val[0] = 2*log(c);
   }
@@ -77,7 +80,7 @@ Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
   if (k == 0)
     return val;
 
-  /* The case k=1 */
+  /* The case k=1: logarithmic kernel times a linear term */
   if (k>=1) {
     if (fabs(u[0]) < EPS && fabs(u[1]) < EPS) {
       val[1] = 0.;
@@ -136,6 +139,8 @@ Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
 }
 
 //------------------------------------------------------------------------------
+// Section 3 of MAI08,
+// Used only for evaluation of Newton potential
 double doubleSlp(int k, int l, const Eigen::Vector2d& u,
 		 const Eigen::Vector2d& v, const Eigen::Vector2d& w)
 {
@@ -312,6 +317,8 @@ double doubleSlp(int k, int l, const Eigen::Vector2d& u,
 }
 
 //------------------------------------------------------------------------------
+// Computation of entries of single layer Galerkin matrix for piecewise
+// constantb trial and test functions.
 double computeVij(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
 		  const Eigen::Vector2d& c, const Eigen::Vector2d& d, double eta)
 {
@@ -353,6 +360,7 @@ double computeWij(Eigen::Vector2d a, Eigen::Vector2d b,
 }
 
 //------------------------------------------------------------------------------
+// Analytic integration of logarithmic kernel over two straight panels
 double computeWijAnalytic(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
 			  const Eigen::Vector2d& c, const Eigen::Vector2d& d)
 {
