@@ -16,6 +16,7 @@
 
 #include "constants.hpp"
 #include "evaluateV.hpp"
+#include <iostream>
 
 
 void evaluateV(Eigen::VectorXd& Vphi_x, const Eigen::MatrixXd &coordinates,
@@ -48,7 +49,8 @@ void evaluateV(Eigen::VectorXd& Vphi_x, const Eigen::MatrixXd &coordinates,
       mEl.row(j)  = 0.5*(a+b);
       dEl.row(j)  = 0.5*(a-b);
   }
-
+  std::cout << "initialized mesh data" << std::endl;
+  
   for(int i = 0; i < nX; ++i){
     // save current point for readibility
     const Eigen::Vector2d& xi = x.row(i);
@@ -68,6 +70,7 @@ void evaluateV(Eigen::VectorXd& Vphi_x, const Eigen::MatrixXd &coordinates,
             // transform point
           const Eigen::Vector2d& s = mEl.row(j) + qp[k]*dEl.row(j);
           sum += phi(j)*qw[k]*lengthE(j)*log((xi - s).squaredNorm());
+	  std::cout << " wii " << i << " , " << j << " , " << k << std::endl;
         }
         Vphi_x(i) -= sum;
       }

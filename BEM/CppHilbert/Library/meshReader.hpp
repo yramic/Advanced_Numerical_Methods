@@ -64,13 +64,13 @@ void readData(const std::string& filename, T & data)
  *  matrices corresponding to elements and coordinates.
  *
  *  @param[in] filename string with the name of the mesh to be read.
- *  @param[out] elements Matrix of integers containing the indices of the
- *              vertices corresponding to each element of the boundary mesh.
  *  @param[out] coordinates Matrix containing the coordinates of each vertex
  *              of the boundary mesh.
+ *  @param[out] elements Matrix of integers containing the indices of the
+ *              vertices corresponding to each element of the boundary mesh.
  */
-void readMesh(const std::string& filename, Eigen::MatrixXi & elements,
-	      Eigen::MatrixXd & coordinates)
+void readMesh(const std::string& filename, Eigen::MatrixXd & coordinates,
+	      Eigen::MatrixXi & elements)
 {
   readData<Eigen::MatrixXd>(filename + "_coordinates.dat", coordinates);
   readData<Eigen::MatrixXi>(filename + "_elements.dat", elements);
@@ -87,6 +87,45 @@ void readMesh(const std::string& filename, Eigen::MatrixXi & elements,
 	   << std::endl;
   std::cout<< "Created " << elements.rows() << " elements "
 	   << ": \n" << elements << std::endl
+	   << std::endl;
+  std::cout << std::string(80, '=') << std::endl;
+}
+
+/**
+ *  This function reads the .dat-files containing the mesh data and fills the
+ *  matrices corresponding to elements and coordinates.
+ *
+ *  @param[in] filename string with the name of the mesh to be read.
+ *  @param[out] coordinates Matrix containing the coordinates of each vertex
+ *              of the boundary mesh.
+ *  @param[out] elements Matrix of integers containing the indices of the
+ *              vertices corresponding to each element of the boundary mesh.
+ *  @param[out] triangles Matrix of integers containing the indices of the
+ *              vertices corresponding to each triangle of the domain mesh.
+ */
+void readMesh(const std::string& filename, Eigen::MatrixXd & coordinates,
+	      Eigen::MatrixXi & elements, Eigen::MatrixXi & triangles )
+{
+  readData<Eigen::MatrixXd>(filename + "_coordinates.dat", coordinates);
+  readData<Eigen::MatrixXi>(filename + "_elements.dat", elements);
+  readData<Eigen::MatrixXi>(filename + "_triangles.dat", triangles);
+  // elements file has indexing starting from 1. Fix it!
+  elements = elements - Eigen::MatrixXi::Ones(elements.rows(), elements.cols());
+  triangles = triangles - Eigen::MatrixXi::Ones(triangles.rows(), triangles.cols());
+
+  // Print mesh information
+  std::cout << std::string(80, '=') << std::endl
+	    << std::string(27, ' ') << " READING MESH FROM FILE \n"
+	    << std::string(80, '=') << std::endl;
+  std::cout << "Input file : " << filename << std::endl; 
+  std::cout<< "Created " << coordinates.rows() << " vertices. "
+	   << "with coordinates :\n" << coordinates << std::endl
+	   << std::endl;
+  std::cout<< "Created " << elements.rows() << " boundary elements. "
+	   << ": \n" << elements << std::endl
+	   << std::endl;
+    std::cout<< "Created " << triangles.rows() << " triangles. "
+	   << ": \n" << triangles << std::endl
 	   << std::endl;
   std::cout << std::string(80, '=') << std::endl;
 }

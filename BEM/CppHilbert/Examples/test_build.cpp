@@ -31,7 +31,7 @@ int main(int, char**) {
 
   Eigen::MatrixXi els;
   Eigen::MatrixXd coords;
-  readMesh("Lshape", els, coords);
+  readMesh("Lshape", coords, els);
 
   
   Eigen::MatrixXd W;
@@ -60,7 +60,10 @@ int main(int, char**) {
 
   Eigen::SparseMatrix<double> M(coords.rows(), coords.rows());
   computeM11(M, coords, els);
-  std::cout<< M << std::endl;
+  const std::string fnameM =  "M_Lshape_Hilbert.dat";
+  std::ofstream outM( fnameM.c_str() );
+  outM << std::setprecision(18) << M; 
+  outM.close( );
   
   std::cout << " Done " << std::endl;
 

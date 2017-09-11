@@ -16,6 +16,7 @@
 #include <cassert>
 #include <cmath>
 
+#include <iostream>
 #include "constants.hpp"
 #include "geometry.hpp"
 #include "doubleLayerPotential.hpp"
@@ -57,15 +58,15 @@ void evaluateW(Eigen::VectorXd& Wx, const Eigen::MatrixXd &coordinates,
      */
     
     int found_element = 0; /* Number of elements containing the evaluation point. */
-    int j_element = 0;     /* Id of the last found element. */
+    int i_element = 0;     /* Id of the last found element. */
     double s = 0;          /* Ratio dist(x,a)/length of element.*/
     double gh_xj = 0.;     /* Function value of gh in evaluation point. */
     double g_0m1, g_1m1, g_0m2, g_1m2, g_2m2;
 
     for (int i = 0; i < nE; ++i){
       // get vertices indices and coordinates for Ei=[a,b]
-      int aidx = elements(j,0);
-      int bidx = elements(j,1);
+      int aidx = elements(i,0);
+      int bidx = elements(i,1);
       const Eigen::Vector2d& a = coordinates.row(aidx);
       const Eigen::Vector2d& b = coordinates.row(bidx);
       double lengthEi = (b-a).norm();
@@ -74,7 +75,7 @@ void evaluateW(Eigen::VectorXd& Wx, const Eigen::MatrixXd &coordinates,
 
       if(dist_x_Ei < 5e-2 * EPS){
         found_element += 1;
-        j_element = i;
+        i_element = i;
 
         if ( (a-xj).norm() < EPS || (b-xj).norm() < EPS){
           fprintf(stderr, "Warning (evaluateW): The evaluation point "
@@ -150,13 +151,12 @@ void evaluateW(Eigen::VectorXd& Wx, const Eigen::MatrixXd &coordinates,
 
       // Compute distance xj to Ei
       double dist_x_Ei = distancePointToSegment(xj, a, b);
-
       // Check whether the evaluation point is on the current element.
       if (dist_x_Ei < 5e-2 * EPS){
        // Compute p.v. of a locally regularized integral
         double lengthEi = sqrt(4.0*u_sqnorm);
         double alpha = (gh(bidx)-gh(aidx))/2.;
-        assert(j_element == i);
+        assert(i_element == i);
 
         Wx(j) += 1./(lengthEi*M_PI)*( 2.0*gh_xj/(1.0-s*s)
                                       -alpha*log(fabs((s-1.0)/(s+1.0))) );

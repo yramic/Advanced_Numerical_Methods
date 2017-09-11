@@ -19,8 +19,14 @@ link_directories( ${CMAKE_BINARY_DIR}/../include )
 set( CPPHILBERT_INCLUDE   ${CMAKE_SOURCE_DIR}/../Library )
 include_directories(${CPPHILBERT_INCLUDE})
 
-set(SRC_test "test.cpp") # Source
-add_executable(cmtest ${SRC_test})
+# Set up test for buildV, buildW, buildK, etc
+set(SRC_test1 "test_build.cpp") # Source
+add_executable(test1 ${SRC_test1})
+add_dependencies(test1 Eigen)
+target_link_libraries(test1 ${PROJECT_LINK_LIBS})
 
-add_dependencies(cmtest Eigen)
-target_link_libraries(cmtest ${PROJECT_LINK_LIBS})
+# Set up test for evaluateV, evaluateW, evaluateK, etc
+set(SRC_test2 "test_evaluate.cpp") # Source
+add_executable(test2 ${SRC_test2})
+add_dependencies(test2 Eigen)
+target_link_libraries(test2 ${PROJECT_LINK_LIBS})
