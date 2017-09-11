@@ -8,3 +8,4 @@ set(SRC_test
 add_executable(cmtest ${SRC_test})
 add_dependencies(cmtest Eigen)
 target_link_libraries(cmtest CppHilbert)
+

@@ -51,5 +51,6 @@ include("${CMAKE_SOURCE_DIR}/cmake/functions/GetEIGEN3.cmake")
 ###########################################################################
 
 add_subdirectory(BEM)
-add_subdirectory(LowRank)
+add_subdirectory(HMAT)
+add_subdirectory(CONVQUAD)
 

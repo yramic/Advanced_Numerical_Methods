@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(LowRank)
+project(HMAT)
 
 add_subdirectory(include)
 add_subdirectory(src)
