@@ -9,7 +9,8 @@
 ///
 ///  C++ adaptation for ANCSE17 of HILBERT V3.1 TUWien 2009-2013
 ///////////////////////////////////////////////////////////////////////////////
-
+#ifndef _BUILDM_HPP_
+#define _BUILDM_HPP_
 
 #include <Eigen/Sparse>
 
@@ -96,3 +97,4 @@ void computeM11(Eigen::SparseMatrix<double>& M, const Eigen::MatrixXd& coordinat
     M.setFromTriplets(triplets.begin(), triplets.end());
 }
 
+#endif

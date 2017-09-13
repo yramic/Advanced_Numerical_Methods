@@ -19,14 +19,14 @@
 #include "constants.hpp"
 
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 double slp(int k, const Eigen::Vector2d& u, const Eigen::Vector2d& v)
 {
   Eigen::VectorXd tmp = slpIterative(k, u, v);
   return tmp[k];
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
 			     const Eigen::Vector2d& v)
 {
@@ -135,7 +135,7 @@ Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
   return val;
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 double doubleSlp(int k, int l, const Eigen::Vector2d& u,
 		 const Eigen::Vector2d& v, const Eigen::Vector2d& w)
 {
@@ -145,7 +145,7 @@ double doubleSlp(int k, int l, const Eigen::Vector2d& u,
   double normUSq = u.squaredNorm();
   double normVSq = v.squaredNorm();
   double normWSq = w.squaredNorm();
-  double detUV = u[0]*v[1] - u[1]*v[0];
+  double detUV = CrossProd2d(u,v);
 
   if (normUSq < EPS && normVSq < EPS)
   {
@@ -156,7 +156,7 @@ double doubleSlp(int k, int l, const Eigen::Vector2d& u,
         if (normWSq < EPS)
           return 0;
         else
-          return 2./((k+1)*(l+1))*log(w[0]*w[0]+w[1]*w[1]);
+          return 2./((k+1)*(l+1))*log(normWSq);
       }
     }
     return 0.;
@@ -248,8 +248,8 @@ double doubleSlp(int k, int l, const Eigen::Vector2d& u,
       memTableUWmv = slpIterative(k, u, w-v);
     }
 
-    mu1 = ( v[1]*w[0] - v[0]*w[1]) / detUV;
-    mu2 = (-u[1]*w[0] + u[0]*w[1]) / detUV;
+    mu1 = CrossProd2d(v,w) / detUV;
+    mu2 = -CrossProd2d(u,w) / detUV;
 
     tmp[0] = -2 + ((mu1+1)*memTableVWpu[0] - (mu1-1)*memTableVWmu[0]
               + (mu2+1)*memTableUWpv[0] - (mu2-1)*memTableUWmv[0]) * 0.25;
@@ -311,7 +311,7 @@ double doubleSlp(int k, int l, const Eigen::Vector2d& u,
   return output;
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 double computeVij(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
 		  const Eigen::Vector2d& c, const Eigen::Vector2d& d, double eta)
 {
@@ -321,7 +321,7 @@ double computeVij(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
   return sqrt(hi*hj)*computeWij(a,b,c,d, eta);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 double computeWij(Eigen::Vector2d a, Eigen::Vector2d b,
 		  Eigen::Vector2d c, Eigen::Vector2d d, double eta)
 {
@@ -352,7 +352,7 @@ double computeWij(Eigen::Vector2d a, Eigen::Vector2d b,
   }
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 double computeWijAnalytic(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
 			  const Eigen::Vector2d& c, const Eigen::Vector2d& d)
 {
@@ -367,7 +367,7 @@ double computeWijAnalytic(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
 
   /* There hold different recursion formulae if Ei and Ej */
   /* are parallel (det = 0) or not                        */
-  double det = x[0]*y[1] - x[1]*y[0];
+  double det = CrossProd2d(x,y);
 
   if ( fabs(det) <= EPS*sqrt(hi*hj) ) { /* case that x and y are linearly */
     if ( fabs(x[0]) < fabs(x[1]) )      /* dependent, i.e., Ei and Ej are */
@@ -390,7 +390,7 @@ double computeWijAnalytic(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
   return -0.125*val /M_PI; /* = -1/(8*M_PI)*val */
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 double computeWijSemianalytic(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
 			      const Eigen::Vector2d& c, const Eigen::Vector2d& d)
 {
