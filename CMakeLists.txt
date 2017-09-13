@@ -9,6 +9,9 @@ project(AdvNumCSE)
 ###########################################################################
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
+include(${CMAKE_SOURCE_DIR}/cmake/functions/add_all_subdirectories.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/functions/add_executable_advnumcse.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/functions/get_target_name_advnumcse.cmake)
 
 ###########################################################################
 #
@@ -42,7 +45,7 @@ set(CMAKE_CXX_STANDARD 11)
 # FIND EIGEN
 ###########################################################################
 
-include("${CMAKE_SOURCE_DIR}/cmake/functions/GetEIGEN3.cmake")
+include(${CMAKE_SOURCE_DIR}/cmake/functions/GetEIGEN3.cmake)
 
 ###########################################################################
 #
