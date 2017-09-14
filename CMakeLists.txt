@@ -21,9 +21,9 @@ include(${CMAKE_SOURCE_DIR}/cmake/functions/get_target_name_advnumcse.cmake)
 
 # DISALLOW IN-SOURCE BUILD
 ###########################################################################
-if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
-    message(FATAL_ERROR "Use an out of source build. Create a separate binary directory and run CMake there.")
-endif("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
+#if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
+#    message(FATAL_ERROR "Use an out of source build. Create a separate binary directory and run CMake there.")
+#endif("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
 
 # SET DEFAULT BUILD TYPE
 ###########################################################################
