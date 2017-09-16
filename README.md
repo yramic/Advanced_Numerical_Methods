@@ -8,7 +8,7 @@
 	$ cmake ..
 	$ make
 
-All binaries can be found in the `build` folder.
+All binaries can be found at the `build/bin` path.
 
 ## Download and Compile One Code
 
@@ -41,7 +41,7 @@ Targets will be in the format `<chapter>_<problem_name>_<code_type>`, where `<co
 
 The corresponding executable will be located in:
 
-        $ ./build/<chapter>/<problem-name>/
+        $ ./build/bin/<chapter>/<problem-name>/
 
 **TIP**
 
