@@ -6,6 +6,6 @@ set(SRC_test
     test.cpp)
 
 add_executable(cmtest ${SRC_test})
-add_dependencies(cmtest Eigen)
+#add_dependencies(cmtest Eigen) # already included in top-level CMakeLists.txt
 target_link_libraries(cmtest CppHilbert)
 
