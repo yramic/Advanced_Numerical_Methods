@@ -25,6 +25,11 @@ include(${CMAKE_SOURCE_DIR}/cmake/functions/get_target_name_advnumcse.cmake)
 #    message(FATAL_ERROR "Use an out of source build. Create a separate binary directory and run CMake there.")
 #endif("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
 
+# STORE BINARIES IN ./bin
+#(else CMake cannot find files to link for automatic targets)
+###########################################################################
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+
 # SET DEFAULT BUILD TYPE
 ###########################################################################
 if( NOT CMAKE_BUILD_TYPE )
