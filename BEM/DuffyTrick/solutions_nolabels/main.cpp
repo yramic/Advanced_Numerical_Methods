@@ -27,15 +27,16 @@ QuadRule GauLeg(int n) {
   // declare
   QuadRule QR1D;
 
-  // set dimension
-  QR1D.dim = 1;
+    // set dimension
+    QR1D.dim = 1;
 
-  // set number nodes/weights
-  QR1D.n = n;
-
-  // get 1D Gauss quadrature nodes & weights for [0,1]
-  Eigen::RowVectorXd xq,wq;
-  std::tie(QR1D.x,QR1D.w) = gauleg(0.,1.,n);
+    // set number nodes/weights
+    QR1D.n = n;
+    
+    // get 1D Gauss quadrature nodes & weights for [0,1]
+    Eigen::RowVectorXd xq,wq;
+    std::tie(QR1D.x,QR1D.w) = gauleg(0.,1.,n);
+           
 
   // return
   return QR1D;
@@ -53,25 +54,26 @@ QuadRule Quad_QR(QuadRule QR1D) {
   // declare
   QuadRule QR2D;
 
-  // set dimension
-  QR2D.dim = 2;
+    // set dimension
+    QR2D.dim = 2;
 
-  // set number nodes/weights
-  QR2D.n = QR1D.n*QR1D.n;
+    // set number nodes/weights
+    QR2D.n = QR1D.n*QR1D.n;
 
-  // set quadrature nodes and weights
-  int iq;
-  QR2D.x = Eigen::MatrixXd::Zero(2,QR2D.n);
-  QR2D.w = Eigen::VectorXd::Zero(QR2D.n);
-  for (int i = 0; i < QR1D.n; i++) {
-    for (int j = 0; j < QR1D.n; j++) {
-      iq = i + QR1D.n*j;
-      QR2D.x(0,iq) = QR1D.x(i);
-      QR2D.x(1,iq) = QR1D.x(j);
-      QR2D.w(  iq) = QR1D.w(i)*QR1D.w(j);
+    // set quadrature nodes and weights
+    int iq;
+    QR2D.x = Eigen::MatrixXd::Zero(2,QR2D.n);
+    QR2D.w = Eigen::VectorXd::Zero(QR2D.n);
+    for (int i = 0; i < QR1D.n; i++) {
+      for (int j = 0; j < QR1D.n; j++) {
+	iq = i + QR1D.n*j;
+	QR2D.x(0,iq) = QR1D.x(i);
+	QR2D.x(1,iq) = QR1D.x(j);
+	QR2D.w(  iq) = QR1D.w(i)*QR1D.w(j);
+      }
     }
-  }
 
+    
   // return
   return QR2D;
 
@@ -85,28 +87,28 @@ QuadRule Quad_QR(QuadRule QR1D) {
  *             duffy trick.
  */
 QuadRule Tria_QR(QuadRule QR1D) {
-
   // declare
   QuadRule QR2D;
 
-  // set dimension
-  QR2D.dim = 2;
-
-  // set number nodes/weights
-  QR2D.n = QR1D.n*QR1D.n;
-
-  // set quadrature nodes and weights (using the transformation formula (8.1.1))
-  int iq;
-  QR2D.x = Eigen::MatrixXd::Zero(2,QR2D.n);
-  QR2D.w = Eigen::VectorXd::Zero(QR2D.n);
-  for (int i = 0; i < QR1D.n; i++) {
-    for (int j = 0; j < QR1D.n; j++) {
-      iq = i + QR1D.n*j;
-      QR2D.x(0,iq) = QR1D.x(i);
-      QR2D.x(1,iq) = QR1D.x(j)*(1. - QR1D.x(i));
-      QR2D.w(  iq) = QR1D.w(i)*QR1D.w(j)*(1. - QR1D.x(i));
+    // set dimension
+    QR2D.dim = 2;
+    
+    // set number nodes/weights
+    QR2D.n = QR1D.n*QR1D.n;
+    
+    // set quadrature nodes and weights (using the transformation formula (8.1.1))
+    int iq;
+    QR2D.x = Eigen::MatrixXd::Zero(2,QR2D.n);
+    QR2D.w = Eigen::VectorXd::Zero(QR2D.n);
+    for (int i = 0; i < QR1D.n; i++) {
+      for (int j = 0; j < QR1D.n; j++) {
+	iq = i + QR1D.n*j;
+	QR2D.x(0,iq) = QR1D.x(i);
+	QR2D.x(1,iq) = QR1D.x(j)*(1. - QR1D.x(i));
+	QR2D.w(  iq) = QR1D.w(i)*QR1D.w(j)*(1. - QR1D.x(i));
+      }
     }
-  }
+
 
   // return
   return QR2D;
@@ -116,17 +118,18 @@ QuadRule Tria_QR(QuadRule QR1D) {
 
 /* @brief integrate function with given quadrature rule
  * \param[in] QR Quadrature rule
- * \param[in] func Function to be integrated
+ * \param[in] func Function to be integrated. Dimension of QR and func should match!
  * \param[out] double Obtained value
  */
 template <typename Function>
 double integrate(QuadRule QR,Function func) {
 
   double sum = 0.;
-  for (int iq = 0; iq < QR.n; iq++) {
-    sum += func(QR.x.col(iq))*QR.w(iq);
-  }
+    for (int iq = 0; iq < QR.n; iq++) {
+      sum += func(QR.x.col(iq))*QR.w(iq);
+    }
 
+    
   // return
   return sum;
 

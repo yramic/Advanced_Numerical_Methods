@@ -92,10 +92,10 @@ QuadRule Quad_QR(QuadRule QR1D) {
  */
 /* SAM_LISTING_BEGIN_1 */
 QuadRule Tria_QR(QuadRule QR1D) {
-  #if SOLUTION
-    // declare
-    QuadRule QR2D;
+  // declare
+  QuadRule QR2D;
 
+  #if SOLUTION
     // set dimension
     QR2D.dim = 2;
     
