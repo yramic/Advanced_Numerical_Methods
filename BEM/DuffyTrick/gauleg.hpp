@@ -4,9 +4,9 @@
 
 
 /* @brief Compute Gaussian quadrature nodes and weights for n nodes over interval [a,b]
- * \param[in] 
- * \param[in] 
- * \param[out] 
+ * \param[in] a,b Interval [a,b] endpoints
+ * \param[in] n Number of quadrature points
+ * \param[out] xq,wq Pair of Gauss-Legendre quadrature points and weights
  */
 std::pair<Eigen::RowVectorXd,Eigen::RowVectorXd>
 gauleg(double a,double b,int n, double eps=1.e-13) {
