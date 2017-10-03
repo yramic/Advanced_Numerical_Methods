@@ -2,8 +2,8 @@
 #include "include/low_rank_app.hpp"
 
 #include <Eigen/Dense>
+#include <chrono>
 #include <cmath>
-#include <ctime>
 #include <iostream>
 
 int main() {
@@ -25,7 +25,7 @@ int main() {
 
     // Compute exact matrix-vector product
 
-    time_t start1; time(&start1);
+    auto start1 = std::chrono::system_clock::now();
 
     Eigen::MatrixXd M(n,n);
     for(int i=0; i<n; ++i)
@@ -33,12 +33,12 @@ int main() {
             M(i,j) = G(grid[i], grid[j]);
     Eigen::VectorXd f_exact = M * c;
 
-    time_t end1; time(&end1);
-    double time_diff1 = std::difftime(end1, start1);
+    auto end1 = std::chrono::system_clock::now();
+    std::chrono::duration<double> time_diff1 = end1 - start1;
 
     // Compute approximated matrix-vector product, given admissibility constant 'eta'
 
-    time_t start2; time(&start2);
+    auto start2 = std::chrono::system_clock::now();
 
     LowRankApp lra(G, grid, grid);
     Eigen::VectorXd f_approx = lra.mvProd(c, eta, d);
@@ -60,8 +60,8 @@ int main() {
 //        err_2(deg)   = (M - M_approx).lpNorm<2>();
 //    }
 
-    time_t end2; time(&end2);
-    double time_diff2 = std::difftime(end2, start2);
+    auto end2 = std::chrono::system_clock::now();
+    std::chrono::duration<double> time_diff2 = end2 - start2;
 
     // Compute approximation error
 
@@ -69,6 +69,6 @@ int main() {
 
     std::cout << "Approximation error (l-inf norm): " << diff.lpNorm<Eigen::Infinity>() << std::endl
               << "Approximation error (l-2 norm): "   << diff.lpNorm<2>() << std::endl
-              << "Time needed for exact multiplication: " << time_diff1 << std::endl
-              << "Time needed for approximate multiplication: " << time_diff2 << std::endl;
+              << "Time needed for exact multiplication: "       << time_diff1.count() << " s" << std::endl
+              << "Time needed for approximate multiplication: " << time_diff2.count() << " s" << std::endl;
 }
