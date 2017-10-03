@@ -35,7 +35,7 @@ public:
     }
     // return the whole vector "x_"
     Eigen::VectorXd getVals() const {
-        return x_;
+        return grid_;
     }
 
     /**
@@ -73,7 +73,7 @@ private:
     void setLists_recursion(Node* cluster, std::vector<double>& xlist, std::vector<double>& ylist);
 
     Node* root_; // pointer to node-root of "cTree"
-    const Eigen::VectorXd x_; // vector associated to "cTree"
+    const Eigen::VectorXd grid_; // vector associated to "cTree"
     friend class Node;
 };
 

@@ -12,8 +12,8 @@ int main() {
 
     std::cout << "Enter gridsize:" << std::endl;
     unsigned n; std::cin >> n;
-    Eigen::VectorXd x = Eigen::VectorXd::LinSpaced(n, 0., (n-1.)/n);
-    Eigen::VectorXd c = Eigen::VectorXd::Random(n);
+    Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(n, 0., (n-1.)/n);
+    Eigen::VectorXd    c = Eigen::VectorXd::Random(n);
 
     std::cout << "Enter admissibility constant:" << std::endl;
     double eta; std::cin >> eta;
@@ -30,7 +30,7 @@ int main() {
     Eigen::MatrixXd M(n,n);
     for(int i=0; i<n; ++i)
         for(int j=0; j<n; ++j)
-            M(i,j) = G(x[i], x[j]);
+            M(i,j) = G(grid[i], grid[j]);
     Eigen::VectorXd f_exact = M * c;
 
     time_t end1; time(&end1);
@@ -40,7 +40,7 @@ int main() {
 
     time_t start2; time(&start2);
 
-    LowRankApp lra(G, x, x);
+    LowRankApp lra(G, grid, grid);
     Eigen::VectorXd f_approx = lra.mvProd(c, eta, d);
 
 //    Eigen::VectorXd c = Eigen::VectorXd::Zero(n);
