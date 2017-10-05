@@ -1,20 +1,64 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(LowRankApp)
+project(AdvNumCSE)
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+###########################################################################
+#
+# INCLUDE MODULES AND FUNCTIONS FOR CMAKE
+#
+###########################################################################
 
-find_package(EIGEN3 REQUIRED)
-if(NOT EIGEN3_FOUND)
-	message(FATAL_ERROR "Could not find EIGEN3, consider setting EIGEN3_ROOT")
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
+include(${CMAKE_SOURCE_DIR}/cmake/functions/add_all_subdirectories.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/functions/add_executable_advnumcse.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/functions/get_target_name_advnumcse.cmake)
+
+###########################################################################
+#
+# COMPILATION SETTINGS
+#
+###########################################################################
+
+# DISALLOW IN-SOURCE BUILD
+###########################################################################
+#if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
+#    message(FATAL_ERROR "Use an out of source build. Create a separate binary directory and run CMake there.")
+#endif("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
+
+# STORE BINARIES IN ./bin
+#(else CMake cannot find files to link for automatic targets)
+###########################################################################
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+
+# SET DEFAULT BUILD TYPE
+###########################################################################
+if( NOT CMAKE_BUILD_TYPE )
+    message(STATUS "No build type selected. Default to Debug")
+    set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
-include_directories(${EIGEN3_INCLUDE_DIR})
+# COMPILATION FLAGS
+###########################################################################
+set(CMAKE_CXX_STANDARD 11)
 
-add_subdirectory(include)
-add_subdirectory(src)
+###########################################################################
+#
+# FIND DEPENDENCIES
+#
+###########################################################################
 
-add_executable(low_rank_test low_rank_test.cpp ${cpp_files} ${headers})
+# FIND EIGEN
+###########################################################################
 
-add_subdirectory(old)
+include(${CMAKE_SOURCE_DIR}/cmake/functions/GetEIGEN3.cmake)
+
+###########################################################################
+#
+# ADD SUBDIRECTORIES
+#
+###########################################################################
+
+add_subdirectory(BEM)
+add_subdirectory(HMAT)
+add_subdirectory(CONVQUAD)
 

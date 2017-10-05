@@ -66,6 +66,4 @@ void computeW(Eigen::MatrixXd& W, const Eigen::MatrixXd& coordinates,
 
     }
   }
-
 }
-

@@ -13,7 +13,7 @@
 /// (C) 2009-2013 HILBERT-Team '09, '10, '12
 /// support + bug report:  hilbert@asc.tuwien.ac.at
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef _GAUSS_TABLE_H_GAURD_
+#ifndef _GAUSS_TABLE_H_GUARD_
 #define _GAUSS_TABLE_H_GUARD_
 
 /* 7-point quadrature on Reference Triangle conv{(0,0),(1,0),(0,1)} */
@@ -185,4 +185,3 @@ const static double gauss32_weights[] = {  0.0070186100094700966004071,
                                            0.0070186100094700966004071 };
 
 #endif
-

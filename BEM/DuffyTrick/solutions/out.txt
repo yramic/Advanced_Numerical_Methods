@@ -1,0 +1,56 @@
+###############################################################################
+### Integration on the unit interval [0,1] ###
+
+Gauss-Legendre quadrature of order 4
+
+Test monomial P(x) = x**p
+
+  Absolute error (p = 0) : 2.22045e-16
+  Absolute error (p = 1) : 1.11022e-16
+  Absolute error (p = 2) : 1.11022e-16
+  Absolute error (p = 3) : 5.55112e-17
+  Absolute error (p = 4) : 0.00555556
+###############################################################################
+### Integration on the unit quadrilateral [0,1]**2 ###
+
+2D quadrature of order 4
+
+Test monomial P(x1,x2) = x1**p * x2**q
+
+  Absolute error (p = 0, q = 0, p + q = 0) : 4.44089e-16
+  Absolute error (p = 1, q = 0, p + q = 1) : 2.22045e-16
+  Absolute error (p = 0, q = 1, p + q = 1) : 2.22045e-16
+  Absolute error (p = 2, q = 0, p + q = 2) : 1.66533e-16
+  Absolute error (p = 1, q = 1, p + q = 2) : 1.11022e-16
+  Absolute error (p = 0, q = 2, p + q = 2) : 1.66533e-16
+  Absolute error (p = 3, q = 0, p + q = 3) : 1.11022e-16
+  Absolute error (p = 2, q = 1, p + q = 3) : 8.32667e-17
+  Absolute error (p = 1, q = 2, p + q = 3) : 8.32667e-17
+  Absolute error (p = 0, q = 3, p + q = 3) : 1.11022e-16
+  Absolute error (p = 4, q = 0, p + q = 4) : 0.00555556
+  Absolute error (p = 3, q = 1, p + q = 4) : 5.55112e-17
+  Absolute error (p = 2, q = 2, p + q = 4) : 6.93889e-17
+  Absolute error (p = 1, q = 3, p + q = 4) : 5.55112e-17
+  Absolute error (p = 0, q = 4, p + q = 4) : 0.00555556
+###############################################################################
+### Integration on the unit triangle K ###
+
+2D quadrature of order 3
+
+Test monomial P(x1,x2) = x1**p * x2**q
+
+  Absolute error (p = 0, q = 0, p + q = 0) : 2.22045e-16
+  Absolute error (p = 1, q = 0, p + q = 1) : 8.32667e-17
+  Absolute error (p = 0, q = 1, p + q = 1) : 8.32667e-17
+  Absolute error (p = 2, q = 0, p + q = 2) : 4.16334e-17
+  Absolute error (p = 1, q = 1, p + q = 2) : 2.77556e-17
+  Absolute error (p = 0, q = 2, p + q = 2) : 4.16334e-17
+  Absolute error (p = 3, q = 0, p + q = 3) : 0.00555556
+  Absolute error (p = 2, q = 1, p + q = 3) : 0.00277778
+  Absolute error (p = 1, q = 2, p + q = 3) : 0.00185185
+  Absolute error (p = 0, q = 3, p + q = 3) : 0.00138889
+  Absolute error (p = 4, q = 0, p + q = 4) : 0.00833333
+  Absolute error (p = 3, q = 1, p + q = 4) : 0.00138889
+  Absolute error (p = 2, q = 2, p + q = 4) : 0.000925926
+  Absolute error (p = 1, q = 3, p + q = 4) : 0.00208333
+  Absolute error (p = 0, q = 4, p + q = 4) : 0.00362654

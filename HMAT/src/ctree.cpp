@@ -7,7 +7,7 @@
 
 // actual constructor
 cTree::cTree(const Eigen::VectorXd& x):
-    root_(NULL), x_(x)
+    root_(NULL), grid_(x)
 {
     unsigned n = x.size();
     if(n > 1) { // build the tree
@@ -24,7 +24,7 @@ void cTree::setV_recursion(Node* cluster, unsigned deg)
 {
     if((*cluster).l_child_ != NULL) {
         // compute V-matrix for *cluster
-        (*cluster).setV_node(x_, deg);
+        (*cluster).setV_node(grid_, deg);
         // recursively call the function for the left  child of *cluster
         setV_recursion((*cluster).l_child_, deg);
         // recursively call the function for the right child of *cluster
@@ -58,7 +58,7 @@ void cTree::setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree Ty)
     } else {
 
         // if the cluster corresponding to *xnode and *ynode is admissible, we add *ynode to the far field list of *xnode
-        if(is_admissible(x_[(*xnode).l_ind_], x_[(*xnode).r_ind_], (Ty.getVals())[(*ynode).l_ind_], (Ty.getVals())[(*ynode).r_ind_], eta)) {
+        if(is_admissible(grid_[(*xnode).l_ind_], grid_[(*xnode).r_ind_], (Ty.getVals())[(*ynode).l_ind_], (Ty.getVals())[(*ynode).r_ind_], eta)) {
             // the line above checks the admissibility condition (eta)
 
             (*xnode).far_f_.push_back(ynode);
@@ -92,10 +92,10 @@ void cTree::setLists_recursion(Node* cluster, std::vector<double>& xlist, std::v
         unsigned iyr = (**iter).r_ind_;
 
         // add the coordinates to the lists
-        xlist.push_back(x_[ixl]);
-        xlist.push_back(x_[ixr]);
-        ylist.push_back(x_[iyl]);
-        ylist.push_back(x_[iyr]);
+        xlist.push_back(grid_[ixl]);
+        xlist.push_back(grid_[ixr]);
+        ylist.push_back(grid_[iyl]);
+        ylist.push_back(grid_[iyr]);
     }
     if((*cluster).l_child_ != 0) { // *cluster is not a leaf, so we do the same for its children
         setLists_recursion((*cluster).l_child_, xlist, ylist);

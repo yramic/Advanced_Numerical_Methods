@@ -26,6 +26,7 @@ double slp(int k, const Eigen::Vector2d& u, const Eigen::Vector2d& v)
   return tmp[k];
 }
 
+
 //------------------------------------------------------------------------------
 // Computes the integrals I^(0)_k from Def. 2.2 in MAI08
 // using a recursion formula given in Lemma 2.2
@@ -138,6 +139,7 @@ Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
 
   return val;
 }
+
 
 //------------------------------------------------------------------------------
 // Section 3 of MAI08,
@@ -318,6 +320,7 @@ double doubleSlp(int k, int l, const Eigen::Vector2d& u,
   return output;
 }
 
+
 //------------------------------------------------------------------------------
 // Computation of entries of single layer Galerkin matrix for piecewise
 // constantb trial and test functions.
@@ -361,6 +364,7 @@ double computeWij(Eigen::Vector2d a, Eigen::Vector2d b,
     }
   }
 }
+
 
 //------------------------------------------------------------------------------
 // Analytic integration of logarithmic kernel over two straight panels

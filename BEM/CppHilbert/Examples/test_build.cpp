@@ -4,12 +4,12 @@
 #include <iostream>
 #include <iomanip>
 
-#include "meshReader.hpp"
-#include "source/geometry.hpp"
-#include "source/buildW.hpp"
-#include "source/buildV.hpp"
-#include "source/buildK.hpp"
-#include "source/buildM.hpp"
+#include "../Library/meshReader.hpp"
+#include "../Library/source/geometry.hpp"
+#include "../Library/source/buildW.hpp"
+#include "../Library/source/buildV.hpp"
+#include "../Library/source/buildK.hpp"
+#include "../Library/source/buildM.hpp"
 
 //! Sparse Matrix type. Makes using this type easier.
 typedef Eigen::SparseMatrix<double> SparseMatrix;
