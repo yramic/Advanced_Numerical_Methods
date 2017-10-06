@@ -100,6 +100,19 @@ void BoundaryMesh::loadMeshFromFile(const std::string& filename)
 
 
 //------------------------------------------------------------------------------
+void BoundaryMesh::writeMeshToFile(const std::string& filename)
+{
+  std::ofstream out_coords(filename+"_coordinates.dat" );
+  out_coords << coordinates_; 
+  out_coords.close( );
+
+  std::ofstream out_els(filename+"_elements.dat" );
+  out_els << elements_; 
+  out_els.close( );
+};
+
+
+//------------------------------------------------------------------------------
 template<typename T>
 void BoundaryMesh::readData(const std::string& filename, T & data)
 {

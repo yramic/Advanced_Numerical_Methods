@@ -104,12 +104,18 @@ class BoundaryMesh
    *  matrices corresponding to elements and coordinates.
    *
    *  @param[in] filename string with the name of the mesh to be read.
-   *  @param[out] coordinates Matrix containing the coordinates of each vertex
-   *              of the boundary mesh.
-   *  @param[out] elements Matrix of integers containing the indices of the
-   *              vertices corresponding to each element of the boundary mesh.
    */
   void loadMeshFromFile(const std::string& filename);
+
+  
+  /**
+   *  This function writes two .dat-files containing the mesh data: elements 
+   *  and coordinates.
+   *
+   *  @param[in] filename string with the name of the files to be written:
+   *             filename_coordinates.dat and filename_elements.dat
+   */
+  void writeMeshToFile(const std::string& filename);
 
   
   private:

@@ -62,6 +62,8 @@ int main(int, char**) {
   std::ofstream outM( fnameM.c_str() );
   outM << std::setprecision(18) << M; 
   outM.close( );
+
+  mesh.writeMeshToFile("lala");
   
   std::cout << " Done " << std::endl;
 
