@@ -16,6 +16,7 @@
 
 #include "geometry.hpp"
 
+
 /**
  *  Computes the double-layer potential type integral        
  *  \f[   G(k,p,q) = \int_{-1}^1 t^k/|tp+q|^2 dt   \f]                

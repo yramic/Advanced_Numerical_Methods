@@ -25,50 +25,45 @@ extern "C" {
 }
 
 
+//------------------------------------------------------------------------------
+// See MAI08, Section 2
 //-----------------------------------------------------------------------------
 double dlp(int k, const Eigen::Vector2d& p, const Eigen::Vector2d& q)
 {
+  // The full recursion is not implemented
+  assert(k<=2 && (k>=0));
+  
   double a = p.squaredNorm();  /* a = <p,p> */
   double b = 2 * p.dot(q);     /* b = 2 <p,q> */
   double c = q.squaredNorm();  /* c = <q,q> */
-  double D = 4*a*c-b*b;
+  double D = 4*a*c-b*b;       /* Discriminant */  
   double root_D = 0;
-  double G0 = 0;
-  double G1 = 0;
+  double G0 = 0,G1 = 0;
 
-  assert(D>=-EPS*4*a*c);
-  if (D > EPS*4*a*c)
-    root_D = sqrt(D);
-  else
-    D = 0.0;
+  assert(D>=-EPS*4*a*c); // In exact arithmetic, D >= 0
+  if (D > EPS*4*a*c) root_D = sqrt(D); else D = 0.0;
 
-  if (D == 0.0)
+  if (D == 0.0) // MAI08, (5), special case
   {
     G0 = 2./(c-a);
   }   
-  else
+  else // g_0^{-1} in MAI08, Lemma 2.1
   {
-    if (fabs(c-a) < EPS*fabs(c))
-      G0 = M_PI/root_D;
-    else if (a < c)
-      G0 = 2.*atan(root_D/(c-a))/root_D;
-    else
-      G0 = 2.*(atan(root_D/(c-a))+M_PI)/root_D;
+    if (fabs(c-a) < EPS*fabs(c)) G0 = M_PI/root_D;
+    else if (a < c) G0 = 2.*atan(root_D/(c-a))/root_D;
+    else            G0 = 2.*(atan(root_D/(c-a))+M_PI)/root_D;
   }
 
-  if (k >= 1)
+  if (k >= 1) // First step of recursion for k=1
   {
+    // MAI08, Lemma 2.1, g_1^{-1}
     G1 = -b*G0;
-    if (a+b+c > EPS*a)
-      G1 += log(a+b+c);
-      
-    if (a-b+c > EPS*a)
-      G1 -= log(a-b+c);
-
+    if (a+b+c > EPS*a) G1 += log(a+b+c);
+    if (a-b+c > EPS*a) G1 -= log(a-b+c);
     G1 /= (2.*a);
-    
-    if (k == 2)
-      return (2.-b*G1-c*G0)/a;
+
+    // MAI08, g_2^{-1}
+    if (k == 2) return (2.-b*G1-c*G0)/a;
     
     return G1;
   }

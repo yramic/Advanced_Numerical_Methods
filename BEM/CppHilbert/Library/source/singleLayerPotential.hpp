@@ -9,13 +9,12 @@
 ///
 ///  C++ adaptation for ANCSE17 of HILBERT V3.1 TUWien 2009-2013
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef _SINGLELAYERPOTENTIAL_HPP_GUARD_
-#define _SINGLELAYERPOTENTIAL_HPP_GUARD_
+#ifndef _SINGLELAYERPOTENTIAL_HPP
+#define _SINGLELAYERPOTENTIAL_HPP
 
 #include <cmath>
 #include <cassert>
 #include "geometry.hpp"
-
 extern "C" {
 #include "gaussQuadrature.h"
 }

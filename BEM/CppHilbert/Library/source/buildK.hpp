@@ -12,10 +12,12 @@
 ///
 ///  C++ adaptation for ANCSE17 of HILBERT V3.1 TUWien 2009-2013
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef _BUILDK_HPP_
-#define _BUILDK_HPP_
+#ifndef _BUILDK_HPP
+#define _BUILDK_HPP
 
 #include <Eigen/Dense>
+#include "BoundaryMesh.hpp"
+
 
 /**
  *  This function generates the panels Ei and Ej. In case of Ej and Ei being
@@ -25,14 +27,10 @@
  *
  *  @param[out] K  (nE x nC) matrix. nC and nE are the number of coordinates and
  *                 elements, respectively.
- *  @param[in] coordinates  (nC x 2) matrix containing the coordinates of the
- *                          vertices of the boundary mesh.
- *  @param[in] elements  (nE x 2) matrix containing the indices of the vertices
- *                       corresponding to each element of the boundary mesh.
+ *  @param[in] mesh 2D BoundaryMesh initialized with vertices and elements).
  *  @param[in] eta  Admissibility constant. It is greater or equal than 0.
  */
-void computeK(Eigen::MatrixXd& K, const Eigen::MatrixXd& coordinates,
-              const Eigen::MatrixXi& elements, double eta);
+void computeK(Eigen::MatrixXd& K, const BoundaryMesh& mesh, double eta);
 
 #endif
 

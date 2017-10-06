@@ -9,10 +9,11 @@
 ///
 ///  C++ adaptation for ANCSE17 of HILBERT V3.1 TUWien 2009-2013
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef _BUILDM_HPP_
-#define _BUILDM_HPP_
+#ifndef _BUILDM_HPP
+#define _BUILDM_HPP
 
 #include <Eigen/Sparse>
+#include "BoundaryMesh.hpp"
 
 /**
  *  Assembles a mass-type matrix M for P0 x S1.
@@ -26,11 +27,10 @@
  * @param[in] elements  (nE x 2) Matrix representing a partition {E1,...,Em} of a
  *                  boundary \f$\Gamma\f$.
  */
-void computeM01(Eigen::SparseMatrix<double>& M, const Eigen::MatrixXd& coordinates,
-            Eigen::MatrixXi& elements)
+void computeM01(Eigen::SparseMatrix<double>& M, const BoundaryMesh& mesh)
 {
 
-    int nE = elements.rows();
+    int nE = mesh.numElements();
     // Define triplets vector
     typedef Eigen::Triplet<double> triplet_t;
     std::vector<triplet_t> triplets;
@@ -39,10 +39,10 @@ void computeM01(Eigen::SparseMatrix<double>& M, const Eigen::MatrixXd& coordinat
     // traverse elements
     for(int i=0; i<nE; i++){
         // identify element's vertices
-        int aidx = elements(i,0);
-        int bidx = elements(i,1);
-        const Eigen::Vector2d& a = coordinates.row(aidx);
-        const Eigen::Vector2d& b = coordinates.row(bidx);
+        int aidx = mesh.getElementVertex(i,0);
+        int bidx = mesh.getElementVertex(i,1);
+        const Eigen::Vector2d& a = mesh.getVertex(aidx);
+        const Eigen::Vector2d& b = mesh.getVertex(bidx);
 
         // Fill triplets with the contribution corresponding to their associated
         // basis functions
@@ -61,17 +61,14 @@ void computeM01(Eigen::SparseMatrix<double>& M, const Eigen::MatrixXd& coordinat
  *  supp \phi_i} \int_{supp \phi_j} \phi_i \phi_j ds, \f$, where \f$ \phi_i \f$
  *  is the S1-hat function associated with the node zi. The output M is a sparse matrix.
  *
- * @param[out] M
- * @param[in] coordinates  (nC x 2) matrix of the mesh nodes {z1,...,zn}.
- * @param[in] elements  (nE x 2) Matrix representing a partition {E1,...,Em} of a
- *                  boundary \f$\Gamma\f$.
+ *  @param[out] M
+ *  @param[in] mesh 2D BoundaryMesh (initialized with vertices and elements).
  */
-void computeM11(Eigen::SparseMatrix<double>& M, const Eigen::MatrixXd& coordinates,
-            Eigen::MatrixXi& elements)
+void computeM11(Eigen::SparseMatrix<double>& M, const BoundaryMesh& mesh)
 {
 
-    int nE = elements.rows();
-    int nC = coordinates.rows();
+    int nE = mesh.numElements();
+    int nC = mesh.numVertices();
     // Define triplets vector
     typedef Eigen::Triplet<double> triplet_t;
     std::vector<triplet_t> triplets;
@@ -80,10 +77,10 @@ void computeM11(Eigen::SparseMatrix<double>& M, const Eigen::MatrixXd& coordinat
     // traverse elements
     for(int i=0; i<nE; i++){
         // identify element's vertices
-        int aidx = elements(i,0);
-        int bidx = elements(i,1);
-        const Eigen::Vector2d& a = coordinates.row(aidx);
-        const Eigen::Vector2d& b = coordinates.row(bidx);
+        int aidx = mesh.getElementVertex(i,0);
+        int bidx = mesh.getElementVertex(i,1);
+        const Eigen::Vector2d& a = mesh.getVertex(aidx);
+        const Eigen::Vector2d& b = mesh.getVertex(bidx);
 
         // Fill triplets with the contribution corresponding to their associated
         // basis functions
