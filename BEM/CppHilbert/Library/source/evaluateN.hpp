@@ -9,8 +9,8 @@
 ///
 ///  C++ adaptation for ANCSE17 of HILBERT V3.1 TUWien 2009-2013
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef _EVALUATEN_HPP_GUARD
-#define _EVALUATEN_HPP_GUARD
+#ifndef _EVALUATEN_HPP
+#define _EVALUATEN_HPP
 
 #include "newtonPotential.hpp"
 
@@ -26,8 +26,10 @@
  *  @param[in] f  nT vector such that phi_i=phi(z_i).
  *  @param[in] x  (nX x 2) matrix that contains the evaluation points.
  */
-void evaluateN(Eigen::VectorXd& s, const Eigen::MatrixXd& vertices,
-               const Eigen::MatrixXi& triangles, const Eigen::VectorXd& f,
+void evaluateN(Eigen::VectorXd& s,
+               const Eigen::Matrix<double, Eigen::Dynamic, 2>& vertices,
+               const Eigen::Matrix<int   , Eigen::Dynamic, 3>& triangles,
+               const Eigen::VectorXd& f,
                const Eigen::MatrixXd& x);
 
 #endif

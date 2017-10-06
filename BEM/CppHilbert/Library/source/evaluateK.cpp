@@ -18,12 +18,11 @@
 #include "evaluateK.hpp"
 
 
-void evaluateK(Eigen::VectorXd& Kgx, const Eigen::MatrixXd& coordinates,
-               const Eigen::MatrixXi& elements, const Eigen::VectorXd &gh,
+void evaluateK(Eigen::VectorXd& Kgx, const BoundaryMesh& mesh, const Eigen::VectorXd &gh,
                const Eigen::MatrixXd &x, double eta)
 {
   int nX = x.rows();
-  int nE = elements.rows();
+  int nE = mesh.numElements();
   // Initialize output vector
   Kgx.resize(nX);
   Kgx.setZero();
@@ -40,9 +39,9 @@ void evaluateK(Eigen::VectorXd& Kgx, const Eigen::MatrixXd& coordinates,
 
   // Traverse the elements
   for (int j = 0; j < nE; ++j){
-    // Get vertices indices and coordinates for Ei=[a,b]
-    const Eigen::Vector2d& a = coordinates.row(elements(j,0));
-    const Eigen::Vector2d& b = coordinates.row(elements(j,1));
+    // Get vertices indices and coordinates for Ej=[a,b]
+    Eigen::Vector2d a,b;
+    std::tie(a,b) = mesh.getElementVertices(j);
     // Fill the vectors
     lengthE(j) = (b-a).norm();
     mEl.row(j)  = 0.5*(a+b);
@@ -57,11 +56,11 @@ void evaluateK(Eigen::VectorXd& Kgx, const Eigen::MatrixXd& coordinates,
 
     // Traverse elements
     for (int j = 0; j < nE; ++j){
-      // Get vertices indices and coordinates for Ei=[a,b]
-      int aidx = elements(j,0);
-      int bidx = elements(j,1);
-      const Eigen::Vector2d& a = coordinates.row(aidx);
-      const Eigen::Vector2d& b = coordinates.row(bidx);
+      // Get vertices indices and coordinates for Ej=[a,b]
+      int aidx = mesh.getElementVertex(j,0);
+      int bidx = mesh.getElementVertex(j,1);
+      const Eigen::Vector2d& a = mesh.getVertex(aidx);
+      const Eigen::Vector2d& b = mesh.getVertex(bidx);
 
       // Check admissibility
       double dist_xi_Ej = distancePointToSegment(xi, a, b);

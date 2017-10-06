@@ -8,16 +8,16 @@
 ///
 ///  C++ adaptation for ANCSE17 of HILBERT V3.1 TUWien 2009-2013
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef _NEWTONPOTENTIAL_HPP_GUARD
-#define _NEWTONPOTENTIAL_HPP_GUARD
+#ifndef _NEWTONPOTENTIAL_HPP
+#define _NEWTONPOTENTIAL_HPP
 
 #include <cmath>
 #include "singleLayerPotential.hpp"
 #include "geometry.hpp"
-
 extern "C" {
 #include "gaussQuadrature.h"
 }
+
 
 /**
  *  The function computeNkj() is called for the computation of the
@@ -36,9 +36,12 @@ extern "C" {
  *                        conforming the triangles of the domain mesh.
  *  @param[in] eta  Admissibility constant. It is greater or equal than 0.
  */
-void computeN(Eigen::MatrixXd& N, const Eigen::MatrixXd& coordinates,
-              const Eigen::MatrixXi& elements, const Eigen::MatrixXd& vertices,
-              const Eigen::MatrixXi& triangles, double eta);
+void computeN(Eigen::MatrixXd& N,
+              const Eigen::Matrix<double, Eigen::Dynamic, 2>& coordinates,
+              const Eigen::Matrix<int   , Eigen::Dynamic, 2>& elements,
+              const Eigen::Matrix<double, Eigen::Dynamic, 2>& vertices,
+              const Eigen::Matrix<int   , Eigen::Dynamic, 3>& triangles,
+              double eta);
 
 
 /**
@@ -53,7 +56,7 @@ void computeN(Eigen::MatrixXd& N, const Eigen::MatrixXd& coordinates,
  *   \f[ -\frac{1}{2\pi} \int_{Ek} \int_{Tj} \log{ \vert x-y \vert} dy ds_x.\f]
  */
 double computeNkj(const Eigen::Vector2d &a, const Eigen::Vector2d& b,
-                  const Eigen::MatrixXd& nodes, double eta);
+                  const Eigen::Matrix<double,3,2>& nodes, double eta);
 
 
 /**
@@ -69,7 +72,7 @@ double computeNkj(const Eigen::Vector2d &a, const Eigen::Vector2d& b,
  */
 double computeNkjSemiAnalyticSegment(const Eigen::Vector2d &a,
                                      const Eigen::Vector2d& b,
-                                     const Eigen::MatrixXd& nodes);
+                                     const Eigen::Matrix<double,3,2>& nodes);
 
 /**
  *  The entry N_kj is computed "ANALYTIC". This means that the two integrals
@@ -88,7 +91,7 @@ double computeNkjSemiAnalyticSegment(const Eigen::Vector2d &a,
  */
 double computeNkjAnalytic(const Eigen::Vector2d &a,
                           const Eigen::Vector2d& b,
-                          const Eigen::MatrixXd& nodes);
+                          const Eigen::Matrix<double,3,2>& nodes);
 
 
 /**
@@ -100,7 +103,7 @@ double computeNkjAnalytic(const Eigen::Vector2d &a,
  *  @return  The function returns the newton-potential \f$ \int_{T} \log{
  *           \vert x-t \vert} dt \f$
  */
-double newtonPotential(const Eigen::MatrixXd& nodes, const Eigen::Vector2d& x);
+double newtonPotential(const Eigen::Matrix<double,3,2>& nodes, const Eigen::Vector2d& x);
 
 
 /**
@@ -118,7 +121,7 @@ double newtonPotential(const Eigen::MatrixXd& nodes, const Eigen::Vector2d& x);
  *  integrateAtanInt(), but it is also used from within the function
  *  newtonPotential().
  */
-double evalAtanInt(const Eigen::MatrixXd& nodes, const Eigen::Vector2d &x);
+double evalAtanInt(const Eigen::Matrix<double,3,2>& nodes, const Eigen::Vector2d &x);
 
 /**
  *  Computes the integral and returns its value.
@@ -146,6 +149,6 @@ double innerAtanInt(double a, double b, double c, double xi);
  */
 double integrateAtanInt(const Eigen::Vector2d &a,
                         const Eigen::Vector2d& b,
-                        const Eigen::MatrixXd& nodes);
+                        const Eigen::Matrix<double,3,2>& nodes);
 #endif
 

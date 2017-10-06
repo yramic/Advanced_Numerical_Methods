@@ -12,12 +12,14 @@
 ///
 ///  C++ adaptation for ANCSE17 of HILBERT V3.1 TUWien 2009-2013
 ///////////////////////////////////////////////////////////////////////////////
+
 #include "constants.hpp"
 #include "evaluateN.hpp"
 
 
-void evaluateN(Eigen::VectorXd &s, const Eigen::MatrixXd& vertices,
-               const Eigen::MatrixXi& triangles,
+void evaluateN(Eigen::VectorXd& s,
+               const Eigen::Matrix<double, Eigen::Dynamic, 2>& vertices,
+               const Eigen::Matrix<int   , Eigen::Dynamic, 3>& triangles,
                const Eigen::VectorXd& f, const Eigen::MatrixXd& x)
 {
   int nX = x.rows();

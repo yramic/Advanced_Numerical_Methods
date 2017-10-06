@@ -13,19 +13,18 @@
 ///
 ///  C++ adaptation for ANCSE17 of HILBERT V3.1 TUWien 2009-2013
 ///////////////////////////////////////////////////////////////////////////////
+
 #include "constants.hpp"
 #include "doubleLayerPotential.hpp"
 #include "evaluateKadj.hpp"
 #include "geometry.hpp"
-
 extern "C" {
 #include "gaussQuadrature.h"
 }
 
 
 
-void evaluateKadj(Eigen::VectorXd &Kx, const Eigen::MatrixXd &coordinates,
-                  const Eigen::MatrixXi &elements, const Eigen::VectorXd &gh,
+void evaluateKadj(Eigen::VectorXd &Kx, const BoundaryMesh& mesh, const Eigen::VectorXd &gh,
                   const Eigen::MatrixXd &x, const Eigen::MatrixXd &n_x, double eta)
 {
   int nX = x.rows();
@@ -43,12 +42,12 @@ void evaluateKadj(Eigen::VectorXd &Kx, const Eigen::MatrixXd &coordinates,
     const Eigen::Vector2d& xj = x.row(j);
 
     //traverse elements
-    for (int i=0; i<elements.rows(); ++i){
-      // get vertices indices and coordinates for Ei=[a,b]
-      int aidx = elements(j,0);
-      int bidx = elements(j,1);
-      const Eigen::Vector2d& a = coordinates.row(aidx);
-      const Eigen::Vector2d& b = coordinates.row(bidx);
+    for (int i=0; i<mesh.numElements(); ++i){
+      // get vertices indices and coordinates for Ej=[a,b]
+      int aidx = mesh.getElementVertex(j,0);
+      int bidx = mesh.getElementVertex(j,1);
+      const Eigen::Vector2d& a = mesh.getVertex(aidx);
+      const Eigen::Vector2d& b = mesh.getVertex(bidx);
 
       // middle point and auxiliary vectors
       const Eigen::Vector2d& mp = 0.5*(a+b);

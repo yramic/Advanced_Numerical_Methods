@@ -13,9 +13,9 @@
 ///
 ///  C++ adaptation for ANCSE17 of HILBERT V3.1 TUWien 2009-2013
 ///////////////////////////////////////////////////////////////////////////////
+
 #include <cassert>
 #include <cmath>
-
 #include <iostream>
 #include "constants.hpp"
 #include "geometry.hpp"
@@ -23,18 +23,16 @@
 extern "C" {
 #include "gaussQuadrature.h"
 }
-
 #include "evaluateW.hpp"
 
 
-void evaluateW(Eigen::VectorXd& Wx, const Eigen::MatrixXd &coordinates,
-               const Eigen::MatrixXi &elements, const Eigen::VectorXd &gh,
+void evaluateW(Eigen::VectorXd& Wx, const BoundaryMesh& mesh, const Eigen::VectorXd &gh,
                const Eigen::MatrixXd &x, const Eigen::MatrixXd &n_x,
                double eta)
 {
   int nX = x.rows();
-  int nE = elements.rows();
-  int nC = coordinates.rows();
+  int nE = mesh.numElements();
+  int nC = mesh.numVertices();
   // Initialize output vector
   Wx.resize(nX);
   Wx.setZero();
@@ -65,10 +63,10 @@ void evaluateW(Eigen::VectorXd& Wx, const Eigen::MatrixXd &coordinates,
 
     for (int i = 0; i < nE; ++i){
       // get vertices indices and coordinates for Ei=[a,b]
-      int aidx = elements(i,0);
-      int bidx = elements(i,1);
-      const Eigen::Vector2d& a = coordinates.row(aidx);
-      const Eigen::Vector2d& b = coordinates.row(bidx);
+      int aidx = mesh.getElementVertex(i,0);
+      int bidx = mesh.getElementVertex(i,1);
+      const Eigen::Vector2d& a = mesh.getVertex(aidx);
+      const Eigen::Vector2d& b = mesh.getVertex(bidx);
       double lengthEi = (b-a).norm();
 
       double dist_x_Ei = distancePointToSegment(xj, a, b);
@@ -92,8 +90,8 @@ void evaluateW(Eigen::VectorXd& Wx, const Eigen::MatrixXd &coordinates,
         s = (2. * dist_xa/lengthEi) - 1.;
         assert(s < 1. && s > -1.);
 
-        assert(elements(i,0) >= 0 && elements(i,0) < nC);
-        assert(elements(i,1) >= 0 && elements(i,1) < nC);
+        assert(aidx >= 0 && aidx < nC);
+        assert(bidx >= 0 && bidx < nC);
 
         double gh_a = gh(aidx); /* Value of gh in start point of element. */
         double gh_b = gh(bidx); /* Value of gh in end point of element. */
@@ -126,10 +124,10 @@ void evaluateW(Eigen::VectorXd& Wx, const Eigen::MatrixXd &coordinates,
     double W_0=0, W_1=0;
     for(int i = 0; i < nE; ++i){
       // get vertices indices and coordinates for Ei=[a,b]
-      int aidx = elements(i,0);
-      int bidx = elements(i,1);
-      const Eigen::Vector2d& a = coordinates.row(aidx);
-      const Eigen::Vector2d& b = coordinates.row(bidx);
+      int aidx = mesh.getElementVertex(i,0);
+      int bidx = mesh.getElementVertex(i,1);
+      const Eigen::Vector2d& a = mesh.getVertex(aidx);
+      const Eigen::Vector2d& b = mesh.getVertex(bidx);
       // auxiliary vectors
       const Eigen::Vector2d& mp = 0.5*(a+b);
       const Eigen::Vector2d& vc  = (b-a);

@@ -14,17 +14,16 @@
 ///  C++ adaptation for ANCSE17 of HILBERT V3.1 TUWien 2009-2013
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <iostream>
 #include "constants.hpp"
 #include "evaluateV.hpp"
-#include <iostream>
 
 
-void evaluateV(Eigen::VectorXd& Vphi_x, const Eigen::MatrixXd &coordinates,
-               const Eigen::MatrixXi &elements, const Eigen::VectorXd &phi,
+void evaluateV(Eigen::VectorXd& Vphi_x, const BoundaryMesh& mesh, const Eigen::VectorXd &phi,
                const Eigen::MatrixXd &x, double eta)
 {
   int nX = x.rows();
-  int nE = elements.rows();
+  int nE = mesh.numElements();
   // Initialize output vector
   Vphi_x.resize(nX);
   Vphi_x.setZero();
@@ -41,9 +40,9 @@ void evaluateV(Eigen::VectorXd& Vphi_x, const Eigen::MatrixXd &coordinates,
   Eigen::MatrixXd dEl(nE,2);
   // traverse the elements
   for (int j = 0; j < nE; ++j){
-      // get vertices indices and coordinates for Ei=[a,b]
-      const Eigen::Vector2d& a = coordinates.row(elements(j,0));
-      const Eigen::Vector2d& b = coordinates.row(elements(j,1));
+      // get vertices indices and coordinates for Ej=[a,b]
+      Eigen::Vector2d a,b;
+      std::tie(a,b) = mesh.getElementVertices(j);
       // fill the vectors
       lengthE(j) = (b-a).norm();
       mEl.row(j)  = 0.5*(a+b);
@@ -56,11 +55,11 @@ void evaluateV(Eigen::VectorXd& Vphi_x, const Eigen::MatrixXd &coordinates,
     const Eigen::Vector2d& xi = x.row(i);
 
     for (int j = 0; j < nE; ++j){
-      // get vertices indices and coordinates for Ei=[a,b]
-      int aidx = elements(j,0);
-      int bidx = elements(j,1);
-      const Eigen::Vector2d& a = coordinates.row(aidx);
-      const Eigen::Vector2d& b = coordinates.row(bidx);
+      // get vertices indices and coordinates for Ej=[a,b]
+        int aidx = mesh.getElementVertex(j,0);
+        int bidx = mesh.getElementVertex(j,1);
+        const Eigen::Vector2d& a = mesh.getVertex(aidx);
+        const Eigen::Vector2d& b = mesh.getVertex(bidx);
 
       // check admissibility
       double dist_x_Ej = distancePointToSegment(xi, a, b);

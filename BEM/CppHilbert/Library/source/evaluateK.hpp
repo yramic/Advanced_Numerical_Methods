@@ -10,14 +10,15 @@
 ///
 ///  C++ adaptation for ANCSE17 of HILBERT V3.1 TUWien 2009-2013
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef _EVALUATEK_HPP_GUARD_
-#define _EVALUATEK_HPP_GUARD_
+#ifndef _EVALUATEK_HPP
+#define _EVALUATEK_HPP
 
 #include "geometry.hpp"
 #include "doubleLayerPotential.hpp"
 extern "C" {
 #include "gaussQuadrature.h"
 }
+#include "BoundaryMesh.hpp"
 
 
 /**
@@ -25,16 +26,12 @@ extern "C" {
  *  of evaluation points.
  *
  *  @param[out] Kgx vector
- *  @param[in] coordinates  (nC x 2) matrix containing the coordinates of the
- *                          vertices of the boundary mesh.
- *  @param[in] elements  (nE x 2) matrix containing the indices of the vertices
- *                       corresponding to each element of the boundary mesh.
+ *  @param[in] mesh 2D BoundaryMesh (initialized with vertices and elements).
  *  @param[in] gh nC vector such that gh_i=g(z_i).
  *  @param[in] x  (nX x 2) matrix that contains the evaluation points.
  *  @param[in] eta  Admissibility constant. It is greater or equal than 0.
  */
-void evaluateK(Eigen::VectorXd& Kgx, const Eigen::MatrixXd& coordinates,
-               const Eigen::MatrixXi& elements, const Eigen::VectorXd& gh,
+void evaluateK(Eigen::VectorXd& Kgx, const BoundaryMesh& mesh, const Eigen::VectorXd& gh,
                const Eigen::MatrixXd& x, double eta);
 
 #endif

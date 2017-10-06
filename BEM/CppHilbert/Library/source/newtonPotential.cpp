@@ -8,15 +8,19 @@
 ///
 ///  C++ adaptation for ANCSE17 of HILBERT V3.1 TUWien 2009-2013
 ///////////////////////////////////////////////////////////////////////////////
-#include <cstdlib>
 
+#include <cstdlib>
 #include "constants.hpp"
 #include "newtonPotential.hpp"
 
+
 //-----------------------------------------------------------------------------
-void computeN(Eigen::MatrixXd& N, const Eigen::MatrixXd& coordinates,
-              const Eigen::MatrixXi& elements, const Eigen::MatrixXd& vertices,
-              const Eigen::MatrixXi& triangles, double eta)
+void computeN(Eigen::MatrixXd& N,
+              const Eigen::Matrix<double, Eigen::Dynamic, 2>& coordinates,
+              const Eigen::Matrix<int   , Eigen::Dynamic, 2>& elements,
+              const Eigen::Matrix<double, Eigen::Dynamic, 2>& vertices,
+              const Eigen::Matrix<int   , Eigen::Dynamic, 3>& triangles,
+              double eta)
 {
   int nT = triangles.rows();
   int nE = elements.rows();
@@ -39,8 +43,8 @@ void computeN(Eigen::MatrixXd& N, const Eigen::MatrixXd& coordinates,
 
 
 //-----------------------------------------------------------------------------
-double computeNkj(const Eigen::Vector2d &a, const Eigen::Vector2d &b,
-                  const Eigen::MatrixXd &nodes, double eta)
+double computeNkj(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
+                  const Eigen::Matrix<double,3,2>& nodes, double eta)
 {
   double distET = distanceSegmentToSegment(a, b, nodes.row(0), nodes.row(1));
   double tmp = distanceSegmentToSegment(a, b, nodes.row(0), nodes.row(2));
@@ -65,8 +69,8 @@ double computeNkj(const Eigen::Vector2d &a, const Eigen::Vector2d &b,
 
 //-----------------------------------------------------------------------------
 double computeNkjSemiAnalyticSegment(const Eigen::Vector2d& a,
-                                     const Eigen::Vector2d &b,
-                                     const Eigen::MatrixXd& nodes)
+                                     const Eigen::Vector2d& b,
+                                     const Eigen::Matrix<double,3,2> &nodes)
 {
   const double *gauss_points = getGaussPoints(GAUSS_ORDER);
   const double *gauss_weights = getGaussWeights(GAUSS_ORDER);
@@ -85,7 +89,7 @@ double computeNkjSemiAnalyticSegment(const Eigen::Vector2d& a,
 //-----------------------------------------------------------------------------
 double computeNkjSemiAnalyticTriangle(const Eigen::Vector2d& a,
                                       const Eigen::Vector2d& b,
-                                      const Eigen::MatrixXd& nodes)
+                                      const Eigen::Matrix<double,3,2>& nodes)
 {
   const int nr_gauss_points = 7;
   const double* gp_x = getGaussPointsT(nr_gauss_points,0);
@@ -110,8 +114,8 @@ double computeNkjSemiAnalyticTriangle(const Eigen::Vector2d& a,
 
 
 //-----------------------------------------------------------------------------
-double computeNkjAnalytic(const Eigen::Vector2d &a, const Eigen::Vector2d &b,
-                          const Eigen::MatrixXd &nodes)
+double computeNkjAnalytic(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
+                          const Eigen::Matrix<double,3,2>& nodes)
 {
   const Eigen::Vector2d& n1 = nodes.row(0);
   const Eigen::Vector2d& n2 = nodes.row(1);
@@ -154,7 +158,8 @@ double computeNkjAnalytic(const Eigen::Vector2d &a, const Eigen::Vector2d &b,
 
 
 //-----------------------------------------------------------------------------
-double newtonPotential(const Eigen::MatrixXd &nodes, const Eigen::Vector2d &x)
+double newtonPotential(const Eigen::Matrix<double,3,2>& nodes,
+                       const Eigen::Vector2d& x)
 {
   const Eigen::Vector2d& n1 = nodes.row(0);
   const Eigen::Vector2d& n2 = nodes.row(1);
@@ -185,7 +190,8 @@ double newtonPotential(const Eigen::MatrixXd &nodes, const Eigen::Vector2d &x)
 
 
 //-----------------------------------------------------------------------------
-double evalAtanInt(const Eigen::MatrixXd& nodes, const Eigen::Vector2d& x)
+double evalAtanInt(const Eigen::Matrix<double,3,2>& nodes,
+                   const Eigen::Vector2d& x)
 {
   /* compute u and v */
   const Eigen::Vector2d& u = nodes.row(0) - nodes.row(1);
@@ -242,8 +248,8 @@ double innerAtanInt(double a, double b, double c, double xi)
 
 
 //-----------------------------------------------------------------------------
-double integrateAtanInt(const Eigen::Vector2d &a, const Eigen::Vector2d &b,
-                        const Eigen::MatrixXd &nodes)
+double integrateAtanInt(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
+                        const Eigen::Matrix<double,3,2>& nodes)
 {
   const double* gauss_point = getGaussPoints(GAUSS_ORDER);
   const double* gauss_wht   = getGaussWeights(GAUSS_ORDER);
