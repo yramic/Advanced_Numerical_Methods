@@ -43,15 +43,16 @@ class BoundaryMesh
   }
 
 
-  int numVertices() const
-  {
-      return coordinates_.rows();
-  }
+  /**
+   *  This function returns the number of vertices on the mesh.
+   */
+  int numVertices() const;
 
-  int numElements() const
-  {
-      return elements_.rows();
-  }
+
+    /**
+   *  This function returns the number of elements on the mesh
+   */
+  int numElements() const;
   
   /**
    *  This function returns the matrix containing the mesh points.
@@ -59,66 +60,34 @@ class BoundaryMesh
    *  @return Matrix containing the coordinates of each vertex of the 
    *  boundary mesh.
    */
-  coord_matrix_t getMeshVertices() const
-  {
-    assert(isInitialized_);
-    
-    return coordinates_;
-  }
+  coord_matrix_t getMeshVertices() const;
 
   
   /**
    *  This function returns the matrix containing the indices of the vertices 
    *  corresponding to each element of the boundary mesh.
    */
-  elem_matrix_t getMeshElements() const
-  {
-    assert(isInitialized_);
-    
-    return elements_;
-  }
+  elem_matrix_t getMeshElements() const;
 
   
   /**
    *  This function returns the 2dvector containing the coordinates of the 
    *  vertex i.
    */
-  Eigen::Vector2d getVertex(int i) const
-  {
-    assert(isInitialized_);
-    assert(i<elements_.rows());
-    
-    return coordinates_.row(i);
-  }
+  Eigen::Vector2d getVertex(int i) const;
 
 
   /**
    *  This function returns the coordinates of the 2 vertices on the 
    *  i-th element.
    */
-  std::pair<Eigen::Vector2d, Eigen::Vector2d> getElementVertices(int i) const
-  {
-    assert(isInitialized_);
-    assert(i<elements_.rows());
-    
-    return std::make_pair<Eigen::Vector2d,
-			  Eigen::Vector2d>(coordinates_.row(elements_(i,0)),
-					   coordinates_.row(elements_(i,1)) );
-
-  }
+  std::pair<Eigen::Vector2d, Eigen::Vector2d> getElementVertices(int i) const;
   
 
   /**
    *  This function returns the index of the j-th vertex on the element i.
    */
-  int getElementVertex(int i, int j) const
-  {
-    assert(isInitialized_);
-    assert(i<elements_.rows());
-    assert(j<2);
-    
-    return elements_(i,j);
-  }
+  int getElementVertex(int i, int j) const;
   
   
   /**
@@ -131,30 +100,9 @@ class BoundaryMesh
    *  @param[out] elements Matrix of integers containing the indices of the
    *              vertices corresponding to each element of the boundary mesh.
    */
-  void loadMesh(const std::string& filename)
-  {
-    readData<coord_matrix_t>(filename + "_coordinates.dat", coordinates_);
-    readData<elem_matrix_t>(filename + "_elements.dat", elements_);
-    // elements file has indexing starting from 1. Fix it!
-    elements_ = elements_ - Eigen::MatrixXi::Ones(elements_.rows(), elements_.cols());
+  void loadMesh(const std::string& filename);
 
-    // Print mesh information
-    std::cout << std::string(80, '=') << std::endl
-	      << std::string(27, ' ') << " READING MESH FROM FILE \n"
-	      << std::string(80, '=') << std::endl;
-    std::cout << "Input file : " << filename << std::endl; 
-    std::cout<< "Created " << coordinates_.rows() << " vertices "
-	     << "with coordinates :\n" << coordinates_ << std::endl
-	     << std::endl;
-    std::cout<< "Created " << elements_.rows() << " elements "
-	     << ": \n" << elements_ << std::endl
-	     << std::endl;
-    std::cout << std::string(80, '=') << std::endl;
-
-    isInitialized_ = 1;
-  }
-
-
+  
   private:
   /**
    *  This function reads a .dat-file and uses it contents to fill the
@@ -165,42 +113,7 @@ class BoundaryMesh
    *  @param[out] data Matrix containing the data read from file.
    */
   template<typename T>
-  void readData(const std::string& filename, T & data)
-  {
-  
-    std::ifstream indata(filename);
-    // check state
-    if ( !indata ) {
-      std::cout << "Could not open file '" << filename << " \n"
-		<< "File does not exist!" << std::endl;
-      exit( -1 );
-    }
-  
-    std::vector<typename T::Scalar> values;
-    std::string line;
-    int rows = 0;
-    // read every line from the stream
-    while( std::getline(indata, line) )
-      {
-	std::stringstream dataStream(line);      
-	std::string dataCell;
-	// read every cell from the line that is seperated by space
-	// and put it into the vector or strings
-	while( std::getline(dataStream, dataCell, '	') ){
-	  values.push_back(std::stod(dataCell));
-	}
-	rows++;
-      }
-    int cols = values.size()/rows;
-  
-    data.resize(rows,cols);
-    data = Eigen::Map<const Eigen::Matrix<typename T::Scalar,
-					  T::RowsAtCompileTime,
-					  T::ColsAtCompileTime,
-					  Eigen::RowMajor>>(values.data(),
-							    rows, cols);
-  
-  }
+  void readData(const std::string& filename, T & data);
 
 
 }; //end class
