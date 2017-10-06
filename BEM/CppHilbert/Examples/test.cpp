@@ -4,7 +4,7 @@
 #include <iostream>
 #include <iomanip>
 
-#include "../Library/meshReader.hpp"
+#include "../Library/source/BoundaryMesh.hpp"
 #include "../Library/source/geometry.hpp"
 #include "../Library/source/buildW.hpp"
 #include "../Library/source/buildV.hpp"
@@ -29,13 +29,11 @@ int main(int, char**) {
   c << 5.1, 3.;
   std::cout << distancePointToSegment(a,b,c) << std::endl;
 
-  Eigen::MatrixXi els;
-  Eigen::MatrixXd coords;
-  readMesh("Lshape", els, coords);
+  BoundaryMesh mesh("Lshape");
 
   
   Eigen::MatrixXd W;
-  computeW(W, coords, els, 0.001);
+  computeW(W, mesh, 0.001);
 
   const std::string fnameW =  "W_Lshape_Hilbert.dat";
   std::ofstream outW( fnameW.c_str() );
@@ -43,7 +41,7 @@ int main(int, char**) {
   outW.close( );
 
   Eigen::MatrixXd V;
-  computeV(V, coords, els, 0.001);
+  computeV(V, mesh, 0.001);
 
   const std::string fnameV =  "V_Lshape_Hilbert.dat";
   std::ofstream outV( fnameV.c_str() );
@@ -51,16 +49,19 @@ int main(int, char**) {
   outV.close( );
 
   Eigen::MatrixXd K;
-  computeK(K, coords, els, 0.001);
+  computeK(K, mesh, 0.001);
 
   const std::string fnameK =  "K_Lshape_Hilbert.dat";
   std::ofstream outK( fnameK.c_str() );
   outK << std::setprecision(18) << K; 
   outK.close( );
 
-  Eigen::SparseMatrix<double> M(coords.rows(), coords.rows());
-  computeM11(M, coords, els);
-  std::cout<< M << std::endl;
+  Eigen::SparseMatrix<double> M(mesh.numVertices(), mesh.numVertices());
+  computeM11(M, mesh);
+  const std::string fnameM =  "M_Lshape_Hilbert.dat";
+  std::ofstream outM( fnameM.c_str() );
+  outM << std::setprecision(18) << M; 
+  outM.close( );
   
   std::cout << " Done " << std::endl;
 
