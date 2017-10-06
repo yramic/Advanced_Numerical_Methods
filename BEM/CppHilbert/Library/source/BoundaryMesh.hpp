@@ -32,14 +32,23 @@ class BoundaryMesh
 
 
   public:
-  BoundaryMesh( )
+  /**
+   * Construct from matrices of coordinates and elements
+   */
+  BoundaryMesh(const coord_matrix_t& coords, const elem_matrix_t& elems)
   {
-    isInitialized_ = 0;
+    coordinates_ = coords;
+    elements_    = elems;
+    isInitialized_ = 1;
   }
+  
 
+  /**
+   * Construct from data files
+   */
   BoundaryMesh(const std::string& filename)
   {
-    loadMesh(filename);
+    loadMeshFromFile(filename);
   }
 
 
@@ -49,7 +58,7 @@ class BoundaryMesh
   int numVertices() const;
 
 
-    /**
+  /**
    *  This function returns the number of elements on the mesh
    */
   int numElements() const;
@@ -100,7 +109,7 @@ class BoundaryMesh
    *  @param[out] elements Matrix of integers containing the indices of the
    *              vertices corresponding to each element of the boundary mesh.
    */
-  void loadMesh(const std::string& filename);
+  void loadMeshFromFile(const std::string& filename);
 
   
   private:
