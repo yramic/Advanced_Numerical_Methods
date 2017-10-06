@@ -32,14 +32,23 @@ class BoundaryMesh
 
 
   public:
-  BoundaryMesh( )
+  /**
+   * Construct from matrices of coordinates and elements
+   */
+  BoundaryMesh(const coord_matrix_t& coords, const elem_matrix_t& elems)
   {
-    isInitialized_ = 0;
+    coordinates_ = coords;
+    elements_    = elems;
+    isInitialized_ = 1;
   }
+  
 
+  /**
+   * Construct from data files
+   */
   BoundaryMesh(const std::string& filename)
   {
-    loadMesh(filename);
+    loadMeshFromFile(filename);
   }
 
 
@@ -49,7 +58,7 @@ class BoundaryMesh
   int numVertices() const;
 
 
-    /**
+  /**
    *  This function returns the number of elements on the mesh
    */
   int numElements() const;
@@ -95,12 +104,18 @@ class BoundaryMesh
    *  matrices corresponding to elements and coordinates.
    *
    *  @param[in] filename string with the name of the mesh to be read.
-   *  @param[out] coordinates Matrix containing the coordinates of each vertex
-   *              of the boundary mesh.
-   *  @param[out] elements Matrix of integers containing the indices of the
-   *              vertices corresponding to each element of the boundary mesh.
    */
-  void loadMesh(const std::string& filename);
+  void loadMeshFromFile(const std::string& filename);
+
+  
+  /**
+   *  This function writes two .dat-files containing the mesh data: elements 
+   *  and coordinates.
+   *
+   *  @param[in] filename string with the name of the files to be written:
+   *             filename_coordinates.dat and filename_elements.dat
+   */
+  void writeMeshToFile(const std::string& filename);
 
   
   private:

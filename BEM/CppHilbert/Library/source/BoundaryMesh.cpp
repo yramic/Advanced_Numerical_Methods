@@ -74,7 +74,7 @@ int BoundaryMesh::getElementVertex(int i, int j) const
   
   
 //------------------------------------------------------------------------------
-void BoundaryMesh::loadMesh(const std::string& filename)
+void BoundaryMesh::loadMeshFromFile(const std::string& filename)
 {
   readData<coord_matrix_t>(filename + "_coordinates.dat", coordinates_);
   readData<elem_matrix_t>(filename + "_elements.dat", elements_);
@@ -96,6 +96,19 @@ void BoundaryMesh::loadMesh(const std::string& filename)
   std::cout << std::string(80, '=') << std::endl;
 
   isInitialized_ = 1;
+};
+
+
+//------------------------------------------------------------------------------
+void BoundaryMesh::writeMeshToFile(const std::string& filename)
+{
+  std::ofstream out_coords(filename+"_coordinates.dat" );
+  out_coords << coordinates_; 
+  out_coords.close( );
+
+  std::ofstream out_els(filename+"_elements.dat" );
+  out_els << elements_; 
+  out_els.close( );
 };
 
 
