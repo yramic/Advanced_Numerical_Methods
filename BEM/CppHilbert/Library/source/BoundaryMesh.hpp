@@ -2,6 +2,35 @@
 /// \file BoundaryMesh.hpp
 /// \brief This class provides functions to read the meshes used in HILBERT and
 ///        handles the boundary mesh data.
+///
+/// The data structure follows the description in Section 3.3 of the HILBERT
+/// documentation:
+///
+/// The set of nodes \f$ \{z_1,...,z_N \}\f$ of the mesh M_h with elements \f$
+/// \{E_1,..,E_N \} \f$ is represented by the (Nx2)-Matrix coordinates. The j-th
+/// row of __coordinates__ stores the coordinates of the j-th node \f$z_j=(x_j,
+/// y_j)\f$.
+///
+/// If the boundary \f$\Gamma\f$ is not split into several parts, its mesh M_h 
+/// is represented by the (Nx2)-Matrix __elements__. The i-th boundary element
+/// \f$E_i=[z_j,z_k]\f$ is stored as
+///
+///                            elements.row(i)=[j, k],
+///
+/// where the nodes are given in *counterclockwise* order,i.e. the parametrization
+/// of the boundary element \f$ E_i \subset \Gamma \f$ is mathematically positive.
+/// In other words, the outer normal vector n_i in R^2 of Gamma on a boundary
+/// element \f$E_i = [z_j, z_k]\f$ reads
+///
+/// \f[ n_i = \frac{1}{\Vert z_k - z_j \Vert} \left( \begin{array}{c}
+///              y_k - y_j \\ x_j - x_k \end{array} \right). \f]
+///
+///
+/// If \f$\Gamma\f$ is split into Dirichlet boundary \f$\Gamma_D\f$ and Neumann 
+/// boundary \f$\Gamma_N\f$ which describe elements completely contained in one 
+/// part or the other, the mesh is represented by a submesh containing the 
+/// Dirichlet elements and another one containing the Neumann elements.
+///
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef BOUNDARY_MESH_HPP
 #define BOUNDARY_MESH_HPP
