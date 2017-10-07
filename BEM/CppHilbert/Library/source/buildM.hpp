@@ -23,9 +23,7 @@
  *  the node zj. The output M is a sparse matrix.
  *
  * @param[out] M
- * @param[in] coordinates  (nC x 2) matrix of the mesh nodes {z1,...,zn}.
- * @param[in] elements  (nE x 2) Matrix representing a partition {E1,...,Em} of a
- *                  boundary \f$\Gamma\f$.
+ *  @param[in] mesh 2D BoundaryMesh (initialized with vertices and elements).
  */
 void computeM01(Eigen::SparseMatrix<double>& M, const BoundaryMesh& mesh)
 {
