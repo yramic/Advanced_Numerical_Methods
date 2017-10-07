@@ -20,16 +20,15 @@
 class BoundaryMesh
 {
   private:
-  /// type for mesh vertices (2d points)
+  /// The two coordinates for vertices are stored in the rows of a matrix
   typedef Eigen::Matrix<double, Eigen::Dynamic, 2>  coord_matrix_t;
-  /// type for mesh elements (storing indices of the vertices conforming the given element)
+  /// The indices of endpoints of flat panels are stored in the rows of a matrix
   typedef Eigen::Matrix<int,    Eigen::Dynamic, 2>  elem_matrix_t;
 
   /// Class data
   coord_matrix_t coordinates_;
   elem_matrix_t  elements_;
   bool isInitialized_;
-
 
   public:
   /**
@@ -41,7 +40,7 @@ class BoundaryMesh
     elements_    = elems;
     isInitialized_ = 1;
   }
-  
+
 
   /**
    * Construct from data files
@@ -69,14 +68,14 @@ class BoundaryMesh
    *  @return Matrix containing the coordinates of each vertex of the 
    *  boundary mesh.
    */
-  coord_matrix_t getMeshVertices() const;
+  const coord_matrix_t &getMeshVertices() const;
 
   
   /**
    *  This function returns the matrix containing the indices of the vertices 
    *  corresponding to each element of the boundary mesh.
    */
-  elem_matrix_t getMeshElements() const;
+  const elem_matrix_t &getMeshElements() const;
 
   
   /**

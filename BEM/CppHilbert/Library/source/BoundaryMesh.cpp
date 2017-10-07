@@ -21,7 +21,7 @@ int BoundaryMesh::numElements() const
 
 
 //------------------------------------------------------------------------------
-BoundaryMesh::coord_matrix_t BoundaryMesh::getMeshVertices() const
+const BoundaryMesh::coord_matrix_t &BoundaryMesh::getMeshVertices() const
 {
   assert(isInitialized_);
     
@@ -30,7 +30,7 @@ BoundaryMesh::coord_matrix_t BoundaryMesh::getMeshVertices() const
 
   
 //------------------------------------------------------------------------------
-BoundaryMesh::elem_matrix_t BoundaryMesh::getMeshElements() const
+const BoundaryMesh::elem_matrix_t &BoundaryMesh::getMeshElements() const
 {
   assert(isInitialized_);
     
