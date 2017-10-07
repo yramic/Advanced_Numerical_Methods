@@ -26,22 +26,21 @@
 //------------------------------------------------------------------------------
 void computeV(Eigen::MatrixXd& V, const BoundaryMesh& mesh, double eta)
 {
-
   assert(eta >= 0);
 
   // resize matrix
-    int nE = mesh.numElements();
+  int nE = mesh.numElements();
   V.resize(nE,nE);
-  // traverse the elements
+  // outer loop traversing all panels 
   for (int i=0; i<nE; ++i)
   {
-    // get vertices indices and coordinates for Ei=[a,b]
+    // get endpoint indices and coordinates for $i$-th panel
     int aidx = mesh.getElementVertex(i,0);
     int bidx = mesh.getElementVertex(i,1);
     const Eigen::Vector2d& a = mesh.getVertex(aidx);
     const Eigen::Vector2d& b = mesh.getVertex(bidx);
 
-    // traverse the elements
+    // inner loop through all panels
     for (int j=i; j<nE; ++j)
     {
       // get vertices indices and coordinates for Ej=[c,d]
@@ -50,11 +49,10 @@ void computeV(Eigen::MatrixXd& V, const BoundaryMesh& mesh, double eta)
       const Eigen::Vector2d& c = mesh.getVertex(cidx);
       const Eigen::Vector2d& d = mesh.getVertex(didx);
 
-      // compute elements' contribution
+      // compute contribution of a pair of panels
       double tmp = computeVij(a, b, c, d, eta);
       // distribute it among the matrix entries
-      V(i,j) = tmp;
-      V(j,i) = V(i,j);
+      V(i,j) = tmp; V(j,i) = V(i,j);
     }
   }
   
