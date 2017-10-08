@@ -21,49 +21,43 @@
 #include "constants.hpp"
 #include "doubleLayerPotential.hpp"
 
-
+/* SAM_LISTING_BEGIN_1 */
 void computeK(Eigen::MatrixXd& K, const BoundaryMesh& mesh, double eta)
 {
-
-  // resize and initialize matrix
   int nE = mesh.numElements();
   int nC = mesh.numVertices();
-  K.resize(nE, nC);
-  K.setZero();
+  // Matrix returned through reference: resize and initialize matrix
+  K.resize(nE,nC); K.setZero();
   
-  // traverse the elements
-  for (int j=0;j<nE;++j)
-  {
-    // get vertices indices and coordinates for Ei=[a,b]
-    int aidx = mesh.getElementVertex(j,0);
-    int bidx = mesh.getElementVertex(j,1);
-    const Eigen::Vector2d& a = mesh.getVertex(aidx);
-    const Eigen::Vector2d& b = mesh.getVertex(bidx);
+  // outer loop: traverse the panels
+  for (int j=0;j<nE;++j) {
+      // get vertices indices and coordinates for panel \cob{$\pan_j = [\Ba,\Bb]$}
+      int aidx = mesh.getElementVertex(j,0);
+      int bidx = mesh.getElementVertex(j,1);
+      const Eigen::Vector2d& a = mesh.getVertex(aidx);
+      const Eigen::Vector2d& b = mesh.getVertex(bidx);
    
-    // traverse the elements
-    for (int i=0;i<nE;++i)
-    {
-      // get vertices indices and coordinates for Ej=[c,d]
-      int cidx = mesh.getElementVertex(i,0);
-      int didx = mesh.getElementVertex(i,1);
-      const Eigen::Vector2d& c = mesh.getVertex(cidx);
-      const Eigen::Vector2d& d = mesh.getVertex(didx);
-      
-      double linetest1 = fabs( (a-c)[0]*(b-a)[1]-(a-c)[1]*(b-a)[0] );
-      double linetest2 = fabs( (a-d)[0]*(b-a)[1]-(a-d)[1]*(b-a)[0] );
+      // inner loop: traverse the panels
+      for (int i=0;i<nE;++i) {
+	  // get vertices indices and coordinates for panel \cob{$\pan_i = [\Bc,\Bd]$}
+	  int cidx = mesh.getElementVertex(i,0);
+	  int didx = mesh.getElementVertex(i,1);
+	  const Eigen::Vector2d& c = mesh.getVertex(cidx);
+	  const Eigen::Vector2d& d = mesh.getVertex(didx);
+	  // Zero contribution for parallel panels !
+	  double lindep1 = fabs( (a-c)[0]*(b-a)[1]-(a-c)[1]*(b-a)[0] );
+	  double lindep2 = fabs( (a-d)[0]*(b-a)[1]-(a-d)[1]*(b-a)[0] );
 
-      if( linetest1>EPS*(a-c).norm() || linetest2>EPS*(a-d).norm() )
-      {
-        // compute elements' contribution
-        double I0=0.0, I1=0.0;
-        computeKij(&I0,&I1,eta,a,b,c,d);
-        // distribute among matrix entries
-        K(j,cidx) += I0-I1;
-        K(j,didx) += I0+I1;
-      }
-
-    }
-  }
-
+	  if( lindep1>EPS*(a-c).norm() || lindep2>EPS*(a-d).norm()) // \Label[line]{K:1}
+	    {
+	      // compute entries of $1\times2$ interaction matrix
+	      double I0=0.0, I1=0.0;
+	      computeKij(&I0,&I1,eta,a,b,c,d);
+	      // distribute values to matrix entries
+	      K(j,cidx) += I0-I1; // \Label[line]{K:2}
+	      K(j,didx) += I0+I1; // \Label[line]{K:3}
+	    } // endif
+      } //endfor
+  } // endfor
 }
-
+/* SAM_LISTING_END_1 */
