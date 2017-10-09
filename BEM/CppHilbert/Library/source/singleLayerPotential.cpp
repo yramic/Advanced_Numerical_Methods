@@ -36,8 +36,8 @@ Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
 			     const Eigen::Vector2d& v)
 {
   double a = u.squaredNorm();  // \cob{$\alpha = \N{\Bu}^2$}
-  double b = 2 * u.dot(v);     // \cob{\beta = 2\Bu\cdot\Bv$}
-  double c = v.squaredNorm();  // \gamma = \N{\Bv}^2$}
+  double b = 2 * u.dot(v);     // \cob{$\beta = 2\Bu\cdot\Bv$}
+  double c = v.squaredNorm();  // \cob{$\gamma = \N{\Bv}^2$}
   double D = 0.;               // discriminant
   Eigen::VectorXd val(k+1);
 
@@ -45,7 +45,8 @@ Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
   double tmp = 4*a*c - b*b;
   assert(fabs(u[0]) > EPS || fabs(u[1]) > EPS
 	 || fabs(v[0]) > EPS || fabs(v[1]) > EPS);
-  assert(tmp >= -fabs(EPS*4*a*c)); // By Cauchy-Schwarz inequality tmp >= 0
+  // By Cauchy-Schwarz inequality tmp >= 0
+  assert(tmp >= -fabs(EPS*4*a*c));
 
   // Numerically sound way of testing if discriminant = 0
   if (tmp > EPS*4*a*c) D = sqrt(tmp); else D = 0.;
@@ -60,7 +61,7 @@ Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
     else val[0] = 0;
     tmp = b - 2*a;
     if (fabs(tmp) > EPS*a) val[0] -= tmp * log( 0.25*tmp*tmp /a );
-    val[0] = 0.5*val[0] /a - 4;
+    val[0] = 0.5*val[0] /a - 4.0;
   }
   else { // case D > 0: argument of logarithm has no zeros 
     tmp = c - a;
@@ -70,7 +71,7 @@ Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
     val[0] = (0.5*((b+2*a)*log(a+b+c)-(b-2*a)*log(a-b+c))+ D*val[0])/a-4.0;
   }
   if (k == 0) return val;
-  /* SAM_LISTING_END_1
+  /* SAM_LISTING_END_1 */
 
   /* The case k=1: logarithmic kernel times a linear term */
   if (k>=1) {
@@ -359,6 +360,7 @@ double computeWij(Eigen::Vector2d a, Eigen::Vector2d b,
 //------------------------------------------------------------------------------
 // Analytic integration of logarithmic kernel over two straight panels
 //-----------------------------------------------------------------------------
+/* SAM_LISTING_BEGIN_2 */
 double computeWijAnalytic(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
 			  const Eigen::Vector2d& c, const Eigen::Vector2d& d)
 {
@@ -392,8 +394,9 @@ double computeWijAnalytic(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
 		  (mu+1)*slp(0, x, z+y) -
 		  (mu-1)*slp(0, x, z-y));
   }
-  return -0.125*val/M_PI; // = -1/(8*M_PI)*val 
+  return -0.125*val/M_PI; // \cob{$=-\frac{1}{8\pi}*\mathrm{val}$}
 }
+/* SAM_LISTING_END_2 */
 
 //-----------------------------------------------------------------------------
 double computeWijSemianalytic(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
