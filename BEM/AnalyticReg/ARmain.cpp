@@ -201,14 +201,11 @@ double L2norm(const PARAMDER& gammaprime, const Eigen::VectorXd& coeffs){
 
 int main() {
 
- std::cout << "========== Test integration==========" << std::endl;
- int N1 = 20;
-  Eigen::MatrixXd TR_points(N1, 2);
-  double TR_w;
+ std::cout << "==========  Test integration  ==========" << std::endl;
+ int N1 = 30;
+  Eigen::MatrixXd TR_points(N1, 2);  double TR_w;
   std::tie(TR_points,TR_w) = PeriodicTrapRule(N1);
-  double Qint1 = 0.;
-  double Qintx = 0.;
-  double Qintcos = 0.;
+  double Qint1 = 0.;  double Qintx = 0.;  double Qintcos = 0.;
   for(int qp=0; qp<N1; qp++){
     auto z = TR_points(qp);
     Qint1 += TR_w;
@@ -218,30 +215,50 @@ int main() {
   std::cout << " int 1 :" << Qint1 << " vs " << 2*M_PI << "\n int x :" << Qintx
 	    << " vs " << 2*M_PI*M_PI << "\n int cosx :"  << Qintcos
 	    << " vs 0" << std::endl;
-  std::cout << "=====================================" << std::endl << std::endl;
+  std::cout << "========================================" << std::endl << std::endl;
 
-  std::cout << "========== Test Coefficients for gamma= (cos(t), sin(t)) =========="
-	    << std::endl << std::endl;
+  
+  std::cout << "============  Test Coefficients for S(t) = (cos(t), sin(t))  ============="
+	    << std::endl;
   int N = 3;
-    std::function<Eigen::Vector2d(const double&)> gamma2 = [](const double& t){
+    std::function<Eigen::Vector2d(const double&)> S = [](const double& t){
     Eigen::Vector2d res;
     res << cos(t) , sin(t);
     return res;
   };
-  auto gammaCoeffs = computeGammaCoefficients(gamma2,N);
-  auto evalCS = evaluateCosSinUn(0.1, 0, N);
-  Eigen::Vector2d aux = (-gammaCoeffs.block(0,0,N+1,2)).transpose()*evalCS.segment(0,N+1)
-              +(gammaCoeffs.block(N+1,0,N,2)).transpose()*evalCS.segment(N+1,N);
-  Eigen::Vector2d exgamma; exgamma<< cos(0.1) - cos(0), sin(0.1);
-  std::cout << "gamma (0.1) = " << aux.transpose() << " vs " << exgamma(0)/exgamma.norm()
-	    << "," << exgamma(1)/exgamma.norm() << std::endl;
-  std::cout << "====================================================================="
+  auto SCoeffs = computeGammaCoefficients(S,N);
+  auto evalFun = evaluateCosSinUn(0.1, 0, N);
+  Eigen::Vector2d diffS = (-SCoeffs.block(0,0,N+1,2)).transpose()*evalFun.segment(0,N+1)
+              +(SCoeffs.block(N+1,0,N,2)).transpose()*evalFun.segment(N+1,N);
+  Eigen::Vector2d exDiffS; exDiffS<< cos(0.1) - cos(0), sin(0.1);
+  std::cout << "(S(0.1)-S(0))/S(0.1)-S(0) = " << diffS.transpose() << " vs "
+	    << exDiffS(0)/exDiffS.norm() << " , " << exDiffS(1)/exDiffS.norm()
+	    << std::endl;
+  std::cout << "=========================================================================="
+	    << std::endl << std::endl;
+
+  
+  std::cout << "=============  Test Coefficients for gamma as in assignment  ============="
+	    << std::endl;
+  std::function<Eigen::Vector2d(const double&)> gamma = [](const double& t){
+    Eigen::Vector2d res;
+    res << cos(t) + 0.65*cos(2*t) - 0.65 , 1.5*sin(t);
+    return res;
+  };
+  auto gammaCoeffs = computeGammaCoefficients(gamma,N);
+  Eigen::Vector2d diffGamma = (-gammaCoeffs.block(0,0,N+1,2)).transpose()
+                               *evalFun.segment(0,N+1)
+                      +(gammaCoeffs.block(N+1,0,N,2)).transpose()*evalFun.segment(N+1,N);
+  Eigen::Vector2d exDiffgamma = gamma(0.1) - gamma(0);
+  std::cout << "(gamma (0.1) - gamma(0))//S(0.1)-S(0) = " << diffGamma.transpose()
+	    << " vs " << exDiffgamma.transpose()/exDiffS.norm() << std::endl;
+  std::cout << "=========================================================================="
 	    << std::endl << std::endl;
 
 
-  std::cout << "========== Test system for gamma= (cos(t), sin(t)) =========="
+  std::cout << "=============  Test system for S(t) = (cos(t), sin(t))  ============="
 	     << std::endl;
-  std::function<Eigen::Vector2d(const double&)> gamma2prime = [](const double& t){
+  std::function<Eigen::Vector2d(const double&)> Sprime = [](const double& t){
     Eigen::Vector2d res;
     res << -sin(t),  cos(t);
     return res;
@@ -251,32 +268,27 @@ int main() {
     return X(0);
   };
   
-  Eigen::VectorXd solC = solveBIE(gamma2, gC, 5);
-  double solCEval = reconstructRho(solC, M_PI, gamma2prime);
+  Eigen::VectorXd solC = solveBIE(S, gC, 5);
+  double solCEval = reconstructRho(solC, M_PI, Sprime);
   std::cout << "eval at PI: " << solCEval
-	    << " vs " << gC(gamma2(M_PI))*2 << std::endl;
+	    << " vs " << gC(S(M_PI))*2 << std::endl;
   std::cout << "====================================================================="
-	    << std::endl;
+	    << std::endl << std::endl;
 
   // THE ISSUE IS IN M!!
   
-  std::cout << "========== Test Coefficients L2-norm =========="
-	    << std::endl << std::endl;
+  std::cout << "================  Test L2-norm  ================"
+	    << std::endl;
     Eigen::VectorXd coeffToy(7);
   coeffToy << 0,1,0,0,0,0,0;
-  double l2norm = L2norm(gamma2prime, coeffToy);
-  std::cout << "L2 norm of cos(t) : " << l2norm << " vs " << std::sqrt(M_PI) << std::endl;
-    std::cout << "====================================================================="
-	    << std::endl;
+  double l2norm = L2norm(Sprime, coeffToy);
+  std::cout << "L2 norm of cos(t) : " << l2norm << " vs " << std::sqrt(M_PI)
+	    << std::endl
+	    << "================================================"
+	    << std::endl << std::endl;
     
     /*
   // SYSTEM
-  std::function<Eigen::Vector2d(const double&)> gamma = [](const double& t){
-    Eigen::Vector2d res;
-    res << cos(t) + 0.65*cos(2*t) - 0.65 , 1.5*sin(t);
-    return res;
-  };
-
   std::function<Eigen::Vector2d(const double&)> gammaprime = [](const double& t){
     Eigen::Vector2d res;
     res << -sin(t) - 1.3*sin(2*t) , 1.5*cos(t);
