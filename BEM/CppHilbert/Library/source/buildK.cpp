@@ -22,14 +22,15 @@
 #include "doubleLayerPotential.hpp"
 
 /* SAM_LISTING_BEGIN_1 */
-void computeK(Eigen::MatrixXd& K, const BoundaryMesh& mesh, double eta)
+void computeK(Eigen::MatrixXd& K, const BoundaryMesh& mesh,
+	      double eta)
 {
   int nE = mesh.numElements();
   int nC = mesh.numVertices();
   // Matrix returned through reference: resize and initialize matrix
   K.resize(nE,nC); K.setZero();
   
-  // outer loop: traverse the panels
+  // \com{outer loop}: traverse the panels
   for (int j=0;j<nE;++j) {
       // get vertices indices and coordinates for panel \cob{$\pan_j = [\Ba,\Bb]$}
       int aidx = mesh.getElementVertex(j,0);
@@ -37,7 +38,7 @@ void computeK(Eigen::MatrixXd& K, const BoundaryMesh& mesh, double eta)
       const Eigen::Vector2d& a = mesh.getVertex(aidx);
       const Eigen::Vector2d& b = mesh.getVertex(bidx);
    
-      // inner loop: traverse the panels
+      // \com{inner loop}: traverse the panels
       for (int i=0;i<nE;++i) {
 	  // get vertices indices and coordinates for panel \cob{$\pan_i = [\Bc,\Bd]$}
 	  int cidx = mesh.getElementVertex(i,0);

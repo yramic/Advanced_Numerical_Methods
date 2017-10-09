@@ -31,55 +31,46 @@ double slp(int k, const Eigen::Vector2d& u, const Eigen::Vector2d& v)
 // using a recursion formula given in Lemma 2.2
 // returns all values for powers up to k in a vector
 //-----------------------------------------------------------------------------
+/* SAM_LISTING_BEGIN_1 */
 Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
 			     const Eigen::Vector2d& v)
 {
-  double a = u.squaredNorm();  /* a = <u,u> */
-  double b = 2 * u.dot(v);     /* b = 2 <u,v> */
-  double c = v.squaredNorm();  /* c = <v,v> */
-  double D = 0.;
+  double a = u.squaredNorm();  // \cob{$\alpha = \N{\Bu}^2$}
+  double b = 2 * u.dot(v);     // \cob{\beta = 2\Bu\cdot\Bv$}
+  double c = v.squaredNorm();  // \gamma = \N{\Bv}^2$}
+  double D = 0.;               // discriminant
   Eigen::VectorXd val(k+1);
 
   /* Ensure that discriminant is either positive or zero */
   double tmp = 4*a*c - b*b;
   assert(fabs(u[0]) > EPS || fabs(u[1]) > EPS
-          || fabs(v[0]) > EPS || fabs(v[1]) > EPS);
-  assert(tmp >= -fabs(EPS*4*a*c)); /* By theory there holds tmp >= 0. */
+	 || fabs(v[0]) > EPS || fabs(v[1]) > EPS);
+  assert(tmp >= -fabs(EPS*4*a*c)); // By Cauchy-Schwarz inequality tmp >= 0
 
-  if (tmp > EPS*4*a*c)
-    D = sqrt(tmp);
-  else
-    D = 0.;
+  // Numerically sound way of testing if discriminant = 0
+  if (tmp > EPS*4*a*c) D = sqrt(tmp); else D = 0.;
   
-  /* The case k=0: pure logarithmic integrand */
-  if (fabs(u[0]) < EPS && fabs(u[1]) < EPS) {
+  // The case k=0: pure logarithmic integrand 
+  if (fabs(u[0]) < EPS && fabs(u[1]) < EPS) { // constant integrand
       val[0] = 2*log(c);
   }
-  else if (D == 0.) {
+  else if (D == 0.) { // Integrand is logarithm of a pure square
     tmp = b + 2*a;
-    if (fabs(tmp) > EPS*a)
-      val[0] = tmp * log( 0.25*tmp*tmp /a );
-    else
-      val[0] = 0;
+    if (fabs(tmp) > EPS*a) val[0] = tmp * log( 0.25*tmp*tmp /a );
+    else val[0] = 0;
     tmp = b - 2*a;
-    if (fabs(tmp) > EPS*a)
-      val[0] -= tmp * log( 0.25*tmp*tmp /a );
+    if (fabs(tmp) > EPS*a) val[0] -= tmp * log( 0.25*tmp*tmp /a );
     val[0] = 0.5*val[0] /a - 4;
   }
-  else { /* case D > 0 */
+  else { // case D > 0: argument of logarithm has no zeros 
     tmp = c - a;
-    if (fabs(tmp) < EPS*c)
-      val[0] = 0.5*M_PI;
-    else if (a < c)
-      val[0] = atan( D /tmp );
-    else
-      val[0] = atan( D /tmp ) + M_PI;
-
-    val[0] = ( 0.5*( (b+2*a) * log(a+b+c) - (b-2*a) * log(a-b+c) )
-                + D*val[0]) / a - 4;
+    if (fabs(tmp) < EPS*c) val[0] = 0.5*M_PI;
+    else if (a < c) val[0] = atan( D /tmp );
+    else val[0] = atan( D /tmp ) + M_PI;
+    val[0] = (0.5*((b+2*a)*log(a+b+c)-(b-2*a)*log(a-b+c))+ D*val[0])/a-4.0;
   }
-  if (k == 0)
-    return val;
+  if (k == 0) return val;
+  /* SAM_LISTING_END_1
 
   /* The case k=1: logarithmic kernel times a linear term */
   if (k>=1) {
@@ -380,29 +371,28 @@ double computeWijAnalytic(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
   Eigen::Vector2d y = (c-d)/2.;
   Eigen::Vector2d z = (a+b-c-d)/2.;
 
-  /* There hold different recursion formulae if Ei and Ej */
-  /* are parallel (det = 0) or not                        */
+  // There hold different recursion formulae when the panels
+  // are parallel (det = 0) or not                        
   double det = CrossProd2d(x,y);
 
-  if ( fabs(det) <= EPS*sqrt(hi*hj) ) { /* case that x and y are linearly */
-    if ( fabs(x[0]) < fabs(x[1]) )      /* dependent, i.e., Ei and Ej are */
-      lambda = y[1] / x[1];             /* parallel. */
+  if ( fabs(det) <= EPS*sqrt(hi*hj) ) { // case that x and y are linearly 
+    if ( fabs(x[0]) < fabs(x[1]) )      // dependent, i.e., panels are 
+      lambda = y[1] / x[1];             // parallel. 
     else
       lambda = y[0] / x[0];
 
     val = 0.5*( lambda * ( slp(1, y, z-x) - slp(1, y, z+x) )
                          + slp(0, x, z+y) + slp(0, x, z-y) );
   }
-
-  else { /* case that x and y are linearly independent */
+  else { // case that x and y are linearly independent 
     lambda = (z[0]*y[1] - z[1]*y[0]) /det;
     mu = (x[0]*z[1] - x[1]*z[0]) /det;
-
-    val = 0.25 * (-8 + (lambda+1)*slp(0, y, z+x) - (lambda-1)*slp(0, y, z-x)
-                          + (mu+1)*slp(0, x, z+y) - (mu-1)*slp(0, x, z-y));
+    val = 0.25 * (-8 + (lambda+1)*slp(0, y, z+x) -
+		  (lambda-1)*slp(0, y, z-x)+
+		  (mu+1)*slp(0, x, z+y) -
+		  (mu-1)*slp(0, x, z-y));
   }
-  
-  return -0.125*val /M_PI; /* = -1/(8*M_PI)*val */
+  return -0.125*val/M_PI; // = -1/(8*M_PI)*val 
 }
 
 //-----------------------------------------------------------------------------
