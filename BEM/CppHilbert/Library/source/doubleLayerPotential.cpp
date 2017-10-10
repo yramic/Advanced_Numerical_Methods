@@ -28,26 +28,23 @@ extern "C" {
 //------------------------------------------------------------------------------
 // See MAI08, Section 2
 //-----------------------------------------------------------------------------
+/* SAM_LISTING_BEGIN_1 */
 double dlp(int k, const Eigen::Vector2d& p, const Eigen::Vector2d& q)
 {
   // The full recursion is not implemented
   assert(k<=2 && (k>=0));
   
-  double a = p.squaredNorm();  /* a = <p,p> */
-  double b = 2 * p.dot(q);     /* b = 2 <p,q> */
-  double c = q.squaredNorm();  /* c = <q,q> */
-  double D = 4*a*c-b*b;       /* Discriminant */  
+  double a = p.squaredNorm();  // a = <p,p> 
+  double b = 2 * p.dot(q);     // b = 2 <p,q> 
+  double c = q.squaredNorm();  // c = <q,q> 
+  double D = 4*a*c-b*b;       //  Discriminant   
   double root_D = 0;
   double G0 = 0,G1 = 0;
 
   assert(D>=-EPS*4*a*c); // In exact arithmetic, D >= 0
   if (D > EPS*4*a*c) root_D = sqrt(D); else D = 0.0;
-
-  if (D == 0.0) // MAI08, (5), special case
-  {
-    G0 = 2./(c-a);
-  }   
-  else // g_0^{-1} in MAI08, Lemma 2.1
+  if (D == 0.0) G0 = 2./(c-a); // linearly dependent vectors, \cite[(5)]{MAI08}
+  else // Denominator cannot vanish, integrate rational function
   {
     if (fabs(c-a) < EPS*fabs(c)) G0 = M_PI/root_D;
     else if (a < c) G0 = 2.*atan(root_D/(c-a))/root_D;
@@ -56,21 +53,19 @@ double dlp(int k, const Eigen::Vector2d& p, const Eigen::Vector2d& q)
 
   if (k >= 1) // First step of recursion for k=1
   {
-    // MAI08, Lemma 2.1, g_1^{-1}
+    // \cob{$g_1^{-1}$} in \cite[Lemma~2.1]{MAI08}
     G1 = -b*G0;
     if (a+b+c > EPS*a) G1 += log(a+b+c);
     if (a-b+c > EPS*a) G1 -= log(a-b+c);
     G1 /= (2.*a);
 
-    // MAI08, g_2^{-1}
+    // \cob{$g_2^{-1}$} in \cite[Lemma~2.1]{MAI08}
     if (k == 2) return (2.-b*G1-c*G0)/a;
-    
     return G1;
   }
-
   return G0;
 }
-
+/* SAM_LISTING_END_1 */
 
 //-----------------------------------------------------------------------------
 void computeKij(double* I0, double* I1, double eta,
@@ -115,19 +110,19 @@ void computeKij(double* I0, double* I1, double eta,
 
 
 //-----------------------------------------------------------------------------
+/* SAM_LISTING_BEGIN_2 */
 void computeKijAnalytic(double* I0, double* I1, 
 			const Eigen::Vector2d& a, const Eigen::Vector2d& b,
 			const Eigen::Vector2d& c, const Eigen::Vector2d& d)
 {
   
-  double hi = (b-a).squaredNorm(); /* hi = norm(b-a)^2 */
-  double hj = (d-c).squaredNorm(); /* hj = norm(d-c)^2 */
-
-  Eigen::Vector2d n = unitNormal(c,d); /* normal vector */
+  double hi = (b-a).squaredNorm(); // hi = norm(b-a) squared 
+  double hj = (d-c).squaredNorm(); // hj = norm(d-c) squared
+  Eigen::Vector2d n = unitNormal(c,d); // normal vector
   
   Eigen::Vector2d u = a-b; 
   Eigen::Vector2d v = d-c;
-  Eigen::Vector2d w = w=c+d-a-b;
+  Eigen::Vector2d w = c+d-a-b;
 
   double dot_u_n = u.dot(n);
   double dot_w_n = w.dot(n);
@@ -137,32 +132,27 @@ void computeKijAnalytic(double* I0, double* I1,
   double det = CrossProd2d(u,v);
   
   double lambda=0.0, mu=0.0;
-  if (fabs(det) <= EPS*sqrt(hi*hj))  /* u,v linearly dependent */
+  if (fabs(det) <= EPS*sqrt(hi*hj))  // u,v linearly dependent
   {
-    if (fabs(u[0]) > fabs(u[1]))
-      mu = v[0]/u[0]; 
-    else
-      mu = v[1]/u[1];
+    if (fabs(u[0]) > fabs(u[1]))  mu = v[0]/u[0]; 
+    else  mu = v[1]/u[1];
 
     *I0 = dot_w_n*( dlp(0,u,w+v)+dlp(0,u,w-v)+ mu*(dlp(1,v,w-u)-dlp(1,v,w+u)) );
     *I1 = dot_w_n*( dlp(0,u,w+v)-dlp(0,u,w-v)+ mu*(dlp(2,v,w-u)-dlp(2,v,w+u)) )*0.5;
   }
-  else                               /* u,v linearly independent */
+  else  // u,v linearly independent 
   {
-    if (a == d)
-    {
+    if (a == d) {
       *I0 = 2*( dot_wpu_n*dlp(0,v,w+u)+dot_u_n*dlp(1,u,w-v)+dot_w_n*dlp(0,u,w-v) );
       *I1 =     dot_wpu_n*dlp(1,v,w+u)-dot_u_n*dlp(1,u,w-v)-dot_w_n*dlp(0,u,w-v)
 	    + 0.5*(*I0);
     }
-    else if (b == c)
-    {
+    else if (b == c) {
       *I0 = 2*( dot_wmu_n*dlp(0,v,w-u)+dot_u_n*dlp(1,u,w+v)+dot_w_n*dlp(0,u,w+v) );
       *I1 =     dot_wmu_n*dlp(1,v,w-u)+dot_u_n*dlp(1,u,w+v)+dot_w_n*dlp(0,u,w+v)
 	    - 0.5*(*I0);
     }
-    else
-    {
+    else {
       mu     = CrossProd2d(w,v)/det;
       lambda = CrossProd2d(u,w)/det;
      
@@ -173,12 +163,11 @@ void computeKijAnalytic(double* I0, double* I1,
                  + (lambda+1)*( dot_u_n*dlp(1,u,w+v) + dot_w_n*dlp(0,u,w+v) )
                  + (lambda-1)*( dot_u_n*dlp(1,u,w-v) + dot_w_n*dlp(0,u,w-v) ) 
                  - lambda*(*I0) ); 
-    }
-  }
+    }}
   *I0 *= -0.125*sqrt(hi*hj)/M_PI;
   *I1 *= -0.125*sqrt(hi*hj)/M_PI;
 }
-
+/* SAM_LISTING_END_2 */
 
 //-----------------------------------------------------------------------------
 void computeKijSwappedAnalytic(double* I0, double* I1, 

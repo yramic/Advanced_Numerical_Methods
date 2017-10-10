@@ -39,9 +39,9 @@ Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
   double b = 2 * u.dot(v);     // \cob{$\beta = 2\Bu\cdot\Bv$}
   double c = v.squaredNorm();  // \cob{$\gamma = \N{\Bv}^2$}
   double D = 0.;               // discriminant
-  Eigen::VectorXd val(k+1);
+  Eigen::VectorXd val(k+1);    // return values 
 
-  /* Ensure that discriminant is either positive or zero */
+  // Ensure one non-zero argument vector
   double tmp = 4*a*c - b*b;
   assert(fabs(u[0]) > EPS || fabs(u[1]) > EPS
 	 || fabs(v[0]) > EPS || fabs(v[1]) > EPS);
@@ -55,21 +55,21 @@ Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
   if (fabs(u[0]) < EPS && fabs(u[1]) < EPS) { // constant integrand
       val[0] = 2*log(c);
   }
-  else if (D == 0.) { // Integrand is logarithm of a pure square
+  else if (D == 0.) { // Integrand is logarithm of a pure square \Label[line]{slp:1}
     tmp = b + 2*a;
     if (fabs(tmp) > EPS*a) val[0] = tmp * log( 0.25*tmp*tmp /a );
     else val[0] = 0;
     tmp = b - 2*a;
     if (fabs(tmp) > EPS*a) val[0] -= tmp * log( 0.25*tmp*tmp /a );
     val[0] = 0.5*val[0] /a - 4.0;
-  }
-  else { // case D > 0: argument of logarithm has no zeros 
+  } // Label[line]{slp:1a}
+  else { // case D > 0: argument of logarithm has no zeros \Label[line]{slp:2}
     tmp = c - a;
     if (fabs(tmp) < EPS*c) val[0] = 0.5*M_PI;
     else if (a < c) val[0] = atan( D /tmp );
     else val[0] = atan( D /tmp ) + M_PI;
     val[0] = (0.5*((b+2*a)*log(a+b+c)-(b-2*a)*log(a-b+c))+ D*val[0])/a-4.0;
-  }
+  } // \Label[line]{slp:2a}
   if (k == 0) return val;
   /* SAM_LISTING_END_1 */
 
@@ -361,15 +361,17 @@ double computeWij(Eigen::Vector2d a, Eigen::Vector2d b,
 // Analytic integration of logarithmic kernel over two straight panels
 //-----------------------------------------------------------------------------
 /* SAM_LISTING_BEGIN_2 */
-double computeWijAnalytic(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
-			  const Eigen::Vector2d& c, const Eigen::Vector2d& d)
+double computeWijAnalytic(const Eigen::Vector2d& a,
+			  const Eigen::Vector2d& b,
+			  const Eigen::Vector2d& c,
+			  const Eigen::Vector2d& d)
 {
-  double hi = (b-a).squaredNorm(); /* hi = norm(b-a)^2 */
-  double hj = (d-c).squaredNorm(); /* hj = norm(d-c)^2 */
-  double val = 0.;
+  double hi = (b-a).squaredNorm(); // length$^2$ of first panel \cob{$[\Ba,\Bb]$}
+  double hj = (d-c).squaredNorm(); // lendth$^2$ of second panel \cob{$[\Bc,\Bd]$}
+  double val = 0.; 
   double lambda, mu;
-
-  Eigen::Vector2d x = (b-a)/2.;
+  // Vectors defined in \eqref{eq:xyzdef}
+  Eigen::Vector2d x = (b-a)/2.; 
   Eigen::Vector2d y = (c-d)/2.;
   Eigen::Vector2d z = (a+b-c-d)/2.;
 
@@ -377,23 +379,24 @@ double computeWijAnalytic(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
   // are parallel (det = 0) or not                        
   double det = CrossProd2d(x,y);
 
-  if ( fabs(det) <= EPS*sqrt(hi*hj) ) { // case that x and y are linearly 
-    if ( fabs(x[0]) < fabs(x[1]) )      // dependent, i.e., panels are 
-      lambda = y[1] / x[1];             // parallel. 
+  if ( fabs(det) <= EPS*sqrt(hi*hj) ) { // parallel panels, Case II \Label[line]{Wij:2}
+    if ( fabs(x[0]) < fabs(x[1]) )      
+      lambda = y[1] / x[1];             
     else
       lambda = y[0] / x[0];
-
+    // Evaluate the four integrals from \eqref{eq:integrals}
     val = 0.5*( lambda * ( slp(1, y, z-x) - slp(1, y, z+x) )
                          + slp(0, x, z+y) + slp(0, x, z-y) );
-  }
-  else { // case that x and y are linearly independent 
+  } // \Label[line]{Wij:2a}
+  else { // \cob{$\Bx$} and \cob{$\By$} linearly independent, Case I \Label[line]{Wij:1}
     lambda = (z[0]*y[1] - z[1]*y[0]) /det;
     mu = (x[0]*z[1] - x[1]*z[0]) /det;
-    val = 0.25 * (-8 + (lambda+1)*slp(0, y, z+x) -
+    // Integrals \eqref{eq:gsl1}--\eqref{eq:gsl4} 
+    val = 0.25 * (-8 + (lambda+1)*slp(0, y, z+x) - 
 		  (lambda-1)*slp(0, y, z-x)+
 		  (mu+1)*slp(0, x, z+y) -
-		  (mu-1)*slp(0, x, z-y));
-  }
+		  (mu-1)*slp(0, x, z-y));         
+  } // \Label[line]{Wij:1a}
   return -0.125*val/M_PI; // \cob{$=-\frac{1}{8\pi}*\mathrm{val}$}
 }
 /* SAM_LISTING_END_2 */
