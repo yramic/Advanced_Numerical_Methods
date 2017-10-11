@@ -3,6 +3,7 @@
 
 #include <Eigen/Dense>
 #include <vector>
+#include "point.hpp"
 
 
 // forward declaration to avoid cross-referencing
@@ -25,6 +26,7 @@ public:
     { }
     // actual  constructor
     cTree(const Eigen::VectorXd& x);
+    cTree(const std::vector<Point> PPointsTree);
 
     /**
     * \brief Getters
@@ -50,13 +52,14 @@ public:
         setVc_recursion(root_, c);
     }
     // add pointers to near and far field nodes of the tree
-    void setNearFar(double eta, cTree Ty) {
-        setNearFar_recursion(root_, Ty.root_, eta, Ty);
+    void setNearFar(double eta, cTree &Ty) {
+        setNearFar_recursion(root_, eta, Ty);
     }
     // make lists with boundaries of bounding boxes (just for testing)
     void setLists(std::vector<double>& xlist, std::vector<double>& ylist) {
         setLists_recursion(root_, xlist, ylist);
     }
+
 
 private:
 
@@ -68,12 +71,15 @@ private:
     // needed for "setVc(...)"
     void setVc_recursion(Node* cluster, const Eigen::VectorXd& c);
     // needed for "setNearFar(...)"
-    void setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree Ty);
+    void setNearFar_recursion(Node* xnode, double eta, cTree &Ty);
+
+    void setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree &Ty);
     // needed for "setLists(...)"
     void setLists_recursion(Node* cluster, std::vector<double>& xlist, std::vector<double>& ylist);
 
     Node* root_; // pointer to node-root of "cTree"
     const Eigen::VectorXd grid_; // vector associated to "cTree"
+    const std::vector<Point> PPointsTree_;
     friend class Node;
 };
 

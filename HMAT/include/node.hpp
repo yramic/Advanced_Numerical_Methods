@@ -3,7 +3,7 @@
 
 #include <Eigen/Dense>
 #include <vector>
-
+#include "point.hpp"
 
 // forward declaration to avoid cross-referencing
 class cTree;
@@ -23,11 +23,14 @@ public:
     */
     // default constructor
     Node():
-        l_child_(NULL), r_child_(NULL), l_ind_(0), r_ind_(0), near_f_(0), far_f_(0)
+        tl_child_(NULL), tr_child_(NULL), bl_child_(NULL), br_child_(NULL), PPointsTree_(std::vector<Point>()), near_f_(vector_t()), far_f_(vector_t())
     { }
-    // actual  constructor: adds a tree below the node if left_index != right_index
+    // actual  constructor: adds a tree below the node if left_index != right_index for the 2d problem(grid)
     Node(unsigned l_ind, unsigned r_ind);
-
+    // actual  constructor: creates the root of the Cluster Tree and the recursivly creates the leaves
+    Node(const std::vector<Point> PPointsTree);
+    // recursive constructor for the leaves of the Cluster Tree
+    Node(const std::vector<Point> PPointsTree, double x1, double x2, double y1, double y2);
     // destructor
     virtual ~Node();
 
@@ -50,6 +53,23 @@ public:
     Node* getRChild() const {
         return r_child_;
     }
+
+    // return a pointer to the top left child of the node
+    Node* getTl_Child() const {
+        return tl_child_;
+    }
+    // return a pointer to the top right child of the node
+    Node* getTr_Child() const {
+        return tr_child_;
+    }
+    // return a pointer to the bottom left  child of the node
+    Node* getBl_Child() const {
+        return bl_child_;
+    }
+    // return a pointer to the bottom right child of the node
+    Node* getBr_Child() const {
+        return br_child_;
+    }
     // return matrix $V_{\sigma}$, where $\sigma$ denotes the cluster
     Eigen::MatrixXd getV_node() const {
         return V_node_;
@@ -66,21 +86,46 @@ public:
     vector_t getFarF() const {
         return far_f_;
     }
-
+    // return Bounding Box x1
+    double getX1_b() const {
+        return x1_b_;
+    }
+    // return Bounding Box x2
+    double getX2_b() const {
+        return x2_b_;
+    }
+    // return Bounding Box y1
+    double getY1_b() const {
+        return y1_b_;
+    }
+    // return Bounding Box y2
+    double getY2_b() const {
+        return y2_b_;
+    }
     /**
     * \brief Setters
     */
     // build tree recursively
     void setLeaves();
+    void setLeaves(double x1, double x2, double y1, double y2);
     // compute V-matrix of cluster
-    void setV_node( const Eigen::VectorXd& x, unsigned deg);
+    //void setV_node( const Eigen::VectorXd& x, unsigned deg);
+    void setV_node(const std::vector<Point>& t, unsigned deg);
     // compute V*c restricted to node indices of the cluster
     void setVc_node(const Eigen::VectorXd& c);
-  
+    void printree(int n);
+
 private:
 
     Node* l_child_; // left  child of node
     Node* r_child_;	// right child of node
+    Node* tl_child_;  // top left child of node
+    Node* tr_child_;  // top right child of node
+    Node* bl_child_;  // bottom left child of node
+    Node* br_child_;  // bottom right child of node
+    /* maybe it´s not needed in node*/std::vector<Point> PPointsTree_; // vector of median points of the polygone's edges
+    double x1_,x2_,y1_,y2_; // cluster coordinates
+    double x1_b_,x2_b_,y1_b_,y2_b_; // bounding box coordinates
     unsigned l_ind_; // smallest index in cluster of node
     unsigned r_ind_; // largest  index in cluster of node
     Eigen::MatrixXd V_node_; // $V_{\sigma}$, where $\sigma$ is the cluster of node

@@ -3,32 +3,44 @@
 #include "../include/ctree.hpp"
 #include "../include/kernel.hpp"
 #include "../include/node.hpp"
+#include <iostream>
 
 
 // constructor
+LowRankApp::LowRankApp(Kernel kernel, std::vector<Point> pp):
+    kernel_(kernel), PPointsTree_(pp)
+{ }
+
 LowRankApp::LowRankApp(Kernel kernel, const Eigen::VectorXd& x, const Eigen::VectorXd& y):
     kernel_(kernel), Tx_(x), Ty_(y)
 { }
 
-
 // approximate matrix-vector multiplication
 Eigen::VectorXd LowRankApp::mvProd(const Eigen::VectorXd& c, double eta, unsigned deg)
 {
+
     // compute V-matrices
-    Tx_.setV(deg);
-    Ty_.setV(deg);
+    //Tx_.setV(deg);
+    //Ty_.setV(deg);
+    std::cout << "mvProd test1" << std::endl;
+    PPointsTree_.setV(deg);
+    std::cout << "mvProd test2" << std::endl;
 
     // compute V*c restricted to node indices of the tree
-    Ty_.setVc(c);
+    //Ty_.setVc(c);
+    PPointsTree_.setVc(c);
+    std::cout << "mvProd test3" << std::endl;
 
     // add pointers to near and far field nodes of the tree
-    Tx_.setNearFar(eta, Ty_);
+    //Tx_.setNearFar(eta, Ty_);
+    PPointsTree_.setNearFar(eta, PPointsTree_);
 
+    PPointsTree_.getRoot()->printree(0);
     // compute far field contribution
     Eigen::VectorXd f_approx = Eigen::VectorXd::Zero(c.size());
-    ff_contribution(f_approx, Tx_.getRoot(), deg);
+    //ff_contribution(f_approx, Tx_.getRoot(), deg);
     // compute near-field contribution
-    nf_contribution(f_approx, Tx_.getRoot(), c);
+    //nf_contribution(f_approx, Tx_.getRoot(), c);
 
     return f_approx;
 }
