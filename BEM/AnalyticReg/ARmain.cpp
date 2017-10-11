@@ -84,7 +84,7 @@ template <typename PARAM>
 Eigen::MatrixXd computeM(const PARAM& gamma, int N){
   #if SOLUTION
   // Get quadrature points and weight
-  int Nq = 8*N;
+  int Nq = 4*N;
   Eigen::VectorXd TR_points(Nq);  double TR_w;
   std::tie(TR_points,TR_w) = PeriodicTrapRule(Nq);
   // For readibility, build each block separately and then assemble the
@@ -259,9 +259,9 @@ double repFormulaSL(const Eigen::VectorXd& mu, const Eigen::Vector2d& X,
 		    const PARAMDER& gammaprime){
   int N = (mu.rows()-1)/2; // asumming coeffs is a 2N+1 vector
   double res=0.;
-  Eigen::VectorXd TR_points(2*N);  double TR_w;
-  std::tie(TR_points,TR_w) = PeriodicTrapRule(2*N);
-  for(int qp=0; qp<2*N; qp++){
+  Eigen::VectorXd TR_points(4*N);  double TR_w;
+  std::tie(TR_points,TR_w) = PeriodicTrapRule(4*N);
+  for(int qp=0; qp<4*N; qp++){
     auto z = TR_points(qp); 
     double aux = reconstructRho(mu, z, gammaprime);
     res += -TR_w/(2*M_PI)*log((X- gamma(z)).norm())*aux*(gammaprime(z)).norm();
@@ -383,7 +383,6 @@ int main() {
   
   //----------------------------------------------------------------------------
   /* SAM_LISTING_BEGIN_6 */
-  
   std::cout << "=====  Test system for gamma(t)  ====="
 	    << std::endl;
   std::function<Eigen::Vector2d(const double&)> gammaprime = [](const double& t){
@@ -423,6 +422,7 @@ int main() {
 	    << std::endl << std::endl;
   
   /* SAM_LISTING_END_6 */
+  std::cout << "DISCLAIMER : This code is still not working! " << std::endl;
     
   return 0;
 
