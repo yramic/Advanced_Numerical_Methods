@@ -102,6 +102,9 @@ public:
     double getY2_b() const {
         return y2_b_;
     }
+    std::vector<Point> getPPoints() const {
+        return PPointsTree_;
+    }
     /**
     * \brief Setters
     */

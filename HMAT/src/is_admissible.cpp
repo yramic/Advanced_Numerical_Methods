@@ -62,7 +62,7 @@ double AdmissibilityH::get_max(Node* a, Node* b)
 }
 
 double dist(double x, double y, double a, double b){
-    return sqrt(pow(x - a, 2) + pow(y - b, 2));
+    return std::sqrt(std::pow(x - a, 2) + std::pow(y - b, 2));
 }
 
 double AdmissibilityH::get_min(Node* a, Node* b)

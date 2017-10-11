@@ -20,12 +20,12 @@ public:
     LowRankApp(Kernel kernel, std::vector<Point> pp);
 
     // approximate matrix-vector multiplication
-    Eigen::VectorXd mvProd(const Eigen::VectorXd& c, double eta, unsigned deg);
+    Eigen::VectorXd mvProd(Eigen::VectorXd &c, double eta, unsigned deg);
 
 private:
 
     // compute far  field contribution
-    void ff_contribution(Eigen::VectorXd& f, Node* tx, unsigned deg);
+    void ff_contribution(Eigen::VectorXd& f, Node* tx, unsigned deg, Eigen::VectorXd& c);
     // compute near field contribution
     void nf_contribution(Eigen::VectorXd& f, Node* tx, const Eigen::VectorXd& c);
 

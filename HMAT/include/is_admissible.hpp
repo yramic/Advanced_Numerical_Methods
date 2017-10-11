@@ -12,6 +12,7 @@
 //double get_min(double xl, double xr, double yl, double yr);
 //bool is_admissible(double xl, double xr, double yl, double yr, double eta);
 
+
 class Admissibility
 {
 public:
@@ -45,5 +46,7 @@ public:
     bool is_admissible(Node* x, Node* y, double eta);
 
 };
+
+
 
 #endif // IS_ADMISSIBLE_HPP

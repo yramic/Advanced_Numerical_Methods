@@ -16,7 +16,7 @@ LowRankApp::LowRankApp(Kernel kernel, const Eigen::VectorXd& x, const Eigen::Vec
 { }
 
 // approximate matrix-vector multiplication
-Eigen::VectorXd LowRankApp::mvProd(const Eigen::VectorXd& c, double eta, unsigned deg)
+Eigen::VectorXd LowRankApp::mvProd(Eigen::VectorXd& c, double eta, unsigned deg)
 {
 
     // compute V-matrices
@@ -38,18 +38,18 @@ Eigen::VectorXd LowRankApp::mvProd(const Eigen::VectorXd& c, double eta, unsigne
     PPointsTree_.getRoot()->printree(0);
     // compute far field contribution
     Eigen::VectorXd f_approx = Eigen::VectorXd::Zero(c.size());
-    //ff_contribution(f_approx, Tx_.getRoot(), deg);
+    ff_contribution(f_approx, PPointsTree_.getRoot(), deg, c);
     // compute near-field contribution
-    //nf_contribution(f_approx, Tx_.getRoot(), c);
-
+    nf_contribution(f_approx, PPointsTree_.getRoot(), c);
+    std::cout << f_approx << std::endl;
     return f_approx;
 }
 
 
 // compute far field contribution
-void LowRankApp::ff_contribution(Eigen::VectorXd& f, Node* tx, unsigned deg)
+void LowRankApp::ff_contribution(Eigen::VectorXd& f, Node* tx, unsigned deg, Eigen::VectorXd& c)
 {
-    if((*tx).getLChild() != NULL) {
+    /*if((*tx).getLChild() != NULL) {
 
         Eigen::VectorXd XVc = Eigen::VectorXd::Zero(deg+1); // auxiliary variable
         int ixl = (*tx).getLInd(); // start index of cluster *tx
@@ -74,8 +74,33 @@ void LowRankApp::ff_contribution(Eigen::VectorXd& f, Node* tx, unsigned deg)
         Node* xr_c = (*tx).getRChild(); // pointer to right child of *tx
 
         // add contribution of leaves of *tx
-        ff_contribution(f, xl_c, deg);
-        ff_contribution(f, xr_c, deg);
+        ff_contribution(f, xl_c, deg, c);
+        ff_contribution(f, xr_c, deg, c);
+    }*/
+    if(tx != NULL){
+        Eigen::MatrixXd VX = Eigen::MatrixXd::Zero(tx->getPPoints().size(),(deg+1)*(deg+1));
+        Eigen::MatrixXd VXV = Eigen::MatrixXd::Zero(tx->getPPoints().size(),tx->getPPoints().size());
+        std::vector<Node*> ffx = (*tx).getFarF(); // far field of *tx_root
+        for(std::vector<Node*>::iterator iter=ffx.begin(); iter!=ffx.end(); ++iter) {
+            BlockCluster X_(tx->getX1_b(), tx->getX2_b(), tx->getY1_b(), tx->getY2_b(), (*iter)->getX1_b(), (*iter)->getX2_b(), (*iter)->getY1_b(), (*iter)->getY2_b(), deg, kernel_);
+            Eigen::MatrixXd X = X_.getMatrix();
+            VX = tx->getV_node() * X;
+            VXV += VX * (*iter)->getV_node().transpose();
+        }
+        Eigen::VectorXd c_seg(tx->getPPoints().size()),f_seg(tx->getPPoints().size());
+        int k = 0;
+        for (std::vector<Point>::iterator it=tx->getPPoints().begin(); it!=tx->getPPoints().end(); it++, k++) {
+            c_seg(k) = c[it->getId()];
+        }
+        f_seg = VXV * c_seg;
+        k = 0;
+        for (std::vector<Point>::iterator it=tx->getPPoints().begin(); it!=tx->getPPoints().end(); it++, k++) {
+            f(it->getId()) += f_seg[k];
+        }
+        ff_contribution(f, tx->getTl_Child(), deg, c);
+        ff_contribution(f, tx->getTr_Child(), deg, c);
+        ff_contribution(f, tx->getBl_Child(), deg, c);
+        ff_contribution(f, tx->getBr_Child(), deg, c);
     }
 }
 
@@ -83,7 +108,7 @@ void LowRankApp::ff_contribution(Eigen::VectorXd& f, Node* tx, unsigned deg)
 // compute near-field contribution
 void LowRankApp::nf_contribution(Eigen::VectorXd& f, Node* tx, const Eigen::VectorXd& c)
 {
-    if(tx != NULL) {
+    /*if(tx != NULL) {
 
         unsigned ixl=(*tx).getLInd(); // start index of cluster *tx
         unsigned ixr=(*tx).getRInd(); // last  index of cluster *tx
@@ -108,5 +133,22 @@ void LowRankApp::nf_contribution(Eigen::VectorXd& f, Node* tx, const Eigen::Vect
             nf_contribution(f, xl_c, c);
             nf_contribution(f, xr_c, c);
         }
+    }*/
+    if(tx != NULL) {   // >1 for checking if it is a leaf with 1 node, which I don`t want to check
+        // iterate over near field of *tx
+        if (tx->getPPoints().size()>1){
+            std::vector<Node*> nfx = (*tx).getNearF(); // near field of *tx
+            for(std::vector<Node*>::iterator iter=nfx.begin(); iter!=nfx.end(); ++iter) {
+                for(std::vector<Point>::iterator it=(*tx).getPPoints().begin(); it!=(*tx).getPPoints().end(); ++it) {
+                    std::vector<Point> t = (*iter)->getPPoints();
+                    f(t[0].getId()) += kernel_(t[0].getX(),t[0].getY(),it->getX(),it->getY()) * c(it->getId());
+                }
+            }
+        }
+        nf_contribution(f, tx->getTl_Child(), c);
+        nf_contribution(f, tx->getTr_Child(), c);
+        nf_contribution(f, tx->getBl_Child(), c);
+        nf_contribution(f, tx->getBr_Child(), c);
     }
+
 }
