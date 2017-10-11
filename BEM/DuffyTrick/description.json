@@ -4,5 +4,5 @@
     "contributors" : "",
 
     "name": "DuffyTrick",
-    "all" : ["main.cpp"]
+    "all" : ["main.cpp", "gauleg.hpp"]
 }
