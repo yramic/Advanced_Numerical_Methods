@@ -97,6 +97,7 @@ int main() {
     res << -sin(t),  cos(t);
     return res;
   };
+
   
   // TODO: You may test your computation of the coefficients for S(t) and the
   // difference (S(0.1)-S(0))/S(0.1)-S(0).
@@ -142,7 +143,6 @@ int main() {
   
   //----------------------------------------------------------------------------
   /* SAM_LISTING_BEGIN_6 */
-  
   std::cout << "=====  Test system for gamma(t)  ====="
 	    << std::endl;
   std::function<Eigen::Vector2d(const double&)> gammaprime = [](const double& t){
@@ -153,6 +153,7 @@ int main() {
   std::function<double(const Eigen::Vector2d&)> g = [](const Eigen::Vector2d& X){
     return sin(X(0))*sinh(X(1));
   };
+
 
   Eigen::VectorXi Nall(9); Nall<< 3,5,7,9,11,13,15,17,19;
   Eigen::VectorXd error(9); error.setZero();
@@ -171,6 +172,7 @@ int main() {
 	    << std::endl << std::endl;
   
   /* SAM_LISTING_END_6 */
+  std::cout << "DISCLAIMER : This code is still not working! " << std::endl;
     
   return 0;
 

@@ -1,7 +1,7 @@
 //// 
 //// Copyright (C) 2017 SAM (D-MATH) @ ETH Zurich
-//// Author(s): curzuato < > 
-//// Contributors:  dcasati 
+//// Author(s): dcasati <daniele.casati@sam.math.ethz.ch> 
+//// Contributors: curzuato
 //// This file is part of the AdvNumCSE repository.
 ////
 #include <iostream>
@@ -92,7 +92,8 @@ int main() {
     res << -sin(t),  cos(t);
     return res;
   };
-    
+
+  
   // TODO: You may test your computation of the coefficients for S(t) and the
   // difference (S(0.1)-S(0))/S(0.1)-S(0).
   Eigen::Vector2d diffS; diffS.setZero();
@@ -136,7 +137,6 @@ int main() {
     
   
   //----------------------------------------------------------------------------
-  
   std::cout << "=====  Test system for gamma(t)  ====="
 	    << std::endl;
   std::function<Eigen::Vector2d(const double&)> gammaprime = [](const double& t){
@@ -148,11 +148,11 @@ int main() {
     return sin(X(0))*sinh(X(1));
   };
 
+
   Eigen::VectorXi Nall(9); Nall<< 3,5,7,9,11,13,15,17,19;
   Eigen::VectorXd error(9); error.setZero();
   Eigen::Vector2d T({0.5,0.2});
-  
-  // TODO: Solve BIE for different Ns and compute error of the solution.
+    // TODO: Solve BIE for different Ns and compute error of the solution.
 
   // Output error and discretization parameters N
   std::ofstream out_error("AR_errors.txt");
@@ -165,6 +165,7 @@ int main() {
   std::cout << "======================================"
 	    << std::endl << std::endl;
   
+  std::cout << "DISCLAIMER : This code is still not working! " << std::endl;
     
   return 0;
 

@@ -75,7 +75,7 @@ Eigen::Vector2d evaluateGammaDiff(const Eigen::MatrixXd& gammaCoeffs, double s,
 template <typename PARAM>
 Eigen::MatrixXd computeM(const PARAM& gamma, int N){
   // Get quadrature points and weight
-  int Nq = 8*N;
+  int Nq = 4*N;
   Eigen::VectorXd TR_points(Nq);  double TR_w;
   std::tie(TR_points,TR_w) = PeriodicTrapRule(Nq);
   // For readibility, build each block separately and then assemble the
@@ -229,9 +229,9 @@ double repFormulaSL(const Eigen::VectorXd& mu, const Eigen::Vector2d& X,
 		    const PARAMDER& gammaprime){
   int N = (mu.rows()-1)/2; // asumming coeffs is a 2N+1 vector
   double res=0.;
-  Eigen::VectorXd TR_points(2*N);  double TR_w;
-  std::tie(TR_points,TR_w) = PeriodicTrapRule(2*N);
-  for(int qp=0; qp<2*N; qp++){
+  Eigen::VectorXd TR_points(4*N);  double TR_w;
+  std::tie(TR_points,TR_w) = PeriodicTrapRule(4*N);
+  for(int qp=0; qp<4*N; qp++){
     auto z = TR_points(qp); 
     double aux = reconstructRho(mu, z, gammaprime);
     res += -TR_w/(2*M_PI)*log((X- gamma(z)).norm())*aux*(gammaprime(z)).norm();
@@ -271,6 +271,13 @@ int main() {
     res << cos(t) , sin(t);
     return res;
   };
+  std::function<Eigen::Vector2d(const double&)> Sprime = [](const double& t){
+    Eigen::Vector2d res;
+    res << -sin(t),  cos(t);
+    return res;
+  };
+
+  
   Eigen::MatrixXd SCoeffs = computeGammaCoefficients(S,N);
   Eigen::Vector2d diffS = evaluateGammaDiff(SCoeffs, 0.1, 0, N);
   Eigen::Vector2d exDiffS; exDiffS<< cos(0.1) - cos(0), sin(0.1);
@@ -300,12 +307,6 @@ int main() {
   //----------------------------------------------------------------------------
   std::cout << "=====  Test system for S(t) = (cos(t), sin(t))  ====="
 	    << std::endl;
-  std::function<Eigen::Vector2d(const double&)> Sprime = [](const double& t){
-    Eigen::Vector2d res;
-    res << -sin(t),  cos(t);
-    return res;
-  };
-
   std::function<double(const Eigen::Vector2d&)> gC = [](const Eigen::Vector2d& X){
     return X(0);
   };
@@ -333,7 +334,6 @@ int main() {
   
   //----------------------------------------------------------------------------
   /* SAM_LISTING_BEGIN_6 */
-  
   std::cout << "=====  Test system for gamma(t)  ====="
 	    << std::endl;
   std::function<Eigen::Vector2d(const double&)> gammaprime = [](const double& t){
@@ -345,10 +345,10 @@ int main() {
     return sin(X(0))*sinh(X(1));
   };
 
+
   Eigen::VectorXi Nall(9); Nall<< 3,5,7,9,11,13,15,17,19;
   Eigen::VectorXd error(9); error.setZero();
   Eigen::Vector2d T({0.5,0.2});
-  
   for(int j=0; j<9; j++){
     Eigen::VectorXd sol = solveBIE(gamma, g, Nall[j]);
     double solEval = repFormulaSL(sol, T, gamma, gammaprime);
@@ -369,6 +369,7 @@ int main() {
 	    << std::endl << std::endl;
   
   /* SAM_LISTING_END_6 */
+  std::cout << "DISCLAIMER : This code is still not working! " << std::endl;
     
   return 0;
 
