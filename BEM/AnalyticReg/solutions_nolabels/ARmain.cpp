@@ -1,3 +1,9 @@
+//// 
+//// Copyright (C) 2017 SAM (D-MATH) @ ETH Zurich
+//// Author(s): curzuato < > 
+//// Contributors:  dcasati 
+//// This file is part of the AdvNumCSE repository.
+////
 #include <iostream>
 #include <fstream>
 #include <istream> 
@@ -6,31 +12,21 @@
 // GMRES
 #include <unsupported/Eigen/IterativeSolvers>
 
-#if SOLUTION
 #include "PeriodicTrapezoidalQR.hpp"
-#endif // SOLUTION
 
 
-/* SAM_LISTING_BEGIN_0 */
 Eigen::MatrixXd computeAminusM(int N){
   Eigen::DiagonalMatrix<double, Eigen::Dynamic> AmM(2*N+1);
 
-#if SOLUTION
   Eigen::VectorXd aux(2*N+1);
   aux << 0, Eigen::VectorXd::LinSpaced(N,1,N).cwiseInverse()*(M_PI/2.),
     Eigen::VectorXd::LinSpaced(N,1,N).cwiseInverse()*(M_PI/2.);
   AmM = aux.asDiagonal();
 
-#else // TEMPLATE
-  // TODO: Compute A-M
-#endif // TEMPLATE
   return AmM;
 }
-/* SAM_LISTING_END_0 */
 
 
-/* SAM_LISTING_BEGIN_1 */
-  #if SOLUTION
 template <typename PARAM>
 Eigen::MatrixXd computeGammaCoefficients(const PARAM& gamma, int N){
   // Get quadrature points and weight
@@ -78,11 +74,9 @@ Eigen::Vector2d evaluateGammaDiff(const Eigen::MatrixXd& gammaCoeffs, double s,
 			 *evalFun.segment(N,N) );
   return res;
 }
-#endif // SOLUTION
 
 template <typename PARAM>
 Eigen::MatrixXd computeM(const PARAM& gamma, int N){
-  #if SOLUTION
   // Get quadrature points and weight
   int Nq = 8*N;
   Eigen::VectorXd TR_points(Nq);  double TR_w;
@@ -120,31 +114,23 @@ Eigen::MatrixXd computeM(const PARAM& gamma, int N){
       }
     }// end for loop over l
   } // end for loop over k
-  #endif // SOLUTION
 
   // Assemble big matrix
   Eigen::MatrixXd M(2*N+1, 2*N+1);
 
-  #if SOLUTION
   M.block(0  , 0  , N+1, N+1) = Mcc.eval();
   M.block(0  , N+1, N+1, N  ) = Msc.transpose().eval();
   M.block(N+1, 0  , N  , N+1) = Msc.eval();
   M.block(N+1, N+1, N  , N  ) = Mss.eval();
-  #else // TEMPLATE
-    // TODO: Compute M using quadrature
-  #endif // TEMPLATE
 
   return M;
 }
-/* SAM_LISTING_END_1 */
 
 
-/* SAM_LISTING_BEGIN_2 */
 template <typename PARAM, typename FUNC>
 Eigen::VectorXd computeG(const PARAM& gamma, const FUNC& g, int N){
   // Initialize right hand side vector
   Eigen::VectorXd RHS(2*N+1);  RHS.setZero();
-  #if SOLUTION
   // Get quadrature points and weight
   Eigen::VectorXd TR_points(2*N);  double TR_w;
   std::tie(TR_points,TR_w) = PeriodicTrapRule(2*N);
@@ -162,18 +148,12 @@ Eigen::VectorXd computeG(const PARAM& gamma, const FUNC& g, int N){
     }// end iteration over quadrature points
   }
 
-  #else // TEMPLATE
-    // TODO: Compute RHS
-  #endif // TEMPLATE
   return RHS;
 }
-/* SAM_LISTING_END_2 */
 
 
-/* SAM_LISTING_BEGIN_3 */
 template <typename PARAM, typename FUNC>
 Eigen::VectorXd solveBIE(const PARAM& gamma, const FUNC& g, int N){
-    #if SOLUTION
   // In order to compute A we use A=(A-M)+M
   std::cout << " Assemble A " << std::endl; 
   Eigen::MatrixXd AmM = computeAminusM(N);
@@ -186,16 +166,10 @@ Eigen::VectorXd solveBIE(const PARAM& gamma, const FUNC& g, int N){
   Eigen::MatrixXd LHS = (AmM - M).eval();
   Eigen::VectorXd sol = LHS.lu().solve(RHS);
   std::cout << " Done " << std::endl;
-#else // TEMPLATE
-    // TODO: Build BIE system and solve it
-  Eigen::VectorXd sol(2*N+1);
-#endif // TEMPLATE
   
   return sol;
 }
-/* SAM_LISTING_END_3 */
 
-  #if SOLUTION
 template <typename PARAM, typename FUNC>
 Eigen::VectorXd solveBIEonDisk(const PARAM& gamma, const FUNC& g, int N){
   // In order to compute A we do (A-M)+M
@@ -214,7 +188,6 @@ Eigen::VectorXd solveBIEonDisk(const PARAM& gamma, const FUNC& g, int N){
 
 
 
-/* SAM_LISTING_BEGIN_4 */
 template <typename PARAMDER>
 double reconstructRho(const Eigen::VectorXd& coeffs, double t,
 		      const PARAMDER& gammaprime){
@@ -226,12 +199,10 @@ double reconstructRho(const Eigen::VectorXd& coeffs, double t,
   }
   return res;
 }
-#endif //SOLUTION
  
 template <typename PARAMDER>
 double L2norm(const PARAMDER& gammaprime, const Eigen::VectorXd& coeffs){
   double res=0.;
-#if SOLUTION
   int N = (coeffs.rows()-1)/2.; // asumming coeffs is a 2N+1 vector
   // Get quadrature points and weight
   Eigen::VectorXd TR_points(2*N);  double TR_w;
@@ -242,17 +213,11 @@ double L2norm(const PARAMDER& gammaprime, const Eigen::VectorXd& coeffs){
     double aux = reconstructRho(coeffs, z, gammaprime);
     res += TR_w*aux*aux;      
   }
-  #else // TEMPLATE
-    // TODO: reconstruct the function and compute its L2norm
-  #endif // TEMPLATE
   
   return std::sqrt(res);
 }
-/* SAM_LISTING_END_4 */
 
 
-/* SAM_LISTING_BEGIN_5 */
- #if SOLUTION
 template <typename PARAM, typename PARAMDER>
 double repFormulaSL(const Eigen::VectorXd& mu, const Eigen::Vector2d& X,
 		    const PARAM& gamma,
@@ -268,8 +233,6 @@ double repFormulaSL(const Eigen::VectorXd& mu, const Eigen::Vector2d& X,
   }
   return res;
 }
- #endif //SOLUTION
-/* SAM_LISTING_END_5 */
 
 int main() {
 
@@ -277,7 +240,6 @@ int main() {
   //----------------------------------------------------------------------------
   std::cout << "===========  Test integration  ===========" << std::endl;
   double Qint1 = 0., Qintcos = 0., Qintlogcos2 = 0.;
-#if SOLUTION
   Eigen::MatrixXd TR_points(N, 2);  double TR_w;
   std::tie(TR_points,TR_w) = PeriodicTrapRule(N);
   for(int qp=0; qp<N; qp++){
@@ -286,9 +248,6 @@ int main() {
     Qintcos += TR_w*cos(z);
     Qintlogcos2 += TR_w*log(cos(z)*cos(z)+1.);
   }
-#else // TEMPLATE
-  // TODO: You may test your quadrature by integrating 1, cos(t) and log(cos(t)^2 + 1)
-  #endif // TEMPLATE
   double intlogcos2ex = 2.*M_PI*log((sqrt(2)+1)/((sqrt(2)-1)*4));
   std::cout << " int 1                : " << fabs (Qint1 - 2*M_PI)
 	    << "\n int cosx             : " << fabs(Qintcos)
@@ -306,21 +265,8 @@ int main() {
     res << cos(t) , sin(t);
     return res;
   };
-  std::function<Eigen::Vector2d(const double&)> Sprime = [](const double& t){
-    Eigen::Vector2d res;
-    res << -sin(t),  cos(t);
-    return res;
-  };
-
-  
-#if SOLUTION
   Eigen::MatrixXd SCoeffs = computeGammaCoefficients(S,N);
   Eigen::Vector2d diffS = evaluateGammaDiff(SCoeffs, 0.1, 0, N);
-#else // TEMPLATE
-  // TODO: You may test your computation of the coefficients for S(t) and the
-  // difference (S(0.1)-S(0))/S(0.1)-S(0).
-  Eigen::Vector2d diffS; diffS.setZero();
-  #endif // TEMPLATE
   Eigen::Vector2d exDiffS; exDiffS<< cos(0.1) - cos(0), sin(0.1);
   std::cout << "(S(0.1)-S(0))/S(0.1)-S(0) = " << diffS.transpose() << " vs "
 	    << exDiffS(0)/exDiffS.norm() << " , " << exDiffS(1)/exDiffS.norm()
@@ -337,24 +283,23 @@ int main() {
     res << cos(t) + 0.65*cos(2*t), 1.5*sin(t);
     return res;
   };
-#if SOLUTION
   Eigen::MatrixXd gammaCoeffs = computeGammaCoefficients(gamma,N);
   Eigen::Vector2d diffGamma = evaluateGammaDiff(gammaCoeffs, 0.1, 0, N);
-  #else // TEMPLATE
-  // TODO: You may test your computation of the coefficients for S(t) and the
-  // difference (S(0.1)-S(0))/S(0.1)-S(0).
-  Eigen::Vector2d diffGamma; diffGamma.setZero();
-  #endif // TEMPLATE
   Eigen::Vector2d exDiffgamma = gamma(0.1) - gamma(0);
   std::cout << "(gamma (0.1) - gamma(0))//S(0.1)-S(0) = " << diffGamma.transpose()
 	    << " vs " << exDiffgamma.transpose()/exDiffS.norm() << std::endl;
   std::cout << "============================================================="
 	    << "=============" << std::endl << std::endl;
   
-#if SOLUTION
   //----------------------------------------------------------------------------
   std::cout << "=====  Test system for S(t) = (cos(t), sin(t))  ====="
 	    << std::endl;
+  std::function<Eigen::Vector2d(const double&)> Sprime = [](const double& t){
+    Eigen::Vector2d res;
+    res << -sin(t),  cos(t);
+    return res;
+  };
+
   std::function<double(const Eigen::Vector2d&)> gC = [](const Eigen::Vector2d& X){
     return X(0);
   };
@@ -366,7 +311,6 @@ int main() {
 	    << " vs " << gC(S(M_PI))*2 << std::endl;
   std::cout << "====================================================="
 	    << std::endl << std::endl;
-  #endif // SOLUTION
 
 
   //----------------------------------------------------------------------------
@@ -382,7 +326,6 @@ int main() {
     
   
   //----------------------------------------------------------------------------
-  /* SAM_LISTING_BEGIN_6 */
   
   std::cout << "=====  Test system for gamma(t)  ====="
 	    << std::endl;
@@ -395,11 +338,10 @@ int main() {
     return sin(X(0))*sinh(X(1));
   };
 
-
   Eigen::VectorXi Nall(9); Nall<< 3,5,7,9,11,13,15,17,19;
   Eigen::VectorXd error(9); error.setZero();
   Eigen::Vector2d T({0.5,0.2});
-#if SOLUTION
+  
   for(int j=0; j<9; j++){
     Eigen::VectorXd sol = solveBIE(gamma, g, Nall[j]);
     double solEval = repFormulaSL(sol, T, gamma, gammaprime);
@@ -407,9 +349,6 @@ int main() {
 	      << std::endl; 
     error(j) = fabs(solEval - g(T) );
   }
-#else // TEMPLATE
-    // TODO: Solve BIE for different Ns and compute error of the solution.
-#endif // TEMPLATE
 
   // Output error and discretization parameters N
   std::ofstream out_error("AR_errors.txt");
@@ -422,7 +361,6 @@ int main() {
   std::cout << "======================================"
 	    << std::endl << std::endl;
   
-  /* SAM_LISTING_END_6 */
     
   return 0;
 

@@ -1,0 +1,8 @@
+{
+    "author" : "curzuato",
+    "email" : " ",
+    "contributors" : "",
+
+    "name": "AnalyticReg",
+    "all" : ["ARmain.cpp", "plot_convergence.py"]
+}

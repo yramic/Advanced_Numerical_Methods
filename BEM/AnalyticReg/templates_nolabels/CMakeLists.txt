@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(DuffyTrick)
+project(AnalyticReg)
 
 ###########################################################################
 #
@@ -56,8 +56,8 @@ else()
 
 endif()
 
-# make main
-set(SRCS main.cpp)
-add_executable(main ${SRCS})
-target_link_libraries(main Figure ${MATHGL2_LIBRARIES})
+# make ARmain
+set(SRCS ARmain.cpp)
+add_executable(ARmain ${SRCS})
+target_link_libraries(ARmain Figure ${MATHGL2_LIBRARIES})
 
