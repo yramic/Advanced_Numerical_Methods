@@ -62,7 +62,7 @@ Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
     tmp = b - 2*a;
     if (fabs(tmp) > EPS*a) val[0] -= tmp * log( 0.25*tmp*tmp /a );
     val[0] = 0.5*val[0] /a - 4.0;
-  } // Label[line]{slp:1a}
+  } // \Label[line]{slp:1a}
   else { // case D > 0: argument of logarithm has no zeros \Label[line]{slp:2}
     tmp = c - a;
     if (fabs(tmp) < EPS*c) val[0] = 0.5*M_PI;

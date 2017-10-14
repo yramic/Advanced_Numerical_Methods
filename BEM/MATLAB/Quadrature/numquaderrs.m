@@ -1,5 +1,6 @@
 function numquaderrs()
 % Numerical quadrature on [0,1]
+% Numerical experiments for Sect 4.1 of ADVNCSE lecture material
 N = 20;
 
 figure('Name','tent');
