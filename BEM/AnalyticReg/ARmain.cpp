@@ -286,7 +286,7 @@ double reconstructRho(const Eigen::VectorXd& coeffs, double t,
 
 //----------------------------------------------------------------------------
 /* @brief Compute L2 norm of UN from its coefficients using periodic trapezoidal 
- *        rule (4N points).
+ *        rule (2N points).
  * \param[in] gammaprime Function that takes a double and returns a 2d vector  
  *                       corresponding to the derivative of the curve's 
  *                       parametrization.
@@ -299,8 +299,8 @@ double L2norm(const PARAMDER& gammaprime, const Eigen::VectorXd& coeffs){
   int N = (coeffs.rows()-1)/2.; // asumming coeffs is a 2N+1 vector
   // Get quadrature points and weight
   Eigen::VectorXd TR_points(2*N);  double TR_w;
-  std::tie(TR_points,TR_w) = PeriodicTrapRule(4*N);
-  for(int qp=0; qp<4*N; qp++){
+  std::tie(TR_points,TR_w) = PeriodicTrapRule(2*N);
+  for(int qp=0; qp<2*N; qp++){
     auto z = TR_points(qp);
     // evaluate
     double aux = reconstructRho(coeffs, z, gammaprime);
@@ -315,6 +315,7 @@ double L2norm(const PARAMDER& gammaprime, const Eigen::VectorXd& coeffs){
 /* SAM_LISTING_END_4 */
 
 
+ #if SOLUTION
 //----------------------------------------------------------------------------
 /* SAM_LISTING_BEGIN_5 */
 /* @brief Evaluate Single Layer Potential of function given by the coefficient 
@@ -329,7 +330,6 @@ double L2norm(const PARAMDER& gammaprime, const Eigen::VectorXd& coeffs){
  *                       corresponding to the derivative of the curve's 
  *                       parametrization.
  */
- #if SOLUTION
 template <typename PARAM, typename PARAMDER>
 double repFormulaSL(const Eigen::VectorXd& mu, const Eigen::Vector2d& X,
 		    const PARAM& gamma,
@@ -478,8 +478,7 @@ int main() {
 
 
   int Nl=15;
-  Eigen::VectorXi Nall(Nl);
-  Nall.setLinSpaced(Nl, 3, 31);
+  Eigen::VectorXi Nall(Nl);  Nall.setLinSpaced(Nl, 3, 31);
   Eigen::VectorXd error(Nl); error.setZero();
   Eigen::Vector2d T({0.5,0.2});
 #if SOLUTION

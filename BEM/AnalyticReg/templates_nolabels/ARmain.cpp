@@ -9,11 +9,13 @@
 #include <istream> 
 #include <cmath>
 #include <Eigen/Dense>
-// GMRES
-#include <unsupported/Eigen/IterativeSolvers>
 
 
 
+//----------------------------------------------------------------------------
+/* @brief Compute matrix A-M using analytic expression.
+ * \param[in] N Discretization parameter indicating number of basis functions.
+ */
 Eigen::MatrixXd computeAminusM(int N){
   Eigen::DiagonalMatrix<double, Eigen::Dynamic> AmM(2*N+1);
 
@@ -23,6 +25,13 @@ Eigen::MatrixXd computeAminusM(int N){
 
 
 
+
+//----------------------------------------------------------------------------
+/* @brief Compute matrix M using periodic trapezoidal rule (2N+2 points).
+ * \param[in] gamma Function that takes a double and returns a 2d vector  
+ *                  corresponding to the parametrized curve.
+ * \param[in] N Discretization parameter indicating number of basis functions.
+ */
 template <typename PARAM>
 Eigen::MatrixXd computeM(const PARAM& gamma, int N){
 
@@ -35,6 +44,13 @@ Eigen::MatrixXd computeM(const PARAM& gamma, int N){
 }
 
 
+//----------------------------------------------------------------------------
+/* @brief Compute right hand side using periodic trapezoidal rule (2N points).
+ * \param[in] gamma Function that takes a double and returns a 2d vector  
+ *                  corresponding to the parametrized curve.
+ * \param[in] g Right hand side function (takes 2d points and returns a double).
+ * \param[in] N Discretization parameter indicating number of basis functions.
+ */
 template <typename PARAM, typename FUNC>
 Eigen::VectorXd computeG(const PARAM& gamma, const FUNC& g, int N){
   // Initialize right hand side vector
@@ -44,6 +60,13 @@ Eigen::VectorXd computeG(const PARAM& gamma, const FUNC& g, int N){
 }
 
 
+//----------------------------------------------------------------------------
+/* @brief Build and solve boundary integral equation V rho = g
+ * \param[in] gamma Function that takes a double and returns a 2d vector  
+ *                  corresponding to the parametrized curve.
+ * \param[in] g Right hand side function (takes 2d points and returns a double).
+ * \param[in] N Discretization parameter indicating number of basis functions.
+ */
 template <typename PARAM, typename FUNC>
 Eigen::VectorXd solveBIE(const PARAM& gamma, const FUNC& g, int N){
     // TODO: Build BIE system and solve it
@@ -52,7 +75,18 @@ Eigen::VectorXd solveBIE(const PARAM& gamma, const FUNC& g, int N){
   return sol;
 }
 
- 
+
+//----------------------------------------------------------------------------
+
+
+//----------------------------------------------------------------------------
+/* @brief Compute L2 norm of UN from its coefficients using periodic trapezoidal 
+ *        rule (2N points).
+ * \param[in] gammaprime Function that takes a double and returns a 2d vector  
+ *                       corresponding to the derivative of the curve's 
+ *                       parametrization.
+ * \param[in] coeffs coefficients of UN
+ */
 template <typename PARAMDER>
 double L2norm(const PARAMDER& gammaprime, const Eigen::VectorXd& coeffs){
   double res=0.;
@@ -63,13 +97,16 @@ double L2norm(const PARAMDER& gammaprime, const Eigen::VectorXd& coeffs){
 
 
 
+
+
 int main() {
 
-  int N = 9;
+  int N = 10;
   //----------------------------------------------------------------------------
   std::cout << "===========  Test integration  ===========" << std::endl;
   double Qint1 = 0., Qintcos = 0., Qintlogcos2 = 0.;
-  // TODO: You may test your quadrature by integrating 1, cos(t) and log(cos(t)^2 + 1)
+  /* TODO: You may test your quadrature by integrating 1, cos(t) and 
+     log(cos(t)^2 + 1) */
   double intlogcos2ex = 2.*M_PI*log((sqrt(2)+1)/((sqrt(2)-1)*4));
   std::cout << " int 1                : " << fabs (Qint1 - 2*M_PI)
 	    << "\n int cosx             : " << fabs(Qintcos)
@@ -82,6 +119,7 @@ int main() {
   //----------------------------------------------------------------------------
   std::cout << "============  Test Coefficients for S(t) = (cos(t), sin(t))  "
 	    << "============="  << std::endl;
+  N = 4;
   std::function<Eigen::Vector2d(const double&)> S = [](const double& t){
     Eigen::Vector2d res;
     res << cos(t) , sin(t);
@@ -92,7 +130,8 @@ int main() {
     res << -sin(t),  cos(t);
     return res;
   };
-    
+
+  
   // TODO: You may test your computation of the coefficients for S(t) and the
   // difference (S(0.1)-S(0))/S(0.1)-S(0).
   Eigen::Vector2d diffS; diffS.setZero();
@@ -136,7 +175,6 @@ int main() {
     
   
   //----------------------------------------------------------------------------
-  
   std::cout << "=====  Test system for gamma(t)  ====="
 	    << std::endl;
   std::function<Eigen::Vector2d(const double&)> gammaprime = [](const double& t){
@@ -148,11 +186,12 @@ int main() {
     return sin(X(0))*sinh(X(1));
   };
 
-  Eigen::VectorXi Nall(9); Nall<< 3,5,7,9,11,13,15,17,19;
-  Eigen::VectorXd error(9); error.setZero();
+
+  int Nl=15;
+  Eigen::VectorXi Nall(Nl);  Nall.setLinSpaced(Nl, 3, 31);
+  Eigen::VectorXd error(Nl); error.setZero();
   Eigen::Vector2d T({0.5,0.2});
-  
-  // TODO: Solve BIE for different Ns and compute error of the solution.
+    // TODO: Solve BIE for different Ns and compute error of the solution.
 
   // Output error and discretization parameters N
   std::ofstream out_error("AR_errors.txt");

@@ -59,5 +59,4 @@ endif()
 # make ARmain
 set(SRCS ARmain.cpp)
 add_executable(ARmain ${SRCS})
-target_link_libraries(ARmain Figure ${MATHGL2_LIBRARIES})
 

@@ -59,5 +59,4 @@ endif()
 # make SampleProblem
 set(SRCS SampleProblem.cpp)
 add_executable(SampleProblem ${SRCS})
-target_link_libraries(SampleProblem Figure ${MATHGL2_LIBRARIES})
 
