@@ -1,7 +1,7 @@
 //// 
 //// Copyright (C) 2017 SAM (D-MATH) @ ETH Zurich
-//// Author(s): curzuato < > 
-//// Contributors:  dcasati 
+//// Author(s): dcasati <daniele.casati@sam.math.ethz.ch> 
+//// Contributors: curzuato
 //// This file is part of the AdvNumCSE repository.
 ////
 #include <iostream>
@@ -442,6 +442,7 @@ int main() {
   std::cout << "======================================"
 	    << std::endl << std::endl;
   
+  std::cout << "DISCLAIMER : This code is still not working! " << std::endl;
     
   return 0;
 

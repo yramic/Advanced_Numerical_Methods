@@ -1,3 +1,9 @@
+//// 
+//// Copyright (C) 2017 SAM (D-MATH) @ ETH Zurich
+//// Author(s): dcasati <daniele.casati@sam.math.ethz.ch> 
+//// Contributors: curzuato
+//// This file is part of the AdvNumCSE repository.
+////
 #include <iostream>
 #include <cmath>
 #include <Eigen/Dense>
