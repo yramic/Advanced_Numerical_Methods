@@ -3,15 +3,17 @@
 #include <istream> 
 #include <cmath>
 #include <Eigen/Dense>
-// GMRES
-#include <unsupported/Eigen/IterativeSolvers>
 
 #if SOLUTION
 #include "PeriodicTrapezoidalQR.hpp"
 #endif // SOLUTION
 
 
+//----------------------------------------------------------------------------
 /* SAM_LISTING_BEGIN_0 */
+/* @brief Compute matrix A-M using analytic expression.
+ * \param[in] N Discretization parameter indicating number of basis functions.
+ */
 Eigen::MatrixXd computeAminusM(int N){
   Eigen::DiagonalMatrix<double, Eigen::Dynamic> AmM(2*N+1);
 
@@ -29,8 +31,14 @@ Eigen::MatrixXd computeAminusM(int N){
 /* SAM_LISTING_END_0 */
 
 
-/* SAM_LISTING_BEGIN_1 */
   #if SOLUTION
+//----------------------------------------------------------------------------
+/* SAM_LISTING_BEGIN_1 */
+/* @brief Compute Fourier coefficients corresponding to gamma.
+ * \param[in] gamma Function that takes a double and returns a 2d vector  
+ *                  corresponding to the parametrized curve.
+ * \param[in] N Discretization parameter indicating number of basis functions.
+ */
 template <typename PARAM>
 Eigen::MatrixXd computeGammaCoefficients(const PARAM& gamma, int N){
   // Get quadrature points and weight
@@ -55,6 +63,14 @@ Eigen::MatrixXd computeGammaCoefficients(const PARAM& gamma, int N){
 }
 
 
+//----------------------------------------------------------------------------
+/* @brief Evaluates the difference gamma(s)-gamma(t) according to its analytic 
+ *        expression.
+ * \param[in] gammaCoeffs Matrix containing 2N 2d-vectors corresponding to the 
+ *                        Fourier expansion of gamma.
+ * \param[in] s,t points in [0,2Pi]
+ * \param[in] N Discretization parameter indicating number of basis functions.
+ */
 Eigen::Vector2d evaluateGammaDiff(const Eigen::MatrixXd& gammaCoeffs, double s,
 				  double t, int N){
   assert(gammaCoeffs.rows()==2*N);
@@ -80,11 +96,18 @@ Eigen::Vector2d evaluateGammaDiff(const Eigen::MatrixXd& gammaCoeffs, double s,
 }
 #endif // SOLUTION
 
+
+//----------------------------------------------------------------------------
+/* @brief Compute matrix M using periodic trapezoidal rule (2N+2 points).
+ * \param[in] gamma Function that takes a double and returns a 2d vector  
+ *                  corresponding to the parametrized curve.
+ * \param[in] N Discretization parameter indicating number of basis functions.
+ */
 template <typename PARAM>
 Eigen::MatrixXd computeM(const PARAM& gamma, int N){
   #if SOLUTION
   // Get quadrature points and weight
-  int Nq = 4*N;
+  int Nq = 2*N+2;
   Eigen::VectorXd TR_points(Nq);  double TR_w;
   std::tie(TR_points,TR_w) = PeriodicTrapRule(Nq);
   // For readibility, build each block separately and then assemble the
@@ -95,6 +118,8 @@ Eigen::MatrixXd computeM(const PARAM& gamma, int N){
   // In order to have a smooth integrand, we use the formula derived on 1.8.b
   // Get coefficients for Gamma in (1.0.42)
   Eigen::MatrixXd gammaCoeffs = computeGammaCoefficients(gamma,N);
+  // Create variable multiplying quadrature weights and integral scaling
+  double coeff = -TR_w*TR_w/(4.*M_PI);
   // Compute matrix entries
   for(int k=0; k<=N; k++){
     for(int l=0; l<=N; l++){
@@ -106,14 +131,14 @@ Eigen::MatrixXd computeM(const PARAM& gamma, int N){
 	  // compute argument of the log in the formula derived on 1.8.b
 	  Eigen::Vector2d aux =  evaluateGammaDiff(gammaCoeffs, s, t, N);
 	  // add contribution to the different matrices
-	  Mcc(k,l)     += -TR_w/(4.*M_PI)*log(aux.squaredNorm())*cos(k*t)*cos(l*s);
+	  Mcc(k,l)     += coeff*log(aux.squaredNorm())*cos(k*t)*cos(l*s);
 	  
 	  if(k>0){
-	    Msc(k-1,l) += -TR_w/(4.*M_PI)*log(aux.squaredNorm())*sin(k*t)*cos(l*s);
+	    Msc(k-1,l) += coeff*log(aux.squaredNorm())*sin(k*t)*cos(l*s);
 	  }
 	  
 	  if(k>0 && l>0){
-	    Mss(k-1,l-1) += -TR_w/(4.*M_PI)*log(aux.squaredNorm())*sin(k*t)*sin(l*s);
+	    Mss(k-1,l-1) += coeff*log(aux.squaredNorm())*sin(k*t)*sin(l*s);
 	  }
 	  
 	}// end loop over quadrature points
@@ -139,7 +164,14 @@ Eigen::MatrixXd computeM(const PARAM& gamma, int N){
 /* SAM_LISTING_END_1 */
 
 
+//----------------------------------------------------------------------------
 /* SAM_LISTING_BEGIN_2 */
+/* @brief Compute right hand side using periodic trapezoidal rule (2N points).
+ * \param[in] gamma Function that takes a double and returns a 2d vector  
+ *                  corresponding to the parametrized curve.
+ * \param[in] g Right hand side function (takes 2d points and returns a double).
+ * \param[in] N Discretization parameter indicating number of basis functions.
+ */
 template <typename PARAM, typename FUNC>
 Eigen::VectorXd computeG(const PARAM& gamma, const FUNC& g, int N){
   // Initialize right hand side vector
@@ -170,7 +202,14 @@ Eigen::VectorXd computeG(const PARAM& gamma, const FUNC& g, int N){
 /* SAM_LISTING_END_2 */
 
 
+//----------------------------------------------------------------------------
 /* SAM_LISTING_BEGIN_3 */
+/* @brief Build and solve boundary integral equation V rho = g
+ * \param[in] gamma Function that takes a double and returns a 2d vector  
+ *                  corresponding to the parametrized curve.
+ * \param[in] g Right hand side function (takes 2d points and returns a double).
+ * \param[in] N Discretization parameter indicating number of basis functions.
+ */
 template <typename PARAM, typename FUNC>
 Eigen::VectorXd solveBIE(const PARAM& gamma, const FUNC& g, int N){
     #if SOLUTION
@@ -183,7 +222,7 @@ Eigen::VectorXd solveBIE(const PARAM& gamma, const FUNC& g, int N){
   Eigen::VectorXd RHS = computeG(gamma, g, N);
   // Use direct solver
   std::cout << " Solve " << std::endl;
-  Eigen::MatrixXd LHS = (AmM - M).eval();
+  Eigen::MatrixXd LHS = (AmM + M).eval();
   Eigen::VectorXd sol = LHS.lu().solve(RHS);
   std::cout << " Done " << std::endl;
 #else // TEMPLATE
@@ -195,7 +234,16 @@ Eigen::VectorXd solveBIE(const PARAM& gamma, const FUNC& g, int N){
 }
 /* SAM_LISTING_END_3 */
 
+
+//----------------------------------------------------------------------------
   #if SOLUTION
+/* @brief Build and solve boundary integral equation V rho = g ignoring first
+ *        row of the system (A has empty row for on the Disk).
+ * \param[in] gamma Function that takes a double and returns a 2d vector  
+ *                  corresponding to the parametrized curve.
+ * \param[in] g Right hand side function (takes 2d points and returns a double).
+ * \param[in] N Discretization parameter indicating number of basis functions.
+ */
 template <typename PARAM, typename FUNC>
 Eigen::VectorXd solveBIEonDisk(const PARAM& gamma, const FUNC& g, int N){
   // In order to compute A we do (A-M)+M
@@ -213,8 +261,15 @@ Eigen::VectorXd solveBIEonDisk(const PARAM& gamma, const FUNC& g, int N){
 }
 
 
-
+//----------------------------------------------------------------------------
 /* SAM_LISTING_BEGIN_4 */
+/* @brief Reconstruct function UN from its coefficients and evaluate it at t.
+ * \param[in] coeffs coefficients of UN
+ * \param[in] t point in [0,2Pi]
+ * \param[in] gammaprime Function that takes a double and returns a 2d vector  
+ *                       corresponding to the derivative of the curve's 
+ *                       parametrization.
+ */
 template <typename PARAMDER>
 double reconstructRho(const Eigen::VectorXd& coeffs, double t,
 		      const PARAMDER& gammaprime){
@@ -227,7 +282,16 @@ double reconstructRho(const Eigen::VectorXd& coeffs, double t,
   return res;
 }
 #endif //SOLUTION
- 
+
+
+//----------------------------------------------------------------------------
+/* @brief Compute L2 norm of UN from its coefficients using periodic trapezoidal 
+ *        rule (4N points).
+ * \param[in] gammaprime Function that takes a double and returns a 2d vector  
+ *                       corresponding to the derivative of the curve's 
+ *                       parametrization.
+ * \param[in] coeffs coefficients of UN
+ */
 template <typename PARAMDER>
 double L2norm(const PARAMDER& gammaprime, const Eigen::VectorXd& coeffs){
   double res=0.;
@@ -251,7 +315,20 @@ double L2norm(const PARAMDER& gammaprime, const Eigen::VectorXd& coeffs){
 /* SAM_LISTING_END_4 */
 
 
+//----------------------------------------------------------------------------
 /* SAM_LISTING_BEGIN_5 */
+/* @brief Evaluate Single Layer Potential of function given by the coefficient 
+ *                 vector mu on the point X and using the parametrization gamma.
+ *                 The integration is done using periodic trapezoidal rule 
+ *                 (2N+2 points).
+ * \param[in] coeffs coefficients of UN.
+ * \param[in] X 2d vector containing evaluation point.
+ * \param[in] gamma Function that takes a double and returns a 2d vector  
+ *                  corresponding to the parametrized curve.
+ * \param[in] gammaprime Function that takes a double and returns a 2d vector  
+ *                       corresponding to the derivative of the curve's 
+ *                       parametrization.
+ */
  #if SOLUTION
 template <typename PARAM, typename PARAMDER>
 double repFormulaSL(const Eigen::VectorXd& mu, const Eigen::Vector2d& X,
@@ -259,9 +336,10 @@ double repFormulaSL(const Eigen::VectorXd& mu, const Eigen::Vector2d& X,
 		    const PARAMDER& gammaprime){
   int N = (mu.rows()-1)/2; // asumming coeffs is a 2N+1 vector
   double res=0.;
-  Eigen::VectorXd TR_points(4*N);  double TR_w;
-  std::tie(TR_points,TR_w) = PeriodicTrapRule(4*N);
-  for(int qp=0; qp<4*N; qp++){
+  int Nq = 2*N+2;
+  Eigen::VectorXd TR_points(Nq);  double TR_w;
+  std::tie(TR_points,TR_w) = PeriodicTrapRule(Nq);
+  for(int qp=0; qp<Nq; qp++){
     auto z = TR_points(qp); 
     double aux = reconstructRho(mu, z, gammaprime);
     res += -TR_w/(2*M_PI)*log((X- gamma(z)).norm())*aux*(gammaprime(z)).norm();
@@ -271,9 +349,11 @@ double repFormulaSL(const Eigen::VectorXd& mu, const Eigen::Vector2d& X,
  #endif //SOLUTION
 /* SAM_LISTING_END_5 */
 
+
+
 int main() {
 
-  int N = 9;
+  int N = 10;
   //----------------------------------------------------------------------------
   std::cout << "===========  Test integration  ===========" << std::endl;
   double Qint1 = 0., Qintcos = 0., Qintlogcos2 = 0.;
@@ -287,7 +367,8 @@ int main() {
     Qintlogcos2 += TR_w*log(cos(z)*cos(z)+1.);
   }
 #else // TEMPLATE
-  // TODO: You may test your quadrature by integrating 1, cos(t) and log(cos(t)^2 + 1)
+  /* TODO: You may test your quadrature by integrating 1, cos(t) and 
+     log(cos(t)^2 + 1) */
   #endif // TEMPLATE
   double intlogcos2ex = 2.*M_PI*log((sqrt(2)+1)/((sqrt(2)-1)*4));
   std::cout << " int 1                : " << fabs (Qint1 - 2*M_PI)
@@ -301,6 +382,7 @@ int main() {
   //----------------------------------------------------------------------------
   std::cout << "============  Test Coefficients for S(t) = (cos(t), sin(t))  "
 	    << "============="  << std::endl;
+  N = 4;
   std::function<Eigen::Vector2d(const double&)> S = [](const double& t){
     Eigen::Vector2d res;
     res << cos(t) , sin(t);
@@ -362,8 +444,8 @@ int main() {
   Eigen::VectorXd solC = solveBIEonDisk(S, gC, 10);
   Eigen::VectorXd solE(21); solE << 0, solC;
   double solCEval = reconstructRho(solE, M_PI, Sprime);
-  std::cout << "eval at PI: " << solCEval
-	    << " vs " << gC(S(M_PI))*2 << std::endl;
+  std::cout << "ERROR for evaluating at PI: " << fabs(solCEval- gC(S(M_PI))*2 )
+	    << std::endl;
   std::cout << "====================================================="
 	    << std::endl << std::endl;
   #endif // SOLUTION
@@ -395,16 +477,17 @@ int main() {
   };
 
 
-  Eigen::VectorXi Nall(9); Nall<< 3,5,7,9,11,13,15,17,19;
-  Eigen::VectorXd error(9); error.setZero();
+  int Nl=15;
+  Eigen::VectorXi Nall(Nl);
+  Nall.setLinSpaced(Nl, 3, 31);
+  Eigen::VectorXd error(Nl); error.setZero();
   Eigen::Vector2d T({0.5,0.2});
 #if SOLUTION
-  for(int j=0; j<9; j++){
+  for(int j=0; j<Nl; j++){
     Eigen::VectorXd sol = solveBIE(gamma, g, Nall[j]);
     double solEval = repFormulaSL(sol, T, gamma, gammaprime);
-    std::cout << j << ": " << solEval << " vs " << g(T)
-	      << std::endl; 
     error(j) = fabs(solEval - g(T) );
+    std::cout << "Error on level " << j << ": " << error(j) << std::endl; 
   }
 #else // TEMPLATE
     // TODO: Solve BIE for different Ns and compute error of the solution.
@@ -422,7 +505,6 @@ int main() {
 	    << std::endl << std::endl;
   
   /* SAM_LISTING_END_6 */
-  std::cout << "DISCLAIMER : This code is still not working! " << std::endl;
     
   return 0;
 
