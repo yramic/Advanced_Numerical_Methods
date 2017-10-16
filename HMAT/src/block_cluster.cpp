@@ -48,7 +48,7 @@ void BlockCluster::setMatrix4D()
         for(int j=0; j<=deg_; j++){
             for(int k=0; k<=deg_; k++){
                 for(int l=0; l<=deg_; l++){
-                    X_(i*(deg_+1)+j,k*(deg_+1)+l) = GP_(cheb_pt1x[i],cheb_pt1y[k],cheb_pt2x[j],cheb_pt2y[l]);
+                    X_(i*(deg_+1)+j,k*(deg_+1)+l) = GP_(cheb_pt1x[i],cheb_pt1y[j],cheb_pt2x[k],cheb_pt2y[l]);
                 }
             }
         }

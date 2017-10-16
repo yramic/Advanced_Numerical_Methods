@@ -38,16 +38,16 @@ bool AdmissibilityD::is_admissible(double xl, double xr, double yl, double yr, d
 double AdmissibilityH::get_max(Node* a, Node* b)
 {
     double xa,ya,xb,yb,maxA,maxB;
-    xa = std::abs(a->getX2_b()-a->getX1_b());
-    ya = std::abs(a->getY2_b()-a->getY1_b());
+    xa = std::abs(a->getXr_b()-a->getXl_b());
+    ya = std::abs(a->getYr_b()-a->getYl_b());
     if(xa > ya){
         maxA = xa;
     }
     else {
         maxA = ya;
     }
-    xb = std::abs(b->getX2_b()-b->getX1_b());
-    yb = std::abs(b->getY2_b()-b->getY1_b());
+    xb = std::abs(b->getXr_b()-b->getXl_b());
+    yb = std::abs(b->getYr_b()-b->getYl_b());
     if(xa > ya){
         maxB = xb;
     }
@@ -70,14 +70,14 @@ double dist(double x, double y, double a, double b){
 // return the distance between 2 Boxes
 double AdmissibilityH::get_min(Node* a, Node* b)
 {
-    double x1 = a->getX1_b();
-    double x1b = a->getX2_b();
-    double x2 = b->getX1_b();
-    double x2b = b->getX2_b();
-    double y1 = a->getY1_b();
-    double y1b = a->getY2_b();
-    double y2 = b->getY1_b();
-    double y2b = b->getY2_b();
+    double x1 = a->getXl_b();
+    double x1b = a->getXr_b();
+    double x2 = b->getXl_b();
+    double x2b = b->getXr_b();
+    double y1 = a->getYl_b();
+    double y1b = a->getYr_b();
+    double y2 = b->getYl_b();
+    double y2b = b->getYr_b();
     bool left, right, bottom, top;
     left = x2b < x1;
     right = x1b < x2;

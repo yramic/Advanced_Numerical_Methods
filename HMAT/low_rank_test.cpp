@@ -74,7 +74,7 @@ int main() {
     //unsigned d; std::cin >> d;
 
     // initializing degree of interpolation for testing
-    unsigned d=3;
+    unsigned d=2;
 
     //Kernel G(1.); // default kernel for 2d problem
     Kernel4D G;     // kernel for 4d problem -1/(2*pi)*log||x-y||

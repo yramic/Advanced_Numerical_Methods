@@ -87,24 +87,28 @@ public:
         return far_f_;
     }
     // return Bounding Box x1
-    double getX1_b() const {
+    double getXl_b() const {
         return x1_b_;
     }
     // return Bounding Box x2
-    double getX2_b() const {
+    double getXr_b() const {
         return x2_b_;
     }
     // return Bounding Box y1
-    double getY1_b() const {
+    double getYl_b() const {
         return y1_b_;
     }
     // return Bounding Box y2
-    double getY2_b() const {
+    double getYr_b() const {
         return y2_b_;
     }
     std::vector<Point> getPPoints() const {
         return PPointsTree_;
     }
+    bool getF(){
+        return f_;
+    }
+
     /**
     * \brief Setters
     */
@@ -117,7 +121,7 @@ public:
     // compute V*c restricted to node indices of the cluster
     void setVc_node(const Eigen::VectorXd& c);
     void printree(int n);
-
+    void setF(bool f);
 private:
 
     Node* l_child_; // left  child of node
@@ -135,6 +139,7 @@ private:
     Eigen::VectorXd Vc_node_; // $V_{\sigma}* c_{|\sigma}$, where $\sigma$ is the cluster of node
     vector_t near_f_; // list with pointers to nodes of the near field of the node
     vector_t  far_f_; // list with pointers to nodes of the  far field of the node
+    bool f_;           // flag to check if a node is checked again with it´s self
     friend class cTree;
  };
 

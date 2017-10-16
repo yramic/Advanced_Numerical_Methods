@@ -205,7 +205,7 @@ void Node::setV_node(const std::vector<Point> &t, unsigned deg) //tt==PPointsTre
         int ppts = PPointsTree_.size();
         V_node_ = Eigen::MatrixXd::Constant(ppts, (deg+1)*(deg+1), 1);
 
-        for(unsigned i=0; i<=ppts-1; ++i) { // calculation of Vx combined with Vy
+        /*for(unsigned i=0; i<=ppts-1; ++i) { // calculation of Vx combined with Vy
             for(unsigned j1=0; j1<=deg; ++j1) {
                 for(unsigned k1=0; k1<j1; ++k1) {
                     for(unsigned j2=0; j2<=deg; ++j2) {
@@ -235,6 +235,35 @@ void Node::setV_node(const std::vector<Point> &t, unsigned deg) //tt==PPointsTre
                     }
                 }
             }
+        }*/
+        for(unsigned i=0; i<=ppts-1; ++i) { // calculation of Vx combined with Vy
+            for(unsigned j1=0; j1<=deg; ++j1) {
+                for(unsigned k1=0; k1<j1; ++k1) {
+                    for(unsigned j2=0; j2<=deg; ++j2) {
+                        V_node_(i,j1*(deg+1) + j2) *= (PPointsTree_[i].getX() - tkx[k1]);
+
+
+                    }
+                }
+                // Skip "k1 == j1"
+                for(unsigned k1=j1+1; k1<=deg; ++k1) {
+                    for(unsigned j2=0; j2<=deg; ++j2) {
+                        V_node_(i,j1*(deg+1) + j2) *= (PPointsTree_[i].getX() - tkx[k1]);
+
+                    }
+                }
+                for(unsigned j2=0; j2<=deg; ++j2) {
+                    for(unsigned k2=0; k2<j2; ++k2) {
+                        V_node_(i,j1*(deg+1) + j2) *= (PPointsTree_[i].getY() - tky[k2]);
+                    }
+                    // Skip "k2 == j2"
+                    for(unsigned k2=j2+1; k2<=deg; ++k2) {
+                        V_node_(i,j1*(deg+1) + j2) *= (PPointsTree_[i].getY() - tky[k2]);
+                    }
+                    V_node_(i,j1*(deg+1) + j2) *= wkx(j1)*wky(j2);
+                }
+
+            }
         }
         /*Eigen::MatrixXd VnodeX = Eigen::MatrixXd::Constant(ppts, (deg+1), 1);
         Eigen::MatrixXd VnodeY = Eigen::MatrixXd::Constant(ppts, (deg+1), 1);
@@ -261,28 +290,23 @@ void Node::setV_node(const std::vector<Point> &t, unsigned deg) //tt==PPointsTre
                 }
                 VnodeY(i,j) *= wky(j);
             }
-        }
-        std::cout << "VnodeX" << std::endl;
-        for(int i=0;i<=ppts-1;i++){
-            for(int j=0;j<(deg+1);j++){
-                std::cout << VnodeX(i,j) << " ";
+        }*/
+
+        /*Eigen::MatrixXd V_node_new(ppts, (deg+1)*(deg+1));
+        for(unsigned i=0; i<=ppts-1; ++i) {
+            for(unsigned j=0; j<=deg; ++j) {
+                V_node_new.block(i, j*(deg+1), 1, deg+1) = VnodeX(i,j) * VnodeY.row(i);
             }
-            std::cout << std::endl << std::flush;
-        }
+        }*/
+
+        /*std::cout << "VnodeX" << std::endl;
+        std::cout << VnodeX << std::endl;
         std::cout << "VnodeY" << std::endl;
-        for(int i=0;i<=ppts-1;i++){
-            for(int j=0;j<(deg+1);j++){
-                std::cout << VnodeY(i,j) << " ";
-            }
-            std::cout << std::endl << std::flush;
-        }*/
-        /*std::cout << "V_Node" << std::endl;
-        for(int i=0;i<=ppts-1;i++){
-            for(int j=0;j<(deg+1)*(deg+1);j++){
-                std::cout << V_node_(i,j) << " ";
-            }
-            std::cout << std::endl << std::flush;
-        }*/
+        std::cout << VnodeY << std::endl;
+        std::cout << "V_Node" << std::endl;
+        std::cout << V_node_ << std::endl;
+        std::cout << "V_Node_new" << std::endl;
+        std::cout << V_node_new << std::endl;*/
     }
 }
 
@@ -332,4 +356,8 @@ void Node::printree(int n)
         std::cout << "br " << n << " ";
         br_child_->printree(n+1);
     }
+}
+
+void Node::setF(bool f){
+    f_ = f;
 }

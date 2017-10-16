@@ -45,8 +45,8 @@ Eigen::VectorXd LowRankApp::mvProd(Eigen::VectorXd& c, double eta, unsigned deg)
     ff_contribution(f_approx, PPointsTree_.getRoot(), deg, c);
     // compute near-field contribution
     nf_contribution(f_approx, PPointsTree_.getRoot(), c);
-    std::cout << "HM  " << std::endl;
-    std::cout << HM_ << std::endl;
+    //std::cout << "HM  " << std::endl;
+    //std::cout << HM_ << std::endl;
     return f_approx;
 }
 
@@ -88,7 +88,7 @@ void LowRankApp::ff_contribution(Eigen::VectorXd& f, Node* tx, unsigned deg, Eig
             std::vector<Node*> ffx = (*tx).getFarF();                                                               // far field of *tx_root
             for(std::vector<Node*>::iterator iter=ffx.begin(); iter!=ffx.end(); ++iter) {                           // iterating on the farfield nodes of the cluster tx
                 Eigen::VectorXd Vc((deg+1)*(deg+1));   // deg+1*deg+1                                                      // V*c restricted to the indices of **iter
-                BlockCluster X_(tx->getX1_b(), tx->getX2_b(), tx->getY1_b(), tx->getY2_b(), (*iter)->getX1_b(), (*iter)->getX2_b(), (*iter)->getY1_b(), (*iter)->getY2_b(), deg, PolynomialKernel_);    // calculation of matrix $X_{\sigma,\mu}$
+                BlockCluster X_(tx->getXl_b(), tx->getXr_b(), tx->getYl_b(), tx->getYr_b(), (*iter)->getXl_b(), (*iter)->getXr_b(), (*iter)->getYl_b(), (*iter)->getYr_b(), deg, PolynomialKernel_);    // calculation of matrix $X_{\sigma,\mu}$
                 Eigen::MatrixXd X = X_.getMatrix();                                                                 // matrix $X_{\sigma,\mu}$
 
                 Eigen::MatrixXd Vm = (*iter)->getV_node().transpose();
