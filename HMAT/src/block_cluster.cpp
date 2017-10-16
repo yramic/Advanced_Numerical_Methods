@@ -3,21 +3,27 @@
 
 
 // constructor for BEM(4d)
-BlockCluster::BlockCluster(double x1l, double x1r, double y1l, double y1r, double x2l, double x2r, double y2l, double y2r, unsigned deg, Kernel G):
-    x1l_(x1l), x1r_(x1r), y1l_(y1l), y1r_(y1r), x2l_(x2l), x2r_(x2r), y2l_(y2l), y2r_(y2r), deg_(deg), G_(G), X_(Eigen::MatrixXd::Zero((deg+1)*(deg+1),(deg+1)*(deg+1)))
+BlockCluster::BlockCluster(double x1l, double x1r, double y1l, double y1r, double x2l, double x2r, double y2l, double y2r, unsigned deg, Kernel4D G):
+    x1l_(x1l), x1r_(x1r), y1l_(y1l), y1r_(y1r), x2l_(x2l), x2r_(x2r), y2l_(y2l), y2r_(y2r), deg_(deg), G4_(G), X_(Eigen::MatrixXd::Zero((deg+1)*(deg+1),(deg+1)*(deg+1)))
 {
-    setMatrix();
+    setMatrix4D();
+}
+
+BlockCluster::BlockCluster(double x1l, double x1r, double y1l, double y1r, double x2l, double x2r, double y2l, double y2r, unsigned deg, PolynomialKernel G):
+    x1l_(x1l), x1r_(x1r), y1l_(y1l), y1r_(y1r), x2l_(x2l), x2r_(x2r), y2l_(y2l), y2r_(y2r), deg_(deg), GP_(G), X_(Eigen::MatrixXd::Zero((deg+1)*(deg+1),(deg+1)*(deg+1)))
+{
+    setMatrix4D();
 }
 
 // constructor
-BlockCluster::BlockCluster(double xl, double xr, double yl, double yr, unsigned deg, Kernel G):
-    xl_(xl), xr_(xr), yl_(yl), yr_(yr), deg_(deg), G_(G), X_(Eigen::MatrixXd::Zero(deg+1,deg+1))
+BlockCluster::BlockCluster(double xl, double xr, double yl, double yr, unsigned deg, Kernel2D G):
+    xl_(xl), xr_(xr), yl_(yl), yr_(yr), deg_(deg), G2_(G), X_(Eigen::MatrixXd::Zero(deg+1,deg+1))
 {
-    setMatrix();
+    setMatrix2D();
 }
 
 // compute matrix $X_{\sigma,\mu}$
-void BlockCluster::setMatrix()
+void BlockCluster::setMatrix4D()
 {
     // first box
     Cheby C_pt1x(x1l_, x1r_, deg_);
@@ -33,12 +39,33 @@ void BlockCluster::setMatrix()
     Eigen::VectorXd cheb_pt2y = C_pt2y.getNodes(); // Chebyshew nodes in interval [y2l,y2r]
 
 
-    for(unsigned i=0; i<=deg_; ++i)
+    /*for(unsigned i=0; i<=deg_; ++i)
         for(unsigned j=0; j<=deg_; ++j)
             for(unsigned k=0; k<=deg_; ++k)
                 for(unsigned l=0; l<=deg_; ++l)
-                    X_(j*(deg_+1)+i,l*(deg_+1)+k) = G_(cheb_pt1x[i],cheb_pt1y[j],cheb_pt2x[k],cheb_pt2y[l]);
+                    X_(j*(deg_+1)+i,l*(deg_+1)+k) = GP_(cheb_pt1x[i],cheb_pt1y[j],cheb_pt2x[k],cheb_pt2y[l]);*/
+    for(int i=0; i<=deg_; i++){
+        for(int j=0; j<=deg_; j++){
+            for(int k=0; k<=deg_; k++){
+                for(int l=0; l<=deg_; l++){
+                    X_(i*(deg_+1)+j,k*(deg_+1)+l) = GP_(cheb_pt1x[i],cheb_pt1y[k],cheb_pt2x[j],cheb_pt2y[l]);
+                }
+            }
+        }
+    }
+}
 
+void BlockCluster::setMatrix2D()
+{
+    Cheby C_ptx(xl_, xr_, deg_);
+    Cheby C_pty(yl_, yr_, deg_);
+
+    Eigen::VectorXd cheb_ptx = C_ptx.getNodes(); // Chebyshew nodes in interval [xl,xr]
+    Eigen::VectorXd cheb_pty = C_pty.getNodes(); // Chebyshew nodes in interval [yl,yr]
+
+    for(unsigned i=0; i<=deg_; ++i)
+        for(unsigned j=0; j<=deg_; ++j)
+            X_(i,j) = G2_(cheb_ptx[i],cheb_pty[j]);
 }
 
 

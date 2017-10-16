@@ -13,9 +13,6 @@ cTree::cTree(const std::vector<Point> PPointsTree):
     unsigned n = PPointsTree.size();
     if(n > 0) { // build the tree
         root_ = new Node(PPointsTree); // root is a node, leaves are added
-    } else {
-        root_ = new Node(PPointsTree);
-        // if "x" has less than 2 elements, the tree consists of a single node
     }
 }
 
@@ -89,6 +86,7 @@ void cTree::setVc_recursion(Node* cluster, const Eigen::VectorXd& c)
     }
 }
 
+// start the recursion for the Near-Far classification of the nodes, starting from the root
 void cTree::setNearFar_recursion(Node* xnode, double eta, cTree &Ty)
 {
     setNearFar_recursion((*xnode).tl_child_, (*xnode).tr_child_, eta, Ty);
@@ -123,50 +121,31 @@ void cTree::setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree &Ty
             setNearFar_recursion((*xnode).r_child_, (*ynode).r_child_, eta, Ty);
         }
     }*/
+    // if *xnode or *ynode don`t exist, we have got nothing to compare
     if(xnode == NULL || ynode == NULL) {
         //std::cout << "wtf" << std::endl;
         return;
     }
     //std::cout << "test" << std::endl;
+    // admissibility for 4D Matrices
     AdmissibilityH adm;
-    if((*ynode).PPointsTree_.size()<=1 || (*xnode).PPointsTree_.size()<=1){
+    // if *xnode or *ynode have only one point in their PPointsTree_ vector, they are added to the Near Field
+    if ((*ynode).PPointsTree_.size()<=1 && (*xnode).PPointsTree_.size()<=1){
+        (*ynode).near_f_.push_back(xnode);
         (*xnode).near_f_.push_back(ynode);
+    }
+    else if((*ynode).PPointsTree_.size()<=1){
         (*ynode).near_f_.push_back(xnode);    // probably it isn`t needed
-    } else {
+    }
+    else if((*xnode).PPointsTree_.size()<=1){
+        (*xnode).near_f_.push_back(ynode);
+    }
+    else {
+        // if the cluster corresponding to *xnode and *ynode is admissible, we add them to the far field list of each one
         if(adm.is_admissible(xnode, ynode, eta)) {
             (*xnode).far_f_.push_back(ynode);
             (*ynode).far_f_.push_back(xnode); // probably it isn`t needed
-        } else {
-            /*setNearFar_recursion(xnode, (*ynode).tl_child_, eta, Ty);
-            setNearFar_recursion(xnode, (*ynode).bl_child_, eta, Ty);
-            setNearFar_recursion(xnode, (*ynode).tr_child_, eta, Ty);
-            setNearFar_recursion(xnode, (*ynode).br_child_, eta, Ty);
-            setNearFar_recursion(ynode, (*ynode).tl_child_, eta, Ty);
-            setNearFar_recursion(ynode, (*ynode).bl_child_, eta, Ty);
-            setNearFar_recursion(ynode, (*ynode).tr_child_, eta, Ty);
-            setNearFar_recursion(ynode, (*ynode).br_child_, eta, Ty);*/
-            /*setNearFar_recursion((*xnode).tl_child_, ynode, eta, Ty);
-            setNearFar_recursion((*xnode).tr_child_, ynode, eta, Ty);
-            setNearFar_recursion((*xnode).bl_child_, ynode, eta, Ty);
-            setNearFar_recursion((*xnode).br_child_, ynode, eta, Ty);*/
-            //setNearFar_recursion((*xnode).tl_child_, Ty.root_, eta, Ty);
-            //setNearFar_recursion((*xnode).bl_child_, Ty.root_, eta, Ty);
-            //setNearFar_recursion((*xnode).tr_child_, Ty.root_, eta, Ty);
-            //setNearFar_recursion((*xnode).br_child_, Ty.root_, eta, Ty);
-            //setNearFar_recursion((*xnode).tl_child_, (*ynode).tl_child_, eta, Ty);
-            //-setNearFar_recursion((*xnode).tl_child_, (*xnode).tl_child_, eta, Ty); // maybe needs also this?
-            //-setNearFar_recursion((*xnode).tl_child_, (*xnode).bl_child_, eta, Ty);
-            //-setNearFar_recursion((*xnode).tl_child_, (*xnode).tr_child_, eta, Ty);
-            //-setNearFar_recursion((*xnode).tl_child_, (*xnode).br_child_, eta, Ty);
-            //-setNearFar_recursion((*xnode).tr_child_, (*xnode).bl_child_, eta, Ty);
-            //-setNearFar_recursion((*xnode).tr_child_, (*xnode).br_child_, eta, Ty);
-            //setNearFar_recursion((*xnode).tr_child_, (*ynode).tl_child_, eta, Ty);
-            //setNearFar_recursion((*xnode).bl_child_, (*ynode).tl_child_, eta, Ty);
-            //setNearFar_recursion((*xnode).bl_child_, (*ynode).tr_child_, eta, Ty);
-            //-setNearFar_recursion((*xnode).bl_child_, (*xnode).br_child_, eta, Ty);
-            //setNearFar_recursion((*xnode).br_child_, (*ynode).tl_child_, eta, Ty);
-            //setNearFar_recursion((*xnode).br_child_, (*ynode).tr_child_, eta, Ty);
-            //setNearFar_recursion((*xnode).br_child_, (*ynode).bl_child_, eta, Ty);
+        } else {    // else we consider all the different combinations of the children of *xnode and *ynode and check whether their clusters are admissible
             setNearFar_recursion((*xnode).tl_child_, (*xnode).tr_child_, eta, Ty);
             setNearFar_recursion((*xnode).tl_child_, (*xnode).bl_child_, eta, Ty);
             setNearFar_recursion((*xnode).tl_child_, (*xnode).br_child_, eta, Ty);
@@ -194,6 +173,23 @@ void cTree::setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree &Ty
 
 }
 
+void cTree::setNearFar_checkrecursion(Node* xnode, double eta, cTree &Ty, int n){
+    if(xnode == NULL) return;
+    if(!(*xnode).getNearF().empty()){
+        if(((*xnode).getNearF().size()==(std::pow(2,n)-1)) && (*xnode).getFarF().empty()){
+            setNearFar_recursion((*xnode).getTl_Child(), (*xnode).getTr_Child(), eta, Ty);
+            setNearFar_recursion((*xnode).getTl_Child(), (*xnode).getBl_Child(), eta, Ty);
+            setNearFar_recursion((*xnode).getTl_Child(), (*xnode).getBr_Child(), eta, Ty);
+            setNearFar_recursion((*xnode).getTr_Child(), (*xnode).getBl_Child(), eta, Ty);
+            setNearFar_recursion((*xnode).getTr_Child(), (*xnode).getBr_Child(), eta, Ty);
+            setNearFar_recursion((*xnode).getBl_Child(), (*xnode).getBr_Child(), eta, Ty);
+        }
+    }
+    setNearFar_checkrecursion((*xnode).getTl_Child(), eta, Ty, n+1);
+    setNearFar_checkrecursion((*xnode).getBl_Child(), eta, Ty, n+1);
+    setNearFar_checkrecursion((*xnode).getTr_Child(), eta, Ty, n+1);
+    setNearFar_checkrecursion((*xnode).getBr_Child(), eta, Ty, n+1);
+}
 
 
 // make two lists with the x- and y-coordinates of boundaries of the bounding boxes of the clusters:

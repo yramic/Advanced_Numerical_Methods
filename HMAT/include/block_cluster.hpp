@@ -15,8 +15,9 @@ public:
     /**
     * \brief Constructor
     */
-    BlockCluster(double x1l, double x1r, double y1l, double y1r, double x2l, double x2r, double y2l, double y2r, unsigned deg, Kernel G);
-    BlockCluster(double xl, double xr, double yl, double yr, unsigned deg, Kernel G);
+    BlockCluster(double x1l, double x1r, double y1l, double y1r, double x2l, double x2r, double y2l, double y2r, unsigned deg, Kernel4D G);
+    BlockCluster(double x1l, double x1r, double y1l, double y1r, double x2l, double x2r, double y2l, double y2r, unsigned deg, PolynomialKernel G);
+    BlockCluster(double xl, double xr, double yl, double yr, unsigned deg, Kernel2D G);
 
     /**
     * \brief Getter
@@ -30,8 +31,8 @@ public:
     * \brief Setter
     */
     // compute matrix $X_{\sigma,\mu}$
-    void setMatrix();
-
+    void setMatrix2D();
+    void setMatrix4D();
 private:
 
     double xl_;	// left  boundary of bounding box of *xcluster
@@ -47,7 +48,9 @@ private:
     double y2l_; // left  y coordinate of second bounding box
     double y2r_; // right y coordinate of second bounding box
     unsigned deg_; // degree of interpolating polynomial
-    Kernel G_; // kernel
+    Kernel2D G2_; // kernel
+    Kernel4D G4_; // kernel
+    PolynomialKernel GP_;
     Eigen::MatrixXd X_; // matrix $X_{\sigma,\mu}$, where $\sigma$ and $\mu$ denote the clusters
 };
 

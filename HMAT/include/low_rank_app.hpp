@@ -16,8 +16,9 @@ public:
     /**
     * \brief Constructor
     */
-    LowRankApp(Kernel kernel, const Eigen::VectorXd& x, const Eigen::VectorXd& y);
-    LowRankApp(Kernel kernel, std::vector<Point> pp);
+    LowRankApp(Kernel2D kernel, const Eigen::VectorXd& x, const Eigen::VectorXd& y, int n);
+    LowRankApp(Kernel4D kernel, std::vector<Point> pp, int n);
+    LowRankApp(PolynomialKernel kernel, std::vector<Point> pp, int n);
 
     // approximate matrix-vector multiplication
     Eigen::VectorXd mvProd(Eigen::VectorXd &c, double eta, unsigned deg);
@@ -29,11 +30,13 @@ private:
     // compute near field contribution
     void nf_contribution(Eigen::VectorXd& f, Node* tx, const Eigen::VectorXd& c);
 
-    Kernel kernel_; // kernel
+    Kernel2D kernel2d_; // kernel for 2D
+    Kernel4D kernel4d_; // kernel for 4D
+    PolynomialKernel PolynomialKernel_; // Polynomial Kernel
     cTree PPointsTree_; // cluster tree of ppoints
     cTree Tx_; // cluster tree of x-values
     cTree Ty_; // cluster tree of y-values
-
+    Eigen::MatrixXd HM_;
 };
 
 #endif // LOW_RANK_APP_HPP

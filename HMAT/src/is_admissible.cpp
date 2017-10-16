@@ -34,6 +34,7 @@ bool AdmissibilityD::is_admissible(double xl, double xr, double yl, double yr, d
     return get_max(xl,xr,yl,yr) <= eta * get_min(xl,xr,yl,yr);
 }
 
+// find the biggest edge of each Bounding Box and compare it with the biggest node of the other Bounding Box
 double AdmissibilityH::get_max(Node* a, Node* b)
 {
     double xa,ya,xb,yb,maxA,maxB;
@@ -61,10 +62,12 @@ double AdmissibilityH::get_max(Node* a, Node* b)
     }
 }
 
+// return the distance between 2 points
 double dist(double x, double y, double a, double b){
     return std::sqrt(std::pow(x - a, 2) + std::pow(y - b, 2));
 }
 
+// return the distance between 2 Boxes
 double AdmissibilityH::get_min(Node* a, Node* b)
 {
     double x1 = a->getX1_b();
@@ -109,6 +112,7 @@ double AdmissibilityH::get_min(Node* a, Node* b)
     }
 }
 
+// return if two Bounding Boxes are admissible
 bool AdmissibilityH::is_admissible(Node* x, Node* y, double eta)
 {
     return get_max(x, y) <= eta * get_min(x, y);
