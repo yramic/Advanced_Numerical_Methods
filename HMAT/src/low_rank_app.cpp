@@ -151,27 +151,21 @@ void LowRankApp::nf_contribution(Eigen::VectorXd& f, Node* tx, const Eigen::Vect
             nf_contribution(f, xr_c, c);
         }
     }*/
-    if(tx != NULL) {   // >1 for checking if it is a leaf with 1 node, which I don`t want to check
+    if(tx != NULL) {
         // iterate over near field of *tx
-        //if (tx->getPPoints().size()>1){
             std::vector<Node*> nfx = (*tx).getNearF(); // near field of *tx
             for(std::vector<Node*>::iterator iter=nfx.begin(); iter!=nfx.end(); ++iter) {
-                /*for(std::vector<Point>::iterator it=(*iter)->getPPoints().begin(); it!=(*iter)->getPPoints().end(); ++it) {
-                    std::vector<Point> t = (*tx).getPPoints();
-                    f(t[0].getId()) += PolynomialKernel_(t[0].getX(),t[0].getY(),(*it).getX(),(*it).getY()) * c((*it).getId());   // add near field contribution
-                    std::cout << t[0].getId() << " " << PolynomialKernel_(t[0].getX(),t[0].getY(),(*it).getX(),(*it).getY()) << " " << (*it).getId() << std::endl;
-                }*/
-                for(int i=0; i<(*iter)->getPPoints().size(); i++){
-                    std::vector<Point> t = (*tx).getPPoints();
-                    f(t[0].getId()) += PolynomialKernel_(t[0].getX(),t[0].getY(),(*iter)->getPPoints()[i].getX(),(*iter)->getPPoints()[i].getY()) * c((*iter)->getPPoints()[i].getId());   // add near field contribution
-                    //std::cout << t[0].getId() << " " << PolynomialKernel_(t[0].getX(),t[0].getY(),(*iter)->getPPoints()[(i)].getX(),(*iter)->getPPoints()[(i)].getY()) << " " << (*iter)->getPPoints()[(i)].getId() << std::endl;
+                for(int j=0; j<(*tx).getPPoints().size(); j++){
+                    for(int i=0; i<(*iter)->getPPoints().size(); i++){
+                        std::vector<Point> t = (*tx).getPPoints();
+                        f(t[j].getId()) += PolynomialKernel_(t[j].getX(),t[j].getY(),(*iter)->getPPoints()[i].getX(),(*iter)->getPPoints()[i].getY()) * c((*iter)->getPPoints()[i].getId());   // add near field contribution
+                        //std::cout << t[j].getId() << " " << PolynomialKernel_(t[j].getX(),t[j].getY(),(*iter)->getPPoints()[(i)].getX(),(*iter)->getPPoints()[(i)].getY()) << " " << (*iter)->getPPoints()[(i)].getId() << std::endl;
+                    }
                 }
             }
-        //}
         nf_contribution(f, tx->getTl_Child(), c);
         nf_contribution(f, tx->getTr_Child(), c);
         nf_contribution(f, tx->getBl_Child(), c);
         nf_contribution(f, tx->getBr_Child(), c);
     }
-
 }

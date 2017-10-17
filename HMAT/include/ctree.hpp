@@ -53,7 +53,7 @@ public:
     }
     // add pointers to near and far field nodes of the tree
     void setNearFar(double eta, cTree &Ty) {
-        setNearFar_recursion(root_, eta, Ty);
+        setNearFar_recursion(root_, Ty.root_, eta, Ty);
     }
     void setNearFarCheck(double eta, cTree &Ty) {
         setNearFar_checkrecursion(root_, eta, Ty, 1);

@@ -132,6 +132,16 @@ void Node::setLeaves(double x1, double x2, double y1, double y2)
             }
             //std::cout << it->getId() << ' ';
         }
+        // fix for points of a bbox being a segment
+        if(std::abs(x1-x2)<10*std::numeric_limits<double>::epsilon()){
+            x2_b_++;
+            //std::cout << "wtf" << std::endl;
+        }
+        if(std::abs(y1-y2)<10*std::numeric_limits<double>::epsilon()){
+            y2_b_++;
+            //std::cout << "wtf" << std::endl;
+        }
+        //
             //std::cout << x1_ << " " << x2_ << " " << y1_ << " " << y2_ << std::endl << std::flush;
             //std::cout << std::endl << std::flush;
             if (!tl_PPoints.empty()) tl_child_ = new Node(tl_PPoints,x1,medX,medY,y2);

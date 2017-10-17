@@ -48,7 +48,7 @@ double AdmissibilityH::get_max(Node* a, Node* b)
     }
     xb = std::abs(b->getXr_b()-b->getXl_b());
     yb = std::abs(b->getYr_b()-b->getYl_b());
-    if(xa > ya){
+    if(xb > yb){
         maxB = xb;
     }
     else {
