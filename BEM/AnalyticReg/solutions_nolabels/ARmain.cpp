@@ -1,3 +1,9 @@
+//// 
+//// Copyright (C) 2017 SAM (D-MATH) @ ETH Zurich
+//// Author(s): curzuato < > 
+//// Contributors:  dcasati 
+//// This file is part of the AdvNumCSE repository.
+////
 #include <iostream>
 #include <fstream>
 #include <istream> 
@@ -11,7 +17,6 @@
 /* @brief Compute matrix A-M using analytic expression.
  * \param[in] N Discretization parameter indicating number of basis functions.
  */
-/* SAM_LISTING_BEGIN_0 */
 Eigen::MatrixXd computeAminusM(int N){
   Eigen::DiagonalMatrix<double, Eigen::Dynamic> AmM(2*N+1);
 
@@ -22,7 +27,6 @@ Eigen::MatrixXd computeAminusM(int N){
 
   return AmM;
 }
-/* SAM_LISTING_END_0 */
 
 
 //----------------------------------------------------------------------------
@@ -31,7 +35,6 @@ Eigen::MatrixXd computeAminusM(int N){
  *                  corresponding to the parametrized curve.
  * \param[in] N Discretization parameter indicating number of basis functions.
  */
-/* SAM_LISTING_BEGIN_1a */
 template <typename PARAM>
 Eigen::MatrixXd computeGammaCoefficients(const PARAM& gamma, int N){
   // Get quadrature points and weight
@@ -54,7 +57,6 @@ Eigen::MatrixXd computeGammaCoefficients(const PARAM& gamma, int N){
   }// end for coeffs (k)
   return coeffs;  
 }
-/* SAM_LISTING_END_1a */
 
 
 //----------------------------------------------------------------------------
@@ -65,7 +67,6 @@ Eigen::MatrixXd computeGammaCoefficients(const PARAM& gamma, int N){
  * \param[in] s,t points in [0,2Pi]
  * \param[in] N Discretization parameter indicating number of basis functions.
  */
-/* SAM_LISTING_BEGIN_1b */
 Eigen::Vector2d evaluateGammaDiff(const Eigen::MatrixXd& gammaCoeffs, double s,
 				  double t, int N){
   assert(gammaCoeffs.rows()==2*N);
@@ -89,7 +90,6 @@ Eigen::Vector2d evaluateGammaDiff(const Eigen::MatrixXd& gammaCoeffs, double s,
 			 *evalFun.segment(N,N) );
   return res;
 }
-/* SAM_LISTING_END_1b */
 
 
 //----------------------------------------------------------------------------
@@ -98,7 +98,6 @@ Eigen::Vector2d evaluateGammaDiff(const Eigen::MatrixXd& gammaCoeffs, double s,
  *                  corresponding to the parametrized curve.
  * \param[in] N Discretization parameter indicating number of basis functions.
  */
-/* SAM_LISTING_BEGIN_1c */
 template <typename PARAM>
 Eigen::MatrixXd computeM(const PARAM& gamma, int N){
   // Get quadrature points and weight
@@ -151,7 +150,6 @@ Eigen::MatrixXd computeM(const PARAM& gamma, int N){
 
   return M;
 }
-/* SAM_LISTING_END_1c */
 
 
 //----------------------------------------------------------------------------
@@ -161,7 +159,6 @@ Eigen::MatrixXd computeM(const PARAM& gamma, int N){
  * \param[in] g Right hand side function (takes 2d points and returns a double).
  * \param[in] N Discretization parameter indicating number of basis functions.
  */
-/* SAM_LISTING_BEGIN_2 */
 template <typename PARAM, typename FUNC>
 Eigen::VectorXd computeG(const PARAM& gamma, const FUNC& g, int N){
   // Initialize right hand side vector
@@ -185,7 +182,6 @@ Eigen::VectorXd computeG(const PARAM& gamma, const FUNC& g, int N){
 
   return RHS;
 }
-/* SAM_LISTING_END_2 */
 
 
 //----------------------------------------------------------------------------
@@ -195,7 +191,6 @@ Eigen::VectorXd computeG(const PARAM& gamma, const FUNC& g, int N){
  * \param[in] g Right hand side function (takes 2d points and returns a double).
  * \param[in] N Discretization parameter indicating number of basis functions.
  */
-/* SAM_LISTING_BEGIN_3 */
 template <typename PARAM, typename FUNC>
 Eigen::VectorXd solveBIE(const PARAM& gamma, const FUNC& g, int N){
   // In order to compute A we use A=(A-M)+M
@@ -213,7 +208,6 @@ Eigen::VectorXd solveBIE(const PARAM& gamma, const FUNC& g, int N){
   
   return sol;
 }
-/* SAM_LISTING_END_3 */
 
 
 //----------------------------------------------------------------------------
@@ -249,7 +243,6 @@ Eigen::VectorXd solveBIEonDisk(const PARAM& gamma, const FUNC& g, int N){
  *                       corresponding to the derivative of the curve's 
  *                       parametrization.
  */
-/* SAM_LISTING_BEGIN_4a */
 template <typename PARAMDER>
 double reconstructRho(const Eigen::VectorXd& coeffs, double t,
 		      const PARAMDER& gammaprime){
@@ -261,7 +254,6 @@ double reconstructRho(const Eigen::VectorXd& coeffs, double t,
   }
   return res;
 }
-/* SAM_LISTING_END_4a */
 
 
 //----------------------------------------------------------------------------
@@ -272,7 +264,6 @@ double reconstructRho(const Eigen::VectorXd& coeffs, double t,
  *                       parametrization.
  * \param[in] coeffs coefficients of UN
  */
-/* SAM_LISTING_BEGIN_4b */
 template <typename PARAMDER>
 double L2norm(const PARAMDER& gammaprime, const Eigen::VectorXd& coeffs){
   double res=0.;
@@ -289,7 +280,6 @@ double L2norm(const PARAMDER& gammaprime, const Eigen::VectorXd& coeffs){
   
   return std::sqrt(res);
 }
-/* SAM_LISTING_END_4b */
 
 
 //----------------------------------------------------------------------------
@@ -305,7 +295,6 @@ double L2norm(const PARAMDER& gammaprime, const Eigen::VectorXd& coeffs){
  *                       corresponding to the derivative of the curve's 
  *                       parametrization.
  */
-/* SAM_LISTING_BEGIN_5 */
 template <typename PARAM, typename PARAMDER>
 double repFormulaSL(const Eigen::VectorXd& mu, const Eigen::Vector2d& X,
 		    const PARAM& gamma,
@@ -322,7 +311,6 @@ double repFormulaSL(const Eigen::VectorXd& mu, const Eigen::Vector2d& X,
   }
   return res;
 }
-/* SAM_LISTING_END_5 */
 
 
 
@@ -420,7 +408,6 @@ int main() {
     
   
   //----------------------------------------------------------------------------
-  /* SAM_LISTING_BEGIN_6 */
   std::cout << "=====  Test system for gamma(t)  ====="
 	    << std::endl;
   std::function<Eigen::Vector2d(const double&)> gammaprime = [](const double& t){
@@ -455,7 +442,6 @@ int main() {
   std::cout << "======================================"
 	    << std::endl << std::endl;
   
-  /* SAM_LISTING_END_6 */
     
   return 0;
 
