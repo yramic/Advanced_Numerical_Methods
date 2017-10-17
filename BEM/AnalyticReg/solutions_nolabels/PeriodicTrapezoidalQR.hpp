@@ -1,9 +1,12 @@
 //// 
 //// Copyright (C) 2017 SAM (D-MATH) @ ETH Zurich
-//// Author(s): dcasati <daniele.casati@sam.math.ethz.ch> 
-//// Contributors: curzuato
+//// Author(s): curzuato < > 
+//// Contributors:  dcasati 
 //// This file is part of the AdvNumCSE repository.
 ////
+#ifndef PTRAPEZOIDALQR_HPP
+#define PTRAPEZOIDALQR_HPP
+
 #include <iostream>
 #include <cmath>
 #include <Eigen/Dense>
@@ -15,14 +18,15 @@
 std::pair<Eigen::VectorXd,double>
 PeriodicTrapRule(int N) {
 
-  double wq = 2*M_PI/N;
+  double wq = 2.*M_PI/N;
  
   Eigen::VectorXd aux;
   aux.setLinSpaced(N+1,0,1);
-  //std::cout << aux.segment(0,N) << std::endl;
-  Eigen::VectorXd xq = aux.segment(0,N)*2*M_PI;
+  Eigen::VectorXd xq = aux.segment(0,N)*2.*M_PI;
 
   // return
   return std::make_pair(xq,wq);
 
 }
+
+#endif

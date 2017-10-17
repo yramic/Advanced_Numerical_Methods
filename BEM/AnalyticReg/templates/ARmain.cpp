@@ -6,11 +6,11 @@
 
 
 
-//----------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_0 */
+ 
 /* @brief Compute matrix A-M using analytic expression.
  * \param[in] N Discretization parameter indicating number of basis functions.
  */
+/* SAM_LISTING_BEGIN_0 */
 Eigen::MatrixXd computeAminusM(int N){
   Eigen::DiagonalMatrix<double, Eigen::Dynamic> AmM(2*N+1);
 
@@ -20,6 +20,7 @@ Eigen::MatrixXd computeAminusM(int N){
 /* SAM_LISTING_END_0 */
 
 
+/* SAM_LISTING_END_1b */
 
 
 //----------------------------------------------------------------------------
@@ -28,6 +29,7 @@ Eigen::MatrixXd computeAminusM(int N){
  *                  corresponding to the parametrized curve.
  * \param[in] N Discretization parameter indicating number of basis functions.
  */
+/* SAM_LISTING_BEGIN_1c */
 template <typename PARAM>
 Eigen::MatrixXd computeM(const PARAM& gamma, int N){
 
@@ -38,17 +40,17 @@ Eigen::MatrixXd computeM(const PARAM& gamma, int N){
 
   return M;
 }
-/* SAM_LISTING_END_1 */
+/* SAM_LISTING_END_1c */
 
 
 //----------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_2 */
 /* @brief Compute right hand side using periodic trapezoidal rule (2N points).
  * \param[in] gamma Function that takes a double and returns a 2d vector  
  *                  corresponding to the parametrized curve.
  * \param[in] g Right hand side function (takes 2d points and returns a double).
  * \param[in] N Discretization parameter indicating number of basis functions.
  */
+/* SAM_LISTING_BEGIN_2 */
 template <typename PARAM, typename FUNC>
 Eigen::VectorXd computeG(const PARAM& gamma, const FUNC& g, int N){
   // Initialize right hand side vector
@@ -60,13 +62,13 @@ Eigen::VectorXd computeG(const PARAM& gamma, const FUNC& g, int N){
 
 
 //----------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_3 */
 /* @brief Build and solve boundary integral equation V rho = g
  * \param[in] gamma Function that takes a double and returns a 2d vector  
  *                  corresponding to the parametrized curve.
  * \param[in] g Right hand side function (takes 2d points and returns a double).
  * \param[in] N Discretization parameter indicating number of basis functions.
  */
+/* SAM_LISTING_BEGIN_3 */
 template <typename PARAM, typename FUNC>
 Eigen::VectorXd solveBIE(const PARAM& gamma, const FUNC& g, int N){
     // TODO: Build BIE system and solve it
@@ -78,6 +80,7 @@ Eigen::VectorXd solveBIE(const PARAM& gamma, const FUNC& g, int N){
 
 
 //----------------------------------------------------------------------------
+/* SAM_LISTING_END_4a */
 
 
 //----------------------------------------------------------------------------
@@ -88,6 +91,7 @@ Eigen::VectorXd solveBIE(const PARAM& gamma, const FUNC& g, int N){
  *                       parametrization.
  * \param[in] coeffs coefficients of UN
  */
+/* SAM_LISTING_BEGIN_4b */
 template <typename PARAMDER>
 double L2norm(const PARAMDER& gammaprime, const Eigen::VectorXd& coeffs){
   double res=0.;
@@ -95,7 +99,7 @@ double L2norm(const PARAMDER& gammaprime, const Eigen::VectorXd& coeffs){
   
   return std::sqrt(res);
 }
-/* SAM_LISTING_END_4 */
+/* SAM_LISTING_END_4b */
 
 
 /* SAM_LISTING_END_5 */
@@ -209,7 +213,6 @@ int main() {
 	    << std::endl << std::endl;
   
   /* SAM_LISTING_END_6 */
-  std::cout << "DISCLAIMER : This code is still not working! " << std::endl;
     
   return 0;
 

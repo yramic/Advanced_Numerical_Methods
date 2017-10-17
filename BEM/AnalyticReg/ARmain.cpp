@@ -9,11 +9,11 @@
 #endif // SOLUTION
 
 
-//----------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_0 */
+ 
 /* @brief Compute matrix A-M using analytic expression.
  * \param[in] N Discretization parameter indicating number of basis functions.
  */
+/* SAM_LISTING_BEGIN_0 */
 Eigen::MatrixXd computeAminusM(int N){
   Eigen::DiagonalMatrix<double, Eigen::Dynamic> AmM(2*N+1);
 
@@ -33,12 +33,12 @@ Eigen::MatrixXd computeAminusM(int N){
 
   #if SOLUTION
 //----------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_1 */
 /* @brief Compute Fourier coefficients corresponding to gamma.
  * \param[in] gamma Function that takes a double and returns a 2d vector  
  *                  corresponding to the parametrized curve.
  * \param[in] N Discretization parameter indicating number of basis functions.
  */
+/* SAM_LISTING_BEGIN_1a */
 template <typename PARAM>
 Eigen::MatrixXd computeGammaCoefficients(const PARAM& gamma, int N){
   // Get quadrature points and weight
@@ -61,6 +61,7 @@ Eigen::MatrixXd computeGammaCoefficients(const PARAM& gamma, int N){
   }// end for coeffs (k)
   return coeffs;  
 }
+/* SAM_LISTING_END_1a */
 
 
 //----------------------------------------------------------------------------
@@ -71,6 +72,7 @@ Eigen::MatrixXd computeGammaCoefficients(const PARAM& gamma, int N){
  * \param[in] s,t points in [0,2Pi]
  * \param[in] N Discretization parameter indicating number of basis functions.
  */
+/* SAM_LISTING_BEGIN_1b */
 Eigen::Vector2d evaluateGammaDiff(const Eigen::MatrixXd& gammaCoeffs, double s,
 				  double t, int N){
   assert(gammaCoeffs.rows()==2*N);
@@ -95,6 +97,7 @@ Eigen::Vector2d evaluateGammaDiff(const Eigen::MatrixXd& gammaCoeffs, double s,
   return res;
 }
 #endif // SOLUTION
+/* SAM_LISTING_END_1b */
 
 
 //----------------------------------------------------------------------------
@@ -103,6 +106,7 @@ Eigen::Vector2d evaluateGammaDiff(const Eigen::MatrixXd& gammaCoeffs, double s,
  *                  corresponding to the parametrized curve.
  * \param[in] N Discretization parameter indicating number of basis functions.
  */
+/* SAM_LISTING_BEGIN_1c */
 template <typename PARAM>
 Eigen::MatrixXd computeM(const PARAM& gamma, int N){
   #if SOLUTION
@@ -161,17 +165,17 @@ Eigen::MatrixXd computeM(const PARAM& gamma, int N){
 
   return M;
 }
-/* SAM_LISTING_END_1 */
+/* SAM_LISTING_END_1c */
 
 
 //----------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_2 */
 /* @brief Compute right hand side using periodic trapezoidal rule (2N points).
  * \param[in] gamma Function that takes a double and returns a 2d vector  
  *                  corresponding to the parametrized curve.
  * \param[in] g Right hand side function (takes 2d points and returns a double).
  * \param[in] N Discretization parameter indicating number of basis functions.
  */
+/* SAM_LISTING_BEGIN_2 */
 template <typename PARAM, typename FUNC>
 Eigen::VectorXd computeG(const PARAM& gamma, const FUNC& g, int N){
   // Initialize right hand side vector
@@ -203,13 +207,13 @@ Eigen::VectorXd computeG(const PARAM& gamma, const FUNC& g, int N){
 
 
 //----------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_3 */
 /* @brief Build and solve boundary integral equation V rho = g
  * \param[in] gamma Function that takes a double and returns a 2d vector  
  *                  corresponding to the parametrized curve.
  * \param[in] g Right hand side function (takes 2d points and returns a double).
  * \param[in] N Discretization parameter indicating number of basis functions.
  */
+/* SAM_LISTING_BEGIN_3 */
 template <typename PARAM, typename FUNC>
 Eigen::VectorXd solveBIE(const PARAM& gamma, const FUNC& g, int N){
     #if SOLUTION
@@ -262,7 +266,6 @@ Eigen::VectorXd solveBIEonDisk(const PARAM& gamma, const FUNC& g, int N){
 
 
 //----------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_4 */
 /* @brief Reconstruct function UN from its coefficients and evaluate it at t.
  * \param[in] coeffs coefficients of UN
  * \param[in] t point in [0,2Pi]
@@ -270,6 +273,7 @@ Eigen::VectorXd solveBIEonDisk(const PARAM& gamma, const FUNC& g, int N){
  *                       corresponding to the derivative of the curve's 
  *                       parametrization.
  */
+/* SAM_LISTING_BEGIN_4a */
 template <typename PARAMDER>
 double reconstructRho(const Eigen::VectorXd& coeffs, double t,
 		      const PARAMDER& gammaprime){
@@ -282,6 +286,7 @@ double reconstructRho(const Eigen::VectorXd& coeffs, double t,
   return res;
 }
 #endif //SOLUTION
+/* SAM_LISTING_END_4a */
 
 
 //----------------------------------------------------------------------------
@@ -292,6 +297,7 @@ double reconstructRho(const Eigen::VectorXd& coeffs, double t,
  *                       parametrization.
  * \param[in] coeffs coefficients of UN
  */
+/* SAM_LISTING_BEGIN_4b */
 template <typename PARAMDER>
 double L2norm(const PARAMDER& gammaprime, const Eigen::VectorXd& coeffs){
   double res=0.;
@@ -312,12 +318,11 @@ double L2norm(const PARAMDER& gammaprime, const Eigen::VectorXd& coeffs){
   
   return std::sqrt(res);
 }
-/* SAM_LISTING_END_4 */
+/* SAM_LISTING_END_4b */
 
 
  #if SOLUTION
 //----------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_5 */
 /* @brief Evaluate Single Layer Potential of function given by the coefficient 
  *                 vector mu on the point X and using the parametrization gamma.
  *                 The integration is done using periodic trapezoidal rule 
@@ -330,6 +335,7 @@ double L2norm(const PARAMDER& gammaprime, const Eigen::VectorXd& coeffs){
  *                       corresponding to the derivative of the curve's 
  *                       parametrization.
  */
+/* SAM_LISTING_BEGIN_5 */
 template <typename PARAM, typename PARAMDER>
 double repFormulaSL(const Eigen::VectorXd& mu, const Eigen::Vector2d& X,
 		    const PARAM& gamma,
