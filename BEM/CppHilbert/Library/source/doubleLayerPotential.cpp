@@ -23,7 +23,7 @@
 extern "C" {
 #include "gaussQuadrature.h"
 }
-
+#include <iostream>
 
 //------------------------------------------------------------------------------
 // See MAI08, Section 2
@@ -41,7 +41,7 @@ double dlp(int k, const Eigen::Vector2d& p, const Eigen::Vector2d& q)
   double G0 = 0,G1 = 0;
 
   assert(D>=-EPS*4*a*c); // In exact arithmetic, D >= 0
-  if (D > EPS*4*a*c) root_D = sqrt(D); else D = 0.0;
+  if (D > EPS*4*a*c){ root_D = sqrt(D);} else{ D = 0.0;}
 
   if (D == 0.0) // MAI08, (5), special case
   {
@@ -49,21 +49,22 @@ double dlp(int k, const Eigen::Vector2d& p, const Eigen::Vector2d& q)
   }   
   else // g_0^{-1} in MAI08, Lemma 2.1
   {
-    if (fabs(c-a) < EPS*fabs(c)) G0 = M_PI/root_D;
-    else if (a < c) G0 = 2.*atan(root_D/(c-a))/root_D;
-    else            G0 = 2.*(atan(root_D/(c-a))+M_PI)/root_D;
+    if (fabs(c-a) < EPS*fabs(c)){ G0 = M_PI/root_D;}
+    else if (a < c){ G0 = 2.*atan(root_D/(c-a))/root_D;}
+    else           { G0 = 2.*(atan(root_D/(c-a))+M_PI)/root_D;}
   }
 
   if (k >= 1) // First step of recursion for k=1
   {
     // MAI08, Lemma 2.1, g_1^{-1}
     G1 = -b*G0;
-    if (a+b+c > EPS*a) G1 += log(a+b+c);
-    if (a-b+c > EPS*a) G1 -= log(a-b+c);
+    if (a+b+c > EPS*a){ G1 += log(a+b+c);}
+    if (a-b+c > EPS*a){ G1 -= log(a-b+c);}
+    
     G1 /= (2.*a);
 
     // MAI08, g_2^{-1}
-    if (k == 2) return (2.-b*G1-c*G0)/a;
+    if (k == 2){return (2.-b*G1-c*G0)/a;}
     
     return G1;
   }
@@ -89,26 +90,32 @@ void computeKij(double* I0, double* I1, double eta,
 
   if (eta == 0)   /* fully analytic computation */
   {
-    if (swap == 0) 
+    if (swap == 0) {
       computeKijAnalytic(I0,I1,a,b,c,d);
-    else
+    }
+    else{
       computeKijSwappedAnalytic(I0,I1,a,b,c,d);
+    }
   }
   else            /* fully analytic or semianalytic */
   {
     if(distanceSegmentToSegment(a,b,c,d)*eta >= sqrt(hi))
     {
-      if (swap == 0)
+      if (swap == 0){
         computeKijSemianalytic(I0,I1,a,b,c,d);
-      else
+      }
+      else{
         computeKijSwappedSemianalytic(I0,I1,a,b,c,d);
+      }
     }
     else
     {
-      if (swap == 0)
+      if (swap == 0){
         computeKijAnalytic(I0,I1,a,b,c,d);
-      else
+      }
+      else{
         computeKijSwappedAnalytic(I0,I1,a,b,c,d);
+      }
     }
   }
 }
@@ -127,12 +134,16 @@ void computeKijAnalytic(double* I0, double* I1,
   
   Eigen::Vector2d u = a-b; 
   Eigen::Vector2d v = d-c;
-  Eigen::Vector2d w = w=c+d-a-b;
+  Eigen::Vector2d w = c+d-a-b;
+  Eigen::Vector2d wpu = w+u;
+  Eigen::Vector2d wmu = w-u;
+  Eigen::Vector2d wpv = w+v;
+  Eigen::Vector2d wmv = w-v;
 
   double dot_u_n = u.dot(n);
   double dot_w_n = w.dot(n);
-  double dot_wpu_n = (w+u).dot(n);
-  double dot_wmu_n = (w-u).dot(n);
+  double dot_wpu_n = wpu.dot(n);
+  double dot_wmu_n = wmu.dot(n);
 
   double det = CrossProd2d(u,v);
   
@@ -144,21 +155,22 @@ void computeKijAnalytic(double* I0, double* I1,
     else
       mu = v[1]/u[1];
 
-    *I0 = dot_w_n*( dlp(0,u,w+v)+dlp(0,u,w-v)+ mu*(dlp(1,v,w-u)-dlp(1,v,w+u)) );
-    *I1 = dot_w_n*( dlp(0,u,w+v)-dlp(0,u,w-v)+ mu*(dlp(2,v,w-u)-dlp(2,v,w+u)) )*0.5;
+    *I0 = dot_w_n*( dlp(0,u,wpv)+dlp(0,u,wmv)+ mu*(dlp(1,v,wmu)-dlp(1,v,wpu)) );
+    *I1 = dot_w_n*( dlp(0,u,wpv)-dlp(0,u,wmv)+ mu*(dlp(2,v,wmu)-dlp(2,v,wpu)) )*0.5;
+
   }
   else                               /* u,v linearly independent */
   {
     if (a == d)
     {
-      *I0 = 2*( dot_wpu_n*dlp(0,v,w+u)+dot_u_n*dlp(1,u,w-v)+dot_w_n*dlp(0,u,w-v) );
-      *I1 =     dot_wpu_n*dlp(1,v,w+u)-dot_u_n*dlp(1,u,w-v)-dot_w_n*dlp(0,u,w-v)
+      *I0 = 2*( dot_wpu_n*dlp(0,v,wpu)+dot_u_n*dlp(1,u,wmv)+dot_w_n*dlp(0,u,wmv) );
+      *I1 =     dot_wpu_n*dlp(1,v,wpu)-dot_u_n*dlp(1,u,wmv)-dot_w_n*dlp(0,u,wmv)
 	    + 0.5*(*I0);
     }
     else if (b == c)
     {
-      *I0 = 2*( dot_wmu_n*dlp(0,v,w-u)+dot_u_n*dlp(1,u,w+v)+dot_w_n*dlp(0,u,w+v) );
-      *I1 =     dot_wmu_n*dlp(1,v,w-u)+dot_u_n*dlp(1,u,w+v)+dot_w_n*dlp(0,u,w+v)
+      *I0 = 2*( dot_wmu_n*dlp(0,v,wmu)+dot_u_n*dlp(1,u,wpv)+dot_w_n*dlp(0,u,wpv) );
+      *I1 =     dot_wmu_n*dlp(1,v,wmu)+dot_u_n*dlp(1,u,wpv)+dot_w_n*dlp(0,u,wpv)
 	    - 0.5*(*I0);
     }
     else
@@ -166,13 +178,13 @@ void computeKijAnalytic(double* I0, double* I1,
       mu     = CrossProd2d(w,v)/det;
       lambda = CrossProd2d(u,w)/det;
      
-      *I0 = (mu+1)*dot_wpu_n*dlp(0,v,w+u) - (mu-1)*dot_wmu_n*dlp(0,v,w-u)
-            + (lambda+1)*( dot_u_n*dlp(1,u,w+v) + dot_w_n*dlp(0,u,w+v) )
-            - (lambda-1)*( dot_u_n*dlp(1,u,w-v) + dot_w_n*dlp(0,u,w-v) );
-      *I1 = 0.5*( (mu+1)*dot_wpu_n*dlp(1,v,w+u) - (mu-1)*dot_wmu_n*dlp(1,v,w-u)
-                 + (lambda+1)*( dot_u_n*dlp(1,u,w+v) + dot_w_n*dlp(0,u,w+v) )
-                 + (lambda-1)*( dot_u_n*dlp(1,u,w-v) + dot_w_n*dlp(0,u,w-v) ) 
-                 - lambda*(*I0) ); 
+      *I0 = (mu+1)*dot_wpu_n*dlp(0,v,wpu) - (mu-1)*dot_wmu_n*dlp(0,v,wmu)
+            + (lambda+1)*( dot_u_n*dlp(1,u,wpv) + dot_w_n*dlp(0,u,wpv) )
+            - (lambda-1)*( dot_u_n*dlp(1,u,wmv) + dot_w_n*dlp(0,u,wmv) );
+      *I1 = 0.5*( (mu+1)*dot_wpu_n*dlp(1,v,wpu) - (mu-1)*dot_wmu_n*dlp(1,v,wmu)
+                 + (lambda+1)*( dot_u_n*dlp(1,u,wpv) + dot_w_n*dlp(0,u,wpv) )
+                 + (lambda-1)*( dot_u_n*dlp(1,u,wmv) + dot_w_n*dlp(0,u,wmv) ) 
+                 - lambda*(*I0) );
     }
   }
   *I0 *= -0.125*sqrt(hi*hj)/M_PI;
@@ -189,62 +201,68 @@ void computeKijSwappedAnalytic(double* I0, double* I1,
   double hi = (b-a).squaredNorm(); /* hi = norm(b-a)^2 */
   double hj = (d-c).squaredNorm(); /* hj = norm(d-c)^2 */
 
-  Eigen::Vector2d n; /* normal vector */
-  n << (d[1]-c[1])/sqrt(hj) , -(d[0]-c[0])/sqrt(hj);
+  Eigen::Vector2d n = unitNormal(c,d); /* normal vector */
+  //Eigen::Vector2d n; /* normal vector */
+  //n << (d[1]-c[1])/sqrt(hj) , -(d[0]-c[0])/sqrt(hj);
 
   Eigen::Vector2d u = d-c;
   Eigen::Vector2d v = a-b;
-  Eigen::Vector2d w = w=c+d-a-b;
+  Eigen::Vector2d w = c+d-a-b;
+  Eigen::Vector2d wpu = w+u;
+  Eigen::Vector2d wmu = w-u;
+  Eigen::Vector2d wpv = w+v;
+  Eigen::Vector2d wmv = w-v;
 
   double dot_v_n = v.dot(n);       /* dot_v_n=<v,n> */
   double dot_w_n = w.dot(n);
-  double dot_wpv_n = (w+u).dot(n); /* dot_wpu_n=<w+u,n> */
-  double dot_wmv_n = (w-v).dot(n);
+  double dot_wpv_n = (wpu).dot(n); /* dot_wpu_n=<w+u,n> */
+  double dot_wmv_n = (wmv).dot(n);
 
   double det = CrossProd2d(u,v);
   
   double lambda=0.0, mu=0.0;
-  if(fabs(det)<=EPS*sqrt(hi*hj))   /* u,v linearly dependent */
+  if(fabs(det)<= 1e-6*sqrt(hi*hj))   /* u,v linearly dependent */
   {
     if(fabs(u[0])>fabs(u[1]))
       mu = v[0]/u[0];
     else
       mu = v[1]/u[1];
 
-    *I0 = dot_w_n*( dlp(0,u,w+v)+dlp(0,u,w-v) + mu*( dlp(1,v,w-u)-dlp(1,v,w+u)) );
-    *I1 = dot_w_n*( dlp(1,u,w+v)+dlp(1,u,w-v) + mu*(-dlp(1,v,w-u)-dlp(1,v,w+u)
-                    +0.5*( dlp(0,u,w+v)-dlp(0,u,w-v)
-                           + mu*(dlp(2,v,w-u)-dlp(2,v,w+u)) ) ));
+    *I0 = dot_w_n*( dlp(0,u,wpv)+dlp(0,u,wmv) + mu*( dlp(1,v,wmu)-dlp(1,v,wpu)) );
+    *I1 = dot_w_n*( dlp(1,u,wpv)+dlp(1,u,wmv) + mu*(-dlp(1,v,wmu)-dlp(1,v,wpu)
+                    +0.5*( dlp(0,u,wpv)-dlp(0,u,wmv)
+                           + mu*(dlp(2,v,wmu)-dlp(2,v,wpu)) ) ));
+
   }
   else                             /* u,v linearly independent */
   {
     if (a == d)
     {
-      *I0 = 2*( dot_v_n*dlp(1,v,w-u) + dot_w_n*dlp(0,v,w-u)
-                + dot_wpv_n*dlp(0,u,w+v) );
-      *I1 =     dot_wpv_n*dlp(1,u,w+v)-dot_v_n*dlp(1,v,w-u)
-              - dot_w_n*dlp(0,v,w-u) + 0.5*(*I0);
+      *I0 = 2*( dot_v_n*dlp(1,v,wmu) + dot_w_n*dlp(0,v,wmu)
+                + dot_wpv_n*dlp(0,u,wpv) );
+      *I1 =     dot_wpv_n*dlp(1,u,wpv)-dot_v_n*dlp(1,v,wmu)
+              - dot_w_n*dlp(0,v,wmu) + 0.5*(*I0);
     }
     else if (b == c)
     {
-      *I0 = 2*( dot_v_n*dlp(1,v,w+u) + dot_w_n*dlp(0,v,w+u)
-                +dot_wmv_n*dlp(0,u,w-v) );
-      *I1 =     dot_v_n*dlp(1,v,w+u) + dot_w_n*dlp(0,v,w+u)
-                + dot_wmv_n*dlp(1,u,w-v) - 0.5*(*I0);
+      *I0 = 2*( dot_v_n*dlp(1,v,wpu) + dot_w_n*dlp(0,v,wpu)
+                +dot_wmv_n*dlp(0,u,wmv) );
+      *I1 =     dot_v_n*dlp(1,v,wpu) + dot_w_n*dlp(0,v,wpu)
+                + dot_wmv_n*dlp(1,u,wmv) - 0.5*(*I0);
     }
     else
     {
       mu     = CrossProd2d(w,v)/det;
       lambda = CrossProd2d(u,w)/det;
      
-      *I0 =   (mu+1)*(dot_v_n*dlp(1,v,w+u) + dot_w_n*dlp(0,v,w+u))
-            - (mu-1)*(dot_v_n*dlp(1,v,w-u) + dot_w_n*dlp(0,v,w-u))
-            + (lambda+1)*dot_wpv_n*dlp(0,u,w+v)
-            - (lambda-1)*dot_wmv_n*dlp(0,u,w-v);
-      *I1 = 0.5*( (mu+1)*(dot_v_n*dlp(1,v,w+u) + dot_w_n*dlp(0,v,w+u))
-                 +(mu-1)*(dot_v_n*dlp(1,v,w-u) + dot_w_n*dlp(0,v,w-u))
-                 +(lambda+1)*dot_wpv_n*dlp(1,u,w+v)
-                 -(lambda-1)*dot_wmv_n*dlp(1,u,w-v)-mu*(*I0));
+      *I0 =   (mu+1)*(dot_v_n*dlp(1,v,wpu) + dot_w_n*dlp(0,v,wpu))
+            - (mu-1)*(dot_v_n*dlp(1,v,wmu) + dot_w_n*dlp(0,v,wmu))
+            + (lambda+1)*dot_wpv_n*dlp(0,u,wpv)
+            - (lambda-1)*dot_wmv_n*dlp(0,u,wmv);
+      *I1 = 0.5*( (mu+1)*(dot_v_n*dlp(1,v,wpu) + dot_w_n*dlp(0,v,wpu))
+                 +(mu-1)*(dot_v_n*dlp(1,v,wmu) + dot_w_n*dlp(0,v,wmu))
+                 +(lambda+1)*dot_wpv_n*dlp(1,u,wpv)
+                 -(lambda-1)*dot_wmv_n*dlp(1,u,wmv)-mu*(*I0));
     }
   }
   *I0 *= -0.125*sqrt(hi*hj)/M_PI;
@@ -269,7 +287,7 @@ void computeKijSemianalytic(double* I0, double* I1,
 
   Eigen::Vector2d u = a-b;
   Eigen::Vector2d v = d-c;
-  Eigen::Vector2d w = w=c+d-a-b;
+  Eigen::Vector2d w = c+d-a-b;
 
   double I0tmp = 0.0;
   double I1tmp = 0.0;
@@ -307,7 +325,7 @@ void computeKijSwappedSemianalytic(double* I0, double* I1,
 
   Eigen::Vector2d u = d-c;
   Eigen::Vector2d v = a-b;
-  Eigen::Vector2d w = w=c+d-a-b;
+  Eigen::Vector2d w = c+d-a-b;
 
   double dot_v_n = v.dot(n);
   double dot_w_n = w.dot(n);
@@ -325,5 +343,6 @@ void computeKijSwappedSemianalytic(double* I0, double* I1,
 
   *I0 = -0.125*sqrt(hi*hj)*I0tmp/M_PI;
   *I1 = -0.125*sqrt(hi*hj)*I1tmp/M_PI;
+
 }
 

@@ -28,8 +28,8 @@ void computeK(Eigen::MatrixXd& K, const BoundaryMesh& mesh, double eta)
   // resize and initialize matrix
   int nE = mesh.numElements();
   int nC = mesh.numVertices();
-  K.resize(nE, nC);
-  K.setZero();
+  K.resize(nE, nC);  K.setZero();
+  double I0=0.0, I1=0.0;
   
   // traverse the elements
   for (int j=0;j<nE;++j)
@@ -55,7 +55,6 @@ void computeK(Eigen::MatrixXd& K, const BoundaryMesh& mesh, double eta)
       if( linetest1>EPS*(a-c).norm() || linetest2>EPS*(a-d).norm() )
       {
         // compute elements' contribution
-        double I0=0.0, I1=0.0;
         computeKij(&I0,&I1,eta,a,b,c,d);
         // distribute among matrix entries
         K(j,cidx) += I0-I1;

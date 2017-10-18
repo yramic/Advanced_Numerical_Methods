@@ -48,7 +48,6 @@ void computeM01(Eigen::SparseMatrix<double>& M, const BoundaryMesh& mesh)
         triplets.push_back(triplet_t(i, aidx, h/2.));
         triplets.push_back(triplet_t(i, bidx, h/2.));
     }
-
     M.setFromTriplets(triplets.begin(), triplets.end());
 }
 

@@ -1,4 +1,5 @@
 #include <Eigen/Dense>
+#include "source/buildM.hpp"
 
 /**
  *  Stabilization matrix for the hypersingular IE using S1-elements.
@@ -22,14 +23,13 @@
  *  @param[in] elements  (nE x 2) matrix containing the indices of the vertices
  *                       corresponding to each element of the boundary mesh.
  */
-void buildHypsingStabilization(Eigen::MatrixXd& S, const Eigen::MatrixXd& coordinates,
-                               const Eigen::MatrixXi& elements)
+void buildHypsingStabilization(Eigen::MatrixXd& S, const BoundaryMesh& mesh)
 {
 
-  int nE = coordinates.rows();
-  Eigen::SparseMatrix<double> M(nE, nE);
-  computeM11(M, coordinates, elements);
-  Eigen::VectorXd aux(nE);
+  int nC = mesh.numVertices();
+  Eigen::SparseMatrix<double> M(nC, nC);
+  computeM11(M, mesh);
+  Eigen::VectorXd aux(nC);
   aux.setOnes();
   Eigen::VectorXd c = M*aux;
 
