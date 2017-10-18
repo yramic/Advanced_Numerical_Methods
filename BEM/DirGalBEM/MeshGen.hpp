@@ -57,7 +57,7 @@ BoundaryMesh createUnitSquareMesh(const int& N){
  * \param[in] N Number of panels on BoundaryMesh
  */
 template<typename PARAM>
-BoundaryMesh createUnitSquareMesh(const PARAM& gamma, const int& N){
+BoundaryMesh createMeshwithGamma(const PARAM& gamma, const int& N){
   // 1. Create boundary vertices for gamma([-1,1])
   // - Create auxiliary vector for interval I
   Eigen::VectorXd Xi; Xi.setLinSpaced(N+1, -1, 1);
