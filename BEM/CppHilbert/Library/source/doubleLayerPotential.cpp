@@ -220,7 +220,7 @@ void computeKijSwappedAnalytic(double* I0, double* I1,
   double det = CrossProd2d(u,v);
   
   double lambda=0.0, mu=0.0;
-  if(fabs(det)<= 1e-6*sqrt(hi*hj))   /* u,v linearly dependent */
+  if(fabs(det)<= EPS*sqrt(hi*hj))   /* u,v linearly dependent */
   {
     if(fabs(u[0])>fabs(u[1]))
       mu = v[0]/u[0];
