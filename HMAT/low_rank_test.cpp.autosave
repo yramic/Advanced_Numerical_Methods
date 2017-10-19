@@ -214,6 +214,5 @@ int main() {
     }*/
     std::cout << "Approximation error (l-inf norm): " << diff_gg.lpNorm<Eigen::Infinity>() << std::endl
               << "Approximation error (l-2 norm): "   << diff_gg.lpNorm<2>() << std::endl;
-
     }
 }

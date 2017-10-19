@@ -55,14 +55,10 @@ public:
     void setNearFar(double eta, cTree &Ty) {
         setNearFar_recursion(root_, Ty.root_, eta, Ty);
     }
-    void setNearFarCheck(double eta, cTree &Ty) {
-        setNearFar_checkrecursion(root_, eta, Ty, 1);
-    }
     // make lists with boundaries of bounding boxes (just for testing)
     void setLists(std::vector<double>& xlist, std::vector<double>& ylist) {
         setLists_recursion(root_, xlist, ylist);
     }
-
 
 private:
 
@@ -74,9 +70,7 @@ private:
     // needed for "setVc(...)"
     void setVc_recursion(Node* cluster, const Eigen::VectorXd& c);
     // needed for "setNearFar(...)"
-    void setNearFar_recursion(Node* xnode, double eta, cTree &Ty);
     void setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree &Ty);
-    void setNearFar_checkrecursion(Node* xnode, double eta, cTree &Ty, int n);
     // needed for "setLists(...)"
     void setLists_recursion(Node* cluster, std::vector<double>& xlist, std::vector<double>& ylist);
 

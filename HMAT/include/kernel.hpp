@@ -19,9 +19,9 @@ public:
     /**
     * \brief Functor
     */
-    //double operator()(double x, double y);
-    //double operator()(double x1, double y1, double x2, double y2);
-    double operator()();
+    double operator()(double x, double y){}
+    virtual double operator()(double x1, double y1, double x2, double y2) = 0;
+    //double operator()();
 protected:
 
     double num_; // numerator
@@ -41,6 +41,8 @@ public:
     * \brief Functor
     */
     double operator()(double x, double y);
+    double operator()(double x1, double y1, double x2, double y2);
+
 };
 
 class Kernel4D: public Kernel
@@ -63,4 +65,42 @@ public:
     double operator()(double x1, double y1, double x2, double y2);
 };
 
+
+class ConstantKernel: public Kernel
+{
+public:
+    /**
+    * \brief Constructor
+    */
+    ConstantKernel(): Kernel() {}
+    ConstantKernel(double num):
+        Kernel(num)
+    { }
+    /**
+    * \brief Functor
+    */
+    double operator()(double x1, double y1, double x2, double y2);
+    double operator()(double x1, double y2);
+};
+
+class GlobalSmoothKernel: public Kernel
+{
+public:
+    /**
+    * \brief Functor
+    */
+    double operator()(double x1, double y1, double x2, double y2);
+    double operator()(double x1, double y2);
+};
+
+
+class GaussKernel: public Kernel
+{
+public:
+    /**
+    * \brief Functor
+    */
+    double operator()(double x1, double y1, double x2, double y2);
+};
 #endif // KERNEL_HPP
+

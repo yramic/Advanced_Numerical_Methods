@@ -91,10 +91,7 @@ void Node::setLeaves()
             else {
                 bl_PPoints.push_back(*it);
             }
-            //std::cout << it->getId() << ' ';
         }
-            //std::cout << x1_ << " " << x2_ << " " << y1_ << " " << y2_ << std::endl << std::flush;
-            //std::cout << std::endl << std::flush;
             if (!tl_PPoints.empty()) tl_child_ = new Node(tl_PPoints,minX,medX,medY,maxY);   // recursive construction of the Cluster Tree levels below root
             if (!tr_PPoints.empty()) tr_child_ = new Node(tr_PPoints,medX,maxX,medY,maxY);
             if (!bl_PPoints.empty()) bl_child_ = new Node(bl_PPoints,minX,medX,minY,medY);
@@ -107,10 +104,8 @@ void Node::setLeaves(double x1, double x2, double y1, double y2)
     if(r_ind_ - l_ind_ > 0) {
         l_child_ = new Node(l_ind_, (l_ind_+r_ind_)/2);
         r_child_ = new Node((l_ind_+r_ind_)/2 + 1, r_ind_);
-        //std::cout << "wtf" << std::endl << std::flush;
     }
     if(!PPointsTree_.empty() && PPointsTree_.size()>1){ // below the root level the space [x1,x2]x[y1,y2] must be divided in quadrants recursivly
-        //std::cout << sumX << " " << sumY << std::endl << std::flush;
         int medX = x1+(x2-x1)/2;
         int medY = y1+(y2-y1)/2;
         std::vector<Point> tl_PPoints, tr_PPoints, bl_PPoints, br_PPoints;
@@ -130,20 +125,7 @@ void Node::setLeaves(double x1, double x2, double y1, double y2)
             else {
                 bl_PPoints.push_back(*it);
             }
-            //std::cout << it->getId() << ' ';
         }
-        // fix for points of a bbox being a segment
-        if(std::abs(x1-x2)<10*std::numeric_limits<double>::epsilon()){
-            x2_b_++;
-            //std::cout << "wtf" << std::endl;
-        }
-        if(std::abs(y1-y2)<10*std::numeric_limits<double>::epsilon()){
-            y2_b_++;
-            //std::cout << "wtf" << std::endl;
-        }
-        //
-            //std::cout << x1_ << " " << x2_ << " " << y1_ << " " << y2_ << std::endl << std::flush;
-            //std::cout << std::endl << std::flush;
             if (!tl_PPoints.empty()) tl_child_ = new Node(tl_PPoints,x1,medX,medY,y2);
             if (!tr_PPoints.empty()) tr_child_ = new Node(tr_PPoints,medX,x2,medY,y2);
             if (!bl_PPoints.empty()) bl_child_ = new Node(bl_PPoints,x1,medX,y1,medY);
@@ -202,50 +184,22 @@ void Node::setV_node(const std::vector<Point> &t, unsigned deg) //tt==PPointsTre
         x2_b_ = x2;
         y1_b_ = y1;
         y2_b_ = y2;
-        Cheby cbx(x1, x2, deg);
-        Cheby cby(y1, y2, deg);
+        // fix for points of a bbox being a segment
+        if(std::abs(x1-x2)<10*std::numeric_limits<double>::epsilon()){
+            x2_b_++;
+        }
+        if(std::abs(y1-y2)<10*std::numeric_limits<double>::epsilon()){
+            y2_b_++;
+        }
+        Cheby cbx(x1_b_, x2_b_, deg);
+        Cheby cby(y1_b_, y2_b_, deg);
         Eigen::VectorXd tkx = cbx.getNodes(); // Chebyshew nodes for x axis
-        //std:: cout << "tkx" << tkx << std::endl;
         Eigen::VectorXd wkx = cbx.getWghts(); // weights of Lagrange polynomial for x axis
-        //std:: cout << "wkx" << wkx << std::endl;
         Eigen::VectorXd tky = cby.getNodes(); // Chebyshew nodes for y axis
-        //std:: cout << "tky" << tky << std::endl;
         Eigen::VectorXd wky = cby.getWghts(); // weights of Lagrange polynomial for y axis
-        //std:: cout << "wky" << wky << std::endl;
         int ppts = PPointsTree_.size();
         V_node_ = Eigen::MatrixXd::Constant(ppts, (deg+1)*(deg+1), 1);
 
-        /*for(unsigned i=0; i<=ppts-1; ++i) { // calculation of Vx combined with Vy
-            for(unsigned j1=0; j1<=deg; ++j1) {
-                for(unsigned k1=0; k1<j1; ++k1) {
-                    for(unsigned j2=0; j2<=deg; ++j2) {
-                        V_node_(i,j1*(deg+1) + j2) *= (PPointsTree_[i].getX() - tkx[k1]);
-                        for(unsigned k2=0; k2<j2; ++k2) {
-                            V_node_(i,j1*(deg+1) + j2) *= (PPointsTree_[i].getY() - tky[k2]);
-                        }
-                        // Skip "k2 == j2"
-                        for(unsigned k2=j2+1; k2<=deg; ++k2) {
-                            V_node_(i,j1*(deg+1) + j2) *= (PPointsTree_[i].getY() - tky[k2]);
-                        }
-                        V_node_(i,j1*(deg+1) + j2) *= wkx(j1)*wky(j2);
-                    }
-                }
-                // Skip "k1 == j1"
-                for(unsigned k1=j1+1; k1<=deg; ++k1) {
-                    for(unsigned j2=0; j2<=deg; ++j2) {
-                        V_node_(i,j1*(deg+1) + j2) *= (PPointsTree_[i].getX() - tkx[k1]);
-                        for(unsigned k2=0; k2<j2; ++k2) {
-                            V_node_(i,j1*(deg+1) + j2) *= (PPointsTree_[i].getY() - tky[k2]);
-                        }
-                        // Skip "k2 == j2"
-                        for(unsigned k2=j2+1; k2<=deg; ++k2) {
-                            V_node_(i,j1*(deg+1) + j2) *= (PPointsTree_[i].getY() - tky[k2]);
-                        }
-                        V_node_(i,j1*(deg+1) + j2) *= wkx(j1)*wky(j2);
-                    }
-                }
-            }
-        }*/
         for(unsigned i=0; i<=ppts-1; ++i) { // calculation of Vx combined with Vy
             for(unsigned j1=0; j1<=deg; ++j1) {
                 for(unsigned k1=0; k1<j1; ++k1) {
@@ -336,11 +290,6 @@ void Node::setVc_node(const Eigen::VectorXd& c)
         }
         Vc_node_ = V_node_.transpose() * c_seg;
     }
-    //std::cout << "Vc_Node" << std::endl;
-
-    //std::cout << Vc_node_ << std::endl << std::flush;
-
-
 }
 
 void Node::printree(int n)
@@ -368,6 +317,5 @@ void Node::printree(int n)
     }
 }
 
-void Node::setF(bool f){
-    f_ = f;
-}
+
+

@@ -1,4 +1,5 @@
 #include "../include/ctree.hpp"
+#include "../include/point.hpp"
 #include "../include/is_admissible.hpp"
 #include "../include/node.hpp"
 #include <Eigen/Dense>
@@ -86,57 +87,6 @@ void cTree::setVc_recursion(Node* cluster, const Eigen::VectorXd& c)
     }
 }
 
-// start the recursion for the Near-Far classification of the nodes, starting from the root
-void cTree::setNearFar_recursion(Node* xnode, double eta, cTree &Ty)
-{
-
-    if(xnode == NULL || xnode->getF() == true) {
-        //std::cout << "wtf" << std::endl;
-        return;
-    }
-    xnode->setF(true);
-    if((*xnode).tl_child_ != NULL && (*xnode).tr_child_ == NULL && (*xnode).bl_child_ == NULL && (*xnode).br_child_ == NULL){
-        setNearFar_recursion((*xnode).tl_child_, eta , Ty);
-        return;
-    }
-    else if((*xnode).tl_child_ == NULL && (*xnode).tr_child_ != NULL && (*xnode).bl_child_ == NULL && (*xnode).br_child_ == NULL){
-        setNearFar_recursion((*xnode).tr_child_, eta , Ty);
-        return;
-    }
-    else if((*xnode).tl_child_ == NULL && (*xnode).tr_child_ == NULL && (*xnode).bl_child_ != NULL && (*xnode).br_child_ == NULL){
-        setNearFar_recursion((*xnode).bl_child_, eta , Ty);
-        return;
-    }
-    else if((*xnode).tl_child_ == NULL && (*xnode).tr_child_ == NULL && (*xnode).bl_child_ == NULL && (*xnode).br_child_ != NULL){
-        setNearFar_recursion((*xnode).br_child_, eta , Ty);
-        return;
-    }
-    /*setNearFar_recursion((*xnode).tl_child_, (*xnode).tl_child_, eta, Ty);
-    setNearFar_recursion((*xnode).tl_child_, (*xnode).tr_child_, eta, Ty);
-    setNearFar_recursion((*xnode).tl_child_, (*xnode).bl_child_, eta, Ty);
-    setNearFar_recursion((*xnode).tl_child_, (*xnode).br_child_, eta, Ty);
-    setNearFar_recursion((*xnode).tr_child_, (*xnode).bl_child_, eta, Ty);
-    setNearFar_recursion((*xnode).tr_child_, (*xnode).br_child_, eta, Ty);
-    setNearFar_recursion((*xnode).bl_child_, (*xnode).br_child_, eta, Ty);*/
-
-    //setNearFar_recursion((*xnode).tl_child_, (*xnode).tl_child_, eta, Ty);
-    setNearFar_recursion((*xnode).tl_child_, (*xnode).tr_child_, eta, Ty);
-    setNearFar_recursion((*xnode).tl_child_, (*xnode).bl_child_, eta, Ty);
-    setNearFar_recursion((*xnode).tl_child_, (*xnode).br_child_, eta, Ty);
-    //setNearFar_recursion((*xnode).tr_child_, (*xnode).tl_child_, eta, Ty);
-    //setNearFar_recursion((*xnode).tr_child_, (*xnode).tr_child_, eta, Ty);
-    setNearFar_recursion((*xnode).tr_child_, (*xnode).bl_child_, eta, Ty);
-    setNearFar_recursion((*xnode).tr_child_, (*xnode).br_child_, eta, Ty);
-    //setNearFar_recursion((*xnode).bl_child_, (*xnode).tl_child_, eta, Ty);
-    //setNearFar_recursion((*xnode).bl_child_, (*xnode).tr_child_, eta, Ty);
-    //setNearFar_recursion((*xnode).bl_child_, (*xnode).bl_child_, eta, Ty);
-    setNearFar_recursion((*xnode).bl_child_, (*xnode).br_child_, eta, Ty);
-    //setNearFar_recursion((*xnode).br_child_, (*xnode).tl_child_, eta, Ty);
-    //setNearFar_recursion((*xnode).br_child_, (*xnode).tr_child_, eta, Ty);
-    //setNearFar_recursion((*xnode).br_child_, (*xnode).bl_child_, eta, Ty);
-    //setNearFar_recursion((*xnode).br_child_, (*xnode).br_child_, eta, Ty);
-
-}
 
 // add pointers to near and far field nodes of the tree
 void cTree::setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree &Ty)
@@ -163,18 +113,10 @@ void cTree::setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree &Ty
     }*/
     // if *xnode or *ynode don`t exist, we have got nothing to compare
     if(xnode == NULL || ynode == NULL) {
-        //std::cout << "wtf" << std::endl;
         return;
     }
-    //std::cout << "test" << std::endl;
     // admissibility for 4D Matrices
     AdmissibilityH adm;
-    // if *xnode or *ynode have only one point in their PPointsTree_ vector, they are added to the Near Field
-    /*if ((*ynode).PPointsTree_.size()<=1 && (*xnode).PPointsTree_.size()<=1){
-        (*ynode).near_f_.push_back(xnode);
-        //(*xnode).near_f_.push_back(ynode);
-    }
-    else*/
     if((*ynode).PPointsTree_.size()<=1 || (*xnode).PPointsTree_.size()<=1){
             (*ynode).near_f_.push_back(xnode);
     }
@@ -182,7 +124,6 @@ void cTree::setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree &Ty
         // if the cluster corresponding to *xnode and *ynode is admissible, we add them to the far field list of each one
         if(adm.is_admissible(xnode, ynode, eta)) {
             (*xnode).far_f_.push_back(ynode);
-            //(*ynode).far_f_.push_back(xnode); // probably it isn`t needed
         } else {    // else we consider all the different combinations of the children of *xnode and *ynode and check whether their clusters are admissible
             setNearFar_recursion((*xnode).tl_child_, (*ynode).tl_child_, eta, Ty);
             setNearFar_recursion((*xnode).tl_child_, (*ynode).tr_child_, eta, Ty);
@@ -203,24 +144,6 @@ void cTree::setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree &Ty
         }
     }
 
-}
-
-void cTree::setNearFar_checkrecursion(Node* xnode, double eta, cTree &Ty, int n){
-    if(xnode == NULL) return;
-    if(!(*xnode).getNearF().empty()){
-        if(((*xnode).getNearF().size()==(std::pow(2,n)-1)) && (*xnode).getFarF().empty()){
-            setNearFar_recursion((*xnode).getTl_Child(), (*xnode).getTr_Child(), eta, Ty);
-            setNearFar_recursion((*xnode).getTl_Child(), (*xnode).getBl_Child(), eta, Ty);
-            setNearFar_recursion((*xnode).getTl_Child(), (*xnode).getBr_Child(), eta, Ty);
-            setNearFar_recursion((*xnode).getTr_Child(), (*xnode).getBl_Child(), eta, Ty);
-            setNearFar_recursion((*xnode).getTr_Child(), (*xnode).getBr_Child(), eta, Ty);
-            setNearFar_recursion((*xnode).getBl_Child(), (*xnode).getBr_Child(), eta, Ty);
-        }
-    }
-    setNearFar_checkrecursion((*xnode).getTl_Child(), eta, Ty, n+1);
-    setNearFar_checkrecursion((*xnode).getBl_Child(), eta, Ty, n+1);
-    setNearFar_checkrecursion((*xnode).getTr_Child(), eta, Ty, n+1);
-    setNearFar_checkrecursion((*xnode).getBr_Child(), eta, Ty, n+1);
 }
 
 
@@ -253,3 +176,4 @@ void cTree::setLists_recursion(Node* cluster, std::vector<double>& xlist, std::v
         setLists_recursion((*cluster).r_child_, xlist, ylist);
     }
 }
+
