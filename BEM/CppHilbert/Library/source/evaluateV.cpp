@@ -48,7 +48,6 @@ void evaluateV(Eigen::VectorXd& Vphi_x, const BoundaryMesh& mesh, const Eigen::V
       mEl.row(j)  = 0.5*(a+b);
       dEl.row(j)  = 0.5*(a-b);
   }
-  std::cout << "initialized mesh data" << std::endl;
   
   for(int i = 0; i < nX; ++i){
     // save current point for readibility

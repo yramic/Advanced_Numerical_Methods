@@ -27,7 +27,7 @@ extern "C" {
  *
  *  @param[out] Vphi_x vector
  *  @param[in] mesh 2D BoundaryMesh (initialized with vertices and elements).
- *  @param[in] phi nC vector such that phi_i=phi(z_i).
+ *  @param[in] phi nE vector such that phi_i=phi(z_i).
  *  @param[in] x  (nX x 2) matrix that contains the evaluation points.
  *  @param[in] eta  Admissibility constant. It is greater or equal than 0.
  */

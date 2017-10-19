@@ -37,8 +37,8 @@ double dlp(int k, const Eigen::Vector2d& p, const Eigen::Vector2d& q)
   double b = 2 * p.dot(q);     /* b = 2 <p,q> */
   double c = q.squaredNorm();  /* c = <q,q> */
   double D = 4*a*c-b*b;       /* Discriminant */  
-  double root_D = 0;
-  double G0 = 0,G1 = 0;
+  double root_D = 0.;
+  double G0 = 0., G1 = 0.;
 
   assert(D>=-EPS*4*a*c); // In exact arithmetic, D >= 0
   if (D > EPS*4*a*c){ root_D = sqrt(D);} else{ D = 0.0;}
@@ -50,8 +50,8 @@ double dlp(int k, const Eigen::Vector2d& p, const Eigen::Vector2d& q)
   else // g_0^{-1} in MAI08, Lemma 2.1
   {
     if (fabs(c-a) < EPS*fabs(c)){ G0 = M_PI/root_D;}
-    else if (a < c){ G0 = 2.*atan(root_D/(c-a))/root_D;}
-    else           { G0 = 2.*(atan(root_D/(c-a))+M_PI)/root_D;}
+    else if (a < c){ G0 = 2.*atan( root_D/(c-a) )/root_D;}
+    else           { G0 = 2.*(atan( root_D/(c-a) )+M_PI)/root_D;}
   }
 
   if (k >= 1) // First step of recursion for k=1
@@ -157,7 +157,6 @@ void computeKijAnalytic(double* I0, double* I1,
 
     *I0 = dot_w_n*( dlp(0,u,wpv)+dlp(0,u,wmv)+ mu*(dlp(1,v,wmu)-dlp(1,v,wpu)) );
     *I1 = dot_w_n*( dlp(0,u,wpv)-dlp(0,u,wmv)+ mu*(dlp(2,v,wmu)-dlp(2,v,wpu)) )*0.5;
-
   }
   else                               /* u,v linearly independent */
   {
@@ -215,7 +214,7 @@ void computeKijSwappedAnalytic(double* I0, double* I1,
 
   double dot_v_n = v.dot(n);       /* dot_v_n=<v,n> */
   double dot_w_n = w.dot(n);
-  double dot_wpv_n = (wpu).dot(n); /* dot_wpu_n=<w+u,n> */
+  double dot_wpv_n = (wpv).dot(n); /* dot_wpv_n=<w+v,n> */
   double dot_wmv_n = (wmv).dot(n);
 
   double det = CrossProd2d(u,v);
