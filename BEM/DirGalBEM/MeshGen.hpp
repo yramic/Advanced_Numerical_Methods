@@ -109,7 +109,6 @@ BoundaryMesh createMeshwithGamma(const PARAM& gamma, const PARAMDER& gammader,
   for(int i=0; i<N; i++){
     coordinates.row(i) = gamma(Xi(i)).transpose();
   }
-  coordinates /= 4.;
 
   // 2. Create matrix specifying the indices of the vertices of each element
   Eigen::MatrixXi elements(N,2);

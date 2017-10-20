@@ -96,17 +96,8 @@ namespace IndirectSecondKind{
     // - Construct RHS
     Eigen::VectorXd RHS = M*G;
 
-    // 3. Solve system
-    typedef Eigen::GMRES< Eigen::MatrixXd > solver_t;
-    // instantiate the solver
-    solver_t solver;
-    solver.setMaxIterations( LHS.cols() );
-    solver.setTolerance( 1.e-10 );
-    // initialize the solver
-    solver.compute( LHS );
-    Eigen::VectorXd sol = solver.solve( RHS );
-
-    //Eigen::VectorXd sol = LHS.lu().solve(RHS);
+    // 3. Solve system    
+    Eigen::VectorXd sol = LHS.lu().solve(RHS);
 
     return sol;
   }
@@ -122,7 +113,7 @@ namespace IndirectSecondKind{
   double reconstructSolution(const Eigen::Vector2d& X, const Eigen::VectorXd& v,
 			     const BoundaryMesh& mesh){
     Eigen::VectorXd DLv_x;
-    evaluateV(DLv_x, mesh, v, X.transpose(), 1e-05);
+    evaluateK(DLv_x, mesh, v, X.transpose(), 1e-05);
     return DLv_x(0);
   }
 

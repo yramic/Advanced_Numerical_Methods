@@ -84,7 +84,7 @@ namespace DirectSecondKind{
    *          corresponding to BEM solution (TNu)
    */
   template <typename FUNC>
-  Eigen::VectorXd solveDirichlet(const BoundaryMesh& mesh, const FUNC& g){
+  Eigen::VectorXd solveDirichlet(const BoundaryMesh& mesh, const FUNC& g, int N){
     // 1. Assemble bilinear form as in (1.3.122)
     // - Compute K
     Eigen::MatrixXd K;
@@ -92,8 +92,9 @@ namespace DirectSecondKind{
     // - Compute Mass matrix for p.w.c/p.w.l
     Eigen::SparseMatrix<double> M01aux(mesh.numElements(), mesh.numVertices());
     computeM01(M01aux, mesh);
-    Eigen::MatrixXd M01; M01 = Eigen::MatrixXd(M01aux);
-    Eigen::MatrixXd LHS = (0.5*M01 - K).transpose().eval();
+    Eigen::MatrixXd M01(mesh.numElements(), mesh.numVertices());
+    M01 = Eigen::MatrixXd(M01aux);
+    Eigen::MatrixXd LHS = (0.5*M01 - K).transpose();
     
     // 2. Assemble right hand side using bilinear form of W as in (1.3.122)
     Eigen::MatrixXd W;
@@ -108,23 +109,28 @@ namespace DirectSecondKind{
     Eigen::VectorXd RHS = W*G;
 
     // 3. Solve system
-/*
-    typedef Eigen::GMRES< Eigen::MatrixXd > solver_t;
-    // instantiate the solver
-    solver_t solver;
-    solver.setMaxIterations( LHS.cols() );
-    solver.setTolerance( 1.e-10 );
-    // initialize the solver
-    solver.compute( LHS );
-    Eigen::VectorXd sol = solver.solve( RHS );
-  std::cout << "=================================================" << std::endl;
-  std::cout << " SOLVER MEASUREMENTS"                              << std::endl
-            << "  #iterations       = "     << solver.iterations() << std::endl
-            << "  estimated error   = "          << solver.error() << std::endl;
-  std::cout << "=================================================" << std::endl;
-*/
+    Eigen::VectorXd sol = LHS.lu().solve(RHS);
+    
+    //export for debugging
+    std::ofstream outW( "W_"+std::to_string(N)+".dat" );
+    outW << std::setprecision(18) << W; 
+    outW.close( );
+    
+    std::ofstream outK( "K_"+std::to_string(N)+".dat");
+    outK << std::setprecision(18) << K; 
+    outK.close( );
+    
+    std::ofstream outM( "M_"+std::to_string(N)+".dat" );
+    outM << std::setprecision(18) << M01; 
+    outM.close( );
 
-   Eigen::VectorXd sol = LHS.lu().solve(RHS);
+    std::ofstream outL( "LHS_"+std::to_string(N)+".dat" );
+    outL << std::setprecision(18) << LHS; 
+    outL.close( );
+
+    std::ofstream outR( "RHS_"+std::to_string(N)+".dat" );
+    outR << std::setprecision(18) << RHS; 
+    outR.close( );
 
     return sol;
   }

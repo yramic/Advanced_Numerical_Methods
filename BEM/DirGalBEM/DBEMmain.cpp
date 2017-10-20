@@ -9,6 +9,7 @@
 #include "DirectBEM.hpp"
 #include "IndirectBEM.hpp"
 #include "../CppHilbert/Library/source/buildM.hpp"
+#include "../CppHilbert/Library/source/geometry.hpp"
 
 //------------------------------------------------------------------------------
 // DATA FOR L-SHAPE
@@ -28,10 +29,7 @@ double g_Lshape(const Eigen::Vector2d& X){
  */
 double TNu_Lshape(const Eigen::Vector2d & X, const Eigen::Vector2d & a,
 	   const Eigen::Vector2d & b){
-  Eigen::Vector2d n;
-  n << b[1]-a[1], a[0]-b[0];
-  n /= (b-a).norm();
-
+  Eigen::Vector2d n = unitNormal(a,b);
   Eigen::Vector2d grad;
   double t = std::atan2(X(1),X(0));
   grad<< 2/3.*std::pow(X.norm(), -1/3.)*(cos(t)*cos(2*t/3.)+sin(t)*sin(2*t/3.)),
@@ -49,6 +47,7 @@ double TNu_Lshape(const Eigen::Vector2d & X, const Eigen::Vector2d & a,
  */
 double g(const Eigen::Vector2d& X){
   return sin(X(0))*sinh(X(1));
+  //return sin(X(0)-X(1))*sinh(X(0)+X(1));
 }
 
 
@@ -59,15 +58,12 @@ double g(const Eigen::Vector2d& X){
  */
 double TNu(const Eigen::Vector2d & X, const Eigen::Vector2d & a,
 	   const Eigen::Vector2d & b){
-  Eigen::Vector2d n;
-  n << b[1]-a[1], a[0]-b[0];
-  n /= (b-a).norm();
-
+  Eigen::Vector2d n = unitNormal(a,b);
   Eigen::Vector2d grad;
-  /*
-  grad<< cos(X(0)-X(1))*sinh(X(0)+X(1)) + sin(X(0)-X(1))*cosh(X(0)+X(1)),
-        -cos(X(0)-X(1))*sinh(X(0)+X(1)) + sin(X(0)-X(1))*cosh(X(0)+X(1));
-  */
+  
+  //grad<< cos(X(0)-X(1))*sinh(X(0)+X(1)) + sin(X(0)-X(1))*cosh(X(0)+X(1)),
+  //      -cos(X(0)-X(1))*sinh(X(0)+X(1)) + sin(X(0)-X(1))*cosh(X(0)+X(1));
+  
   grad << cos(X(0))*sinh(X(1)), sin(X(0))*cosh(X(1));
 
   return grad.dot(n);
@@ -108,13 +104,13 @@ int main() {
 
   std::function<Eigen::Vector2d(const double&)> gamma = [](const double& t){
     Eigen::Vector2d res;
-    res << cos(M_PI*t) + 0.65*cos(2*M_PI*t), 1.5*sin(M_PI*t);
+    res << 0.25*cos(M_PI*t) + 0.1625*cos(2*M_PI*t), 0.375*sin(M_PI*t);
     return res;
   };
 
   std::function<Eigen::Vector2d(const double&)> gammader = [](const double& t){
     Eigen::Vector2d res;
-    res << -M_PI*sin(M_PI*t)-1.3*M_PI*sin(2*M_PI*t), M_PI*1.5*cos(M_PI*t);
+    res << -M_PI*0.25*sin(M_PI*t)-0.325*M_PI*sin(2*M_PI*t), M_PI*0.375*cos(M_PI*t);
     return res;
   };
 
@@ -128,7 +124,8 @@ int main() {
   //--------------------------------------------------------
   std::cout << "RESULTS FOR KITE DOMAIN" << std::endl;
   int Nl = 7; //Number of levels
-  Eigen::VectorXd errorD1(Nl), errorD2(Nl), errorI1(Nl), errorI2(Nl);
+  Eigen::VectorXd errorD1(Nl), errorD2(Nl), errorD1L2(Nl), errorD2L2(Nl);
+  Eigen::VectorXd errorI1(Nl), errorI2(Nl);
   Eigen::VectorXi Nall(7); Nall<< 50,100,200,400,800,1600,3200;
   for(int k=0; k<Nl; k++){
     int N = Nall(k);
@@ -136,21 +133,36 @@ int main() {
     auto mesh = createMeshwithGamma(gamma,gammader, N);
     mesh.writeMeshToFile("kite"+std::to_string(N));
 
-    Eigen::VectorXd solex = ComputeTNu(TNu, mesh);
     Eigen::MatrixXd V; computeV(V, mesh, 1e-05);
+    Eigen::SparseMatrix<double> M00(mesh.numElements(), mesh.numElements());
+    computeM00(M00, mesh);
+    Eigen::VectorXd solex = ComputeTNu(TNu, mesh);
+    {
+      std::ofstream out_sol("solex_"+std::to_string(N)+".txt");
+      out_sol << std::setprecision(18) << solex; 
+      out_sol.close( );
+     }
+
     
     std::cout << "Solving 1st kind Direct. ";
     Eigen::VectorXd sol1 = DirectFirstKind::solveDirichlet(mesh, g);
-    errorD1(k) = sqrt((sol1-solex).transpose()*V*(sol1-solex)); 
+    errorD1(k) = sqrt((sol1-solex).transpose()*V*(sol1-solex));
+    errorD1L2(k) = sqrt((sol1-solex).transpose()*M00*(sol1-solex)); 
     std::cout << "Obtained error " << errorD1(k) << std::endl;
     
     std::cout << "Solving 2nd kind Direct. " ;
-    Eigen::VectorXd sol2 = DirectSecondKind::solveDirichlet(mesh, g);
+    Eigen::VectorXd sol2 = DirectSecondKind::solveDirichlet(mesh, g, N);
     errorD2(k) = sqrt((sol2-solex).transpose()*V*(sol2-solex));
-    std::cout << "Obtained error " << errorD2(k) << std::endl; 
+    errorD2L2(k) = sqrt((sol2-solex).transpose()*M00*(sol2-solex));
+    std::cout << "Obtained error " << errorD2(k) << std::endl;
+    {
+      std::ofstream out_sol("sol2nd_"+std::to_string(N)+".txt");
+      out_sol << std::setprecision(18) << sol2; 
+      out_sol.close( );
+     }
 
     
-    Eigen::Vector2d X({0.,0.2});
+    Eigen::Vector2d X({0.,0.3});
     std::cout << "Solving 1st kind Indirect : ";
     Eigen::VectorXd sol1i = IndirectFirstKind::solveDirichlet(mesh, g);
     double solEval1i = IndirectFirstKind::reconstructSolution(X, sol1i, mesh);
@@ -174,6 +186,16 @@ int main() {
   {
   std::ofstream out_error("DBEM2ndK_errors.txt");
   out_error << std::setprecision(18) << errorD2; 
+  out_error.close( );
+  }
+    {
+  std::ofstream out_error("DBEM1stK_L2errors.txt");
+  out_error << std::setprecision(18) << errorD1L2; 
+  out_error.close( );
+  }
+  {
+  std::ofstream out_error("DBEM2ndK_L2errors.txt");
+  out_error << std::setprecision(18) << errorD2L2; 
   out_error.close( );
   }
   {
