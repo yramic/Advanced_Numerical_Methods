@@ -85,14 +85,15 @@ void evaluateK(Eigen::VectorXd& Kgx, const BoundaryMesh& mesh, const Eigen::Vect
           double commonFactor = aux.dot(nEl.row(j)) * lengthE(j);
           double prod1 = commonFactor * dlp(0, dEl.row(j), aux ) / 2.;
           double prod2 = commonFactor * dlp(1, dEl.row(j), aux ) / 2.;
-          Kgx(i) -= ( (gh(aidx) + gh(bidx))* prod1 + (gh(bidx) - gh(aidx))* prod2);
+          Kgx(i) -= ( ( (gh(aidx)* prod1 + gh(bidx)* prod1)
+			+ gh(bidx)* prod2) - gh(aidx)* prod2);
         }
       }
 
     } // end elements' for loop
 
-    Kgx(i) /= 4. * M_PI;
-  }
+    Kgx(i) /= (4. * M_PI);
+  } // end evaluation points' for loop
 
 }
 

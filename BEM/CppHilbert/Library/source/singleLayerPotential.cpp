@@ -108,7 +108,7 @@ Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
   for (int i=2; i <= k; ++i) {
     if (fabs(u[0]) < EPS && fabs(u[1]) < EPS) {
       if (i%2 == 0)
-        val[i] = 2.*log(c)/(i+1);
+        val[i] = 2.*log(c)/(double)(i+1);
       else
         val[i] = 0.;
     }
@@ -164,7 +164,7 @@ double doubleSlp(int k, int l, const Eigen::Vector2d& u,
         if (normWSq < EPS)
           return 0;
         else
-          return 2./((k+1)*(l+1))*log(normWSq);
+          return (double)2./(double)((k+1)*(l+1))*log(normWSq);
       }
     }
     return 0.;
@@ -172,14 +172,14 @@ double doubleSlp(int k, int l, const Eigen::Vector2d& u,
   else if (normUSq < EPS)
   {
     if (k%2 == 0)
-      return 1./(k+1) * slp(l, v, w);
+      return (double)1./(k+1) * slp(l, v, w);
     else
       return 0.;
   }
   else if (normVSq < EPS)
   {
     if (l%2 == 0)
-      return 1./(l+1) * slp(k, u, w);
+      return (double)1./(l+1) * slp(k, u, w);
     else
       return 0.;
   }
@@ -228,13 +228,8 @@ double doubleSlp(int k, int l, const Eigen::Vector2d& u,
 
     if (fabs(w[0]+v[0]-u[0]) < fabs(w[0])*EPS
           && fabs(w[1]+v[1]-u[1]) < fabs(w[1])*EPS) {
-      memTableVWmu.resize(l+1);
-      for (int i = 0; i <= l; ++i)
-        memTableVWmu[i] = 0.;
-
-      memTableUWpv.resize(k+1);
-      for (int i = 0; i <= k; ++i)
-        memTableUWpv[i] = 0.;
+      memTableVWmu.resize(l+1); memTableVWmu.setZero();
+      memTableUWpv.resize(k+1); memTableUWpv.setZero();
     }
     else {
       memTableVWmu = slpIterative(l, v, w-u);
@@ -243,21 +238,16 @@ double doubleSlp(int k, int l, const Eigen::Vector2d& u,
 
     if (fabs(w[0]+u[0]-v[0]) < fabs(w[0])*EPS
           && fabs(w[1]+u[1]-v[1]) < fabs(w[1])*EPS) {
-      memTableVWpu.resize(l+1);
-      for (int i = 0; i <= l; ++i)
-        memTableVWpu[i] = 0.;
-
-      memTableUWmv.resize(k+1);
-      for (int i = 0; i <= k; ++i)
-        memTableUWmv[i] = 0.;
+      memTableVWpu.resize(l+1); memTableVWpu.setZero();
+      memTableUWmv.resize(k+1); memTableUWmv.setZero();
     }
     else {
       memTableVWpu = slpIterative(l, v, w+u);
       memTableUWmv = slpIterative(k, u, w-v);
     }
 
-    mu1 = CrossProd2d(v,w) / detUV;
-    mu2 = -CrossProd2d(u,w) / detUV;
+    mu1 = CrossProd2d(w,v) / detUV;
+    mu2 = CrossProd2d(u,w) / detUV;
 
     tmp[0] = -2 + ((mu1+1)*memTableVWpu[0] - (mu1-1)*memTableVWmu[0]
               + (mu2+1)*memTableUWpv[0] - (mu2-1)*memTableUWmv[0]) * 0.25;
@@ -266,7 +256,7 @@ double doubleSlp(int k, int l, const Eigen::Vector2d& u,
       tmp[i] = 0.5*((mu1+1)*memTableVWpu[i] - (mu1-1)*memTableVWmu[i]
             + (mu2+1)*memTableUWpv[0]) - i*mu2*tmp[i-1];
       if (i%2 == 0) {
-        tmp[i] -= 4./(i+1);
+        tmp[i] -= (double)4./(double)(i+1);
         tmp[i] -= 0.5 * (mu2-1)*memTableUWmv[0];
       }
       else
@@ -279,7 +269,7 @@ double doubleSlp(int k, int l, const Eigen::Vector2d& u,
       tmp[0] = 0.5*((mu1+1)*memTableVWpu[0] + (mu2+1)*memTableUWpv[i]
                   - (mu2-1)*memTableUWmv[i]) - i*mu1*tmp[0];
       if (i%2 == 0) {
-        tmp[0] -= 4./(i+1);
+        tmp[0] -= (double)4./(double)(i+1);
         tmp[0] -= 0.5*(mu1-1)*memTableVWmu[0];
       }
       else {
@@ -294,7 +284,7 @@ double doubleSlp(int k, int l, const Eigen::Vector2d& u,
         tmp[j] += 0.5*( (mu1+1)*memTableVWpu[j] + (mu2+1)*memTableUWpv[i] );
         if (i%2 == 0) {
           if (j%2 == 0) {
-            tmp[j] -= 4./((i+1)*(j+1));
+            tmp[j] -= (double)4./(double)((i+1)*(j+1));
           }
           tmp[j] -= 0.5 * (mu1-1) * memTableVWmu[j];
         }
