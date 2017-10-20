@@ -16,8 +16,7 @@ int main() {
     //std::cout << "Enter number of edges:" << std::endl;
     //unsigned n; std::cin >> n;
 
-    unsigned n=100;  // initalizing n for testing
-
+    unsigned n=10;
     //Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(n, 0., (n-1.)/n);
     std::vector<Point> PPoints; // initalizing Polygon Points properties
     PPoints.reserve(n);
@@ -34,8 +33,8 @@ int main() {
         Point p;
         p.setId(i);
         p.setV(std::rand()%100);    // values 0-100
-        tx = std::rand()%1000;
-        ty = std::rand()%1000;
+        tx = std::rand()%100;
+        ty = std::rand()%100;
         while (f) {             // checking if a point exists 2 times
             f=0;
             for (std::vector<Point>::iterator it=PPoints.begin(); it!=PPoints.end(); it++) {
@@ -43,8 +42,8 @@ int main() {
                     f = 1;
                 }
             }
-            tx = std::rand()%1000;
-            ty = std::rand()%1000;
+            tx = std::rand()%100;
+            ty = std::rand()%100;
         }
         p.setX(tx);
         p.setY(ty);
@@ -77,12 +76,15 @@ int main() {
 
     // initializing degree of interpolation for testing
     //unsigned d=1;
-    std::vector<unsigned> t = {1,2,3,4,5,6,7,8,9,10,20,40,60};
+    std::vector<unsigned> t = {1,2,3,5,7,10,20,40,65,70,80,90,100};
     for(auto d : t){
-    //Kernel G(1.); // default kernel for 2d problem
-    Kernel4D G;     // kernel for 4d problem -1/(2*pi)*log||x-y||
-    PolynomialKernel P;
-    ConstantKernel CK(1);
+    //Kernel G(1.);             // default kernel for 2d problem
+    Kernel4D G;                 // initialization of kernel for 4d problem -1/(2*pi)*log||x-y||
+    PolynomialKernel P;         // Polynomial Kernel initialization
+    ConstantKernel CK(1);       // Constant Kernel initialization
+    GlobalSmoothKernel gskernel;// Global Smooth Periodic Kernel initialization
+    GaussKernel gkernel;        // Gauss Kernel initialization
+
     // Compute exact matrix-vector product
 
     auto start1 = std::chrono::system_clock::now();
@@ -90,7 +92,7 @@ int main() {
     Eigen::MatrixXd M(n,n);
     for(int i=0; i<n; ++i)
         for(int j=0; j<n; ++j)
-            M(i,j) = P(PPoints[i].getX(), PPoints[i].getY(), PPoints[j].getX(), PPoints[j].getY());    // the diagonal of the matrix will be zero because the 4D kernel between the same point is inf
+            M(i,j) = gskernel(PPoints[i].getX(), PPoints[i].getY(), PPoints[j].getX(), PPoints[j].getY());
     Eigen::VectorXd f_exact = M * c;
 
 
@@ -102,10 +104,14 @@ int main() {
     auto start2 = std::chrono::system_clock::now();
 
     //LowRankApp lra(G, grid, grid);    // initialization of low rank approximation for 2D
-    //LowRankApp lra(&P, PPoints, n);         // initialization of low rank approximation for BEM approx for matrix multiplication
+    LowRankApp lra(&gskernel, PPoints, n);         // initialization of low rank approximation for BEM approx for matrix multiplication
 
-    //Eigen::VectorXd f_approx = lra.mvProd(c, eta, d);   // calculation of the low rank approximation
+    Eigen::VectorXd f_approx = lra.mvProd(c, eta, d);   // calculation of the low rank approximation
 
+    auto end2 = std::chrono::system_clock::now();
+    std::chrono::duration<double> time_diff2 = end2 - start2;
+
+    // debugging code
 //    Eigen::VectorXd c = Eigen::VectorXd::Zero(n);
 //    LowRankApp lra(G, x, x);
 //    Eigen::MatrixXd M_approx = Eigen::MatrixXd::Zero(n,n);
@@ -123,8 +129,6 @@ int main() {
 //        err_2(deg)   = (M - M_approx).lpNorm<2>();
 //    }
 
-    auto end2 = std::chrono::system_clock::now();
-    std::chrono::duration<double> time_diff2 = end2 - start2;
 
     std::cout << std::endl << "Interpolation with polynomial kernel" << std::endl;
     std::cout << "Number of points: " << n << std::endl;
@@ -132,50 +136,32 @@ int main() {
     // Compute approximation error
     std::cout << std::endl << "Local Interpolation" << std::endl;
 
-    //Eigen::VectorXd diff = f_exact - f_approx;
+    Eigen::VectorXd diff = f_exact - f_approx;
 
     // printing for testing
-    /*std::cout << "f_exact   f_approx    diff" << std::endl;
-    for(int i=0; i<n; i++){
-        std::cout << f_exact(i) << "    " << f_approx(i) << "   " << diff(i) << std::endl;
-    }*/
-    /*std::cout << "Approximation error (l-inf norm): " << diff.lpNorm<Eigen::Infinity>() << std::endl
-              << "Approximation error (l-2 norm): "   << diff.lpNorm<2>() << std::endl
-              << "Time needed for exact multiplication: "       << time_diff1.count() << " s" << std::endl
-              << "Time needed for approximate multiplication: " << time_diff2.count() << " s" << std::endl;*/
-
-
-    /*std::cout << "degree+1: " << d+2 << std::endl;
-    LowRankApp lra2(P, PPoints, n);         // initialization of low rank approximation for BEM approx for matrix multiplication
-
-    Eigen::VectorXd f_approx2 = lra2.mvProd(c, eta, d+2);   // calculation of the low rank approximation
-     Eigen::VectorXd diff2 = f_exact - f_approx2;
     std::cout << "f_exact   f_approx    diff" << std::endl;
     for(int i=0; i<n; i++){
-        std::cout << f_exact(i) << "    " << f_approx2(i) << "   " << diff2(i) << std::endl;
+        std::cout << f_exact(i) << "    " << f_approx(i) << "   " << diff(i) << std::endl;
     }
-    std::cout << "Approximation error (l-inf norm): " << diff2.lpNorm<Eigen::Infinity>() << std::endl
-              << "Approximation error (l-2 norm): "   << diff2.lpNorm<2>() << std::endl
+    std::cout << "Approximation error (l-inf norm): " << diff.lpNorm<Eigen::Infinity>() << std::endl
+              << "Approximation error (l-2 norm): "   << diff.lpNorm<2>() << std::endl
               << "Time needed for exact multiplication: "       << time_diff1.count() << " s" << std::endl
               << "Time needed for approximate multiplication: " << time_diff2.count() << " s" << std::endl;
-    std::cout << "enddeg+2" << std::endl;*/
-
-
 
     // Global Interpolation
     std::cout << std::endl << "Global Interpolation" << std::endl;
     std::cout << "Global Smooth Kernel (cos)" << std::endl;
 
-    GlobalSmoothKernel gskernel;
-    GaussKernel gkernel;
+    // Compute approximated matrix-vector product, given admissibility constant 'eta'
     auto start3 = std::chrono::system_clock::now();
 
     GlobalInterpolationApp gip_gskernel(&gskernel, PPoints, n);
     Eigen::VectorXd f_g_approx = gip_gskernel.mvProd(c,d);
-    //std::cout << f_g_approx << std::endl;
+
     auto end3 = std::chrono::system_clock::now();
     std::chrono::duration<double> time_diff3 = end3 - start3;
 
+    // Compute exact matrix-vector product
     Eigen::MatrixXd MG(n,n);
     auto start4 = std::chrono::system_clock::now();
 
@@ -186,32 +172,43 @@ int main() {
     auto end4 = std::chrono::system_clock::now();
     std::chrono::duration<double> time_diff4 = end4 - start4;
 
+    // Compute approximation error
     Eigen::VectorXd diff_g = f_g_exact - f_g_approx;
-    /*std::cout << "f_g_exact   f_g_approx    diff_g" << std::endl;
+
+    // printing for testing
+    std::cout << "f_g_exact   f_g_approx    diff_g" << std::endl;
     for(int i=0; i<n; i++){
         std::cout << f_g_exact(i) << "    " << f_g_approx(i) << "   " << diff_g(i) << std::endl;
-    }*/
+    }
     std::cout << "Approximation error (l-inf norm): " << diff_g.lpNorm<Eigen::Infinity>() << std::endl
               << "Approximation error (l-2 norm): "   << diff_g.lpNorm<2>() << std::endl
               << "Time needed for exact multiplication: "       << time_diff4.count() << " s" << std::endl
               << "Time needed for approximate multiplication: " << time_diff3.count() << " s" << std::endl;
 
+
     std::cout << "Gauss" << std::endl;
+
+    // Compute approximated matrix-vector product, given admissibility constant 'eta'
+
     GlobalInterpolationApp gip_gkernel(&gkernel, PPoints, n);
     Eigen::VectorXd f_gg_approx = gip_gkernel.mvProd(c,d);
-    Eigen::MatrixXd MGG(n,n);
 
+    // Compute exact matrix-vector product
+
+    Eigen::MatrixXd MGG(n,n);
     for(int i=0; i<n; ++i)
         for(int j=0; j<n; ++j)
             MGG(i,j) = gkernel(PPoints[i].getX(), PPoints[i].getY(), PPoints[j].getX(), PPoints[j].getY());
     Eigen::VectorXd f_gg_exact = MGG * c;
 
-
+    // Compute approximation error
     Eigen::VectorXd diff_gg = f_gg_exact - f_gg_approx;
-    /*std::cout << "f_gg_exact   f_gg_approx    diff_gg" << std::endl;
+
+    // printing for testing
+    std::cout << "f_gg_exact   f_gg_approx    diff_gg" << std::endl;
     for(int i=0; i<n; i++){
         std::cout << f_gg_exact(i) << "    " << f_gg_approx(i) << "   " << diff_gg(i) << std::endl;
-    }*/
+    }
     std::cout << "Approximation error (l-inf norm): " << diff_gg.lpNorm<Eigen::Infinity>() << std::endl
               << "Approximation error (l-2 norm): "   << diff_gg.lpNorm<2>() << std::endl;
 

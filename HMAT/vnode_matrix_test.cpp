@@ -19,7 +19,9 @@ int main() {
     }
     Node t(PPoints);
     unsigned deg = 2;
-    t.setV_node(PPoints, deg);
+    t.setV_node(PPoints, deg);          // calculating the V matrix of this Node
+
+    // alternate calculation of the V matrix of this Node
     double x1,x2,y1,y2;                 // construction of Bounding Box of this Node
     x1 = PPoints.begin()->getX();
     x2 = PPoints.begin()->getX();
@@ -46,22 +48,17 @@ int main() {
     // fix for points of a bbox being a segment
     if(std::abs(x1-x2)<10*std::numeric_limits<double>::epsilon()){
         x2_b_++;
-        //std::cout << "wtf" << std::endl;
     }
     if(std::abs(y1-y2)<10*std::numeric_limits<double>::epsilon()){
         y2_b_++;
-        //std::cout << "wtf" << std::endl;
     }
+    // calculate Vnode for x axis and then for y axis
     Cheby cbx(x1_b_, x2_b_, deg);
     Cheby cby(y1_b_, y2_b_, deg);
     Eigen::VectorXd tkx = cbx.getNodes(); // Chebyshew nodes for x axis
-    //std:: cout << "tkx" << tkx << std::endl;
     Eigen::VectorXd wkx = cbx.getWghts(); // weights of Lagrange polynomial for x axis
-    //std:: cout << "wkx" << wkx << std::endl;
     Eigen::VectorXd tky = cby.getNodes(); // Chebyshew nodes for y axis
-    //std:: cout << "tky" << tky << std::endl;
     Eigen::VectorXd wky = cby.getWghts(); // weights of Lagrange polynomial for y axis
-    //std:: cout << "wky" << wky << std::endl;
     Eigen::MatrixXd VnodeX = Eigen::MatrixXd::Constant(n, (deg+1), 1);
     Eigen::MatrixXd VnodeY = Eigen::MatrixXd::Constant(n, (deg+1), 1);
     for(unsigned i=0; i<=n-1; ++i) {
@@ -88,14 +85,14 @@ int main() {
             VnodeY(i,j) *= wky(j);
         }
     }
-
+    // calculate the V node
     Eigen::MatrixXd V_node_new(n, (deg+1)*(deg+1));
     for(unsigned i=0; i<=n-1; ++i) {
         for(unsigned j=0; j<=deg; ++j) {
             V_node_new.block(i, j*(deg+1), 1, deg+1) = VnodeX(i,j) * VnodeY.row(i);
         }
     }
-
+    // check if the two ways of calculation produce the same V matrix
     for(int i = 0; i<n; i++){
         for(int j = 0; j<deg*deg; j++){
             if(std::abs(V_node_new(i,j) - t.getV_node()(i,j))>10*std::numeric_limits<double>::epsilon()) {

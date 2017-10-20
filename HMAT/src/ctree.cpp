@@ -146,7 +146,65 @@ void cTree::setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree &Ty
 
 }
 
+// add pointers to near and far field nodes of the tree for debugging
+void cTree::setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree &Ty, Eigen::MatrixXd& cmatrix)
+{
+    /*// if *xnode or *ynode is a leaf, we add it to the near field
+    if((*xnode).l_child_ == NULL || (*ynode).l_child_ == NULL) {
 
+        (*xnode).near_f_.push_back(ynode);
+
+    } else {
+        AdmissibilityD adm;
+        // if the cluster corresponding to *xnode and *ynode is admissible, we add *ynode to the far field list of *xnode
+        if(adm.is_admissible(grid_[(*xnode).l_ind_], grid_[(*xnode).r_ind_], (Ty.getVals())[(*ynode).l_ind_], (Ty.getVals())[(*ynode).r_ind_], eta)) {
+            // the line above checks the admissibility condition (eta)
+
+            (*xnode).far_f_.push_back(ynode);
+
+        } else { // else we consider the children of *xnode and *ynode and check whether their clusters are admissible
+            setNearFar_recursion((*xnode).l_child_, (*ynode).l_child_, eta, Ty);
+            setNearFar_recursion((*xnode).r_child_, (*ynode).l_child_, eta, Ty);
+            setNearFar_recursion((*xnode).l_child_, (*ynode).r_child_, eta, Ty);
+            setNearFar_recursion((*xnode).r_child_, (*ynode).r_child_, eta, Ty);
+        }
+    }*/
+    // if *xnode or *ynode don`t exist, we have got nothing to compare
+    if(xnode == NULL || ynode == NULL) {
+        return;
+    }
+    // admissibility for 4D Matrices
+    AdmissibilityH adm;
+    if((*ynode).PPointsTree_.size()<=1 || (*xnode).PPointsTree_.size()<=1){
+        (*ynode).near_f_.push_back(xnode);
+        cmatrix((*ynode).getNodeID(),(*xnode).getNodeID())++;
+    }
+    else {
+        // if the cluster corresponding to *xnode and *ynode is admissible, we add them to the far field list of each one
+        if(adm.is_admissible(xnode, ynode, eta)) {
+            (*xnode).far_f_.push_back(ynode);
+            cmatrix((*xnode).getNodeID(),(*ynode).getNodeID())++;
+        } else {    // else we consider all the different combinations of the children of *xnode and *ynode and check whether their clusters are admissible
+            setNearFar_recursion((*xnode).tl_child_, (*ynode).tl_child_, eta, Ty, cmatrix);
+            setNearFar_recursion((*xnode).tl_child_, (*ynode).tr_child_, eta, Ty, cmatrix);
+            setNearFar_recursion((*xnode).tl_child_, (*ynode).bl_child_, eta, Ty, cmatrix);
+            setNearFar_recursion((*xnode).tl_child_, (*ynode).br_child_, eta, Ty, cmatrix);
+            setNearFar_recursion((*xnode).tr_child_, (*ynode).tl_child_, eta, Ty, cmatrix);
+            setNearFar_recursion((*xnode).tr_child_, (*ynode).tr_child_, eta, Ty, cmatrix);
+            setNearFar_recursion((*xnode).tr_child_, (*ynode).bl_child_, eta, Ty, cmatrix);
+            setNearFar_recursion((*xnode).tr_child_, (*ynode).br_child_, eta, Ty, cmatrix);
+            setNearFar_recursion((*xnode).bl_child_, (*ynode).tl_child_, eta, Ty, cmatrix);
+            setNearFar_recursion((*xnode).bl_child_, (*ynode).tr_child_, eta, Ty, cmatrix);
+            setNearFar_recursion((*xnode).bl_child_, (*ynode).bl_child_, eta, Ty, cmatrix);
+            setNearFar_recursion((*xnode).bl_child_, (*ynode).br_child_, eta, Ty, cmatrix);
+            setNearFar_recursion((*xnode).br_child_, (*ynode).tl_child_, eta, Ty, cmatrix);
+            setNearFar_recursion((*xnode).br_child_, (*ynode).tr_child_, eta, Ty, cmatrix);
+            setNearFar_recursion((*xnode).br_child_, (*ynode).bl_child_, eta, Ty, cmatrix);
+            setNearFar_recursion((*xnode).br_child_, (*ynode).br_child_, eta, Ty, cmatrix);
+        }
+    }
+
+}
 // make two lists with the x- and y-coordinates of boundaries of the bounding boxes of the clusters:
 // odd entries of the lists are coordinates of the left boundaries // even entries are coordinates of the right boundaries
 void cTree::setLists_recursion(Node* cluster, std::vector<double>& xlist, std::vector<double>& ylist)

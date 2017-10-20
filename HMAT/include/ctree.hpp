@@ -55,6 +55,10 @@ public:
     void setNearFar(double eta, cTree &Ty) {
         setNearFar_recursion(root_, Ty.root_, eta, Ty);
     }
+    // add pointers to near and far field nodes of the tree debugging
+    void setNearFar(double eta, cTree &Ty, Eigen::MatrixXd& cmatrix) {
+        setNearFar_recursion(root_, Ty.root_, eta, Ty, cmatrix);
+    }
     // make lists with boundaries of bounding boxes (just for testing)
     void setLists(std::vector<double>& xlist, std::vector<double>& ylist) {
         setLists_recursion(root_, xlist, ylist);
@@ -71,6 +75,8 @@ private:
     void setVc_recursion(Node* cluster, const Eigen::VectorXd& c);
     // needed for "setNearFar(...)"
     void setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree &Ty);
+    // needed for "setNearFar(...)" for debugging
+    void setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree &Ty, Eigen::MatrixXd& cmatrix);
     // needed for "setLists(...)"
     void setLists_recursion(Node* cluster, std::vector<double>& xlist, std::vector<double>& ylist);
 

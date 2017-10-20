@@ -17,3 +17,5 @@ add_executable(vnode_matrix_test
 add_executable(is_admissible_test
                is_admissible_test.cpp ${cpp_files} ${headers})
 
+add_executable(nearfar_test
+               nearfar_test.cpp ${cpp_files} ${headers})

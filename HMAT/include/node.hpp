@@ -105,17 +105,8 @@ public:
     std::vector<Point> getPPoints() const {
         return PPointsTree_;
     }
-    void setX1_b(int x1) {
-        x1_b_=x1;
-    }
-    void setX2_b(int x2) {
-        x2_b_=x2;
-    }
-    void setY1_b(int y1) {
-        y1_b_=y1;
-    }
-    void setY2_b(int y2) {
-        y2_b_=y2;
+    int getNodeID(){
+        return nodeId_;
     }
 
     /**
@@ -130,8 +121,21 @@ public:
     // compute V*c restricted to node indices of the cluster
     void setVc_node(const Eigen::VectorXd& c);
     void printree(int n);
-    std::vector<Point> DFS_traversing(Node* x);
-
+    void setX1_b(int x1) {
+        x1_b_=x1;
+    }
+    void setX2_b(int x2) {
+        x2_b_=x2;
+    }
+    void setY1_b(int y1) {
+        y1_b_=y1;
+    }
+    void setY2_b(int y2) {
+        y2_b_=y2;
+    }
+    void setNodeId(int n){
+        nodeId_ = n;
+    }
 
 private:
 
@@ -150,6 +154,7 @@ private:
     Eigen::VectorXd Vc_node_; // $V_{\sigma}* c_{|\sigma}$, where $\sigma$ is the cluster of node
     vector_t near_f_; // list with pointers to nodes of the near field of the node
     vector_t  far_f_; // list with pointers to nodes of the  far field of the node
+    int nodeId_;
     friend class cTree;
  };
 
