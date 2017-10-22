@@ -1,0 +1,8 @@
+{
+    "author" : "curzuato",
+    "email" : "carolina.urzua@sam.math.ethz.ch",
+    "contributors" : "Ralf Hiptmair",
+
+    "name": "LogWeightedGaussRule",
+    "all" : ["main.cpp", "genLaguerreRule.hpp", "genLaguerreRule.cpp"]
+}
