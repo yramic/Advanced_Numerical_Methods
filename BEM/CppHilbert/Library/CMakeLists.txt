@@ -4,7 +4,7 @@ project(Hilbert)
 
 include_directories(source)
 
-file(GLOB SOURCES "./*.hpp" "source/*.cpp" "source/*.hpp" "source/*.h" "source/*.c")
+file(GLOB SOURCES "./*.hpp" "source/*.cpp" "source/*.hpp" "source/gaussTable.h" "source/gaussQuadrature.h" "source/gaussQuadrature.c")
 
 add_library(CppHilbert SHARED ${SOURCES})
 

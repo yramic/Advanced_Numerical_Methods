@@ -111,7 +111,11 @@ namespace DirectSecondKind{
 
     return sol;
   }
+<<<<<<< HEAD
   /* SAM_LISTING_END_1 */
+=======
+  /* SAM_LISTING_BEGIN_1 */
+>>>>>>> bem_dev
 
 } // end namespace Direct2ndKind
 

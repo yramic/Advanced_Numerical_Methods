@@ -29,6 +29,7 @@ void computeK(Eigen::MatrixXd& K, const BoundaryMesh& mesh,
   int nC = mesh.numVertices();
   // Matrix returned through reference: resize and initialize matrix
   K.resize(nE,nC); K.setZero();
+  double I0=0.0, I1=0.0;
   
   // \com{outer loop}: traverse the panels
   for (int j=0;j<nE;++j) {
@@ -52,7 +53,7 @@ void computeK(Eigen::MatrixXd& K, const BoundaryMesh& mesh,
 	  if( lindep1>EPS*(a-c).norm() || lindep2>EPS*(a-d).norm()) // \Label[line]{K:1}
 	    {
 	      // compute entries of $1\times2$ interaction matrix
-	      double I0=0.0, I1=0.0;
+	      //double I0=0.0, I1=0.0;
 	      computeKij(&I0,&I1,eta,a,b,c,d);
 	      // distribute values to matrix entries
 	      K(j,cidx) += I0-I1; // \Label[line]{K:2}

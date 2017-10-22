@@ -87,8 +87,10 @@ void computeKij(double* I0, double* I1, double eta,
   {
     if (swap == 0)
       computeKijAnalytic(I0,I1,a,b,c,d);
+    
     else
       computeKijSwappedAnalytic(I0,I1,a,b,c,d);
+    
   }
   else            /* fully analytic or semianalytic */
   {
@@ -96,15 +98,19 @@ void computeKij(double* I0, double* I1, double eta,
     {
       if (swap == 0)
         computeKijSemianalytic(I0,I1,a,b,c,d);
+      
       else
         computeKijSwappedSemianalytic(I0,I1,a,b,c,d);
+      
     }
     else
     {
       if (swap == 0)
         computeKijAnalytic(I0,I1,a,b,c,d);
+      
       else
         computeKijSwappedAnalytic(I0,I1,a,b,c,d);
+      
     }
   }
 }
@@ -189,7 +195,6 @@ void computeKijSwappedAnalytic(double* I0, double* I1,
   double hj = (d-c).squaredNorm(); /* hj = norm(d-c)^2 */
 
   Eigen::Vector2d n = unitNormal(c,d); /* normal vector */
-
   Eigen::Vector2d u = d-c;
   Eigen::Vector2d v = a-b;
   Eigen::Vector2d w = c+d-a-b;

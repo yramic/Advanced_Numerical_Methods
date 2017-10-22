@@ -18,9 +18,6 @@ typedef Eigen::SparseMatrix<double> SparseMatrix;
 typedef Eigen::VectorXd Vector;
 
 
-
-
-
 int main(int, char**) {
 
   Eigen::Vector2d a,b,c;
@@ -63,7 +60,13 @@ int main(int, char**) {
   outM << std::setprecision(18) << M; 
   outM.close( );
 
-  mesh.writeMeshToFile("lala");
+
+  Eigen::SparseMatrix<double> M2(mesh.numElements(), mesh.numVertices());
+  computeM01(M2, mesh);
+  const std::string fnameM2 =  "M2_Lshape_Hilbert.dat";
+  std::ofstream outM2( fnameM2.c_str() );
+  outM2 << std::setprecision(18) << M2; 
+  outM2.close( );
   
   std::cout << " Done " << std::endl;
 
