@@ -4,7 +4,7 @@
 #include <cmath>
 #include <Eigen/Dense>
 #include <unsupported/Eigen/IterativeSolvers>
-
+// CppHilbert includes
 #include "../CppHilbert/Library/source/BoundaryMesh.hpp"
 #include "../CppHilbert/Library/source/evaluateV.hpp"
 #include "../CppHilbert/Library/source/evaluateK.hpp"
@@ -20,8 +20,10 @@ namespace IndirectFirstKind{
    * \returns coefficient vector of \f$ \mathcal{S}^{-1}_0(\mathcal{G}\f$ 
    *          corresponding to the jump of Neumann trace of the BEM solution.
    */
+  /* SAM_LISTING_BEGIN_0 */
   template <typename FUNC>
   Eigen::VectorXd solveDirichlet(const BoundaryMesh& mesh, const FUNC& g){
+    #if SOLUTION
     // 1. Assemble bilinear form of V (see par 1.3.132)
     Eigen::MatrixXd V;
     computeV(V, mesh, 1e-05);
@@ -42,9 +44,14 @@ namespace IndirectFirstKind{
     // 3. Solve system
     Eigen::VectorXd sol = V.lu().solve(RHS);
 
+    #else // TEMPLATE
+    // TODO: ASSEMBLE AND SOLVE INDIRECT FIRST-KIND BIE
+    Eigen::VectorXd sol(mesh.numElements());
+    #endif // TEMPLATE
+
     return sol;
   }
-
+  /* SAM_LISTING_END_0 */
 
   /* 
    * @brief Reconstructs and evaluates solution from density psi using Single 
@@ -53,12 +60,19 @@ namespace IndirectFirstKind{
    * \param[in] psi Coefficient vector corresponding to density
    * \param[in] mesh 
    */
-  double reconstructSolution(const Eigen::Vector2d& X, const Eigen::VectorXd& psi,
+  /* SAM_LISTING_BEGIN_1 */
+  double reconstructSolution(const Eigen::Vector2d& X, const Eigen::VectorXd& phi,
 			     const BoundaryMesh& mesh){
-    Eigen::VectorXd SLpsi_x;
-    evaluateV(SLpsi_x, mesh, psi, X.transpose(), 1e-05);
-    return SLpsi_x(0);
+    Eigen::VectorXd SLphi_x(1);
+    #if SOLUTION
+    evaluateV(SLphi_x, mesh, phi, X.transpose(), 1e-05);
+    
+    #else // TEMPLATE
+    // TODO: USE SINGLE LAYER POTENTIAL TO EVALUATE U(X)
+    #endif // TEMPLATE
+    return SLphi_x(0);
   }
+  /* SAM_LISTING_END_1 */
 
 }  // end namespace Indirect1stKind
 
@@ -74,8 +88,10 @@ namespace IndirectSecondKind{
    * \returns coefficient vector of \f$ \mathcal{S}^{-1}_0(\mathcal{G}\f$ 
    *          corresponding to jump of the Neumann trace of the BEM solution.
    */
+  /* SAM_LISTING_BEGIN_2 */
   template <typename FUNC>
   Eigen::VectorXd solveDirichlet(const BoundaryMesh& mesh, const FUNC& g){
+    #if SOLUTION
     // 1. Assemble bilinear form (see page 31 on tablet's notes)
     // - Compute K
     Eigen::MatrixXd K;
@@ -99,9 +115,14 @@ namespace IndirectSecondKind{
     // 3. Solve system    
     Eigen::VectorXd sol = LHS.lu().solve(RHS);
 
+    #else // TEMPLATE
+    // TODO: ASSEMBLE AND SOLVE INDIRECT SECOND-KIND BIE
+    Eigen::VectorXd sol(mesh.numVertices());
+    #endif // TEMPLATE
+
     return sol;
   }
-
+  /* SAM_LISTING_END_2 */
   
   /* 
    * @brief Reconstructs and evaluates solution from density v using Double 
@@ -110,12 +131,19 @@ namespace IndirectSecondKind{
    * \param[in] v Coefficient vector corresponding to density
    * \param[in] mesh 
    */
-  double reconstructSolution(const Eigen::Vector2d& X, const Eigen::VectorXd& v,
+  /* SAM_LISTING_BEGIN_3 */
+  double reconstructSolution(const Eigen::Vector2d& X, const Eigen::VectorXd& f,
 			     const BoundaryMesh& mesh){
-    Eigen::VectorXd DLv_x;
-    evaluateK(DLv_x, mesh, v, X.transpose(), 1e-05);
-    return DLv_x(0);
+    Eigen::VectorXd DLf_x(1);
+    #if SOLUTION
+    evaluateK(DLf_x, mesh, f, X.transpose(), 1e-05);
+    
+    #else // TEMPLATE
+    // TODO: USE DOUBLE LAYER POTENTIAL TO EVALUATE U(X)
+    #endif // TEMPLATE
+    return DLf_x(0);
   }
+  /* SAM_LISTING_END_3 */
 
 } // end namespace Indirect2ndkind
 

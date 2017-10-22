@@ -4,5 +4,5 @@
     "contributors" : "",
 
     "name": "DirichletBEM",
-    "all" : ["DBEMmain.cpp"]
+    "all" : ["DBEMmain.cpp", "MeshGen.hpp", "DirectBEM", "IndirectBEM", "plot_convergenceDBEM.py", "plot_convergenceIBEM.py"]
 }

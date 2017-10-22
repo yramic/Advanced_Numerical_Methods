@@ -6,14 +6,12 @@
 #include <iomanip>
 #include <Eigen/Dense>
 #include <unsupported/Eigen/IterativeSolvers>
-
+// CppHilbert includes
 #include "../CppHilbert/Library/source/BoundaryMesh.hpp"
 #include "../CppHilbert/Library/source/buildV.hpp"
 #include "../CppHilbert/Library/source/buildW.hpp"
 #include "../CppHilbert/Library/source/buildK.hpp"
 #include "../CppHilbert/Library/source/buildM.hpp"
-#include "../CppHilbert/Library/buildHypsingStabilization.hpp"
-
 
 
 namespace DirectFirstKind{
@@ -26,8 +24,10 @@ namespace DirectFirstKind{
    * \returns coefficient vector of \f$\mathcal{S}^{-1}_0(\mathcal{G}\f$ 
    *          corresponding to BEM solution (TNu).
    */
+  /* SAM_LISTING_BEGIN_0 */
   template <typename FUNC>
   Eigen::VectorXd solveDirichlet(const BoundaryMesh& mesh, const FUNC& g){
+    #if SOLUTION
     // 1. Assemble bilinear form of V as in (1.3.107)
     Eigen::MatrixXd V;
     computeV(V, mesh, 1e-05);
@@ -51,23 +51,14 @@ namespace DirectFirstKind{
     // 3. Solve system
     Eigen::VectorXd sol = V.lu().solve(RHS);
 
-    /*
-    //export for debugging
-    std::ofstream outV( "V.dat" );
-    outV << std::setprecision(18) << V; 
-    outV.close( );
-    
-    std::ofstream outK( "K.dat");
-    outK << std::setprecision(18) << K; 
-    outK.close( );
-    
-    std::ofstream outM( "M.dat" );
-    outM << std::setprecision(18) << M; 
-    outM.close( );
-    */
+    #else // TEMPLATE
+    // TODO: ASSEMBLE AND SOLVE DIRECT FIRST-KIND BIE
+    Eigen::VectorXd sol(mesh.numElements());
+    #endif // TEMPLATE
 
     return sol;
   }
+  /* SAM_LISTING_END_0 */
 
 } // end namespace Direct1stKind
 
@@ -83,8 +74,10 @@ namespace DirectSecondKind{
    * \returns coefficient vector of \f$ \mathcal{S}^{-1}_0(\mathcal{G}\f$ 
    *          corresponding to BEM solution (TNu)
    */
+  /* SAM_LISTING_BEGIN_1 */
   template <typename FUNC>
-  Eigen::VectorXd solveDirichlet(const BoundaryMesh& mesh, const FUNC& g, int N){
+  Eigen::VectorXd solveDirichlet(const BoundaryMesh& mesh, const FUNC& g){
+    #if SOLUTION
     // 1. Assemble bilinear form as in (1.3.122)
     // - Compute K
     Eigen::MatrixXd K;
@@ -111,29 +104,14 @@ namespace DirectSecondKind{
     // 3. Solve system
     Eigen::VectorXd sol = LHS.lu().solve(RHS);
     
-    //export for debugging
-    std::ofstream outW( "W_"+std::to_string(N)+".dat" );
-    outW << std::setprecision(18) << W; 
-    outW.close( );
-    
-    std::ofstream outK( "K_"+std::to_string(N)+".dat");
-    outK << std::setprecision(18) << K; 
-    outK.close( );
-    
-    std::ofstream outM( "M_"+std::to_string(N)+".dat" );
-    outM << std::setprecision(18) << M01; 
-    outM.close( );
-
-    std::ofstream outL( "LHS_"+std::to_string(N)+".dat" );
-    outL << std::setprecision(18) << LHS; 
-    outL.close( );
-
-    std::ofstream outR( "RHS_"+std::to_string(N)+".dat" );
-    outR << std::setprecision(18) << RHS; 
-    outR.close( );
+    #else // TEMPLATE
+    // TODO: ASSEMBLE AND SOLVE DIRECT SECOND-KIND BIE
+    Eigen::VectorXd sol(mesh.numElements());
+    #endif // TEMPLATE
 
     return sol;
   }
+  /* SAM_LISTING_BEGIN_1 */
 
 } // end namespace Direct2ndKind
 
