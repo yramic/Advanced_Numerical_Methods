@@ -29,16 +29,14 @@ namespace DirectFirstKind{
   Eigen::VectorXd solveDirichlet(const BoundaryMesh& mesh, const FUNC& g){
     #if SOLUTION
     // 1. Assemble bilinear form of V as in (1.3.107)
-    Eigen::MatrixXd V;
-    computeV(V, mesh, 1e-05);
+    Eigen::MatrixXd V; computeV(V, mesh, 1e-05);
     // 2. Assemble right hand side using <(1/2Id + K)g, psi> as in (1.3.107)
     // - Compute K
-    Eigen::MatrixXd K;
-    computeK(K, mesh, 1e-05);
+    Eigen::MatrixXd K; computeK(K, mesh, 1e-05);
     // - Compute Mass Matrix
     Eigen::SparseMatrix<double> M01(mesh.numElements(), mesh.numVertices());
     computeM01(M01, mesh);
-    Eigen::MatrixXd M; M = Eigen::MatrixXd(M01);
+    Eigen::MatrixXd M = Eigen::MatrixXd(M01);
     // - Compute coefficient vector for g (in $\mathcal{S}^{0}_1(\mathcal{G}$)
     //   (we do this by interpolation).
     Eigen::VectorXd G(mesh.numVertices());
@@ -80,18 +78,15 @@ namespace DirectSecondKind{
     #if SOLUTION
     // 1. Assemble bilinear form as in (1.3.122)
     // - Compute K
-    Eigen::MatrixXd K;
-    computeK(K, mesh, 1e-05);
+    Eigen::MatrixXd K; computeK(K, mesh, 1e-05);
     // - Compute Mass matrix for p.w.c/p.w.l
     Eigen::SparseMatrix<double> M01aux(mesh.numElements(), mesh.numVertices());
     computeM01(M01aux, mesh);
-    Eigen::MatrixXd M01(mesh.numElements(), mesh.numVertices());
-    M01 = Eigen::MatrixXd(M01aux);
+    Eigen::MatrixXd M01 = Eigen::MatrixXd(M01aux);
     Eigen::MatrixXd LHS = (0.5*M01 - K).transpose();
     
     // 2. Assemble right hand side using bilinear form of W as in (1.3.122)
-    Eigen::MatrixXd W;
-    computeW(W, mesh, 1e-05);
+    Eigen::MatrixXd W; computeW(W, mesh, 1e-05);
     // - Compute coefficient vector for g (in $\mathcal{S}^{0}_1(\mathcal{G}$)
     //   (we do this by interpolation).
     Eigen::VectorXd G(mesh.numVertices());

@@ -86,31 +86,25 @@ void computeKij(double* I0, double* I1, double eta,
   if (eta == 0)   /* fully analytic computation */
   {
     if (swap == 0)
-      computeKijAnalytic(I0,I1,a,b,c,d);
-    
+      computeKijAnalytic(I0,I1,a,b,c,d);    
     else
-      computeKijSwappedAnalytic(I0,I1,a,b,c,d);
-    
+      computeKijSwappedAnalytic(I0,I1,a,b,c,d);    
   }
   else            /* fully analytic or semianalytic */
   {
     if(distanceSegmentToSegment(a,b,c,d)*eta >= sqrt(hi))
     {
       if (swap == 0)
-        computeKijSemianalytic(I0,I1,a,b,c,d);
-      
+        computeKijSemianalytic(I0,I1,a,b,c,d);      
       else
-        computeKijSwappedSemianalytic(I0,I1,a,b,c,d);
-      
+        computeKijSwappedSemianalytic(I0,I1,a,b,c,d);      
     }
     else
     {
       if (swap == 0)
-        computeKijAnalytic(I0,I1,a,b,c,d);
-      
+        computeKijAnalytic(I0,I1,a,b,c,d);      
       else
-        computeKijSwappedAnalytic(I0,I1,a,b,c,d);
-      
+        computeKijSwappedAnalytic(I0,I1,a,b,c,d);      
     }
   }
 }
@@ -154,13 +148,13 @@ void computeKijAnalytic(double* I0, double* I1,
   }
   else  // u,v linearly independent 
   {
-    if (a == d)
+    if (a[0] == d[0] && a[1] == d[1])
     {
       *I0 = 2*( dot_wpu_n*dlp(0,v,wpu)+dot_u_n*dlp(1,u,wmv)+dot_w_n*dlp(0,u,wmv) );
       *I1 =     dot_wpu_n*dlp(1,v,wpu)-dot_u_n*dlp(1,u,wmv)-dot_w_n*dlp(0,u,wmv)
 	    + 0.5*(*I0);
     }
-    else if (b == c)
+    else if (b[0] == c[0] && b[1] == c[1])
     {
       *I0 = 2*( dot_wmu_n*dlp(0,v,wmu)+dot_u_n*dlp(1,u,wpv)+dot_w_n*dlp(0,u,wpv) );
       *I1 =     dot_wmu_n*dlp(1,v,wmu)+dot_u_n*dlp(1,u,wpv)+dot_w_n*dlp(0,u,wpv)
@@ -226,14 +220,14 @@ void computeKijSwappedAnalytic(double* I0, double* I1,
   }
   else                             /* u,v linearly independent */
   {
-    if (a == d)
+    if (a[0] == d[0] && a[1] == d[1])
     {
       *I0 = 2*( dot_v_n*dlp(1,v,wmu) + dot_w_n*dlp(0,v,wmu)
                 + dot_wpv_n*dlp(0,u,wpv) );
       *I1 =     dot_wpv_n*dlp(1,u,wpv)-dot_v_n*dlp(1,v,wmu)
               - dot_w_n*dlp(0,v,wmu) + 0.5*(*I0);
     }
-    else if (b == c)
+    else if (b[0] == c[0] && b[1] == c[1])
     {
       *I0 = 2*( dot_v_n*dlp(1,v,wpu) + dot_w_n*dlp(0,v,wpu)
                 +dot_wmv_n*dlp(0,u,wmv) );
@@ -283,8 +277,7 @@ void computeKijSemianalytic(double* I0, double* I1,
   double I1tmp = 0.0;
   for (int i=0;i<order;++i)
   {
-    Eigen::Vector2d z = gauss_point[i]*u + w;
-   
+    Eigen::Vector2d z = gauss_point[i]*u + w;   
     double dot_z_n = z.dot(n);
    
     I0tmp += gauss_weight[i]*dot_z_n*dlp(0,v,z);

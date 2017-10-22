@@ -36,7 +36,7 @@ Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
 			     const Eigen::Vector2d& v)
 {
   double a = u.squaredNorm();  // \cob{$\alpha = \N{\Bu}^2$}
-  double b = 2 * u.dot(v);     // \cob{$\beta = 2\Bu\cdot\Bv$}
+  double b = 2. * u.dot(v);    // \cob{$\beta = 2\Bu\cdot\Bv$}
   double c = v.squaredNorm();  // \cob{$\gamma = \N{\Bv}^2$}
   double D = 0.;               // discriminant
   Eigen::VectorXd val(k+1);    // return values 
@@ -49,7 +49,8 @@ Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
   assert(tmp >= -fabs(EPS*4*a*c));
 
   // Numerically sound way of testing if discriminant = 0
-  if (tmp > EPS*4*a*c) D = sqrt(tmp); else D = 0.;
+  if (tmp > EPS*4*a*c) D = sqrt(tmp);
+  else D = 0.;
   
   // The case k=0: pure logarithmic integrand 
   if (fabs(u[0]) < EPS && fabs(u[1]) < EPS) { // constant integrand
@@ -68,6 +69,7 @@ Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
     if (fabs(tmp) < EPS*c) val[0] = 0.5*M_PI;
     else if (a < c) val[0] = atan( D /tmp );
     else val[0] = atan( D /tmp ) + M_PI;
+
     val[0] = (0.5*((b+2*a)*log(a+b+c)-(b-2*a)*log(a-b+c))+ D*val[0])/a-4.0;
   } // \Label[line]{slp:2a}
   if (k == 0) return val;
@@ -316,9 +318,10 @@ double computeVij(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
 }
 
 //-----------------------------------------------------------------------------
-double computeWij(Eigen::Vector2d a, Eigen::Vector2d b,
-		  Eigen::Vector2d c, Eigen::Vector2d d, double eta)
+double computeWij(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
+		  const Eigen::Vector2d& c, const Eigen::Vector2d& d, double eta)
 {
+  int swap = 0;
   double hi = (b-a).squaredNorm(); /* hi = norm(b-a)^2 */
   double hj = (d-c).squaredNorm(); /* hj = norm(d-c)^2 */
   double tmp = 0.;
@@ -327,21 +330,29 @@ double computeWij(Eigen::Vector2d a, Eigen::Vector2d b,
    * outer integration is over smaller domain. This is done by       *
    * swapping Ej and Ei if necessary.                                */
   if (hj > hi) {
-    std::swap(a,c);
-    std::swap(b,d);
+    swap = 1;
     std::swap(hi,hj);
   }
 
   if ( eta == 0) { /* compute all matrix entries analytically */
-    return computeWijAnalytic(a,b,c,d);
+    if(swap == 1)
+      return computeWijAnalytic(c,d,a,b);
+    else
+      return computeWijAnalytic(a,b,c,d);
   }
   else { /* compute admissible matrix entries semi-analytically */
     if ( distanceSegmentToSegment(a,b,c,d) > eta*sqrt(hj) )
     {
-      return computeWijSemianalytic(a,b,c,d);
+      if(swap == 1)
+	return computeWijSemianalytic(c,d,a,b);
+      else
+	return computeWijSemianalytic(a,b,c,d);
     }
     else {
-      return computeWijAnalytic(a,b,c,d);
+      if(swap == 1)
+	return computeWijAnalytic(c,d,a,b);
+      else
+	return computeWijAnalytic(a,b,c,d);
     }
   }
 }

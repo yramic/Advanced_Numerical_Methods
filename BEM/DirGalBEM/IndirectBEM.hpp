@@ -25,13 +25,12 @@ namespace IndirectFirstKind{
   Eigen::VectorXd solveDirichlet(const BoundaryMesh& mesh, const FUNC& g){
     #if SOLUTION
     // 1. Assemble bilinear form of V (see par 1.3.132)
-    Eigen::MatrixXd V;
-    computeV(V, mesh, 1e-05);
+    Eigen::MatrixXd V; computeV(V, mesh, 1e-05);
     // 2. Assemble right hand side using <g, psi> (see 1.3.134)
     // - Compute Mass Matrix
     Eigen::SparseMatrix<double> M01(mesh.numElements(), mesh.numVertices());
     computeM01(M01, mesh);
-    Eigen::MatrixXd M; M = Eigen::MatrixXd(M01);
+    Eigen::MatrixXd M = Eigen::MatrixXd(M01);
     // - Compute coefficient vector for g (in $\mathcal{S}^{0}_1(\mathcal{G}$)
     //   (we do this by interpolation).
     Eigen::VectorXd G(mesh.numVertices());
@@ -94,12 +93,11 @@ namespace IndirectSecondKind{
     #if SOLUTION
     // 1. Assemble bilinear form (see page 31 on tablet's notes)
     // - Compute K
-    Eigen::MatrixXd K;
-    computeK(K, mesh, 1e-05);
+    Eigen::MatrixXd K; computeK(K, mesh, 1e-05);
     // - Compute Mass matrix for p.w.c/p.w.l
     Eigen::SparseMatrix<double> M01aux(mesh.numElements(), mesh.numVertices());
     computeM01(M01aux, mesh);
-    Eigen::MatrixXd M; M = Eigen::MatrixXd(M01aux);
+    Eigen::MatrixXd M = Eigen::MatrixXd(M01aux);
     Eigen::MatrixXd LHS = (-0.5*M + K).eval();
     
     // 2. Assemble right hand side using <g, psi> 

@@ -83,8 +83,8 @@ double computeVij(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
  *           \frac{1}{|Ej|} \int_{Ej} \int_{Ei} \log{\vert x-y \vert} dsy dsx \f$
  *          where Ei = [a,b] and Ej = [c,d].                                   
  */
-double computeWij(Eigen::Vector2d a, Eigen::Vector2d b, Eigen::Vector2d c,
-		  Eigen::Vector2d d, double eta);
+double computeWij(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
+		  const Eigen::Vector2d& c, const Eigen::Vector2d& d, double eta);
 
 
 /**

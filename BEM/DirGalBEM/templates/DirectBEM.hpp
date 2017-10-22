@@ -56,7 +56,7 @@ namespace DirectSecondKind{
 
     return sol;
   }
-  /* SAM_LISTING_BEGIN_1 */
+  /* SAM_LISTING_END_1 */
 
 } // end namespace Direct2ndKind
 

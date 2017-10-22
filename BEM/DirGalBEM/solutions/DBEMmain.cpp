@@ -33,10 +33,8 @@ double TNu(const Eigen::Vector2d & X, const Eigen::Vector2d & a,
 	   const Eigen::Vector2d & b){
   Eigen::Vector2d n = unitNormal(a,b);
   Eigen::Vector2d grad;
-  
   grad<< cos(X(0)-X(1))*sinh(X(0)+X(1)) + sin(X(0)-X(1))*cosh(X(0)+X(1)),
-        -cos(X(0)-X(1))*sinh(X(0)+X(1)) + sin(X(0)-X(1))*cosh(X(0)+X(1));
-  
+    -cos(X(0)-X(1))*sinh(X(0)+X(1)) + sin(X(0)-X(1))*cosh(X(0)+X(1));
 
   return grad.dot(n);
 }
