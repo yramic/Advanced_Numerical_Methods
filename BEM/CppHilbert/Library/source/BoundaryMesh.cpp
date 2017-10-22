@@ -4,6 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "BoundaryMesh.hpp"
+#include <iomanip>
 
 
 //------------------------------------------------------------------------------
@@ -21,7 +22,7 @@ int BoundaryMesh::numElements() const
 
 
 //------------------------------------------------------------------------------
-const BoundaryMesh::coord_matrix_t &BoundaryMesh::getMeshVertices() const
+BoundaryMesh::coord_matrix_t BoundaryMesh::getMeshVertices() const
 {
   assert(isInitialized_);
     
@@ -30,7 +31,7 @@ const BoundaryMesh::coord_matrix_t &BoundaryMesh::getMeshVertices() const
 
   
 //------------------------------------------------------------------------------
-const BoundaryMesh::elem_matrix_t &BoundaryMesh::getMeshElements() const
+BoundaryMesh::elem_matrix_t BoundaryMesh::getMeshElements() const
 {
   assert(isInitialized_);
     
@@ -103,11 +104,11 @@ void BoundaryMesh::loadMeshFromFile(const std::string& filename)
 void BoundaryMesh::writeMeshToFile(const std::string& filename)
 {
   std::ofstream out_coords(filename+"_coordinates.dat" );
-  out_coords << coordinates_; 
+  out_coords << std::setprecision(18) << coordinates_; 
   out_coords.close( );
 
   std::ofstream out_els(filename+"_elements.dat" );
-  out_els << elements_; 
+  out_els << std::setprecision(18) << elements_; 
   out_els.close( );
 };
 

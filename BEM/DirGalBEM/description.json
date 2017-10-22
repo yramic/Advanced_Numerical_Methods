@@ -1,0 +1,8 @@
+{
+    "author" : "curzuato",
+    "email" : "carolina.urzua@sam.math.ethz.ch",
+    "contributors" : "",
+
+    "name": "DirichletBEM",
+    "all" : ["DBEMmain.cpp", "MeshGen.hpp", "DirectBEM", "IndirectBEM", "plot_convergenceDBEM.py", "plot_convergenceIBEM.py"]
+}
