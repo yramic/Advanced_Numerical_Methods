@@ -23,9 +23,7 @@
  *  the node zj. The output M is a sparse matrix.
  *
  * @param[out] M
- * @param[in] coordinates  (nC x 2) matrix of the mesh nodes {z1,...,zn}.
- * @param[in] elements  (nE x 2) Matrix representing a partition {E1,...,Em} of a
- *                  boundary \f$\Gamma\f$.
+ *  @param[in] mesh 2D BoundaryMesh (initialized with vertices and elements).
  */
 void computeM01(Eigen::SparseMatrix<double>& M, const BoundaryMesh& mesh)
 {
@@ -50,7 +48,6 @@ void computeM01(Eigen::SparseMatrix<double>& M, const BoundaryMesh& mesh)
         triplets.push_back(triplet_t(i, aidx, h/2.));
         triplets.push_back(triplet_t(i, bidx, h/2.));
     }
-
     M.setFromTriplets(triplets.begin(), triplets.end());
 }
 
@@ -89,6 +86,39 @@ void computeM11(Eigen::SparseMatrix<double>& M, const BoundaryMesh& mesh)
         triplets.push_back(triplet_t(aidx, bidx, h/6.));
         triplets.push_back(triplet_t(bidx, aidx, h/6.));
         triplets.push_back(triplet_t(bidx, bidx, h/3.));
+    }
+
+    M.setFromTriplets(triplets.begin(), triplets.end());
+}
+
+/**
+ *  Assembles a mass-type matrix M for S0 x S0.
+ *
+ *  The entries of the (nE x nE)-matrix M for S0 x S0 read \f$ M_{ij} = \int_{
+ *  E_i} \int_{E_j} ds, \f$. The output M is a sparse matrix.
+ *
+ *  @param[out] M
+ *  @param[in] mesh 2D BoundaryMesh (initialized with vertices and elements).
+ */
+void computeM00(Eigen::SparseMatrix<double>& M, const BoundaryMesh& mesh)
+{
+
+    int nE = mesh.numElements();
+    // Define triplets vector
+    typedef Eigen::Triplet<double> triplet_t;
+    std::vector<triplet_t> triplets;
+    triplets.reserve(1*nE);
+
+    // traverse elements
+    for(int i=0; i<nE; i++){
+      // identify element's vertices
+      int aidx = mesh.getElementVertex(i,0);
+      int bidx = mesh.getElementVertex(i,1);
+      const Eigen::Vector2d& a = mesh.getVertex(aidx);
+      const Eigen::Vector2d& b = mesh.getVertex(bidx);
+      // Fill triplets with the contribution corresponding to their associated
+      // basis functions
+      triplets.push_back(triplet_t(i, i, (b-a).norm()));
     }
 
     M.setFromTriplets(triplets.begin(), triplets.end());

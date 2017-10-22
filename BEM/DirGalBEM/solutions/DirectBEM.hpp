@@ -38,7 +38,7 @@ namespace DirectFirstKind{
     Eigen::SparseMatrix<double> M01(mesh.numElements(), mesh.numVertices());
     computeM01(M01, mesh);
     Eigen::MatrixXd M; M = Eigen::MatrixXd(M01);
-    // - Compute coefficient vector for g (in \f$\mathcal{S}^{0}_1(\mathcal{G}\f$)
+    // - Compute coefficient vector for g (in $\mathcal{S}^{0}_1(\mathcal{G}$)
     //   (we do this by interpolation).
     Eigen::VectorXd G(mesh.numVertices());
     for(int i=0; i<mesh.numVertices(); i++){
@@ -86,7 +86,7 @@ namespace DirectSecondKind{
     // 2. Assemble right hand side using bilinear form of W as in (1.3.122)
     Eigen::MatrixXd W;
     computeW(W, mesh, 1e-05);
-    // - Compute coefficient vector for g (in \f$\mathcal{S}^{0}_1(\mathcal{G}\f$)
+    // - Compute coefficient vector for g (in $\mathcal{S}^{0}_1(\mathcal{G}$)
     //   (we do this by interpolation).
     Eigen::VectorXd G(mesh.numVertices());
     for(int i=0; i<mesh.numVertices(); i++){
@@ -101,7 +101,7 @@ namespace DirectSecondKind{
 
     return sol;
   }
-  /* SAM_LISTING_BEGIN_1 */
+  /* SAM_LISTING_END_1 */
 
 } // end namespace Direct2ndKind
 

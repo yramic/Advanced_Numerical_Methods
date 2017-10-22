@@ -31,7 +31,7 @@ namespace IndirectFirstKind{
     Eigen::SparseMatrix<double> M01(mesh.numElements(), mesh.numVertices());
     computeM01(M01, mesh);
     Eigen::MatrixXd M; M = Eigen::MatrixXd(M01);
-    // - Compute coefficient vector for g (in \f$\mathcal{S}^{0}_1(\mathcal{G}\f$)
+    // - Compute coefficient vector for g (in $\mathcal{S}^{0}_1(\mathcal{G}$)
     //   (we do this by interpolation).
     Eigen::VectorXd G(mesh.numVertices());
     for(int i=0; i<mesh.numVertices(); i++){
@@ -93,7 +93,7 @@ namespace IndirectSecondKind{
     Eigen::MatrixXd LHS = (-0.5*M + K).eval();
     
     // 2. Assemble right hand side using <g, psi> 
-    // - Compute coefficient vector for g (in \f$\mathcal{S}^{0}_1(\mathcal{G}\f$)
+    // - Compute coefficient vector for g (in $\mathcal{S}^{0}_1(\mathcal{G}$)
     //   (we do this by interpolation).
     Eigen::VectorXd G(mesh.numVertices());
     for(int i=0; i<mesh.numVertices(); i++){

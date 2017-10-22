@@ -69,7 +69,7 @@ Eigen::VectorXd ComputeTNu(const TNFUNC& tnu, const BoundaryMesh& mesh){
   }
   return tnuval;
 }
-/* SAM_LISTING_BEGIN_1 */
+/* SAM_LISTING_END_1 */
 
 
 //------------------------------------------------------------------------------
@@ -133,7 +133,7 @@ int main() {
     std::cout << "Obtained error " << errorI2(k) << std::endl;
     
   }
-  /* SAM_LISTING_BEGIN_2 */
+  /* SAM_LISTING_END_2 */
 
   
   // OUTPUT ERRORS

@@ -21,7 +21,7 @@ BoundaryMesh createMiniSquareMesh(const int& N){
   // Create variable indicating number of points on each side of square
   int NperSide = N/4;
   
-  // 1. Create boundary vertices for unit square [0,1]^2. 
+  // 1. Create boundary vertices for unit square [0,0.5]x[0,0.5]. 
   // - Begin by creating auxiliary vector discretizing interval [0,0.5]  
   Eigen::VectorXd auxLinSp; auxLinSp.setLinSpaced(NperSide+1, 0, 0.5);
   // - Create auxiliary vectors with ones and zeros
@@ -32,10 +32,10 @@ BoundaryMesh createMiniSquareMesh(const int& N){
   Eigen::MatrixXd coordinates(N,2);
   // Use auxiliary vectors to fill coordinate matrix. Remember we need to
   // generate the points counter-clockwise.
-  coordinates << auxLinSp.segment(0,NperSide),             auxZero, // bottom line
-              auxOne*0.5,             auxLinSp.segment(0,NperSide), // right line
+  coordinates << auxLinSp.segment(0,NperSide), auxZero, // bottom line
+              auxOne*0.5, auxLinSp.segment(0,NperSide), // right line
               (auxLinSp.reverse()).segment(0,NperSide), 0.5*auxOne, // upper line
-              auxZero,    (auxLinSp.reverse()).segment(0,NperSide); // left line
+              auxZero, (auxLinSp.reverse()).segment(0,NperSide); // left line
 
   // 2. Create matrix specifying the indices of the vertices of each element
   Eigen::MatrixXi elements(N,2);

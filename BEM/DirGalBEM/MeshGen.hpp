@@ -22,7 +22,7 @@ BoundaryMesh createMiniSquareMesh(const int& N){
   // Create variable indicating number of points on each side of square
   int NperSide = N/4;
   
-  // 1. Create boundary vertices for unit square [0,1]^2. 
+  // 1. Create boundary vertices for unit square [0,0.5]x[0,0.5].
   // - Begin by creating auxiliary vector discretizing interval [0,0.5]  
   Eigen::VectorXd auxLinSp; auxLinSp.setLinSpaced(NperSide+1, 0, 0.5);
   // - Create auxiliary vectors with ones and zeros
