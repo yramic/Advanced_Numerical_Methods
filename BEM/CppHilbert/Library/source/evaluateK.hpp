@@ -25,13 +25,13 @@ extern "C" {
  *  evaluateK evaluates the double layer potential operator K tilde on a number
  *  of evaluation points.
  *
- *  @param[out] Kgx vector
+ *  @param[out] Kfx vector
  *  @param[in] mesh 2D BoundaryMesh (initialized with vertices and elements).
- *  @param[in] gh nC vector such that gh_i=g(z_i).
+ *  @param[in] fh nC vector such that fh_i=f(z_i).
  *  @param[in] x  (nX x 2) matrix that contains the evaluation points.
  *  @param[in] eta  Admissibility constant. It is greater or equal than 0.
  */
-void evaluateK(Eigen::VectorXd& Kgx, const BoundaryMesh& mesh, const Eigen::VectorXd& gh,
+void evaluateK(Eigen::VectorXd& Kfx, const BoundaryMesh& mesh, const Eigen::VectorXd& fh,
                const Eigen::MatrixXd& x, double eta);
 
 #endif

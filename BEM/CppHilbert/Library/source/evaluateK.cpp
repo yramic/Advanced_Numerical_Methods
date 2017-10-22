@@ -18,14 +18,14 @@
 #include "evaluateK.hpp"
 
 
-void evaluateK(Eigen::VectorXd& Kgx, const BoundaryMesh& mesh, const Eigen::VectorXd &gh,
+void evaluateK(Eigen::VectorXd& Kfx, const BoundaryMesh& mesh, const Eigen::VectorXd &fh,
                const Eigen::MatrixXd &x, double eta)
 {
   int nX = x.rows();
   int nE = mesh.numElements();
   // Initialize output vector
-  Kgx.resize(nX);
-  Kgx.setZero();
+  Kfx.resize(nX);
+  Kfx.setZero();
 
   // Get quadrature points and weights
   const double* qp  = getGaussPoints(GAUSS_ORDER);
@@ -72,11 +72,11 @@ void evaluateK(Eigen::VectorXd& Kgx, const BoundaryMesh& mesh, const Eigen::Vect
           const Eigen::Vector2d& s = mEl.row(j) + qp[k]*dEl.row(j);
           // Add contribution
           sum += qw[k]*(s-xi).dot(nEl.row(j))
-                  *( gh[aidx] + ((1+qp[k])*(gh[bidx]-gh[aidx])/2) )
+	    *( fh[aidx] + ((1+qp[k])*(fh(bidx)-fh(aidx))/2) )
                   / (s-xi).squaredNorm();
         }
 
-        Kgx(i) -= lengthE(j) * sum;
+        Kfx(i) -= lengthE(j) * sum;
       }
       else{
         // Compute integral analitically
@@ -85,14 +85,14 @@ void evaluateK(Eigen::VectorXd& Kgx, const BoundaryMesh& mesh, const Eigen::Vect
           double commonFactor = aux.dot(nEl.row(j)) * lengthE(j);
           double prod1 = commonFactor * dlp(0, dEl.row(j), aux ) / 2.;
           double prod2 = commonFactor * dlp(1, dEl.row(j), aux ) / 2.;
-          Kgx(i) -= ( ( (gh(aidx)* prod1 + gh(bidx)* prod1)
-			+ gh(bidx)* prod2) - gh(aidx)* prod2);
+          Kfx(i) -= ( ( (fh(aidx)* prod1 + fh(bidx)* prod1)
+			+ fh(bidx)* prod2) - fh(aidx)* prod2);
         }
       }
 
     } // end elements' for loop
 
-    Kgx(i) /= (4. * M_PI);
+    Kfx(i) /= (4. * M_PI);
   } // end evaluation points' for loop
 
 }
