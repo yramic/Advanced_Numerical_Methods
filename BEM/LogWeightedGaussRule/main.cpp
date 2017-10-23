@@ -16,19 +16,18 @@ struct QuadRule {
 
 static const int KIND = 5;
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /* SAM_LISTING_BEGIN_0 */
-int testGaussLaguerre(int N){
+bool testGaussLaguerre(int N){
   // get Gauss-Laguerre quadrature points and weights
   double *w = new double[N];
   double *x = new double[N];
   cgqf(N, KIND, 0, 0, 0, 1, x, w);
   
   // initialize exact value of integral
-  int exval = 1;
-  int k=0;
+  double exval = 1;
   // Start test for different k=1..N
-  for(k=0; k<2*N; k++){
+  for(int k=0; k<2*N; k++){
     // compute exact value for $\int_0^{\infty} e^{-t} t^k dt$
     if(k>0)
       exval *= k;
@@ -37,16 +36,16 @@ int testGaussLaguerre(int N){
     for(int i=0; i<N; i++){
       I += std::pow(x[i], k)*w[i];
     }
-    if(fabs(I-exval)>1e-10){ // if not exact, stop
-      return k;
+    if(fabs(I-exval)>1e-10*exval){ // if not exact, stop
+      return false;
     }
   }
-  return k;
+  return true;
 }
 /* SAM_LISTING_END_0 */
 
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /* SAM_LISTING_BEGIN_1 */
 Eigen::VectorXd testGaussLaguerreConvergence(int N = 20){
   Eigen::VectorXd error(N);
@@ -67,7 +66,7 @@ Eigen::VectorXd testGaussLaguerreConvergence(int N = 20){
 }
 /* SAM_LISTING_END_1 */
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /* SAM_LISTING_BEGIN_2 */
 QuadRule getLogWeightQR(double a, int n){
   // get Gauss-Laguerre quadrature points and weights
@@ -97,7 +96,8 @@ QuadRule getLogWeightQR(double a, int n){
 /* SAM_LISTING_END_2 */
 
 
-//----------------------------------------------------------------------------/* SAM_LISTING_BEGIN_3 */
+//------------------------------------------------------------------------------
+/* SAM_LISTING_BEGIN_3 */
 Eigen::VectorXd testLogWeightQRConvergence(int n){
   Eigen::VectorXd error(n);
   for(int k=1; k<=n; k++){
@@ -116,14 +116,14 @@ Eigen::VectorXd testLogWeightQRConvergence(int n){
 /* SAM_LISTING_END_3 */
 
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /* SAM_LISTING_BEGIN_4 */
 int testLogWeightQR(int N){
   // initialize exact value
   double exval;
   // get quadrature points and weights
   QuadRule LWQR = getLogWeightQR(1, N);
-  for(int k=0; k<N; k++){
+  for(int k=1; k<2*N; k++){
     // compute exact value for $\int_0^1 log(t) t^k dt$
     exval = -1./std::pow(k+1,2);
     // compute integral using quadrature
@@ -131,7 +131,7 @@ int testLogWeightQR(int N){
     for(int i=0; i<N; i++){
       I += std::pow(LWQR.x(i), k)*LWQR.w(i);
     }
-    if(fabs(I-exval)>1e-10){ // if not exact, stop
+    if(fabs(I-exval)/exval>1e-10){ // if not exact, stop
       return k;
     }
   }
@@ -140,21 +140,19 @@ int testLogWeightQR(int N){
 /* SAM_LISTING_END_4 */
 
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 int main() {
 
   //-------------------------------------------------------------
   /* SAM_LISTING_BEGIN_5 */
   std::cout << "TESTING GAUSS-LAGUERRE QUADRATURE" << std::endl;
   for(int j=1; j<30; j++){
-    int orderfail = testGaussLaguerre(j);
-    if(orderfail >= j){
-      std::cout << "Test passed for N = " << j << " with "
-		<< orderfail << std::endl;
+    bool pass = testGaussLaguerre(j);
+    if(pass){
+      std::cout << "Test passed for N = " << j << std::endl;
     }
     else{
-      std::cout << "Test for N = " << j << " failed at "
-	     << orderfail << std::endl;
+      std::cout << "Test for N = " << j << " failed " << std::endl;
     }
   }
   /* SAM_LISTING_END_5 */
@@ -185,12 +183,11 @@ int main() {
   for(int j=1; j<30; j++){
     int orderfail = testLogWeightQR(j);
     if(orderfail >= j){
-      std::cout << "Test passed for N = " << j << " with "
-		<< orderfail << std::endl;
+      std::cout << "Test passed for N = " << j  << std::endl;
     }
     else{
-      std::cout << "Test for N = " << j << " failed at "
-	     << orderfail << std::endl;
+      std::cout << "Test for N = " << j << " failed at " << orderfail
+		<< std::endl;
     }
   }
   /* SAM_LISTING_END_7 */

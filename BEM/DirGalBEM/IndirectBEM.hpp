@@ -93,12 +93,12 @@ namespace IndirectSecondKind{
     #if SOLUTION
     // 1. Assemble bilinear form (see page 31 on tablet's notes)
     // - Compute K
-    Eigen::MatrixXd K; computeK(K, mesh, 1e-05);
-    // - Compute Mass matrix for p.w.c/p.w.l
-    Eigen::SparseMatrix<double> M01aux(mesh.numElements(), mesh.numVertices());
-    computeM01(M01aux, mesh);
-    Eigen::MatrixXd M = Eigen::MatrixXd(M01aux);
-    Eigen::MatrixXd LHS = (-0.5*M + K).eval();
+    Eigen::MatrixXd K; computeK00(K, mesh, 1e-05);
+    // - Compute Mass matrix for p.w.c/p.w.c
+    Eigen::SparseMatrix<double> M00aux(mesh.numElements(), mesh.numElements());
+    computeM00(M00aux, mesh);
+    Eigen::MatrixXd M0 = Eigen::MatrixXd(M00aux);
+    Eigen::MatrixXd LHS = (-0.5*M0 + K).eval();
     
     // 2. Assemble right hand side using <g, psi> 
     // - Compute coefficient vector for g (in $\mathcal{S}^{0}_1(\mathcal{G}$)
@@ -108,6 +108,10 @@ namespace IndirectSecondKind{
       G(i) = g(mesh.getVertex(i));
     }
     // - Construct RHS
+    // - Compute Mass matrix for p.w.c/p.w.l
+    Eigen::SparseMatrix<double> M01aux(mesh.numElements(), mesh.numVertices());
+    computeM01(M01aux, mesh);
+    Eigen::MatrixXd M = Eigen::MatrixXd(M01aux);
     Eigen::VectorXd RHS = M*G;
 
     // 3. Solve system    
