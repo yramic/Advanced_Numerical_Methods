@@ -32,7 +32,7 @@ double g(const Eigen::Vector2d& X){
 double TNu(const Eigen::Vector2d & X, const Eigen::Vector2d & a,
 	   const Eigen::Vector2d & b){
   Eigen::Vector2d n = unitNormal(a,b);
-  Eigen::Vector2d grad;
+  Eigen::Vector2d grad;  
   grad<< cos(X(0)-X(1))*sinh(X(0)+X(1)) + sin(X(0)-X(1))*cosh(X(0)+X(1)),
     -cos(X(0)-X(1))*sinh(X(0)+X(1)) + sin(X(0)-X(1))*cosh(X(0)+X(1));
 
@@ -74,13 +74,12 @@ Eigen::VectorXd ComputeTNu(const TNFUNC& tnu, const BoundaryMesh& mesh){
 int main() {
 
   auto squareMesh = createMiniSquareMesh(16);
-
+  
   std::function<Eigen::Vector2d(const double&)> gamma = [](const double& t){
     Eigen::Vector2d res;
     res << 0.25*cos(M_PI*t) + 0.1625*cos(2*M_PI*t), 0.375*sin(M_PI*t);
     return res;
   };
-
   auto gammaMesh = createMeshwithGamma(gamma, 8);
   gammaMesh.writeMeshToFile("gamma");
 
@@ -110,13 +109,16 @@ int main() {
     Eigen::VectorXd sol1 = DirectFirstKind::solveDirichlet(mesh, g);
     errorD1(k) = sqrt((sol1-solex).transpose()*V*(sol1-solex));
     errorD1L2(k) = sqrt((sol1-solex).transpose()*M00*(sol1-solex)); 
-    std::cout << "Obtained error " << errorD1(k) << std::endl;
+    std::cout << "Obtained error " << errorD1(k) << " and " << errorD1L2(k)
+	      << std::endl;    
     
     std::cout << "Solving 2nd kind Direct. " ;
     Eigen::VectorXd sol2 = DirectSecondKind::solveDirichlet(mesh, g);
     errorD2(k) = sqrt((sol2-solex).transpose()*V*(sol2-solex));
     errorD2L2(k) = sqrt((sol2-solex).transpose()*M00*(sol2-solex));
-    std::cout << "Obtained error " << errorD2(k) << std::endl;    
+    std::cout << "Obtained error " << errorD2(k) << " and " << errorD2L2(k)
+	      << std::endl;
+    //std::cout << sol2.transpose() << std::endl;
 
     std::cout << "Solving 1st kind Indirect : ";
     Eigen::VectorXd sol1i = IndirectFirstKind::solveDirichlet(mesh, g);

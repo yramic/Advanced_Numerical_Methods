@@ -19,8 +19,7 @@
  * @brief Dirichlet data for the Laplace Dirichlet problem over these two domains
  */
 double g(const Eigen::Vector2d& X){
-  //return sin(X(0)-X(1))*sinh(X(0)+X(1));
-  return sin(X(0))*sinh(X(1));
+  return sin(X(0)-X(1))*sinh(X(0)+X(1));
 }
 
 
@@ -33,11 +32,9 @@ double g(const Eigen::Vector2d& X){
 double TNu(const Eigen::Vector2d & X, const Eigen::Vector2d & a,
 	   const Eigen::Vector2d & b){
   Eigen::Vector2d n = unitNormal(a,b);
-  Eigen::Vector2d grad;
-  
-  //  grad<< cos(X(0)-X(1))*sinh(X(0)+X(1)) + sin(X(0)-X(1))*cosh(X(0)+X(1)),
-  //    -cos(X(0)-X(1))*sinh(X(0)+X(1)) + sin(X(0)-X(1))*cosh(X(0)+X(1));
-  grad<< cos(X(0))*sinh(X(1)),  sin(X(0))*cosh(X(1));
+  Eigen::Vector2d grad;  
+  grad<< cos(X(0)-X(1))*sinh(X(0)+X(1)) + sin(X(0)-X(1))*cosh(X(0)+X(1)),
+    -cos(X(0)-X(1))*sinh(X(0)+X(1)) + sin(X(0)-X(1))*cosh(X(0)+X(1));
 
   return grad.dot(n);
 }
@@ -77,13 +74,12 @@ Eigen::VectorXd ComputeTNu(const TNFUNC& tnu, const BoundaryMesh& mesh){
 int main() {
 
   auto squareMesh = createMiniSquareMesh(16);
-
+  
   std::function<Eigen::Vector2d(const double&)> gamma = [](const double& t){
     Eigen::Vector2d res;
     res << 0.25*cos(M_PI*t) + 0.1625*cos(2*M_PI*t), 0.375*sin(M_PI*t);
     return res;
   };
-
   auto gammaMesh = createMeshwithGamma(gamma, 8);
   gammaMesh.writeMeshToFile("gamma");
 

@@ -12,6 +12,7 @@
 #include "../CppHilbert/Library/source/buildW.hpp"
 #include "../CppHilbert/Library/source/buildK.hpp"
 #include "../CppHilbert/Library/source/buildM.hpp"
+#include "../CppHilbert/Library/source/evaluateW.hpp"
 
 
 namespace DirectFirstKind{

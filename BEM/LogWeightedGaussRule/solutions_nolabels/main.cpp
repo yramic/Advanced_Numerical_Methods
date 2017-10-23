@@ -1,3 +1,9 @@
+//// 
+//// Copyright (C) 2017 SAM (D-MATH) @ ETH Zurich
+//// Author(s): curzuato < > 
+//// Contributors:  dcasati 
+//// This file is part of the AdvNumCSE repository.
+////
 #include <iostream>
 #include <fstream>
 #include <istream> 
@@ -17,14 +23,12 @@ struct QuadRule {
 static const int KIND = 5;
 
 //------------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_0 */
 bool testGaussLaguerre(int N){
   // get Gauss-Laguerre quadrature points and weights
   double *w = new double[N];
   double *x = new double[N];
   cgqf(N, KIND, 0, 0, 0, 1, x, w);
 
-#if SOLUTION
   // initialize exact value of integral
   double exval = 1;
   // Start test for different k=1..N
@@ -41,19 +45,13 @@ bool testGaussLaguerre(int N){
       return false;
     }
   }
-    #else // TEMPLATE
-  // TODO: Implement your code
-  #endif // TEMPLATE
   return true;
 }
-/* SAM_LISTING_END_0 */
 
 
 //------------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_1 */
 Eigen::VectorXd testGaussLaguerreConvergence(int N = 20){
   Eigen::VectorXd error(N);
-  #if SOLUTION
   for(int k=1; k<=N; k++){
     // get Gauss-Laguerre quadrature points and weights
     double *w = new double[k];
@@ -67,15 +65,10 @@ Eigen::VectorXd testGaussLaguerreConvergence(int N = 20){
     // compute error
     error(k-1) = fabs(I - 0.5);
   }
-#else // TEMPLATE
-  // TODO: Implement your code
-#endif // TEMPLATE
   return error;
 }
-/* SAM_LISTING_END_1 */
 
 //------------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_2 */
 QuadRule getLogWeightQR(double a, int n){
   // get Gauss-Laguerre quadrature points and weights
   double *w = new double[n];
@@ -84,7 +77,6 @@ QuadRule getLogWeightQR(double a, int n){
 
   // create new Quadrature rule
   QuadRule logWeightQR;
-#if SOLUTION
   logWeightQR.dim = 1;
   logWeightQR.n = n;
   // create matrix and vector for its points and weights
@@ -99,19 +91,13 @@ QuadRule getLogWeightQR(double a, int n){
   }
   logWeightQR.x = points;
   logWeightQR.w = weights;
-#else // TEMPLATE
-  // TODO: Implement your code
-#endif // TEMPLATE
   return logWeightQR;
 }
-/* SAM_LISTING_END_2 */
 
 
 //------------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_3 */
 Eigen::VectorXd testLogWeightQRConvergence(int n){
   Eigen::VectorXd error(n);
-#if SOLUTION
   for(int k=1; k<=n; k++){
     // get quadrature points and weights
     QuadRule LWQR = getLogWeightQR(M_PI, k);
@@ -123,17 +109,11 @@ Eigen::VectorXd testLogWeightQRConvergence(int n){
     // compute error
     error(k-1) = fabs(I - 0.641182132994293);
   }
-  #else // TEMPLATE
-  // TODO: Implement your code
-#endif // TEMPLATE
   return error;
 }
-/* SAM_LISTING_END_3 */
 
 
 //------------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_4 */
-#if SOLUTION
 int testLogWeightQR(int N){
   // initialize exact value
   double exval;
@@ -153,15 +133,12 @@ int testLogWeightQR(int N){
   }
   return N;
 }
-#endif // TEMPLATE
-/* SAM_LISTING_END_4 */
 
 
 //------------------------------------------------------------------------------
 int main() {
 
   //-------------------------------------------------------------
-  /* SAM_LISTING_BEGIN_5 */
   std::cout << "TESTING GAUSS-LAGUERRE QUADRATURE" << std::endl;
   for(int j=1; j<30; j++){
     bool pass = testGaussLaguerre(j);
@@ -172,11 +149,9 @@ int main() {
       std::cout << "Test for N = " << j << " failed " << std::endl;
     }
   }
-  /* SAM_LISTING_END_5 */
   std::cout << std::endl;
 
   //-------------------------------------------------------------
-  /* SAM_LISTING_BEGIN_6 */
   std::cout << "TESTING QUADRATURES' CONVERGENCE" << std::endl
 	    << std::endl;
   Eigen::VectorXd errorGL = testGaussLaguerreConvergence(30);
@@ -192,12 +167,9 @@ int main() {
   std::ofstream out_N("QR_N.txt");
   out_N << N; 
   out_N.close( );
-  /* SAM_LISTING_END_6 */
 
   //-------------------------------------------------------------
-  /* SAM_LISTING_BEGIN_7 */
   std::cout << "TESTING LOG-WEIGHT QUADRATURE" << std::endl;
-  #if SOLUTION
   for(int j=1; j<30; j++){
     int orderfail = testLogWeightQR(j);
     if(orderfail >= j){
@@ -208,11 +180,7 @@ int main() {
 		<< std::endl;
     }
   }
-  /* SAM_LISTING_END_7 */
   std::cout << std::endl;
-#else // TEMPLATE
-  // TODO: Implement your code
-#endif // TEMPLATE
   
   return 0;
 
