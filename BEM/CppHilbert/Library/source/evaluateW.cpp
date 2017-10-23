@@ -34,8 +34,7 @@ void evaluateW(Eigen::VectorXd& Wx, const BoundaryMesh& mesh, const Eigen::Vecto
   int nE = mesh.numElements();
   int nC = mesh.numVertices();
   // Initialize output vector
-  Wx.resize(nX);
-  Wx.setZero();
+  Wx.resize(nX);  Wx.setZero();
 
   // Get quadrature points and weights
   const double* qp = getGaussPoints(GAUSS_ORDER);
@@ -56,7 +55,7 @@ void evaluateW(Eigen::VectorXd& Wx, const BoundaryMesh& mesh, const Eigen::Vecto
      */
     
     int found_element = 0; /* Number of elements containing the evaluation point. */
-    int i_element = 0;     /* Id of the last found element. */
+    int j_element = 0;     /* Id of the last found element. */
     double s = 0;          /* Ratio dist(x,a)/length of element.*/
     double gh_xj = 0.;     /* Function value of gh in evaluation point. */
     double g_0m1, g_1m1, g_0m2, g_1m2, g_2m2;
@@ -73,7 +72,7 @@ void evaluateW(Eigen::VectorXd& Wx, const BoundaryMesh& mesh, const Eigen::Vecto
 
       if(dist_x_Ei < 5e-2 * EPS){
         found_element += 1;
-        i_element = i;
+        j_element = i;
 
         if ( (a-xj).norm() < EPS || (b-xj).norm() < EPS){
           fprintf(stderr, "Warning (evaluateW): The evaluation point "
@@ -154,7 +153,7 @@ void evaluateW(Eigen::VectorXd& Wx, const BoundaryMesh& mesh, const Eigen::Vecto
        // Compute p.v. of a locally regularized integral
         double lengthEi = sqrt(4.0*u_sqnorm);
         double alpha = (gh(bidx)-gh(aidx))/2.;
-        assert(i_element == i);
+        assert(j_element == i);
 
         Wx(j) += 1./(lengthEi*M_PI)*( 2.0*gh_xj/(1.0-s*s)
                                       -alpha*log(fabs((s-1.0)/(s+1.0))) );
@@ -164,8 +163,8 @@ void evaluateW(Eigen::VectorXd& Wx, const BoundaryMesh& mesh, const Eigen::Vecto
         if ((sqrt(4*u_sqnorm) > eta*dist_x_Ei) || eta==-1){
           // Compute the integrals analytically
           /* g_0^(-1)*/
-          g_0m1 = dlp(0,a,b);
-          g_1m1 = dlp(1,a,b);
+          g_0m1 = dlp(0,u,v);
+          g_1m1 = dlp(1,u,v);
   
           /* g_0^(-2)*/
           if(sqrdelta*sqrdelta > 4.0*EPS * u_sqnorm * v_sqnorm){
@@ -185,17 +184,17 @@ void evaluateW(Eigen::VectorXd& Wx, const BoundaryMesh& mesh, const Eigen::Vecto
   
           // Compute W_0
           W_0 = ( n_vc.dot(n_x.row(j))*g_0m1
-                -2*( a.dot(n_x.row(j))*n_vc.dot(a)*g_1m2
-                     + (b.dot(n_x.row(j))*n_vc.dot(a)
-                        +a.dot(n_x.row(j))*n_vc.dot(b))*g_1m2
-                     + b.dot(n_x.row(j))*n_vc.dot(b)*g_0m2 ) )/M_PI;
+                -2*( u.dot(n_x.row(j))*n_vc.dot(u)*g_1m2
+                     + (v.dot(n_x.row(j))*n_vc.dot(u)
+                        +u.dot(n_x.row(j))*n_vc.dot(v))*g_1m2
+                     + u.dot(n_x.row(j))*n_vc.dot(v)*g_0m2 ) )/M_PI;
   
           // Compute W_1
           W_1 = ( n_vc.dot(n_x.row(j))*g_1m1
-                 -2*( a.dot(n_x.row(j))*n_vc.dot(a)*g_2m2
-                     + (b.dot(n_x.row(j))*n_vc.dot(a)
-                        +a.dot(n_x.row(j))*n_vc.dot(b))*g_2m2
-                     + b.dot(n_x.row(j))*n_vc.dot(b)*g_1m2 ) )/M_PI;
+                 -2*( u.dot(n_x.row(j))*n_vc.dot(u)*g_2m2
+                     + (v.dot(n_x.row(j))*n_vc.dot(u)
+                        +u.dot(n_x.row(j))*n_vc.dot(v))*g_2m2
+                     + v.dot(n_x.row(j))*n_vc.dot(v)*g_1m2 ) )/M_PI;
         }
         else{
           // Compute the integrals via quadrature rule*/
@@ -204,11 +203,11 @@ void evaluateW(Eigen::VectorXd& Wx, const BoundaryMesh& mesh, const Eigen::Vecto
           for(int k=0;k<GAUSS_ORDER;++k){
             double denom = u_sqnorm*qp[k]*qp[k] + 2*udotv*qp[k] + v_sqnorm;
             W_0 += qw[k]*( n_vc.dot(n_x.row(j))/denom
-                           -2*(n_x.row(j).dot(a*qp[k]+b)*n_vc.dot(a*qp[k]+b))
+                           -2*(n_x.row(j).dot(u*qp[k]+v)*n_vc.dot(u*qp[k]+v))
                            /(denom*denom) )/M_PI;
   
             W_1 += qw[k]*qp[k]*( n_vc.dot(n_x.row(j))/denom
-                             -2*(n_x.row(j).dot(a*qp[k]+b)*n_vc.dot(a*qp[k]+b))
+                             -2*(n_x.row(j).dot(u*qp[k]+v)*n_vc.dot(u*qp[k]+v))
                                  /(denom*denom) )/M_PI;
           } // end quadrature for loop
         }

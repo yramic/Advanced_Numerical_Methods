@@ -32,5 +32,15 @@
  */
 void computeK(Eigen::MatrixXd& K, const BoundaryMesh& mesh, double eta);
 
+/**
+ *  Compute the double layer operator K for piecewise constant test and trial 
+ *  basis functions.
+ *
+ *  @param[out] K  (nE x nE) matrix. nE is the number of elements.
+ *  @param[in] mesh 2D BoundaryMesh initialized with vertices and elements).
+ *  @param[in] eta  Admissibility constant. It is greater or equal than 0.
+ */
+void computeK00(Eigen::MatrixXd& K, const BoundaryMesh& mesh, double eta);
+
 #endif
 
