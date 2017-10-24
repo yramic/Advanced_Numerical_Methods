@@ -11,10 +11,10 @@
 #include <Eigen/Dense>
 #include <unsupported/Eigen/IterativeSolvers>
 // CppHilbert includes
-#include "../CppHilbert/Library/source/BoundaryMesh.hpp"
-#include "../CppHilbert/Library/source/evaluateV.hpp"
-#include "../CppHilbert/Library/source/evaluateK.hpp"
-#include "../CppHilbert/Library/source/buildM.hpp"
+#include "source/BoundaryMesh.hpp"
+#include "source/evaluateV.hpp"
+#include "source/evaluateK.hpp"
+#include "source/buildM.hpp"
 
 namespace IndirectFirstKind{
 
@@ -29,18 +29,17 @@ namespace IndirectFirstKind{
   template <typename FUNC>
   Eigen::VectorXd solveDirichlet(const BoundaryMesh& mesh, const FUNC& g){
     // 1. Assemble bilinear form of V (see par 1.3.132)
-    Eigen::MatrixXd V;
-    computeV(V, mesh, 1e-05);
+    Eigen::MatrixXd V; computeV(V, mesh, 1e-05);
     // 2. Assemble right hand side using <g, psi> (see 1.3.134)
     // - Compute Mass Matrix
-    Eigen::SparseMatrix<double> M01(mesh.numElements(), mesh.numVertices());
-    computeM01(M01, mesh);
-    Eigen::MatrixXd M; M = Eigen::MatrixXd(M01);
-    // - Compute coefficient vector for g (in $\mathcal{S}^{0}_1(\mathcal{G}$)
-    //   (we do this by interpolation).
-    Eigen::VectorXd G(mesh.numVertices());
-    for(int i=0; i<mesh.numVertices(); i++){
-      G(i) = g(mesh.getVertex(i));
+    Eigen::SparseMatrix<double> M00(mesh.numElements(), mesh.numElements());
+    computeM00(M00, mesh);
+    Eigen::MatrixXd M = Eigen::MatrixXd(M00);
+    // - Compute coefficient vector for g (in $\mathcal{S}^{-1}_0(\mathcal{G}$)
+    Eigen::VectorXd G(mesh.numElements());
+    for(int i=0; i<mesh.numElements(); i++){
+      Eigen::Vector2d a,b; std::tie(a,b) = mesh.getElementVertices(i);
+      G(i) = g(0.5*(a+b).eval());
     }
     // - Construct RHS
     Eigen::VectorXd RHS = (M*G).eval();
@@ -85,20 +84,20 @@ namespace IndirectSecondKind{
   Eigen::VectorXd solveDirichlet(const BoundaryMesh& mesh, const FUNC& g){
     // 1. Assemble bilinear form (see page 31 on tablet's notes)
     // - Compute K
-    Eigen::MatrixXd K;
-    computeK(K, mesh, 1e-05);
-    // - Compute Mass matrix for p.w.c/p.w.l
-    Eigen::SparseMatrix<double> M01aux(mesh.numElements(), mesh.numVertices());
-    computeM01(M01aux, mesh);
-    Eigen::MatrixXd M; M = Eigen::MatrixXd(M01aux);
+    Eigen::MatrixXd K; computeK00(K, mesh, 1e-05);
+    // - Compute Mass matrix for p.w.c/p.w.c
+    Eigen::SparseMatrix<double> M00aux(mesh.numElements(), mesh.numElements());
+    computeM00(M00aux, mesh);
+    Eigen::MatrixXd M = Eigen::MatrixXd(M00aux);
     Eigen::MatrixXd LHS = (-0.5*M + K).eval();
     
     // 2. Assemble right hand side using <g, psi> 
-    // - Compute coefficient vector for g (in $\mathcal{S}^{0}_1(\mathcal{G}$)
-    //   (we do this by interpolation).
-    Eigen::VectorXd G(mesh.numVertices());
-    for(int i=0; i<mesh.numVertices(); i++){
-      G(i) = g(mesh.getVertex(i));
+    // - Compute coefficient vector for g (in $\mathcal{S}^{-1}_0(\mathcal{G}$)
+    Eigen::VectorXd G(mesh.numElements());
+    for(int i=0; i<mesh.numElements(); i++){
+      Eigen::Vector2d a,b;
+      std::tie(a,b) = mesh.getElementVertices(i);
+      G(i) = g(0.5*(a+b).eval());
     }
     // - Construct RHS
     Eigen::VectorXd RHS = M*G;

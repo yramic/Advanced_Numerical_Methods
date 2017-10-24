@@ -11,8 +11,8 @@
 #include <cmath>
 #include <Eigen/Dense>
 // CppHilbert includes
-#include "../CppHilbert/Library/source/buildM.hpp"
-#include "../CppHilbert/Library/source/geometry.hpp"
+#include "source/buildM.hpp"
+#include "source/geometry.hpp"
 // Own includes
 #include "MeshGen.hpp"
 #include "DirectBEM.hpp"
@@ -25,8 +25,7 @@
  * @brief Dirichlet data for the Laplace Dirichlet problem over these two domains
  */
 double g(const Eigen::Vector2d& X){
-  //return sin(X(0)-X(1))*sinh(X(0)+X(1));
-  return sin(X(0))*sinh(X(1));
+  return sin(X(0)-X(1))*sinh(X(0)+X(1));
 }
 
 
@@ -38,11 +37,9 @@ double g(const Eigen::Vector2d& X){
 double TNu(const Eigen::Vector2d & X, const Eigen::Vector2d & a,
 	   const Eigen::Vector2d & b){
   Eigen::Vector2d n = unitNormal(a,b);
-  Eigen::Vector2d grad;
-  
-  //  grad<< cos(X(0)-X(1))*sinh(X(0)+X(1)) + sin(X(0)-X(1))*cosh(X(0)+X(1)),
-  //    -cos(X(0)-X(1))*sinh(X(0)+X(1)) + sin(X(0)-X(1))*cosh(X(0)+X(1));
-  grad<< cos(X(0))*sinh(X(1)),  sin(X(0))*cosh(X(1));
+  Eigen::Vector2d grad;  
+  grad<< cos(X(0)-X(1))*sinh(X(0)+X(1)) + sin(X(0)-X(1))*cosh(X(0)+X(1)),
+    -cos(X(0)-X(1))*sinh(X(0)+X(1)) + sin(X(0)-X(1))*cosh(X(0)+X(1));
 
   return grad.dot(n);
 }
@@ -76,16 +73,27 @@ Eigen::VectorXd ComputeTNu(const TNFUNC& tnu, const BoundaryMesh& mesh){
 
 
 //------------------------------------------------------------------------------
+void testMassMatrixSVD(const BoundaryMesh& mesh){
+  Eigen::SparseMatrix<double> M01aux(mesh.numElements(), mesh.numVertices());
+  computeM01(M01aux, mesh);
+  Eigen::MatrixXd M01 = Eigen::MatrixXd(M01aux);
+  Eigen::JacobiSVD<Eigen::MatrixXd> svd(M01, Eigen::ComputeThinU | Eigen::ComputeThinV);
+  Eigen::VectorXd singvals = svd.singularValues();
+  if(singvals.array().abs().minCoeff()<1e-12){
+    std::cout << "M is singular!" << std::endl;
+  }
+}
+
+//------------------------------------------------------------------------------
 int main() {
 
   auto squareMesh = createMiniSquareMesh(16);
-
+  
   std::function<Eigen::Vector2d(const double&)> gamma = [](const double& t){
     Eigen::Vector2d res;
     res << 0.25*cos(M_PI*t) + 0.1625*cos(2*M_PI*t), 0.375*sin(M_PI*t);
     return res;
   };
-
   auto gammaMesh = createMeshwithGamma(gamma, 8);
   gammaMesh.writeMeshToFile("gamma");
 
@@ -114,13 +122,15 @@ int main() {
     Eigen::VectorXd sol1 = DirectFirstKind::solveDirichlet(mesh, g);
     errorD1(k) = sqrt((sol1-solex).transpose()*V*(sol1-solex));
     errorD1L2(k) = sqrt((sol1-solex).transpose()*M00*(sol1-solex)); 
-    std::cout << "Obtained error " << errorD1(k) << std::endl;
+    std::cout << "Obtained error " << errorD1(k) << " and " << errorD1L2(k)
+	      << std::endl;    
     
     std::cout << "Solving 2nd kind Direct. " ;
     Eigen::VectorXd sol2 = DirectSecondKind::solveDirichlet(mesh, g);
     errorD2(k) = sqrt((sol2-solex).transpose()*V*(sol2-solex));
     errorD2L2(k) = sqrt((sol2-solex).transpose()*M00*(sol2-solex));
-    std::cout << "Obtained error " << errorD2(k) << std::endl;    
+    std::cout << "Obtained error " << errorD2(k) << " and " << errorD2L2(k)
+	      << std::endl;
 
     std::cout << "Solving 1st kind Indirect : ";
     Eigen::VectorXd sol1i = IndirectFirstKind::solveDirichlet(mesh, g);
@@ -134,6 +144,11 @@ int main() {
     errorI2(k) = fabs(solEval2i - g(X) );
     std::cout << "Obtained error " << errorI2(k) << std::endl;
     
+  }
+  
+  for(int k=0; k<4; k++){
+    auto mesh = createMeshwithGamma(gamma, Nall(k));
+    testMassMatrixSVD(mesh);
   }
 
   
@@ -171,8 +186,7 @@ int main() {
   std::ofstream out_N("BEM_N.txt");
   out_N << Nall.segment(0,Nl); 
   out_N.close( );
-  
-    
+   
   return 0;
 
 }

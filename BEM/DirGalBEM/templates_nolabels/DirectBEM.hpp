@@ -13,11 +13,11 @@
 #include <Eigen/Dense>
 #include <unsupported/Eigen/IterativeSolvers>
 // CppHilbert includes
-#include "../CppHilbert/Library/source/BoundaryMesh.hpp"
-#include "../CppHilbert/Library/source/buildV.hpp"
-#include "../CppHilbert/Library/source/buildW.hpp"
-#include "../CppHilbert/Library/source/buildK.hpp"
-#include "../CppHilbert/Library/source/buildM.hpp"
+#include "source/BoundaryMesh.hpp"
+#include "source/buildV.hpp"
+#include "source/buildW.hpp"
+#include "source/buildK.hpp"
+#include "source/buildM.hpp"
 
 
 namespace DirectFirstKind{
@@ -46,7 +46,7 @@ namespace DirectSecondKind{
 
    /* 
    * @brief Build and solve direct second kind BIE arising from Dirichlet Laplace 
-   *        problem (Interior BVP). 
+   *        problem (Interior BVP) with different test and trial space (non-stable)
    * \param[in] mesh 
    * \param[in] g Dirichlet data. Should take a 2d-vector and return a double.
    * \returns coefficient vector of \f$ \mathcal{S}^{-1}_0(\mathcal{G}\f$ 
