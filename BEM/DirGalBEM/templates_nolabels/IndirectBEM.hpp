@@ -11,10 +11,10 @@
 #include <Eigen/Dense>
 #include <unsupported/Eigen/IterativeSolvers>
 // CppHilbert includes
-#include "../CppHilbert/Library/source/BoundaryMesh.hpp"
-#include "../CppHilbert/Library/source/evaluateV.hpp"
-#include "../CppHilbert/Library/source/evaluateK.hpp"
-#include "../CppHilbert/Library/source/buildM.hpp"
+#include "source/BoundaryMesh.hpp"
+#include "source/evaluateV.hpp"
+#include "source/evaluateK.hpp"
+#include "source/buildM.hpp"
 
 namespace IndirectFirstKind{
 

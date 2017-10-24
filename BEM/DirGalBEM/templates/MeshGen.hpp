@@ -4,8 +4,7 @@
 #include <cmath>
 #include <Eigen/Dense>
 // CppHilbert includes
-#include "../CppHilbert/Library/source/BoundaryMesh.hpp"
-
+#include "source/BoundaryMesh.hpp"
 
 /*
  * @brief Set up an uniform BoundaryMesh for a Square [0, 0.5]^2

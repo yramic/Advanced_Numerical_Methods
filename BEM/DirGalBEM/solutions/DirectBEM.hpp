@@ -7,12 +7,11 @@
 #include <Eigen/Dense>
 #include <unsupported/Eigen/IterativeSolvers>
 // CppHilbert includes
-#include "../CppHilbert/Library/source/BoundaryMesh.hpp"
-#include "../CppHilbert/Library/source/buildV.hpp"
-#include "../CppHilbert/Library/source/buildW.hpp"
-#include "../CppHilbert/Library/source/buildK.hpp"
-#include "../CppHilbert/Library/source/buildM.hpp"
-#include "../CppHilbert/Library/source/evaluateW.hpp"
+#include "source/BoundaryMesh.hpp"
+#include "source/buildV.hpp"
+#include "source/buildW.hpp"
+#include "source/buildK.hpp"
+#include "source/buildM.hpp"
 
 
 namespace DirectFirstKind{
@@ -41,8 +40,7 @@ namespace DirectFirstKind{
     //   (we do this by interpolation).
     Eigen::VectorXd G(mesh.numElements());
     for(int i=0; i<mesh.numElements(); i++){
-      Eigen::Vector2d a,b;
-      std::tie(a,b) = mesh.getElementVertices(i);
+      Eigen::Vector2d a,b; std::tie(a,b) = mesh.getElementVertices(i);
       G(i) = g(0.5*(a+b).eval());
     }
     // - Put all pieces together and construct RHS
@@ -64,7 +62,7 @@ namespace DirectSecondKind{
 
    /* 
    * @brief Build and solve direct second kind BIE arising from Dirichlet Laplace 
-   *        problem (Interior BVP). 
+   *        problem (Interior BVP) with different test and trial space (non-stable)
    * \param[in] mesh 
    * \param[in] g Dirichlet data. Should take a 2d-vector and return a double.
    * \returns coefficient vector of \f$ \mathcal{S}^{-1}_0(\mathcal{G}\f$ 
@@ -75,12 +73,12 @@ namespace DirectSecondKind{
   Eigen::VectorXd solveDirichlet(const BoundaryMesh& mesh, const FUNC& g){
     // 1. Assemble bilinear form as in (1.3.122)
     // - Compute K
-    Eigen::MatrixXd K; computeK00(K, mesh, 1e-05);
+    Eigen::MatrixXd K; computeK(K, mesh, 1e-05);
     // - Compute Mass matrix for p.w.c/p.w.l
-    Eigen::SparseMatrix<double> M00aux(mesh.numElements(), mesh.numElements());
-    computeM00(M00aux, mesh);
-    Eigen::MatrixXd M0 = Eigen::MatrixXd(M00aux);
-    Eigen::MatrixXd LHS = (0.5*M0 - K).transpose();
+    Eigen::SparseMatrix<double> M01aux(mesh.numElements(), mesh.numVertices());
+    computeM01(M01aux, mesh);
+    Eigen::MatrixXd M01 = Eigen::MatrixXd(M01aux);
+    Eigen::MatrixXd LHS = (0.5*M01 - K).transpose();
     
     // 2. Assemble right hand side using bilinear form of W as in (1.3.122)
     Eigen::MatrixXd W; computeW(W, mesh, 1e-05);
@@ -91,22 +89,7 @@ namespace DirectSecondKind{
       G(i) = g(mesh.getVertex(i));
     }
     // - Put all pieces together and construct RHS
-    Eigen::VectorXd RHS = W*G; // funnyly this works although it's wrong
-    // this one doesn't
-    /*
-    Eigen::VectorXd G(mesh.numElements());
-    Eigen::MatrixXd X(mesh.numElements(),2), n(mesh.numElements(),2);
-    for(int i=0; i<mesh.numElements(); i++){
-      Eigen::Vector2d a,b;
-      std::tie(a,b) = mesh.getElementVertices(i);
-      n.row(i) = unitNormal(a,b);
-      X.row(i) = (a+b)/2.;      
-      G(i) = g(mesh.getVertex(i));
-    }
-    Eigen::VectorXd WG_x;
-    evaluateW(WG_x, mesh, G, X, n, 1e-05);
-    Eigen::VectorXd RHS = M0*WG_x;
-    */
+    Eigen::VectorXd RHS = W*G;
     
     // 3. Solve system
     Eigen::VectorXd sol = LHS.lu().solve(RHS);

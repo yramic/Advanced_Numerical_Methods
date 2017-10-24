@@ -28,8 +28,23 @@ bool testGaussLaguerre(int N){
   double *w = new double[N];
   double *x = new double[N];
   cgqf(N, KIND, 0, 0, 0, 1, x, w);
-
-  // TODO: Implement your code
+  
+  // initialize exact value of integral
+  double exval = 1;
+  // Start test for different k=1..N
+  for(int k=0; k<2*N; k++){
+    // compute exact value for $\int_0^{\infty} e^{-t} t^k dt$
+    if(k>0)
+      exval *= k;
+    // compute integral using quadrature
+    double I = 0.;
+    for(int i=0; i<N; i++){
+      I += std::pow(x[i], k)*w[i];
+    }
+    if(fabs(I-exval)>1e-10*exval){ // if not exact, stop
+      return false;
+    }
+  }
   return true;
 }
 
@@ -37,7 +52,19 @@ bool testGaussLaguerre(int N){
 //------------------------------------------------------------------------------
 Eigen::VectorXd testGaussLaguerreConvergence(int N = 20){
   Eigen::VectorXd error(N);
-  // TODO: Implement your code
+  for(int k=1; k<=N; k++){
+    // get Gauss-Laguerre quadrature points and weights
+    double *w = new double[k];
+    double *x = new double[k];
+    cgqf(k, KIND, 0, 0, 0, 1, x, w);
+    // compute integral using quadrature
+    double I = 0.;
+    for(int i=0; i<k; i++){
+      I += sin(x[i])*w[i];
+    }
+    // compute error
+    error(k-1) = fabs(I - 0.5);
+  }
   return error;
 }
 
@@ -50,7 +77,21 @@ QuadRule getLogWeightQR(double a, int n){
 
   // create new Quadrature rule
   QuadRule logWeightQR;
-  // TODO: Implement your code
+  logWeightQR.dim = 1;
+  logWeightQR.n = n;
+  // create matrix and vector for its points and weights
+  Eigen::MatrixXd points(n,1);
+  Eigen::VectorXd weights(n);
+  // Generate them applying the required transformation
+  for(int i=0; i<n; i++){
+    // quadrature point becomes: $q = a e^{-x}$
+    points(i,0) = a*exp(-x[i]);
+    // weight becomes $w = a(log(a)-x)w$
+    weights(i) = a*(log(a)-x[i])*w[i];
+  }
+  logWeightQR.x = points;
+  logWeightQR.w = weights;
+
   return logWeightQR;
 }
 
@@ -58,12 +99,41 @@ QuadRule getLogWeightQR(double a, int n){
 //------------------------------------------------------------------------------
 Eigen::VectorXd testLogWeightQRConvergence(int n){
   Eigen::VectorXd error(n);
-  // TODO: Implement your code
+  for(int k=1; k<=n; k++){
+    // get quadrature points and weights
+    QuadRule LWQR = getLogWeightQR(M_PI, k);
+    // compute integral using quadrature
+    double I = 0.;
+    for(int i=0; i<k; i++){
+      I += sin(LWQR.x(i))*LWQR.w(i);
+    }
+    // compute error
+    error(k-1) = fabs(I - 0.641182132994293);
+  }
   return error;
 }
 
 
 //------------------------------------------------------------------------------
+int testLogWeightQR(int N){
+  // initialize exact value
+  double exval;
+  // get quadrature points and weights
+  QuadRule LWQR = getLogWeightQR(1, N);
+  for(int k=1; k<2*N; k++){
+    // compute exact value for $\int_0^1 log(t) t^k dt$
+    exval = -1./std::pow(k+1,2);
+    // compute integral using quadrature
+    double I = 0.;
+    for(int i=0; i<N; i++){
+      I += std::pow(LWQR.x(i), k)*LWQR.w(i);
+    }
+    if(fabs(I-exval)/exval>1e-10){ // if not exact, stop
+      return k;
+    }
+  }
+  return N;
+}
 
 
 //------------------------------------------------------------------------------
@@ -101,7 +171,17 @@ int main() {
 
   //-------------------------------------------------------------
   std::cout << "TESTING LOG-WEIGHT QUADRATURE" << std::endl;
-  // TODO: Implement your code
+  for(int j=1; j<30; j++){
+    int orderfail = testLogWeightQR(j);
+    if(orderfail >= j){
+      std::cout << "Test passed for N = " << j  << std::endl;
+    }
+    else{
+      std::cout << "Test for N = " << j << " failed at " << orderfail
+		<< std::endl;
+    }
+  }
+  std::cout << std::endl;
   
   return 0;
 

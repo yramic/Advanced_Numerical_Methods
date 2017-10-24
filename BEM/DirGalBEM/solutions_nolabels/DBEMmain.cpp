@@ -11,8 +11,8 @@
 #include <cmath>
 #include <Eigen/Dense>
 // CppHilbert includes
-#include "../CppHilbert/Library/source/buildM.hpp"
-#include "../CppHilbert/Library/source/geometry.hpp"
+#include "source/buildM.hpp"
+#include "source/geometry.hpp"
 // Own includes
 #include "MeshGen.hpp"
 #include "DirectBEM.hpp"
@@ -73,6 +73,18 @@ Eigen::VectorXd ComputeTNu(const TNFUNC& tnu, const BoundaryMesh& mesh){
 
 
 //------------------------------------------------------------------------------
+void testMassMatrixSVD(const BoundaryMesh& mesh){
+  Eigen::SparseMatrix<double> M01aux(mesh.numElements(), mesh.numVertices());
+  computeM01(M01aux, mesh);
+  Eigen::MatrixXd M01 = Eigen::MatrixXd(M01aux);
+  Eigen::JacobiSVD<Eigen::MatrixXd> svd(M01, Eigen::ComputeThinU | Eigen::ComputeThinV);
+  Eigen::VectorXd singvals = svd.singularValues();
+  if(singvals.array().abs().minCoeff()<1e-12){
+    std::cout << "M is singular!" << std::endl;
+  }
+}
+
+//------------------------------------------------------------------------------
 int main() {
 
   auto squareMesh = createMiniSquareMesh(16);
@@ -119,7 +131,6 @@ int main() {
     errorD2L2(k) = sqrt((sol2-solex).transpose()*M00*(sol2-solex));
     std::cout << "Obtained error " << errorD2(k) << " and " << errorD2L2(k)
 	      << std::endl;
-    //std::cout << sol2.transpose() << std::endl;
 
     std::cout << "Solving 1st kind Indirect : ";
     Eigen::VectorXd sol1i = IndirectFirstKind::solveDirichlet(mesh, g);
@@ -133,6 +144,11 @@ int main() {
     errorI2(k) = fabs(solEval2i - g(X) );
     std::cout << "Obtained error " << errorI2(k) << std::endl;
     
+  }
+  
+  for(int k=0; k<4; k++){
+    auto mesh = createMeshwithGamma(gamma, Nall(k));
+    testMassMatrixSVD(mesh);
   }
 
   
@@ -170,8 +186,7 @@ int main() {
   std::ofstream out_N("BEM_N.txt");
   out_N << Nall.segment(0,Nl); 
   out_N.close( );
-  
-    
+   
   return 0;
 
 }

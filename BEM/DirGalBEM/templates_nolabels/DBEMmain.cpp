@@ -11,8 +11,8 @@
 #include <cmath>
 #include <Eigen/Dense>
 // CppHilbert includes
-#include "../CppHilbert/Library/source/buildM.hpp"
-#include "../CppHilbert/Library/source/geometry.hpp"
+#include "source/buildM.hpp"
+#include "source/geometry.hpp"
 // Own includes
 #include "MeshGen.hpp"
 #include "DirectBEM.hpp"
@@ -71,6 +71,11 @@ Eigen::VectorXd ComputeTNu(const TNFUNC& tnu, const BoundaryMesh& mesh){
   return tnuval;
 }
 
+
+//------------------------------------------------------------------------------
+void testMassMatrixSVD(const BoundaryMesh& mesh){
+  // TODO: IMPLEMENT YOUR CODE
+}
 
 //------------------------------------------------------------------------------
 int main() {
@@ -132,8 +137,7 @@ int main() {
   std::ofstream out_N("BEM_N.txt");
   out_N << Nall.segment(0,Nl); 
   out_N.close( );
-  
-    
+   
   return 0;
 
 }
