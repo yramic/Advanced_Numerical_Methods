@@ -76,11 +76,11 @@ Eigen::VectorXd ComputeTNu(const TNFUNC& tnu, const BoundaryMesh& mesh){
 void testMassMatrixSVD(const BoundaryMesh& mesh){
   Eigen::SparseMatrix<double> M01aux(mesh.numElements(), mesh.numVertices());
   computeM01(M01aux, mesh);
-  Eigen::MatrixXd M01 = Eigen::MatrixXd(M01aux);
-  Eigen::JacobiSVD<Eigen::MatrixXd> svd(M01,
+  Eigen::MatrixXd M10 = Eigen::MatrixXd(M01aux.transpose());
+  Eigen::JacobiSVD<Eigen::MatrixXd> svd(M10,
 					Eigen::ComputeThinU | Eigen::ComputeThinV);
   Eigen::VectorXd singvals = svd.singularValues();
-  // Since M01 scales with h, we consider the relative size of the smallest 
+  // Since M10 scales with h, we consider the relative size of the smallest 
   // singular value with respect to the second smallest.
   if(singvals.array().minCoeff()
      <1e-12* singvals.head(mesh.numElements()-1).array().minCoeff()){
