@@ -14,7 +14,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <cstdlib>
-
 #include "singleLayerPotential.hpp"
 #include "constants.hpp"
 
@@ -26,58 +25,57 @@ double slp(int k, const Eigen::Vector2d& u, const Eigen::Vector2d& v)
   return tmp[k];
 }
 
+
+//------------------------------------------------------------------------------
+// Computes the integrals I^(0)_k from Def. 2.2 in MAI08
+// using a recursion formula given in Lemma 2.2
+// returns all values for powers up to k in a vector
 //-----------------------------------------------------------------------------
+/* SAM_LISTING_BEGIN_1 */
 Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
 			     const Eigen::Vector2d& v)
 {
-  double a = u.squaredNorm();  /* a = <u,u> */
-  double b = 2 * u.dot(v);     /* b = 2 <u,v> */
-  double c = v.squaredNorm();  /* c = <v,v> */
-  double D = 0.;
-  Eigen::VectorXd val(k+1);
+  double a = u.squaredNorm();  // \cob{$\alpha = \N{\Bu}^2$}
+  double b = 2. * u.dot(v);    // \cob{$\beta = 2\Bu\cdot\Bv$}
+  double c = v.squaredNorm();  // \cob{$\gamma = \N{\Bv}^2$}
+  double D = 0.;               // discriminant
+  Eigen::VectorXd val(k+1);    // return values 
 
-  /* Ensure that discriminant is either positive or zero */
+  // Ensure one non-zero argument vector
   double tmp = 4*a*c - b*b;
   assert(fabs(u[0]) > EPS || fabs(u[1]) > EPS
-          || fabs(v[0]) > EPS || fabs(v[1]) > EPS);
-  assert(tmp >= -fabs(EPS*4*a*c)); /* By theory there holds tmp >= 0. */
+	 || fabs(v[0]) > EPS || fabs(v[1]) > EPS);
+  // By Cauchy-Schwarz inequality tmp >= 0
+  assert(tmp >= -fabs(EPS*4*a*c));
 
-  if (tmp > EPS*4*a*c)
-    D = sqrt(tmp);
-  else
-    D = 0.;
+  // Numerically sound way of testing if discriminant = 0
+  if (tmp > EPS*4*a*c) D = sqrt(tmp);
+  else D = 0.;
   
-  /* The case k=0 */
-  if (fabs(u[0]) < EPS && fabs(u[1]) < EPS) {
+  // The case k=0: pure logarithmic integrand 
+  if (fabs(u[0]) < EPS && fabs(u[1]) < EPS) { // constant integrand
       val[0] = 2*log(c);
   }
-  else if (D == 0.) {
+  else if (D == 0.) { // Integrand is logarithm of a pure square \Label[line]{slp:1}
     tmp = b + 2*a;
-    if (fabs(tmp) > EPS*a)
-      val[0] = tmp * log( 0.25*tmp*tmp /a );
-    else
-      val[0] = 0;
+    if (fabs(tmp) > EPS*a) val[0] = tmp * log( 0.25*tmp*tmp /a );
+    else val[0] = 0;
     tmp = b - 2*a;
-    if (fabs(tmp) > EPS*a)
-      val[0] -= tmp * log( 0.25*tmp*tmp /a );
-    val[0] = 0.5*val[0] /a - 4;
-  }
-  else { /* case D > 0 */
+    if (fabs(tmp) > EPS*a) val[0] -= tmp * log( 0.25*tmp*tmp /a );
+    val[0] = 0.5*val[0] /a - 4.0;
+  } // \Label[line]{slp:1a}
+  else { // case D > 0: argument of logarithm has no zeros \Label[line]{slp:2}
     tmp = c - a;
-    if (fabs(tmp) < EPS*c)
-      val[0] = 0.5*M_PI;
-    else if (a < c)
-      val[0] = atan( D /tmp );
-    else
-      val[0] = atan( D /tmp ) + M_PI;
+    if (fabs(tmp) < EPS*c) val[0] = 0.5*M_PI;
+    else if (a < c) val[0] = atan( D /tmp );
+    else val[0] = atan( D /tmp ) + M_PI;
 
-    val[0] = ( 0.5*( (b+2*a) * log(a+b+c) - (b-2*a) * log(a-b+c) )
-                + D*val[0]) / a - 4;
-  }
-  if (k == 0)
-    return val;
+    val[0] = (0.5*((b+2*a)*log(a+b+c)-(b-2*a)*log(a-b+c))+ D*val[0])/a-4.0;
+  } // \Label[line]{slp:2a}
+  if (k == 0) return val;
+  /* SAM_LISTING_END_1 */
 
-  /* The case k=1 */
+  /* The case k=1: logarithmic kernel times a linear term */
   if (k>=1) {
     if (fabs(u[0]) < EPS && fabs(u[1]) < EPS) {
       val[1] = 0.;
@@ -104,7 +102,7 @@ Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
   for (int i=2; i <= k; ++i) {
     if (fabs(u[0]) < EPS && fabs(u[1]) < EPS) {
       if (i%2 == 0)
-        val[i] = 2.*log(c)/(i+1);
+        val[i] = 2.*log(c)/(double)(i+1);
       else
         val[i] = 0.;
     }
@@ -135,6 +133,10 @@ Eigen::VectorXd slpIterative(int k, const Eigen::Vector2d& u,
   return val;
 }
 
+
+//------------------------------------------------------------------------------
+// Section 3 of MAI08,
+// Used only for evaluation of Newton potential
 //-----------------------------------------------------------------------------
 double doubleSlp(int k, int l, const Eigen::Vector2d& u,
 		 const Eigen::Vector2d& v, const Eigen::Vector2d& w)
@@ -156,7 +158,7 @@ double doubleSlp(int k, int l, const Eigen::Vector2d& u,
         if (normWSq < EPS)
           return 0;
         else
-          return 2./((k+1)*(l+1))*log(normWSq);
+          return (double)2./(double)((k+1)*(l+1))*log(normWSq);
       }
     }
     return 0.;
@@ -164,14 +166,14 @@ double doubleSlp(int k, int l, const Eigen::Vector2d& u,
   else if (normUSq < EPS)
   {
     if (k%2 == 0)
-      return 1./(k+1) * slp(l, v, w);
+      return (double)1./(k+1) * slp(l, v, w);
     else
       return 0.;
   }
   else if (normVSq < EPS)
   {
     if (l%2 == 0)
-      return 1./(l+1) * slp(k, u, w);
+      return (double)1./(l+1) * slp(k, u, w);
     else
       return 0.;
   }
@@ -220,13 +222,8 @@ double doubleSlp(int k, int l, const Eigen::Vector2d& u,
 
     if (fabs(w[0]+v[0]-u[0]) < fabs(w[0])*EPS
           && fabs(w[1]+v[1]-u[1]) < fabs(w[1])*EPS) {
-      memTableVWmu.resize(l+1);
-      for (int i = 0; i <= l; ++i)
-        memTableVWmu[i] = 0.;
-
-      memTableUWpv.resize(k+1);
-      for (int i = 0; i <= k; ++i)
-        memTableUWpv[i] = 0.;
+      memTableVWmu.resize(l+1); memTableVWmu.setZero();
+      memTableUWpv.resize(k+1); memTableUWpv.setZero();
     }
     else {
       memTableVWmu = slpIterative(l, v, w-u);
@@ -235,21 +232,16 @@ double doubleSlp(int k, int l, const Eigen::Vector2d& u,
 
     if (fabs(w[0]+u[0]-v[0]) < fabs(w[0])*EPS
           && fabs(w[1]+u[1]-v[1]) < fabs(w[1])*EPS) {
-      memTableVWpu.resize(l+1);
-      for (int i = 0; i <= l; ++i)
-        memTableVWpu[i] = 0.;
-
-      memTableUWmv.resize(k+1);
-      for (int i = 0; i <= k; ++i)
-        memTableUWmv[i] = 0.;
+      memTableVWpu.resize(l+1); memTableVWpu.setZero();
+      memTableUWmv.resize(k+1); memTableUWmv.setZero();
     }
     else {
       memTableVWpu = slpIterative(l, v, w+u);
       memTableUWmv = slpIterative(k, u, w-v);
     }
 
-    mu1 = CrossProd2d(v,w) / detUV;
-    mu2 = -CrossProd2d(u,w) / detUV;
+    mu1 = CrossProd2d(w,v) / detUV;
+    mu2 = CrossProd2d(u,w) / detUV;
 
     tmp[0] = -2 + ((mu1+1)*memTableVWpu[0] - (mu1-1)*memTableVWmu[0]
               + (mu2+1)*memTableUWpv[0] - (mu2-1)*memTableUWmv[0]) * 0.25;
@@ -258,7 +250,7 @@ double doubleSlp(int k, int l, const Eigen::Vector2d& u,
       tmp[i] = 0.5*((mu1+1)*memTableVWpu[i] - (mu1-1)*memTableVWmu[i]
             + (mu2+1)*memTableUWpv[0]) - i*mu2*tmp[i-1];
       if (i%2 == 0) {
-        tmp[i] -= 4./(i+1);
+        tmp[i] -= (double)4./(double)(i+1);
         tmp[i] -= 0.5 * (mu2-1)*memTableUWmv[0];
       }
       else
@@ -271,7 +263,7 @@ double doubleSlp(int k, int l, const Eigen::Vector2d& u,
       tmp[0] = 0.5*((mu1+1)*memTableVWpu[0] + (mu2+1)*memTableUWpv[i]
                   - (mu2-1)*memTableUWmv[i]) - i*mu1*tmp[0];
       if (i%2 == 0) {
-        tmp[0] -= 4./(i+1);
+        tmp[0] -= (double)4./(double)(i+1);
         tmp[0] -= 0.5*(mu1-1)*memTableVWmu[0];
       }
       else {
@@ -286,7 +278,7 @@ double doubleSlp(int k, int l, const Eigen::Vector2d& u,
         tmp[j] += 0.5*( (mu1+1)*memTableVWpu[j] + (mu2+1)*memTableUWpv[i] );
         if (i%2 == 0) {
           if (j%2 == 0) {
-            tmp[j] -= 4./((i+1)*(j+1));
+            tmp[j] -= (double)4./(double)((i+1)*(j+1));
           }
           tmp[j] -= 0.5 * (mu1-1) * memTableVWmu[j];
         }
@@ -311,6 +303,10 @@ double doubleSlp(int k, int l, const Eigen::Vector2d& u,
   return output;
 }
 
+
+//------------------------------------------------------------------------------
+// Computation of entries of single layer Galerkin matrix for piecewise
+// constantb trial and test functions.
 //-----------------------------------------------------------------------------
 double computeVij(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
 		  const Eigen::Vector2d& c, const Eigen::Vector2d& d, double eta)
@@ -322,9 +318,10 @@ double computeVij(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
 }
 
 //-----------------------------------------------------------------------------
-double computeWij(Eigen::Vector2d a, Eigen::Vector2d b,
-		  Eigen::Vector2d c, Eigen::Vector2d d, double eta)
+double computeWij(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
+		  const Eigen::Vector2d& c, const Eigen::Vector2d& d, double eta)
 {
+  int swap = 0;
   double hi = (b-a).squaredNorm(); /* hi = norm(b-a)^2 */
   double hj = (d-c).squaredNorm(); /* hj = norm(d-c)^2 */
   double tmp = 0.;
@@ -333,62 +330,77 @@ double computeWij(Eigen::Vector2d a, Eigen::Vector2d b,
    * outer integration is over smaller domain. This is done by       *
    * swapping Ej and Ei if necessary.                                */
   if (hj > hi) {
-    std::swap(a,c);
-    std::swap(b,d);
+    swap = 1;
     std::swap(hi,hj);
   }
 
   if ( eta == 0) { /* compute all matrix entries analytically */
-    return computeWijAnalytic(a,b,c,d);
+    if(swap == 1)
+      return computeWijAnalytic(c,d,a,b);
+    else
+      return computeWijAnalytic(a,b,c,d);
   }
   else { /* compute admissible matrix entries semi-analytically */
     if ( distanceSegmentToSegment(a,b,c,d) > eta*sqrt(hj) )
     {
-      return computeWijSemianalytic(a,b,c,d);
+      if(swap == 1)
+	return computeWijSemianalytic(c,d,a,b);
+      else
+	return computeWijSemianalytic(a,b,c,d);
     }
     else {
-      return computeWijAnalytic(a,b,c,d);
+      if(swap == 1)
+	return computeWijAnalytic(c,d,a,b);
+      else
+	return computeWijAnalytic(a,b,c,d);
     }
   }
 }
 
-//-----------------------------------------------------------------------------
-double computeWijAnalytic(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
-			  const Eigen::Vector2d& c, const Eigen::Vector2d& d)
-{
-  double hi = (b-a).squaredNorm(); /* hi = norm(b-a)^2 */
-  double hj = (d-c).squaredNorm(); /* hj = norm(d-c)^2 */
-  double val = 0.;
-  double lambda, mu;
 
-  Eigen::Vector2d x = (b-a)/2.;
+//------------------------------------------------------------------------------
+// Analytic integration of logarithmic kernel over two straight panels
+//-----------------------------------------------------------------------------
+/* SAM_LISTING_BEGIN_2 */
+double computeWijAnalytic(const Eigen::Vector2d& a,
+			  const Eigen::Vector2d& b,
+			  const Eigen::Vector2d& c,
+			  const Eigen::Vector2d& d)
+{
+  double hi = (b-a).squaredNorm(); // length$^2$ of first panel \cob{$[\Ba,\Bb]$}
+  double hj = (d-c).squaredNorm(); // lendth$^2$ of second panel \cob{$[\Bc,\Bd]$}
+  double val = 0.; 
+  double lambda, mu;
+  // Vectors defined in \eqref{eq:xyzdef}
+  Eigen::Vector2d x = (b-a)/2.; 
   Eigen::Vector2d y = (c-d)/2.;
   Eigen::Vector2d z = (a+b-c-d)/2.;
 
-  /* There hold different recursion formulae if Ei and Ej */
-  /* are parallel (det = 0) or not                        */
+  // There hold different recursion formulae when the panels
+  // are parallel (det = 0) or not                        
   double det = CrossProd2d(x,y);
 
-  if ( fabs(det) <= EPS*sqrt(hi*hj) ) { /* case that x and y are linearly */
-    if ( fabs(x[0]) < fabs(x[1]) )      /* dependent, i.e., Ei and Ej are */
-      lambda = y[1] / x[1];             /* parallel. */
+  if ( fabs(det) <= EPS*sqrt(hi*hj) ) { // parallel panels, Case II \Label[line]{Wij:2}
+    if ( fabs(x[0]) < fabs(x[1]) )      
+      lambda = y[1] / x[1];             
     else
       lambda = y[0] / x[0];
-
+    // Evaluate the four integrals from \eqref{eq:integrals}
     val = 0.5*( lambda * ( slp(1, y, z-x) - slp(1, y, z+x) )
                          + slp(0, x, z+y) + slp(0, x, z-y) );
-  }
-
-  else { /* case that x and y are linearly independent */
+  } // \Label[line]{Wij:2a}
+  else { // \cob{$\Bx$} and \cob{$\By$} linearly independent, Case I \Label[line]{Wij:1}
     lambda = (z[0]*y[1] - z[1]*y[0]) /det;
     mu = (x[0]*z[1] - x[1]*z[0]) /det;
-
-    val = 0.25 * (-8 + (lambda+1)*slp(0, y, z+x) - (lambda-1)*slp(0, y, z-x)
-                          + (mu+1)*slp(0, x, z+y) - (mu-1)*slp(0, x, z-y));
-  }
-  
-  return -0.125*val /M_PI; /* = -1/(8*M_PI)*val */
+    // Integrals \eqref{eq:gsl1}--\eqref{eq:gsl4} 
+    val = 0.25 * (-8 + (lambda+1)*slp(0, y, z+x) - 
+		  (lambda-1)*slp(0, y, z-x)+
+		  (mu+1)*slp(0, x, z+y) -
+		  (mu-1)*slp(0, x, z-y));         
+  } // \Label[line]{Wij:1a}
+  return -0.125*val/M_PI; // \cob{$=-\frac{1}{8\pi}*\mathrm{val}$}
 }
+/* SAM_LISTING_END_2 */
 
 //-----------------------------------------------------------------------------
 double computeWijSemianalytic(const Eigen::Vector2d& a, const Eigen::Vector2d& b,

@@ -123,7 +123,7 @@ Eigen::Vector2d unitNormal(const Eigen::Vector2d& a, const Eigen::Vector2d& b)
   n /= (b-a).norm();
   return n;
 }
-
+ 
 //-----------------------------------------------------------------------------
 double CrossProd2d(const Eigen::Vector2d& a, const Eigen::Vector2d& b)
 {

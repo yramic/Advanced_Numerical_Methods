@@ -1,7 +1,7 @@
 //// 
 //// Copyright (C) 2017 SAM (D-MATH) @ ETH Zurich
-//// Author(s): dcasati <daniele.casati@sam.math.ethz.ch> 
-//// Contributors: curzuato
+//// Author(s): curzuato < > 
+//// Contributors:  dcasati 
 //// This file is part of the AdvNumCSE repository.
 ////
 #include <iostream>

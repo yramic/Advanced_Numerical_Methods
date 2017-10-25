@@ -15,53 +15,90 @@
 ///
 ///  C++ adaptation for ANCSE17 of HILBERT V3.1 TUWien 2009-2013
 ///////////////////////////////////////////////////////////////////////////////
-#include <cmath>
 
+#include <cmath>
 #include "buildK.hpp"
 #include "constants.hpp"
 #include "doubleLayerPotential.hpp"
 
-void computeK(Eigen::MatrixXd& K, const Eigen::MatrixXd& coordinates,
-              const Eigen::MatrixXi& elements, double eta)
+/* SAM_LISTING_BEGIN_1 */
+void computeK(Eigen::MatrixXd& K, const BoundaryMesh& mesh,
+	      double eta)
 {
-
-  // resize and initialize matrix
-  int nE = elements.rows();
-  int nC = coordinates.rows();
-  K.resize(nE, nC);
-  K.setZero();
+  int nE = mesh.numElements();
+  int nC = mesh.numVertices();
+  // Matrix returned through reference: resize and initialize matrix
+  K.resize(nE,nC); K.setZero();
+  double I0=0.0, I1=0.0;
   
-  // traverse the elements
-  for (int j=0;j<nE;++j)
-  {
-    // get vertices indices and coordinates for Ei=[a,b]
-    const Eigen::Vector2d& a = coordinates.row(elements(j,0));
-    const Eigen::Vector2d& b = coordinates.row(elements(j,1));
+  // \com{outer loop}: traverse the panels
+  for (int j=0;j<nE;++j) {
+      // get vertices indices and coordinates for panel \cob{$\pan_j = [\Ba,\Bb]$}
+      int aidx = mesh.getElementVertex(j,0);
+      int bidx = mesh.getElementVertex(j,1);
+      const Eigen::Vector2d& a = mesh.getVertex(aidx);
+      const Eigen::Vector2d& b = mesh.getVertex(bidx);
    
-    // traverse the elements
-    for (int i=0;i<nE;++i)
-    {
-      // get vertices indices and coordinates for Ej=[c,d]
-      int cidx = elements(i,0);
-      int didx = elements(i,1);
-      const Eigen::Vector2d& c = coordinates.row(cidx);
-      const Eigen::Vector2d& d = coordinates.row(didx);
-      
-      double linetest1 = fabs( (a-c)[0]*(b-a)[1]-(a-c)[1]*(b-a)[0] );
-      double linetest2 = fabs( (a-d)[0]*(b-a)[1]-(a-d)[1]*(b-a)[0] );
+      // \com{inner loop}: traverse the panels
+      for (int i=0;i<nE;++i) {
+	  // get vertices indices and coordinates for panel \cob{$\pan_i = [\Bc,\Bd]$}
+	  int cidx = mesh.getElementVertex(i,0);
+	  int didx = mesh.getElementVertex(i,1);
+	  const Eigen::Vector2d& c = mesh.getVertex(cidx);
+	  const Eigen::Vector2d& d = mesh.getVertex(didx);
+	  // Zero contribution for parallel panels !
+	  double lindep1 = fabs( (a-c)[0]*(b-a)[1]-(a-c)[1]*(b-a)[0] );
+	  double lindep2 = fabs( (a-d)[0]*(b-a)[1]-(a-d)[1]*(b-a)[0] );
 
-      if( linetest1>EPS*(a-c).norm() || linetest2>EPS*(a-d).norm() )
-      {
-        // compute elements' contribution
-        double I0=0.0, I1=0.0;
-        computeKij(&I0,&I1,eta,a,b,c,d);
-        // distribute among matrix entries
-        K(j,cidx) += I0-I1;
-        K(j,didx) += I0+I1;
-      }
-
-    }
-  }
-
+	  if( lindep1>EPS*(a-c).norm() || lindep2>EPS*(a-d).norm()) // \Label[line]{K:1}
+	    {
+	      // compute entries of $1\times2$ interaction matrix
+	      //double I0=0.0, I1=0.0;
+	      computeKij(&I0,&I1,eta,a,b,c,d);
+	      // distribute values to matrix entries
+	      K(j,cidx) += I0-I1; // \Label[line]{K:2}
+	      K(j,didx) += I0+I1; // \Label[line]{K:3}
+	    } // endif
+      } //endfor
+  } // endfor
 }
+/* SAM_LISTING_END_1 */
 
+
+
+
+void computeK00(Eigen::MatrixXd& K, const BoundaryMesh& mesh,
+		double eta)
+{
+  int nE = mesh.numElements();
+  // Matrix returned through reference: resize and initialize matrix
+  K.resize(nE,nE); K.setZero();
+  double I0=0.0, I1=0.0;
+  
+  // \com{outer loop}: traverse the panels
+  for (int j=0;j<nE;++j) {
+    // get vertices indices and coordinates for panel \cob{$\pan_j = [\Ba,\Bb]$}
+    Eigen::Vector2d a,b;
+    std::tie(a,b) = mesh.getElementVertices(j);
+   
+    // \com{inner loop}: traverse the panels
+    for (int i=0;i<nE;++i) {
+      // get vertices indices and coordinates for panel \cob{$\pan_i = [\Bc,\Bd]$}
+      Eigen::Vector2d c,d;
+      std::tie(c,d) = mesh.getElementVertices(i);
+      // Zero contribution for parallel panels !
+      double lindep1 = fabs( (a-c)[0]*(b-a)[1]-(a-c)[1]*(b-a)[0] );
+      double lindep2 = fabs( (a-d)[0]*(b-a)[1]-(a-d)[1]*(b-a)[0] );
+      
+      if( lindep1>EPS*(a-c).norm() || lindep2>EPS*(a-d).norm())
+	{
+	  // compute entries of $1\times2$ interaction matrix
+	  //double I0=0.0, I1=0.0;
+	  computeKij(&I0,&I1,eta,a,b,c,d);
+	  // distribute values to matrix entries
+	  K(j,i) += 2*I0;
+	} // endif
+      
+    } //endfor
+  } // endfor
+}

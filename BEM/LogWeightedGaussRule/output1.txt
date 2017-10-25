@@ -1,0 +1,31 @@
+TESTING GAUSS-LAGUERRE QUADRATURE
+Test passed for N = 1
+Test passed for N = 2
+Test passed for N = 3
+Test passed for N = 4
+Test passed for N = 5
+Test passed for N = 6
+Test passed for N = 7
+Test passed for N = 8
+Test passed for N = 9
+Test passed for N = 10
+Test passed for N = 11
+Test passed for N = 12
+Test passed for N = 13
+Test passed for N = 14
+Test passed for N = 15
+Test passed for N = 16
+Test passed for N = 17
+Test passed for N = 18
+Test passed for N = 19
+Test passed for N = 20
+Test passed for N = 21
+Test passed for N = 22
+Test passed for N = 23
+Test passed for N = 24
+Test passed for N = 25
+Test passed for N = 26
+Test passed for N = 27
+Test passed for N = 28
+Test passed for N = 29
+

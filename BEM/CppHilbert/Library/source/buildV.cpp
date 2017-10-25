@@ -18,41 +18,41 @@
 ///  C++ adaptation for ANCSE17 of HILBERT V3.1 TUWien 2009-2013
 ///////////////////////////////////////////////////////////////////////////////
 #include <cmath>
-
 #include "buildV.hpp"
 #include "constants.hpp"
 #include "singleLayerPotential.hpp"
 
 
 //------------------------------------------------------------------------------
-void computeV(Eigen::MatrixXd& V, const Eigen::MatrixXd& coordinates,
-	      const Eigen::MatrixXi& elements, double eta)
+void computeV(Eigen::MatrixXd& V, const BoundaryMesh& mesh, double eta)
 {
-
   assert(eta >= 0);
 
   // resize matrix
-  int nE = elements.rows();
+  int nE = mesh.numElements();
   V.resize(nE,nE);
-  // traverse the elements
+  // outer loop traversing all panels 
   for (int i=0; i<nE; ++i)
   {
-    // get vertices indices and coordinates for Ei=[a,b]
-    const Eigen::Vector2d& a = coordinates.row(elements(i,0));
-    const Eigen::Vector2d& b = coordinates.row(elements(i,1));
+    // get endpoint indices and coordinates for $i$-th panel
+    int aidx = mesh.getElementVertex(i,0);
+    int bidx = mesh.getElementVertex(i,1);
+    const Eigen::Vector2d& a = mesh.getVertex(aidx);
+    const Eigen::Vector2d& b = mesh.getVertex(bidx);
 
-    // traverse the elements
+    // inner loop through all panels
     for (int j=i; j<nE; ++j)
     {
       // get vertices indices and coordinates for Ej=[c,d]
-      const Eigen::Vector2d& c = coordinates.row(elements(j,0));
-      const Eigen::Vector2d& d = coordinates.row(elements(j,1));
+      int cidx = mesh.getElementVertex(j,0);
+      int didx = mesh.getElementVertex(j,1);
+      const Eigen::Vector2d& c = mesh.getVertex(cidx);
+      const Eigen::Vector2d& d = mesh.getVertex(didx);
 
-      // compute elements' contribution
+      // compute contribution of a pair of panels
       double tmp = computeVij(a, b, c, d, eta);
       // distribute it among the matrix entries
-      V(i,j) = tmp;
-      V(j,i) = V(i,j);
+      V(i,j) = tmp; V(j,i) = V(i,j);
     }
   }
   

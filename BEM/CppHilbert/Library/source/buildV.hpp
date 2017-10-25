@@ -14,10 +14,11 @@
 ///
 ///  C++ adaptation for ANCSE17 of HILBERT V3.1 TUWien 2009-2013
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef _BUILDV_HPP_GUARD_
-#define _BUILDV_HPP_GUARD_
+#ifndef _BUILDV_HPP
+#define _BUILDV_HPP
 
 #include <Eigen/Dense>
+#include "BoundaryMesh.hpp"
 
 
 /**
@@ -27,14 +28,10 @@
  *
  *  @param[out] V  (nE x nE) matrix. nC and nE are the number of coordinates and
  *                 elements, respectively.
- *  @param[in] coordinates  (nC x 2) matrix containing the coordinates of the
- *                          vertices of the boundary mesh.
- *  @param[in] elements  (nE x 2) matrix containing the indices of the vertices
- *                       corresponding to each element of the boundary mesh.
+ *  @param[in] mesh 2D BoundaryMesh (initialized with vertices and elements).
  *  @param[in] eta  Admissibility constant. It is greater or equal than 0.
  */
-void computeV(Eigen::MatrixXd& V, const Eigen::MatrixXd& coordinates,
-	      const Eigen::MatrixXi& elements, double eta);
+void computeV(Eigen::MatrixXd& V, const BoundaryMesh& mesh, double eta);
 
 #endif
 

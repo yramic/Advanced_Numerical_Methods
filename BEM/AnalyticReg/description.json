@@ -1,0 +1,8 @@
+{
+    "author" : "curzuato",
+    "email" : "carolina.urzua@sam.math.ethz.ch",
+    "contributors" : "",
+
+    "name": "AnalyticReg",
+    "all" : ["ARmain.cpp", "PeriodicTrapezoidalQR.hpp", "plot_convergence.py"]
+}

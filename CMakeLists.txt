@@ -52,6 +52,14 @@ set(CMAKE_CXX_STANDARD 11)
 
 include(${CMAKE_SOURCE_DIR}/cmake/functions/GetEIGEN3.cmake)
 
+
+###########################################################################
+#
+# INCLUDE DIRECTORIES
+#
+###########################################################################
+include_directories("BEM/CppHilbert/Library")
+  
 ###########################################################################
 #
 # ADD SUBDIRECTORIES
