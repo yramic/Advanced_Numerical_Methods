@@ -76,10 +76,14 @@ void testMassMatrixSVD(const BoundaryMesh& mesh){
   Eigen::SparseMatrix<double> M01aux(mesh.numElements(), mesh.numVertices());
   computeM01(M01aux, mesh);
   Eigen::MatrixXd M01 = Eigen::MatrixXd(M01aux);
-  Eigen::JacobiSVD<Eigen::MatrixXd> svd(M01, Eigen::ComputeThinU | Eigen::ComputeThinV);
+  Eigen::JacobiSVD<Eigen::MatrixXd> svd(M01,
+					Eigen::ComputeThinU | Eigen::ComputeThinV);
   Eigen::VectorXd singvals = svd.singularValues();
-  if(singvals.array().abs().minCoeff()<1e-12){
-    std::cout << "M is singular!" << std::endl;
+  // Since M01 scales with h, we consider the relative size of the smallest 
+  // singular value with respect to the second smallest.
+  if(singvals.array().minCoeff()
+     <1e-12* singvals.head(mesh.numElements()-1).array().minCoeff()){
+    std::cout << "M is singular!"  <<std::endl;
   }
 }
 /* SAM_LISTING_END_1b */
@@ -155,7 +159,7 @@ int main() {
   }
   /* SAM_LISTING_END_2b */  
 
-  
+
   // OUTPUT ERRORS
   {
   std::ofstream out_error("DBEM1stK_errors.txt");
@@ -190,7 +194,7 @@ int main() {
   std::ofstream out_N("BEM_N.txt");
   out_N << Nall.segment(0,Nl); 
   out_N.close( );
-   
+  
   return 0;
 
 }

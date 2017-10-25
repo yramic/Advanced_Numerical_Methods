@@ -36,17 +36,16 @@ namespace DirectFirstKind{
     Eigen::MatrixXd V; computeV(V, mesh, 1e-05);
     // 2. Assemble right hand side using <(1/2Id + K)g, psi> as in (1.3.107)
     // - Compute K
-    Eigen::MatrixXd K; computeK00(K, mesh, 1e-05);
+    Eigen::MatrixXd K; computeK(K, mesh, 1e-05);
     // - Compute Mass Matrix
-    Eigen::SparseMatrix<double> M0(mesh.numElements(), mesh.numElements());
-    computeM00(M0, mesh);
-    Eigen::MatrixXd M = Eigen::MatrixXd(M0);
+    Eigen::SparseMatrix<double> M01(mesh.numElements(), mesh.numElements());
+    computeM01(M01, mesh);
+    Eigen::MatrixXd M = Eigen::MatrixXd(M01);
     // - Compute coefficient vector for g (in $\mathcal{S}^{0}_1(\mathcal{G}$)
     //   (we do this by interpolation).
-    Eigen::VectorXd G(mesh.numElements());
-    for(int i=0; i<mesh.numElements(); i++){
-      Eigen::Vector2d a,b; std::tie(a,b) = mesh.getElementVertices(i);
-      G(i) = g(0.5*(a+b).eval());
+    Eigen::VectorXd G(mesh.numVertices());
+    for(int i=0; i<mesh.numVertices(); i++){
+      G(i) = g(mesh.getVertex(i));
     }
     // - Put all pieces together and construct RHS
     Eigen::VectorXd RHS = ((0.5*M+K)*G).eval();

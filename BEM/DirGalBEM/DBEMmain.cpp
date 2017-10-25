@@ -77,10 +77,14 @@ void testMassMatrixSVD(const BoundaryMesh& mesh){
   Eigen::SparseMatrix<double> M01aux(mesh.numElements(), mesh.numVertices());
   computeM01(M01aux, mesh);
   Eigen::MatrixXd M01 = Eigen::MatrixXd(M01aux);
-  Eigen::JacobiSVD<Eigen::MatrixXd> svd(M01, Eigen::ComputeThinU | Eigen::ComputeThinV);
+  Eigen::JacobiSVD<Eigen::MatrixXd> svd(M01,
+					Eigen::ComputeThinU | Eigen::ComputeThinV);
   Eigen::VectorXd singvals = svd.singularValues();
-  if(singvals.array().abs().minCoeff()<1e-12){
-    std::cout << "M is singular!" << std::endl;
+  // Since M01 scales with h, we consider the relative size of the smallest 
+  // singular value with respect to the second smallest.
+  if(singvals.array().minCoeff()
+     <1e-12* singvals.head(mesh.numElements()-1).array().minCoeff()){
+    std::cout << "M is singular!"  <<std::endl;
   }
 #else // TEMPLATE
   // TODO: IMPLEMENT YOUR CODE
@@ -113,7 +117,7 @@ int main() {
   Eigen::VectorXd errorI1(Nl), errorI2(Nl);
   Eigen::VectorXi Nall(7); Nall<< 50,100,200,400,800,1600,3200;
   Eigen::Vector2d X({0.,0.3});
-  #if SOLUTION
+  #if SOLUTION 
   for(int k=0; k<Nl; k++){
     int N = Nall(k);
     std::cout << "Using N = " << N << " elements" << std::endl;
@@ -163,7 +167,7 @@ int main() {
   #else // TEMPLATE
   // TODO: COMPUTE THE DESIRED ERRORS
   #endif // TEMPLATE
-  
+
   // OUTPUT ERRORS
   {
   std::ofstream out_error("DBEM1stK_errors.txt");
@@ -198,7 +202,7 @@ int main() {
   std::ofstream out_N("BEM_N.txt");
   out_N << Nall.segment(0,Nl); 
   out_N.close( );
-   
+  
   return 0;
 
 }

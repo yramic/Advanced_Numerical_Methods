@@ -102,7 +102,7 @@ int main() {
   Eigen::VectorXi Nall(7); Nall<< 50,100,200,400,800,1600,3200;
   Eigen::Vector2d X({0.,0.3});
   // TODO: COMPUTE THE DESIRED ERRORS
-  
+
   // OUTPUT ERRORS
   {
   std::ofstream out_error("DBEM1stK_errors.txt");
@@ -137,7 +137,7 @@ int main() {
   std::ofstream out_N("BEM_N.txt");
   out_N << Nall.segment(0,Nl); 
   out_N.close( );
-   
+  
   return 0;
 
 }
