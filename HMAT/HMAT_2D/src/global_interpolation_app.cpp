@@ -4,23 +4,12 @@
 #include <iostream>
 #include <Eigen/Dense>
 
-/*GlobalInterpolationApp::GlobalInterpolationApp(GlobalSmoothKernel gskernel, std::vector<Point> pp, int n):
-    GSK_(gskernel), PPoints_(pp)
+
+GlobalInterpolationApp::GlobalInterpolationApp(Kernel* kernel, std::vector<Point> pp, int n):
+    K_(kernel), PPoints_(pp)
 {}
 
-GlobalInterpolationApp::GlobalInterpolationApp(ConstantKernel ckernel, std::vector<Point> pp, int n):
-    CK_(ckernel), PPoints_(pp)
-{}
 
-GlobalInterpolationApp::GlobalInterpolationApp(PolynomialKernel ckernel, std::vector<Point> pp, int n):
-    PK_(ckernel), PPoints_(pp)
-{}
-GlobalInterpolationApp::GlobalInterpolationApp(GaussKernel ckernel, std::vector<Point> pp, int n):
-    GK_(ckernel), PPoints_(pp)
-{}*/
-GlobalInterpolationApp::GlobalInterpolationApp(Kernel* ckernel, std::vector<Point> pp, int n):
-    K_(ckernel), PPoints_(pp)
-{}
 // approximate matrix-vector multiplication
 Eigen::VectorXd GlobalInterpolationApp::mvProd(Eigen::VectorXd& c, unsigned deg)
 {
@@ -46,13 +35,9 @@ Eigen::VectorXd GlobalInterpolationApp::mvProd(Eigen::VectorXd& c, unsigned deg)
     Cheby cbx(minX, maxX, deg);
     Cheby cby(minY, maxY, deg);
     Eigen::VectorXd tkx = cbx.getNodes(); // Chebyshew nodes for x axis
-    //std:: cout << "tkx" << tkx << std::endl;
     Eigen::VectorXd wkx = cbx.getWghts(); // weights of Lagrange polynomial for x axis
-    //std:: cout << "wkx" << wkx << std::endl;
     Eigen::VectorXd tky = cby.getNodes(); // Chebyshew nodes for y axis
-    //std:: cout << "tky" << tky << std::endl;
     Eigen::VectorXd wky = cby.getWghts(); // weights of Lagrange polynomial for y axis
-    //std:: cout << "wky" << wky << std::endl;
 
     int ppts = PPoints_.size();   // farfield like computation
     Eigen::MatrixXd V = Eigen::MatrixXd::Constant(ppts, (deg+1)*(deg+1), 1);

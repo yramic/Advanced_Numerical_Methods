@@ -14,33 +14,33 @@ public:
 
     /*!
     * \brief Constructor
+    * \param xl left coordinate of the interpolating domain
+    * \param xr right coordinate of the interpolating domain
     */
     Cheby(double xl, double xr, unsigned deg);
 
     /*!
-    * \brief return Chebyshew nodes on domain [xl,xr]
+    * \brief Return Chebyshew nodes on domain [xl,xr]
     */
-    // return Chebyshew nodes on domain [xl,xr]
     Eigen::VectorXd getNodes() const {
         return tk_;
     }
+
     /*!
-    * \brief return weights of Lagrange polynomial
+    * \brief Return weights of Lagrange polynomial
     */
-    // return weights of Lagrange polynomial
     Eigen::VectorXd getWghts() const {
         return wk_;
     }
 
     /*!
-    * \brief compute Chebyshew nodes on domain [xl,xr]
+    * \brief Compute Chebyshew nodes on domain [xl,xr]
     */
-    // compute Chebyshew nodes on domain [xl,xr]
     void setNodes();
+
     /*!
-    * \brief compute weights of Lagrange polynomial
+    * \brief Compute weights of Lagrange polynomial
     */
-    // compute weights of Lagrange polynomial
     void setWghts();
 
 private:

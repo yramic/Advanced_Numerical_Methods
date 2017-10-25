@@ -22,48 +22,19 @@ cTree::cTree(const std::vector<Point> PPointsTree):
     }
 }
 
-cTree::cTree(const Eigen::VectorXd& x):
-    root_(NULL), grid_(x)
-{
-    unsigned n = x.size();
-    if(n > 1) { // build the tree
-        root_ = new Node(0, n-1); // root is a node, leaves are added
-    } else {
-        root_ = new Node(0, 0);
-        // if "x" has less than 2 elements, the tree consists of a single node
-    }
-}
-
 
 // compute V-matrices for nodes of the tree (contains evaluations of Chebyshew polynomials at corresponding points)
 void cTree::setV_recursion(Node* cluster, unsigned deg)
 {
-    //if((*cluster).l_child_ != NULL) {
     if(!(*cluster).PPointsTree_.empty()) {
         // compute V-matrix for *cluster
-        (*cluster).setV_node(PPointsTree_, deg);    // passing PPointsTree_ here may is not needed
+        (*cluster).setV_node(PPointsTree_, deg);
 
         // recursively call the function for the childs of *cluster
         if((*cluster).tl_child_ != NULL) setV_recursion((*cluster).tl_child_, deg);
         if((*cluster).tr_child_ != NULL) setV_recursion((*cluster).tr_child_, deg);
         if((*cluster).bl_child_ != NULL) setV_recursion((*cluster).bl_child_, deg);
         if((*cluster).br_child_ != NULL) setV_recursion((*cluster).br_child_, deg);
-    }
-}
-
-
-// compute V*c restricted to node indices of the tree
-void cTree::setVc_recursion(Node* cluster, const Eigen::VectorXd& c)
-{
-    if(!(*cluster).PPointsTree_.empty()) {
-        // compute V*c restricted to node indices beloning to *cluster
-        (*cluster).setVc_node(c);
-
-        // recursively call the function for the childs of *cluster
-        if((*cluster).tl_child_ != NULL) setVc_recursion((*cluster).tl_child_, c);
-        if((*cluster).tr_child_ != NULL) setVc_recursion((*cluster).tr_child_, c);
-        if((*cluster).bl_child_ != NULL) setVc_recursion((*cluster).bl_child_, c);
-        if((*cluster).br_child_ != NULL) setVc_recursion((*cluster).br_child_, c);
     }
 }
 
@@ -149,7 +120,7 @@ void cTree::setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree &Ty
 }
 // make two lists with the x- and y-coordinates of boundaries of the bounding boxes of the clusters:
 // odd entries of the lists are coordinates of the left boundaries // even entries are coordinates of the right boundaries
-void cTree::setLists_recursion(Node* cluster, std::vector<double>& xlist, std::vector<double>& ylist)
+/*void cTree::setLists_recursion(Node* cluster, std::vector<double>& xlist, std::vector<double>& ylist)
 {
     // list of pointers to nodes of the far field
     std::vector<Node*> ffx = (*cluster).getFarF();
@@ -175,5 +146,5 @@ void cTree::setLists_recursion(Node* cluster, std::vector<double>& xlist, std::v
         setLists_recursion((*cluster).l_child_, xlist, ylist);
         setLists_recursion((*cluster).r_child_, xlist, ylist);
     }
-}
+}*/
 

@@ -7,45 +7,32 @@
 
 // actual  constructor: creates the root of the Cluster Tree and the recursivly creates the leaves
 Node::Node(std::vector<Point> PPointsTree):
-    l_child_(NULL), r_child_(NULL), l_ind_(0), r_ind_(0), tl_child_(NULL), tr_child_(NULL), bl_child_(NULL), br_child_(NULL), PPointsTree_(PPointsTree), near_f_(vector_t()), far_f_(vector_t())//, x1_(-(std::numeric_limits<double>::max())), x2_(std::numeric_limits<double>::max()), y1_(-(std::numeric_limits<double>::max())), y2_(std::numeric_limits<double>::max())
+    tl_child_(NULL), tr_child_(NULL), bl_child_(NULL), br_child_(NULL), PPointsTree_(PPointsTree), near_f_(vector_t()), far_f_(vector_t())//, x1_(-(std::numeric_limits<double>::max())), x2_(std::numeric_limits<double>::max()), y1_(-(std::numeric_limits<double>::max())), y2_(std::numeric_limits<double>::max())
 {
     setLeaves();
 }
 
 // recursive constructor for the leaves of the Cluster Tree
 Node::Node(std::vector<Point> PPointsTree, double x1, double x2, double y1, double y2):
-    l_child_(NULL), r_child_(NULL), l_ind_(0), r_ind_(0), tl_child_(NULL), tr_child_(NULL), bl_child_(NULL), br_child_(NULL), PPointsTree_(PPointsTree), near_f_(vector_t()), far_f_(vector_t()), x1_(x1), x2_(x2), y1_(y1), y2_(y2)
+    tl_child_(NULL), tr_child_(NULL), bl_child_(NULL), br_child_(NULL), PPointsTree_(PPointsTree), near_f_(vector_t()), far_f_(vector_t()), x1_(x1), x2_(x2), y1_(y1), y2_(y2)
 {
     setLeaves(x1,x2,y1,y2);
-}
-
-// actual constructor: adds a tree below the node if left_index != right_index
-Node::Node(unsigned l_ind, unsigned r_ind):
-    tl_child_(NULL), tr_child_(NULL), bl_child_(NULL), br_child_(NULL), PPointsTree_(std::vector<Point>()), l_child_(NULL), r_child_(NULL), l_ind_(l_ind), r_ind_(r_ind), near_f_(vector_t()), far_f_(vector_t())
-{
-    setLeaves();
 }
 
 
 // destructor
 Node::~Node()
 {
-    if((l_child_ == NULL) && (r_child_ == NULL))
-        std::cout << "leaves destroyed" << std::endl;
-    if(l_child_ != NULL)
-        delete l_child_;
-    if(r_child_ != NULL)
-        delete r_child_;
+    if(tl_child_ != NULL) delete tl_child_;
+    if(tr_child_ != NULL) delete tl_child_;
+    if(bl_child_ != NULL) delete tl_child_;
+    if(br_child_ != NULL) delete tl_child_;
 }
 
 
 // build tree recursively
 void Node::setLeaves()
 {
-    if(r_ind_ - l_ind_ > 0) {
-        l_child_ = new Node(l_ind_, (l_ind_+r_ind_)/2);
-        r_child_ = new Node((l_ind_+r_ind_)/2 + 1, r_ind_);
-    }
     if(!PPointsTree_.empty() && PPointsTree_.size()>1){ // in the beggining the space must be divided based on the max coordinates of the points
         double medX,medY,maxX,minX,maxY,minY;
         maxX = PPointsTree_.begin()->getX();
@@ -71,7 +58,6 @@ void Node::setLeaves()
         y1_ = y1_b_ = minY;
         y2_ = y2_b_ = maxY;
 
-        //std::cout << sumX << " " << sumY << std::endl << std::flush;
         medX = minX+(maxX-minX)/2;                      // the space is devided in 4 quadrants and the point of each quadrant is saved in a vector on the coresponding Node
         medY = minY+(maxY-minY)/2;
         std::vector<Point> tl_PPoints, tr_PPoints, bl_PPoints, br_PPoints;
@@ -101,10 +87,6 @@ void Node::setLeaves()
 
 void Node::setLeaves(double x1, double x2, double y1, double y2)
 {
-    if(r_ind_ - l_ind_ > 0) {
-        l_child_ = new Node(l_ind_, (l_ind_+r_ind_)/2);
-        r_child_ = new Node((l_ind_+r_ind_)/2 + 1, r_ind_);
-    }
     if(!PPointsTree_.empty() && PPointsTree_.size()>1){ // below the root level the space [x1,x2]x[y1,y2] must be divided in quadrants recursivly
         double medX = x1+(x2-x1)/2;
         double medY = y1+(y2-y1)/2;
@@ -137,29 +119,6 @@ void Node::setLeaves(double x1, double x2, double y1, double y2)
 // compute V-matrix of node
 void Node::setV_node(const std::vector<Point> &t, unsigned deg) //tt==PPointsTree??
 {
-    //std::cout << "setV_Node test" << std::endl;
-    /*if(r_ind_ - l_ind_ > 0) {
-
-        double xmin = x[l_ind_];
-        double xmax = x[r_ind_];
-        Cheby cb(xmin, xmax, deg);
-        Eigen::VectorXd tk = cb.getNodes(); // Chebyshew nodes
-        Eigen::VectorXd wk = cb.getWghts(); // weights of Lagrange polynomial
-        V_node_ = Eigen::MatrixXd::Constant(r_ind_-l_ind_+1, deg+1, 1);
-
-        for(unsigned i=0; i<=r_ind_-l_ind_; ++i) {
-            for(unsigned j=0; j<=deg; ++j) {
-                for(unsigned k=0; k<j; ++k) {
-                    V_node_(i,j) *= x[i+l_ind_] - tk[k];
-                }
-                // Skip "k == j"
-                for(unsigned k=j+1; k<=deg; ++k) {
-                    V_node_(i,j) *= x[i+l_ind_] - tk[k];
-                }
-                V_node_(i,j) *= wk(j);
-            }
-        }
-    }*/
     if (PPointsTree_.size() > 1) {
         double x1,x2,y1,y2;                 // construction of Bounding Box of this Node
         x1 = PPointsTree_.begin()->getX();
@@ -274,23 +233,6 @@ void Node::setV_node(const std::vector<Point> &t, unsigned deg) //tt==PPointsTre
     }
 }
 
-
-// compute V*c restricted to node indices
-void Node::setVc_node(const Eigen::VectorXd& c)
-{
-    if(r_ind_ - l_ind_ > 0) {
-        Eigen::VectorXd c_seg = c.segment(l_ind_, r_ind_-l_ind_+1);
-        Vc_node_ = V_node_.transpose() * c_seg;
-    }
-    if(PPointsTree_.size() > 1) {
-        Eigen::VectorXd c_seg(PPointsTree_.size());
-        int k = 0;
-        for (std::vector<Point>::iterator it=PPointsTree_.begin(); it!=PPointsTree_.end(); it++, k++) {
-            c_seg(k) = c[it->getId()];
-        }
-        Vc_node_ = V_node_.transpose() * c_seg;
-    }
-}
 
 void Node::printree(int n)
 {

@@ -17,7 +17,7 @@ int main() {
     //unsigned n; std::cin >> n;
 
     // initializing n for testing
-    unsigned n=16;
+    unsigned n=10;
 
     //Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(n, 0., (n-1.)/n);
     std::vector<Point> PPoints; // initalizing Polygon Points properties
@@ -40,9 +40,10 @@ int main() {
         tx = ((double)rand() / (double)(RAND_MAX));
         ty = ((double)rand() / (double)(RAND_MAX));
         // for circle
-        /*double angle = ((double)rand() / (double)(RAND_MAX))*M_PI*2;
-        tx = std::cos(angle);
-        ty = std::sin(angle);*/
+        //double angle = ((double)rand() / (double)(RAND_MAX))*M_PI*2;  // random points
+        //double angle = M_PI*2/n;
+        //tx = std::cos(angle*i);
+        //ty = std::sin(angle*i);
         double t1 = ((double)rand() / (double)(RAND_MAX));
         if(t1 < 0.5){
             tx = -tx;
@@ -71,9 +72,10 @@ int main() {
                 ty = -ty;
             }
             // for circle
-            /*double angle = std::rand()*M_PI*2;
-            tx = std::cos(angle)*2;
-            ty = std::sin(angle)*2;*/
+            //double angle = std::rand()*M_PI*2;    // random points
+            //double angle = M_PI*2/n;
+            //tx = std::cos(angle*i);
+            //ty = std::sin(angle*i);
             //tx = std::rand()%100;
             //ty = std::rand()%100;
         }
@@ -92,7 +94,7 @@ int main() {
 
     // printing the Polygon Points
     //for (std::vector<Point>::iterator it=PPoints.begin(); it!=PPoints.end(); it++)
-    //    std::cout << ' ' << it->getX() << ' ' << it->getY() << ' ' << it->getId() << ' ' << it->getV() << std::endl << std::flush;
+    //    std::cout << "(" << it->getX() << "," << it->getY() << ") "; //<< it->getId() << ' ' << it->getV() << std::endl << std::flush;
 
     //std::cout << "Enter admissibility constant:" << std::endl;
     //double eta; std::cin >> eta;
@@ -108,15 +110,15 @@ int main() {
 
     //std::vector<unsigned> t = {1,2,3,5,7,10,20,40,65,70,80,90,100};
     std::vector<unsigned> t = {3};
-    for(auto d : t){                                                    // multiple runs of the program to check the behavior of the error for different degrees
-    //Kernel G(1.);             // default kernel for 2d problem
-    Kernel4D G;                 // initialization of kernel for 4d problem -1/(2*pi)*log||x-y||
+    for(auto d : t){            // multiple runs of the program to check the behavior of the error for different degrees
+    KernelGalerkin G;           // initialization of Galerkin kernel for 2d problem -1/(2*pi)*log||x-y||
     PolynomialKernel P;         // Polynomial Kernel initialization
     ConstantKernel CK(1);       // Constant Kernel initialization
     GlobalSmoothKernel gskernel;// Global Smooth Periodic Kernel initialization
     GaussKernel gkernel;        // Gauss Kernel initialization
     SingularKernel skernel;     // Singular Kernel initialization (log|x-y|)
-    SingularKernelf skernelf;     // Singular Kernel initialization (log(1/|x-y|))
+    SingularKernelf skernelf;   // Singular Kernel initialization (log(1/|x-y|))
+
     // Compute exact matrix-vector product
 
     auto start1 = std::chrono::system_clock::now();
@@ -135,7 +137,6 @@ int main() {
 
     auto start2 = std::chrono::system_clock::now();
 
-    //LowRankApp lra(G, grid, grid);    // initialization of low rank approximation for 2D
     LowRankApp lra(&P, PPoints, n);         // initialization of low rank approximation for BEM approx for matrix multiplication
 
     Eigen::VectorXd f_approx = lra.mvProd(c, eta, d);   // calculation of the low rank approximation
@@ -170,14 +171,14 @@ int main() {
     Eigen::VectorXd diff = f_exact - f_approx;
 
     // printing for testing
-    std::cout << "f_exact   f_approx    diff" << std::endl;
+    /*std::cout << "f_exact   f_approx    diff" << std::endl;
     for(int i=0; i<n; i++){
         std::cout << f_exact(i) << "    " << f_approx(i) << "   " << diff(i) << std::endl;
-    }
+    }*/
     std::cout << "Approximation error (l-inf norm): " << diff.lpNorm<Eigen::Infinity>() << std::endl
-              << "Approximation error (l-2 norm): "   << diff.lpNorm<2>() << std::endl
-              << "Time needed for exact multiplication: "       << time_diff1.count() << " s" << std::endl
-              << "Time needed for approximate multiplication: " << time_diff2.count() << " s" << std::endl;
+              << "Approximation error (l-2 norm): "   << diff.lpNorm<2>() << std::endl;
+              //<< "Time needed for exact multiplication: "       << time_diff1.count() << " s" << std::endl
+              //<< "Time needed for approximate multiplication: " << time_diff2.count() << " s" << std::endl;
 
     // Global Interpolation
     std::cout << std::endl << "Global Interpolation" << std::endl;

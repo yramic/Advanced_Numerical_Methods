@@ -2,38 +2,6 @@
 #include <cmath>
 
 
-double AdmissibilityD::get_max(double xl, double xr, double yl, double yr)
-{
-    if(std::abs(xr-xl) > std::abs(yr-yl))
-        return std::abs(xr-xl);
-    else
-        return std::abs(yr-yl);
-}
-
-
-double AdmissibilityD::get_min(double xl, double xr, double yl, double yr)
-{
-    double dist = std::abs(xl-yl);
-    double dist2 = std::abs(xl-yr);
-    double dist3 = std::abs(xr-yl);
-    double dist4 = std::abs(xr-yr);
-
-    if(dist2 < dist)
-        dist = dist2;
-    if(dist3 < dist)
-        dist = dist3;
-    if(dist4 < dist)
-        dist = dist4;
-
-    return dist;
-}
-
-
-bool AdmissibilityD::is_admissible(double xl, double xr, double yl, double yr, double eta)
-{
-    return get_max(xl,xr,yl,yr) <= eta * get_min(xl,xr,yl,yr);
-}
-
 // find the biggest edge of each Bounding Box and compare it with the biggest node of the other Bounding Box
 double AdmissibilityH::get_max(Node* a, Node* b)
 {

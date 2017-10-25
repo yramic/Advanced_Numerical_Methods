@@ -7,7 +7,6 @@
 class Kernel
 {
 public:
-
     /*!
     * \brief Default Constructor
     */
@@ -19,55 +18,33 @@ public:
         num_(num)
     { }
 
-    // functor for 2D
-    double operator()(double x, double y){}
-
     /*!
     * \brief Virtual Functor
+    * \param x1 x coordinate of first point
+    * \param y1 y coordinate of first point
+    * \param x2 x coordinate of second point
+    * \param y2 y coordinate of second point
     */
     virtual double operator()(double x1, double y1, double x2, double y2) = 0;
-    //double operator()();
-protected:
 
+protected:
     double num_; //!< numerator
 };
 
-/*!
-* \brief Kernel functor \f$\frac{num}{|x-y|}\f$ if \f$x != y\f$, else 0
-*/
-class Kernel2D: public Kernel
-{
-public:
-
-    /*!
-    * \brief Constructor
-    */
-    Kernel2D(): Kernel() {}
-    /*!
-    * \brief Constructor for num
-    */
-    Kernel2D(double num): Kernel(num) {}
-
-    /*!
-    * \brief Functor for 2D
-    */
-    double operator()(double x, double y);
-    /*!
-    * \brief Definition for virtual functor
-    */
-    double operator()(double x1, double y1, double x2, double y2);
-
-};
 
 /*!
 * \brief Kernel functor \f$-\frac{1}{2 \pi}\log{\left|\vec{x}-\vec{y}\right|}\f$
 */
-class Kernel4D: public Kernel
+class KernelGalerkin: public Kernel
 {
 public:
 
     /*!
-    * \brief Functor for 4D
+    * \brief Functor for 2D
+    * \param x1 x coordinate of first point
+    * \param y1 y coordinate of first point
+    * \param x2 x coordinate of second point
+    * \param y2 y coordinate of second point
     */
     double operator()(double x1, double y1, double x2, double y2);
 };
@@ -80,7 +57,11 @@ class SingularKernel: public Kernel
 public:
 
     /*!
-    * \brief Functor for 4D Singular Kernel
+    * \brief Functor for 2D Singular Kernel
+    * \param x1 x coordinate of first point
+    * \param y1 y coordinate of first point
+    * \param x2 x coordinate of second point
+    * \param y2 y coordinate of second point
     */
     double operator()(double x1, double y1, double x2, double y2);
 };
@@ -93,7 +74,11 @@ class SingularKernelf: public Kernel
 public:
 
     /*!
-    * \brief Functor for 4D Singular Kernel
+    * \brief Functor for 2D Singular Kernel
+    * \param x1 x coordinate of first point
+    * \param y1 y coordinate of first point
+    * \param x2 x coordinate of second point
+    * \param y2 y coordinate of second point
     */
     double operator()(double x1, double y1, double x2, double y2);
 };
@@ -106,7 +91,11 @@ class PolynomialKernel: public Kernel
 public:
 
     /*!
-    * \brief Functor for 4D
+    * \brief Functor for 2D
+    * \param x1 x coordinate of first point
+    * \param y1 y coordinate of first point
+    * \param x2 x coordinate of second point
+    * \param y2 y coordinate of second point
     */
     double operator()(double x1, double y1, double x2, double y2);
 };
@@ -128,13 +117,13 @@ public:
         Kernel(num)
     { }
     /*!
-    * \brief Functor for 4D
+    * \brief Functor for 2D
+    * \param x1 x coordinate of first point
+    * \param y1 y coordinate of first point
+    * \param x2 x coordinate of second point
+    * \param y2 y coordinate of second point
     */
     double operator()(double x1, double y1, double x2, double y2);
-    /*!
-    * \brief Functor for 2D
-    */
-    double operator()(double x1, double y2);
 };
 
 /**
@@ -144,13 +133,13 @@ class GlobalSmoothKernel: public Kernel
 {
 public:
     /**
-    * \brief Functor for 4D
+    * \brief Functor for 2D
+    * \param x1 x coordinate of first point
+    * \param y1 y coordinate of first point
+    * \param x2 x coordinate of second point
+    * \param y2 y coordinate of second point
     */
     double operator()(double x1, double y1, double x2, double y2);
-    /*!
-    * \brief Functor for 2D
-    */
-    double operator()(double x1, double y2);
 };
 
 /**
@@ -160,7 +149,11 @@ class GaussKernel: public Kernel
 {
 public:
     /**
-    * \brief Functor for 4D
+    * \brief Functor for 2D
+    * \param x1 x coordinate of first point
+    * \param y1 y coordinate of first point
+    * \param x2 x coordinate of second point
+    * \param y2 y coordinate of second point
     */
     double operator()(double x1, double y1, double x2, double y2);
 };

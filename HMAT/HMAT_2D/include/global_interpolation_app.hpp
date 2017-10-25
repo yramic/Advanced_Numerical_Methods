@@ -13,26 +13,22 @@ class GlobalInterpolationApp
 public:
 
     /*!
-     * \brief Constructor for 4D problem
+     * \brief Constructor for 2D problem
+     * \param kernel Kernel used for the matrix multiplication
+     * \param pp Vector of points in space
+     * \param n Number of points
      */
-    //GlobalInterpolationApp(GlobalSmoothKernel gskernel, std::vector<Point> pp, int n);
-    //GlobalInterpolationApp(ConstantKernel ckernel, std::vector<Point> pp, int n);
-    //GlobalInterpolationApp(PolynomialKernel ckernel, std::vector<Point> pp, int n);
-    //GlobalInterpolationApp(GaussKernel ckernel, std::vector<Point> pp, int n);
-    GlobalInterpolationApp(Kernel* ckernel, std::vector<Point> pp, int n);
-    // approximate matrix-vector multiplication
+    GlobalInterpolationApp(Kernel* kernel, std::vector<Point> pp, int n);
     /*!
      * \brief Approximate matrix-vector multiplication
+     * \param c Vector c
+     * \param deg Degree of itnerpolation
      */
     Eigen::VectorXd mvProd(Eigen::VectorXd &c, unsigned deg);
 
 private:
-    GlobalSmoothKernel GSK_;    //!< Global Smooth Kernel
-    ConstantKernel CK_;         //!< Constant Kernel
-    PolynomialKernel PK_;       //!< Polynomial Kernel
-    GaussKernel GK_;            //!< Gauss Kernel
-    Kernel* K_;                 //!< Kernel pointer
-    std::vector<Point> PPoints_;//!< Polygon Points
+    Kernel* K_;                     //!< Kernel pointer
+    std::vector<Point> PPoints_;    //!< Polygon Points
 };
 
 #endif // GLOBAL_INTERPOLATION_APP_HPP

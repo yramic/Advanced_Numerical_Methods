@@ -20,67 +20,55 @@ public:
     /*!
     * \brief Default Constructor
     */
-    // default constructor
     cTree():
         root_(NULL)
     { }
-    // actual  constructor
+
     /*!
     * \brief Actual Constructor for 2D
-    */
-    cTree(const Eigen::VectorXd& x);
-    /*!
-    * \brief Actual Constructor for 4D
+    * \param PPointsTree Vector of Polygon Points
     */
     cTree(const std::vector<Point> PPointsTree);
 
     /*!
-    * \brief return a pointer to node-root of "cTree"
+    * \brief Return a pointer to node-root of "cTree"
     */
-    // return a pointer to node-root of "cTree"
     Node* getRoot() const {
         return root_;
     }
-    /*!
-    * \brief return the whole vector "x_"
-    */
-    // return the whole vector "x_"
-    Eigen::VectorXd getVals() const {
-        return grid_;
-    }
 
     /*!
-    * \brief compute V-matrices for nodes of the tree (contains evaluations of Chebyshew polynomials at corresponding points)
+    * \brief Compute V-matrices for nodes of the tree (contains evaluations of Chebyshew polynomials at corresponding points)
+    * \param deg Degree of interpolation
     */
-    // compute V-matrices for nodes of the tree (contains evaluations of Chebyshew polynomials at corresponding points)
     void setV(unsigned deg) {
         setV_recursion(root_, deg);
     }
+
     /*!
-    * \brief compute V*c restricted to node indices of the tree
+    * \brief Add pointers to near and far field nodes of the tree
+    * \param eta eta variable of admissibility
+    * \param Ty Reference tree for recursion
+    * \param near Number of Near Field relationships between Nodes
+    * \param far Number of Far Field relationships between Nodes
     */
-    // compute V*c restricted to node indices of the tree
-    void setVc(const Eigen::VectorXd& c) {
-        setVc_recursion(root_, c);
-    }
-    /*!
-    * \brief add pointers to near and far field nodes of the tree
-    */
-    // add pointers to near and far field nodes of the tree
-    void setNearFar(double eta, cTree &Ty,int& near, int& far) {
+    void setNearFar(double eta, cTree &Ty, int& near, int& far) {
         setNearFar_recursion(root_, Ty.root_, eta, Ty, near, far);
     }
+
     /*!
-    * \brief add pointers to near and far field nodes of the tree for debugging
+    * \brief Add pointers to near and far field nodes of the tree for debugging
+    * \param eta eta variable of admissibility
+    * \param Ty Reference tree for recursion
+    * \param cmatrix Matrix for saving calculations used for checking
     */
-    // add pointers to near and far field nodes of the tree debugging
     void setNearFar(double eta, cTree &Ty, Eigen::MatrixXd& cmatrix) {
         setNearFar_recursion(root_, Ty.root_, eta, Ty, cmatrix);
     }
+    // I should delete this function maybe also
     /*!
-    * \brief make lists with boundaries of bounding boxes (just for testing)
+    * \brief Make lists with boundaries of bounding boxes (just for testing)
     */
-    // make lists with boundaries of bounding boxes (just for testing)
     void setLists(std::vector<double>& xlist, std::vector<double>& ylist) {
         setLists_recursion(root_, xlist, ylist);
     }
@@ -88,33 +76,39 @@ public:
 private:
 
     /*!
-    * \brief needed for "setV(...)"
+    * \brief Needed for "setV(...)"
+    * \param cluster Node that contains the cluster
+    * \param deg Degree of interpolation
     */
-    // needed for "setV(...)"
     void setV_recursion(Node* cluster, unsigned deg);
+
     /*!
-    * \brief needed for "setVc(...)"
+    * \brief Needed for "setNearFar(...)"
+    * \param xnode First node for checking
+    * \param ynode Second node for checking
+    * \param eta eta admissibility variable
+    * \param Ty Tree for reference in the recursion
+    * \param near Number of Near Field relationships between Nodes
+    * \param far Number of Far Field relationships between Nodes
     */
-    // needed for "setVc(...)"
-    void setVc_recursion(Node* cluster, const Eigen::VectorXd& c);
-    /*!
-    * \brief needed for "setNearFar(...)"
-    */
-    // needed for "setNearFar(...)"
     void setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree &Ty, int& near, int& far);
+
     /*!
-    * \brief needed for "setNearFar(...)" for debugging
+    * \brief Needed for "setNearFar(...)" for debugging
+    * \param xnode First node for checking
+    * \param ynode Second node for checking
+    * \param eta eta admissibility variable
+    * \param Ty Tree for reference in the recursion
+    * \param cmatrix Matrix for saving calculations used for checking
     */
-    // needed for "setNearFar(...)" for debugging
     void setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree &Ty, Eigen::MatrixXd& cmatrix);
+
     /*!
     * \brief needed for "setLists(...)"
     */
-    // needed for "setLists(...)"
     void setLists_recursion(Node* cluster, std::vector<double>& xlist, std::vector<double>& ylist);
 
     Node* root_; //!< pointer to node-root of "cTree"
-    const Eigen::VectorXd grid_; //!< vector associated to "cTree"
     const std::vector<Point> PPointsTree_;  //!< vector that has all the Polygon Points
     friend class Node;
 };

@@ -13,35 +13,32 @@ class BlockCluster
 public:
 
     /*!
-    * \brief Constructor for 4D
-    */
-    //BlockCluster(double x1l, double x1r, double y1l, double y1r, double x2l, double x2r, double y2l, double y2r, unsigned deg, Kernel4D* G);
-    //BlockCluster(double x1l, double x1r, double y1l, double y1r, double x2l, double x2r, double y2l, double y2r, unsigned deg, PolynomialKernel* G);
-    //BlockCluster(double x1l, double x1r, double y1l, double y1r, double x2l, double x2r, double y2l, double y2r, unsigned deg, ConstantKernel* G);
-    BlockCluster(double x1l, double x1r, double y1l, double y1r, double x2l, double x2r, double y2l, double y2r, unsigned deg, Kernel* G);
-    /*!
     * \brief Constructor for 2D
-    */
-    BlockCluster(double xl, double xr, double yl, double yr, unsigned deg, Kernel2D G);
-
+    * \param x1l x coordinate of left edge of the first bounind box
+    * \param x1r x coordinate of right edge of the first bounind box
+    * \param y1l y coordinate of bottom edge of the first bounind box
+    * \param y1r y coordinate of top edge of the first bounind box
+    * \param x2l x coordinate of left edge of the second bounind box
+    * \param x2r x coordinate of right edge of the second bounind box
+    * \param y2l y coordinate of bottom edge of the second bounind box
+    * \param y2r y coordinate of top edge of the second bounind box
+    * \param deg degree of interpolation
+    * \param G any kind of derived kernel from base class Kernel
+    */ 
+    BlockCluster(double x1l, double x1r, double y1l, double y1r, double x2l, double x2r, double y2l, double y2r, unsigned deg, Kernel* G);
 
     /*!
     * \brief return matrix \f$X_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
     */
-    // return matrix $X_{\sigma,\mu}$, where $\sigma$ and $\mu$ denote the clusters
     Eigen::MatrixXd getMatrix() const {
         return X_;
     }
 
     /*!
     * \brief compute matrix \f$X_{\sigma,\mu}\f$ for 2D
+    * \param G any kind of derived kernel from base class Kernel
     */
-    // compute matrix $X_{\sigma,\mu}$
-    void setMatrix2D();
-    /*!
-    * \brief compute matrix \f$X_{\sigma,\mu}\f$ for 4D
-    */
-    void setMatrix4D(Kernel* G);
+    void setMatrix2D(Kernel* G);
 private:
 
     double xl_;     //!< left  boundary of bounding box of *xcluster
@@ -57,11 +54,10 @@ private:
     double y2l_;    //!< left  y coordinate of second bounding box
     double y2r_;    //!< right y coordinate of second bounding box
     unsigned deg_;  //!< degree of interpolating polynomial
-    Kernel2D G2_;           //!< 2D kernel
-    Kernel4D G4_;           //!< 4D Galerkin kernel
-    PolynomialKernel GP_;   //!< POlynomial Kernel
+    KernelGalerkin G4_;           //!< 2D Galerkin kernel
+    PolynomialKernel GP_;   //!< Polynomial Kernel
     ConstantKernel GC_;     //!< Constant Kernel
-    Eigen::MatrixXd X_;     //!< matrix \f$X_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
+    Eigen::MatrixXd X_;     //!< Matrix \f$X_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
 };
 
 #endif // BLOCK_CLUSTER_HPP
