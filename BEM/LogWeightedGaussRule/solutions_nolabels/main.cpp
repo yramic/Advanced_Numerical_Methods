@@ -28,7 +28,7 @@ bool testGaussLaguerre(int N){
   double *w = new double[N];
   double *x = new double[N];
   cgqf(N, KIND, 0, 0, 0, 1, x, w);
-  
+
   // initialize exact value of integral
   double exval = 1;
   // Start test for different k=1..N
@@ -91,7 +91,6 @@ QuadRule getLogWeightQR(double a, int n){
   }
   logWeightQR.x = points;
   logWeightQR.w = weights;
-
   return logWeightQR;
 }
 
