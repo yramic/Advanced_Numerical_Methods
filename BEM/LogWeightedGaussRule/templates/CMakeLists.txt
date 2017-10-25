@@ -56,16 +56,9 @@ else()
 
 endif()
 
-ExternalProject_Add(
-	CppHilbert
-	GIT_REPOSITORY "https://gitlab.math.ethz.ch/AdvNumCSE/Code/tree/master/BEM/CppHilbert"
-       	GIT_TAG "master")
 
 # make main
-set(SRCS main.cpp)
-add_executable(main ${SRCS})
+FILE(GLOB SRC *.cpp *.hpp)
+add_executable(main ${SRC})
 
-# make genLaguerreRule
-set(SRCS genLaguerreRule.cpp)
-add_executable(genLaguerreRule ${SRCS})
 
