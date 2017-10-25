@@ -56,6 +56,11 @@ else()
 
 endif()
 
+ExternalProject_Add(
+	CppHilbert
+	GIT_REPOSITORY "https://gitlab.math.ethz.ch/AdvNumCSE/Code/tree/master/BEM/CppHilbert"
+       	GIT_TAG "master")
+
 # make ARmain
 set(SRCS ARmain.cpp)
 add_executable(ARmain ${SRCS})

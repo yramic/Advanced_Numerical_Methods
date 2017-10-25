@@ -56,6 +56,11 @@ else()
 
 endif()
 
+ExternalProject_Add(
+	CppHilbert
+	GIT_REPOSITORY "https://gitlab.math.ethz.ch/AdvNumCSE/Code/tree/master/BEM/CppHilbert"
+       	GIT_TAG "master")
+
 # make SampleProblem
 set(SRCS SampleProblem.cpp)
 add_executable(SampleProblem ${SRCS})
