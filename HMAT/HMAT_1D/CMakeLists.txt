@@ -1,10 +1,2 @@
-cmake_minimum_required(VERSION 3.1)
-
-project(HMAT)
-
-add_subdirectory(include)
-add_subdirectory(src)
-
-add_executable(low_rank_test
-               low_rank_test.cpp ${cpp_files} ${headers})
+add_all_subdirectories(${CMAKE_CURRENT_SOURCE_DIR})
 
