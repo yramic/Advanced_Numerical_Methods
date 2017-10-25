@@ -41,7 +41,7 @@ bool testGaussLaguerre(int N){
     for(int i=0; i<N; i++){
       I += std::pow(x[i], k)*w[i];
     }
-    if(fabs(I-exval)>1e-10*exval){ // if not exact, stop
+    if(fabs(I-exval)>1e-10*fabs(exval)){ // if not exact, stop
       return false;
     }
   }
@@ -101,14 +101,14 @@ Eigen::VectorXd testLogWeightQRConvergence(int n){
   Eigen::VectorXd error(n);
   for(int k=1; k<=n; k++){
     // get quadrature points and weights
-    QuadRule LWQR = getLogWeightQR(M_PI, k);
+    QuadRule LWQR = getLogWeightQR(1, k);
     // compute integral using quadrature
     double I = 0.;
     for(int i=0; i<k; i++){
       I += sin(LWQR.x(i))*LWQR.w(i);
     }
     // compute error
-    error(k-1) = fabs(I - 0.641182132994293);
+    error(k-1) = fabs(I + 0.239811742000564);
   }
   return error;
 }
@@ -128,7 +128,7 @@ int testLogWeightQR(int N){
     for(int i=0; i<N; i++){
       I += std::pow(LWQR.x(i), k)*LWQR.w(i);
     }
-    if(fabs(I-exval)/exval>1e-10){ // if not exact, stop
+    if(fabs(I-exval)>1e-10*fabs(exval)){ // if not exact, stop
       return k;
     }
   }

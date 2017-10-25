@@ -56,11 +56,8 @@ else()
 
 endif()
 
-# make main
-set(SRCS main.cpp)
-add_executable(main ${SRCS})
 
-# make genLaguerreRule
-set(SRCS genLaguerreRule.cpp)
-add_executable(genLaguerreRule ${SRCS})
+# make main
+FILE(GLOB SRC *.cpp *.hpp)
+add_executable(main ${SRC})
 
