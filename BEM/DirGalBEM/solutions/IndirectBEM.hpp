@@ -23,14 +23,15 @@ namespace IndirectFirstKind{
   /* SAM_LISTING_BEGIN_0 */
   template <typename FUNC>
   Eigen::VectorXd solveDirichlet(const BoundaryMesh& mesh, const FUNC& g){
-    // 1. Assemble bilinear form of V (see par 1.3.132)
+     // 1. Assemble bilinear form of \cop{$\biov$}, see \lectref{par:iddir}
     Eigen::MatrixXd V; computeV(V, mesh, 1e-05);
-    // 2. Assemble right hand side using <g, psi> (see 1.3.134)
-    // - Compute Mass Matrix
+    // 2. Assemble right hand side \cop{$(\Fg,\psi)\mapsto\int\limits_{\Gamma}\Fg(\Bx)\,\psi(\Bx)\,\mathrm{d}S(\Bx)$},  see \lectref{eq:iddirVv}
+    // Compute the mass matrix, Galerkin matrix for \cop{$\Ltwo[\Gamma]$}-inner product
     Eigen::SparseMatrix<double> M00(mesh.numElements(), mesh.numElements());
     computeM00(M00, mesh);
     Eigen::MatrixXd M = Eigen::MatrixXd(M00);
     // - Compute coefficient vector for g (in $\mathcal{S}^{-1}_0(\mathcal{G}$)
+    // \cor{Not correct: approximate \cob{$\Fg$} in \cob{$\sbe$}!}
     Eigen::VectorXd G(mesh.numElements());
     for(int i=0; i<mesh.numElements(); i++){
       Eigen::Vector2d a,b; std::tie(a,b) = mesh.getElementVertices(i);
@@ -41,8 +42,6 @@ namespace IndirectFirstKind{
     
     // 3. Solve system
     Eigen::VectorXd sol = V.lu().solve(RHS);
-
-
     return sol;
   }
   /* SAM_LISTING_END_0 */
