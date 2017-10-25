@@ -106,8 +106,8 @@ void Node::setLeaves(double x1, double x2, double y1, double y2)
         r_child_ = new Node((l_ind_+r_ind_)/2 + 1, r_ind_);
     }
     if(!PPointsTree_.empty() && PPointsTree_.size()>1){ // below the root level the space [x1,x2]x[y1,y2] must be divided in quadrants recursivly
-        int medX = x1+(x2-x1)/2;
-        int medY = y1+(y2-y1)/2;
+        double medX = x1+(x2-x1)/2;
+        double medY = y1+(y2-y1)/2;
         std::vector<Point> tl_PPoints, tr_PPoints, bl_PPoints, br_PPoints;
         for (std::vector<Point>::iterator it=PPointsTree_.begin(); it!=PPointsTree_.end(); it++){
             if (it->getX()<=medX && it->getY()<=medY) {

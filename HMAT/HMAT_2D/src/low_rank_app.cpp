@@ -17,11 +17,11 @@ LowRankApp::LowRankApp(ConstantKernel* kernel, std::vector<Point> pp, int n):
     kernel_(kernel), PPointsTree_(pp), HM_(Eigen::MatrixXd::Constant(n,n,0))
 { }*/
 LowRankApp::LowRankApp(Kernel* kernel, std::vector<Point> pp, int n):
-    kernel_(kernel), PPointsTree_(pp), HM_(Eigen::MatrixXd::Constant(n,n,0))
+    kernel_(kernel), PPointsTree_(pp)
 { }
 // constructor for solving the 2D problem
 LowRankApp::LowRankApp(Kernel2D kernel, const Eigen::VectorXd& x, const Eigen::VectorXd& y, int n):
-    kernel2d_(kernel), Tx_(x), Ty_(y), HM_(Eigen::MatrixXd::Constant(n,n,0))
+    kernel2d_(kernel), Tx_(x), Ty_(y)
 { }
 
 
@@ -41,21 +41,27 @@ Eigen::VectorXd LowRankApp::mvProd(Eigen::VectorXd& c, double eta, unsigned deg)
 
     // add pointers to near and far field nodes of the tree
     //Tx_.setNearFar(eta, Ty_);                     // for the 2D problem
-    PPointsTree_.setNearFar(eta, PPointsTree_);     // for the 4D problem
-
+    int near = 0, far = 0;
+    PPointsTree_.setNearFar(eta, PPointsTree_, near, far);     // for the 4D problem
+    std::cout << "Near Field Nodes: " << (double)near/(double)(near+far)*100 << "% " << "Far Field Nodes: " << (double)far/(double)(near+far)*100 << "%" << std::endl;
     //PPointsTree_.getRoot()->printree(0);          // printing the tree for testing
-
+    Eigen::VectorXd f_approx_ff_contr = Eigen::VectorXd::Zero(c.size());
+    Eigen::VectorXd f_approx_nf_contr = Eigen::VectorXd::Zero(c.size());
     // compute far field contribution
     Eigen::VectorXd f_approx = Eigen::VectorXd::Zero(c.size());
-    ff_contribution(f_approx, PPointsTree_.getRoot(), deg, c);
+    ff_contribution(f_approx, PPointsTree_.getRoot(), deg, c, f_approx_ff_contr);
     // compute near-field contribution
-    nf_contribution(f_approx, PPointsTree_.getRoot(), c);
+    nf_contribution(f_approx, PPointsTree_.getRoot(), c, f_approx_nf_contr);
+    std::cout << "Far Field Contribution for each row" << std::endl;
+    std:: cout << f_approx_ff_contr << std::endl;
+    std::cout << "Near Field Contribution for each row" << std::endl;
+    std:: cout << f_approx_nf_contr << std::endl;
     return f_approx;
 }
 
 
 // compute far field contribution
-void LowRankApp::ff_contribution(Eigen::VectorXd& f, Node* tx, unsigned deg, Eigen::VectorXd& c)
+void LowRankApp::ff_contribution(Eigen::VectorXd& f, Node* tx, unsigned deg, Eigen::VectorXd& c, Eigen::VectorXd& f_approx_ff_contr)
 {
     /*if((*tx).getLChild() != NULL) {
 
@@ -99,6 +105,9 @@ void LowRankApp::ff_contribution(Eigen::VectorXd& f, Node* tx, unsigned deg, Eig
                 Eigen::VectorXd c_seg((*iter)->getPPoints().size());
                 for (int i = 0; i<(*iter)->getPPoints().size(); i++) {
                     c_seg[i] = c[(*iter)->getPPoints()[i].getId()];
+                    for (int i = 0; i<tx->getPPoints().size(); i++) {
+                        f_approx_ff_contr[tx->getPPoints()[i].getId()]++;
+                    }
                 }
                 Vc = Vm * c_seg;                                                                                    // computation of V*cm
                 XVc += X * Vc;                                                                                      // add contribution of block **iter to "s"
@@ -112,16 +121,16 @@ void LowRankApp::ff_contribution(Eigen::VectorXd& f, Node* tx, unsigned deg, Eig
             }
         }
         // add contribution of leaves of *tx
-        ff_contribution(f, tx->getTl_Child(), deg, c);
-        ff_contribution(f, tx->getTr_Child(), deg, c);
-        ff_contribution(f, tx->getBl_Child(), deg, c);
-        ff_contribution(f, tx->getBr_Child(), deg, c);
+        ff_contribution(f, tx->getTl_Child(), deg, c, f_approx_ff_contr);
+        ff_contribution(f, tx->getTr_Child(), deg, c, f_approx_ff_contr);
+        ff_contribution(f, tx->getBl_Child(), deg, c, f_approx_ff_contr);
+        ff_contribution(f, tx->getBr_Child(), deg, c, f_approx_ff_contr);
     }
 }
 
 
 // compute near-field contribution
-void LowRankApp::nf_contribution(Eigen::VectorXd& f, Node* tx, const Eigen::VectorXd& c)
+void LowRankApp::nf_contribution(Eigen::VectorXd& f, Node* tx, const Eigen::VectorXd& c, Eigen::VectorXd& f_approx_nf_contr)
 {
     /*if(tx != NULL) {
 
@@ -157,13 +166,14 @@ void LowRankApp::nf_contribution(Eigen::VectorXd& f, Node* tx, const Eigen::Vect
                     for(int i=0; i<(*iter)->getPPoints().size(); i++){
                         std::vector<Point> t = (*tx).getPPoints();
                         f(t[j].getId()) += (*kernel_)(t[j].getX(),t[j].getY(),(*iter)->getPPoints()[i].getX(),(*iter)->getPPoints()[i].getY()) * c((*iter)->getPPoints()[i].getId());   // add near field contribution
+                        f_approx_nf_contr[tx->getPPoints()[j].getId()]++;
                         //std::cout << t[j].getId() << " " << (*kernel_)(t[j].getX(),t[j].getY(),(*iter)->getPPoints()[(i)].getX(),(*iter)->getPPoints()[(i)].getY()) << " " << (*iter)->getPPoints()[(i)].getId() << std::endl;
                     }
                 }
             }
-        nf_contribution(f, tx->getTl_Child(), c);
-        nf_contribution(f, tx->getTr_Child(), c);
-        nf_contribution(f, tx->getBl_Child(), c);
-        nf_contribution(f, tx->getBr_Child(), c);
+        nf_contribution(f, tx->getTl_Child(), c, f_approx_nf_contr);
+        nf_contribution(f, tx->getTr_Child(), c, f_approx_nf_contr);
+        nf_contribution(f, tx->getBl_Child(), c, f_approx_nf_contr);
+        nf_contribution(f, tx->getBr_Child(), c, f_approx_nf_contr);
     }
 }
