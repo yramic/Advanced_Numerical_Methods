@@ -1,3 +1,13 @@
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             * 
+ * Author:                                                             *
+ * Date:                                                               *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
 #ifndef LOW_RANK_APP_HPP
 #define LOW_RANK_APP_HPP
 
@@ -20,9 +30,7 @@ public:
 
     // approximate matrix-vector multiplication
     Eigen::VectorXd mvProd(const Eigen::VectorXd& c, double eta, unsigned deg);
-
 private:
-
     // compute far  field contribution
     void ff_contribution(Eigen::VectorXd& f, Node* tx, unsigned deg);
     // compute near field contribution

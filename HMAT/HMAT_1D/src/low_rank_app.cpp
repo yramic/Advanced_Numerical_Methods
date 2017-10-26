@@ -1,9 +1,18 @@
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             * 
+ * Author:                                                             *
+ * Date:                                                               *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
 #include "../include/low_rank_app.hpp"
 #include "../include/block_cluster.hpp"
 #include "../include/ctree.hpp"
 #include "../include/kernel.hpp"
 #include "../include/node.hpp"
-
 
 // constructor
 LowRankApp::LowRankApp(Kernel kernel, const Eigen::VectorXd& x, const Eigen::VectorXd& y):

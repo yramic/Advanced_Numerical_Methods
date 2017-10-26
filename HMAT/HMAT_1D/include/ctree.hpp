@@ -1,3 +1,13 @@
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             * 
+ * Author:                                                             *
+ * Date:                                                               *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
 #ifndef CTREE_HPP
 #define CTREE_HPP
 
@@ -20,9 +30,7 @@ public:
     * \brief Constructors
     */
     // default constructor
-    cTree():
-        root_(NULL)
-    { }
+    cTree(): root_(NULL) { }
     // actual  constructor
     cTree(const Eigen::VectorXd& x);
 
@@ -30,25 +38,17 @@ public:
     * \brief Getters
     */
     // return a pointer to node-root of "cTree"
-    Node* getRoot() const {
-        return root_;
-    }
+    Node* getRoot() const { return root_; }
     // return the whole vector "x_"
-    Eigen::VectorXd getVals() const {
-        return grid_;
-    }
+    Eigen::VectorXd getVals() const { return grid_; }
 
     /**
     * \brief Setters
     */
     // compute V-matrices for nodes of the tree (contains evaluations of Chebyshew polynomials at corresponding points)
-    void setV(unsigned deg) {
-        setV_recursion(root_, deg);
-    }
+    void setV(unsigned deg) { setV_recursion(root_, deg); }
     // compute V*c restricted to node indices of the tree
-    void setVc(const Eigen::VectorXd& c) {
-        setVc_recursion(root_, c);
-    }
+    void setVc(const Eigen::VectorXd& c) { setVc_recursion(root_, c); }
     // add pointers to near and far field nodes of the tree
     void setNearFar(double eta, cTree Ty) {
         setNearFar_recursion(root_, Ty.root_, eta, Ty);

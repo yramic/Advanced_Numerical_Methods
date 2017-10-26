@@ -1,8 +1,17 @@
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             * 
+ * Author:                                                             *
+ * Date:                                                               *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
 #ifndef CHEBY_HPP
 #define CHEBY_HPP
 
 #include <Eigen/Dense>
-
 
 /**
 * \brief Compute Chebyshew nodes "tk_" and weights "wk_"
@@ -21,9 +30,7 @@ public:
     * \brief Getters
     */
     // return Chebyshew nodes on domain [xl,xr]
-    Eigen::VectorXd getNodes() const {
-        return tk_;
-    }
+    Eigen::VectorXd getNodes() const { return tk_;  }
     // return weights of Lagrange polynomial
     Eigen::VectorXd getWghts() const {
         return wk_;

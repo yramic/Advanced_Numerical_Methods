@@ -1,3 +1,13 @@
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             * 
+ * Author:                                                             *
+ * Date:                                                               *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
 #include "../include/ctree.hpp"
 #include "../include/is_admissible.hpp"
 #include "../include/node.hpp"
@@ -6,8 +16,7 @@
 
 
 // actual constructor
-cTree::cTree(const Eigen::VectorXd& x):
-    root_(NULL), grid_(x)
+cTree::cTree(const Eigen::VectorXd& x):  root_(NULL), grid_(x)
 {
     unsigned n = x.size();
     if(n > 1) { // build the tree
@@ -19,7 +28,8 @@ cTree::cTree(const Eigen::VectorXd& x):
 }
 
 
-// compute V-matrices for nodes of the tree (contains evaluations of Chebyshew polynomials at corresponding points)
+// compute V-matrices for nodes of the tree
+// (involves evaluations of Chebyshew polynomials at corresponding points)
 void cTree::setV_recursion(Node* cluster, unsigned deg)
 {
     if((*cluster).l_child_ != NULL) {
