@@ -9,6 +9,15 @@
 #include <iostream>
 #include <chrono>
 
+#define circle
+//#define vector16
+//#define random1
+
+
+#define local
+//#define global
+//#define gsk
+//#define gauss
 int main() {
 
     // Input
@@ -18,17 +27,22 @@ int main() {
 
     // initializing n for testing
     unsigned n=10;
-
+#ifdef vector16
+    n = 16;
+#endif
     //Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(n, 0., (n-1.)/n);
     std::vector<Point> PPoints; // initalizing Polygon Points properties
     PPoints.reserve(n);
 
     // x,y,v vextors used for testing(n=16)
     //std::vector<int> x = {14,77,11,38,81,54,7,48,17,30}, y = {62,45,46,87,37,20,72,21,30,90}, v = {59,7,23,71,34,50,48,54,30,60};
-    //std::vector<int> x = {24,22,73,63,14,17,39,99,83,41,40,4,83,30,65,23}, y = {24,55,87,91,30,1,9,28,67,85,10,84,57,72,86,56}, v = {66,63,27,46,83,58,46,8,95,57,2,79,34,21,64,95};
+#ifdef vector16
+    std::vector<int> x = {24,22,73,63,14,17,39,99,83,41,40,4,83,30,65,23}, y = {24,55,87,91,30,1,9,28,67,85,10,84,57,72,86,56}, v = {66,63,27,46,83,58,46,8,95,57,2,79,34,21,64,95};
+#endif
     //std::vector<int> x = {18,89,39,39,26,53,4,44}, y = {63,49,66,27,46,4,54,59}, v = {1,2,3,4,5,6,7,8}; // vector with problem with setnearfar
     //std::vector<int> x = {80,27,17,80,23,86,99,89,70,43}, y = {65,74,12,88,44,56,77,31,41,88}, v = {1,2,3,4,5,6,7,8,9,10};
     //std::vector<int> x = {2,2,2,2,2,2,2,2,2,2}, y = {4,5,6,7,8,9,10,11,12,13}, v = {1,2,3,4,5,6,7,8,9,10};
+
 
     std::srand(std::time(0));   // initializing points properties randomly
     double tx,ty;
@@ -37,13 +51,10 @@ int main() {
         Point p;
         p.setId(i);
         p.setV(std::rand()%100);    // values 0-100
+
+#ifdef random1
         tx = ((double)rand() / (double)(RAND_MAX));
         ty = ((double)rand() / (double)(RAND_MAX));
-        // for circle
-        //double angle = ((double)rand() / (double)(RAND_MAX))*M_PI*2;  // random points
-        //double angle = M_PI*2/n;
-        //tx = std::cos(angle*i);
-        //ty = std::sin(angle*i);
         double t1 = ((double)rand() / (double)(RAND_MAX));
         if(t1 < 0.5){
             tx = -tx;
@@ -52,8 +63,15 @@ int main() {
         if(t2 < 0.5){
             ty = -ty;
         }
-        //tx = std::rand()%100;
-        //ty = std::rand()%100;
+        std::cout << "random1" << std::endl;
+#endif
+
+#ifdef circle
+        double angle = M_PI*2/n;
+        tx = std::cos(angle*i);
+        ty = std::sin(angle*i);
+#endif
+
         while (f) {             // checking if a point exists 2 times
             f=0;
             for (std::vector<Point>::iterator it=PPoints.begin(); it!=PPoints.end(); it++) {
@@ -61,6 +79,7 @@ int main() {
                     f = 1;
                 }
             }
+#ifdef random1
             tx = ((double)rand() / (double)(RAND_MAX));
             ty = ((double)rand() / (double)(RAND_MAX));
             t1 = ((double)rand() / (double)(RAND_MAX));
@@ -71,27 +90,34 @@ int main() {
             if(t2 < 0.5){
                 ty = -ty;
             }
-            // for circle
-            //double angle = std::rand()*M_PI*2;    // random points
-            //double angle = M_PI*2/n;
-            //tx = std::cos(angle*i);
-            //ty = std::sin(angle*i);
-            //tx = std::rand()%100;
-            //ty = std::rand()%100;
+#endif
+
+#ifdef circle
+            double angle = M_PI*2/n;
+            tx = std::cos(angle*i);
+            ty = std::sin(angle*i);
+#endif
         }
+#if defined(random1) || defined(circle)
         p.setX(tx);
         p.setY(ty);
-        //p.setX(x[i]);             // for testing
-        //p.setY(y[i]);             // for testing
-        //p.setV(v[i]);             // for testing
+#endif
+
+
+#ifdef vector16
+        p.setX(x[i]);             // for testing
+        p.setY(y[i]);             // for testing
+        p.setV(v[i]);             // for testing
+#endif
         PPoints.push_back(p);
     }
     Eigen::VectorXd    c = Eigen::VectorXd::Random(n);  // random initialization of vector c
 
     // vector c initialization for testing
-    //Eigen::VectorXd c(n);
-    //c << 0.168182, -0.835255, 0.661581, -0.827464, 0.0385175, 0.559586, 0.745203, -0.624835, 0.273339, -0.327815, -0.528608, -0.320443, -0.731551, -0.600541, 0.474063, 0.98031;
-
+#ifdef vector16
+    Eigen::VectorXd c(n);
+    c << 0.168182, -0.835255, 0.661581, -0.827464, 0.0385175, 0.559586, 0.745203, -0.624835, 0.273339, -0.327815, -0.528608, -0.320443, -0.731551, -0.600541, 0.474063, 0.98031;
+#endif
     // printing the Polygon Points
     //for (std::vector<Point>::iterator it=PPoints.begin(); it!=PPoints.end(); it++)
     //    std::cout << "(" << it->getX() << "," << it->getY() << ") "; //<< it->getId() << ' ' << it->getV() << std::endl << std::flush;
@@ -120,7 +146,7 @@ int main() {
     SingularKernelf skernelf;   // Singular Kernel initialization (log(1/|x-y|))
 
     // Compute exact matrix-vector product
-
+#ifdef local
     auto start1 = std::chrono::system_clock::now();
 
     Eigen::MatrixXd M(n,n);
@@ -171,17 +197,20 @@ int main() {
     Eigen::VectorXd diff = f_exact - f_approx;
 
     // printing for testing
-    /*std::cout << "f_exact   f_approx    diff" << std::endl;
+    std::cout << "f_exact   f_approx    diff" << std::endl;
     for(int i=0; i<n; i++){
         std::cout << f_exact(i) << "    " << f_approx(i) << "   " << diff(i) << std::endl;
-    }*/
+    }
     std::cout << "Approximation error (l-inf norm): " << diff.lpNorm<Eigen::Infinity>() << std::endl
-              << "Approximation error (l-2 norm): "   << diff.lpNorm<2>() << std::endl;
-              //<< "Time needed for exact multiplication: "       << time_diff1.count() << " s" << std::endl
-              //<< "Time needed for approximate multiplication: " << time_diff2.count() << " s" << std::endl;
+              << "Approximation error (l-2 norm): "   << diff.lpNorm<2>() << std::endl
+              << "Time needed for exact multiplication: "       << time_diff1.count() << " s" << std::endl
+              << "Time needed for approximate multiplication: " << time_diff2.count() << " s" << std::endl;
+#endif
 
+#ifdef global
     // Global Interpolation
     std::cout << std::endl << "Global Interpolation" << std::endl;
+#ifdef gsk
     std::cout << "Global Smooth Kernel (cos)" << std::endl;
 
     // Compute approximated matrix-vector product, given admissibility constant 'eta'
@@ -216,8 +245,9 @@ int main() {
               << "Approximation error (l-2 norm): "   << diff_g.lpNorm<2>() << std::endl
               << "Time needed for exact multiplication: "       << time_diff4.count() << " s" << std::endl
               << "Time needed for approximate multiplication: " << time_diff3.count() << " s" << std::endl;
+#endif
 
-
+#ifdef gauss
     std::cout << "Gauss" << std::endl;
 
     // Compute approximated matrix-vector product, given admissibility constant 'eta'
@@ -251,5 +281,7 @@ int main() {
               << "Approximation error (l-2 norm): "   << diff_gg.lpNorm<2>() << std::endl
               << "Time needed for exact multiplication: "       << time_diff6.count() << " s" << std::endl
               << "Time needed for approximate multiplication: " << time_diff5.count() << " s" << std::endl;
+#endif
+#endif
     }
 }
