@@ -23,7 +23,8 @@ bool testGaussLaguerre(int N){
   double *w = new double[N];
   double *x = new double[N];
   cgqf(N, KIND, 0, 0, 0, 1, x, w);
-  
+
+#if SOLUTION
   // initialize exact value of integral
   double exval = 1;
   // Start test for different k=1..N
@@ -36,10 +37,13 @@ bool testGaussLaguerre(int N){
     for(int i=0; i<N; i++){
       I += std::pow(x[i], k)*w[i];
     }
-    if(fabs(I-exval)>1e-10*exval){ // if not exact, stop
+    if(fabs(I-exval)>1e-10*fabs(exval)){ // if not exact, stop
       return false;
     }
   }
+    #else // TEMPLATE
+  // TODO: Implement your code
+  #endif // TEMPLATE
   return true;
 }
 /* SAM_LISTING_END_0 */
@@ -49,6 +53,7 @@ bool testGaussLaguerre(int N){
 /* SAM_LISTING_BEGIN_1 */
 Eigen::VectorXd testGaussLaguerreConvergence(int N = 20){
   Eigen::VectorXd error(N);
+  #if SOLUTION
   for(int k=1; k<=N; k++){
     // get Gauss-Laguerre quadrature points and weights
     double *w = new double[k];
@@ -62,6 +67,9 @@ Eigen::VectorXd testGaussLaguerreConvergence(int N = 20){
     // compute error
     error(k-1) = fabs(I - 0.5);
   }
+#else // TEMPLATE
+  // TODO: Implement your code
+#endif // TEMPLATE
   return error;
 }
 /* SAM_LISTING_END_1 */
@@ -76,6 +84,7 @@ QuadRule getLogWeightQR(double a, int n){
 
   // create new Quadrature rule
   QuadRule logWeightQR;
+#if SOLUTION
   logWeightQR.dim = 1;
   logWeightQR.n = n;
   // create matrix and vector for its points and weights
@@ -90,7 +99,9 @@ QuadRule getLogWeightQR(double a, int n){
   }
   logWeightQR.x = points;
   logWeightQR.w = weights;
-
+#else // TEMPLATE
+  // TODO: Implement your code
+#endif // TEMPLATE
   return logWeightQR;
 }
 /* SAM_LISTING_END_2 */
@@ -100,17 +111,21 @@ QuadRule getLogWeightQR(double a, int n){
 /* SAM_LISTING_BEGIN_3 */
 Eigen::VectorXd testLogWeightQRConvergence(int n){
   Eigen::VectorXd error(n);
+#if SOLUTION
   for(int k=1; k<=n; k++){
     // get quadrature points and weights
-    QuadRule LWQR = getLogWeightQR(M_PI, k);
+    QuadRule LWQR = getLogWeightQR(1, k);
     // compute integral using quadrature
     double I = 0.;
     for(int i=0; i<k; i++){
       I += sin(LWQR.x(i))*LWQR.w(i);
     }
     // compute error
-    error(k-1) = fabs(I - 0.641182132994293);
+    error(k-1) = fabs(I + 0.239811742000564);
   }
+  #else // TEMPLATE
+  // TODO: Implement your code
+#endif // TEMPLATE
   return error;
 }
 /* SAM_LISTING_END_3 */
@@ -118,6 +133,7 @@ Eigen::VectorXd testLogWeightQRConvergence(int n){
 
 //------------------------------------------------------------------------------
 /* SAM_LISTING_BEGIN_4 */
+#if SOLUTION
 int testLogWeightQR(int N){
   // initialize exact value
   double exval;
@@ -131,12 +147,13 @@ int testLogWeightQR(int N){
     for(int i=0; i<N; i++){
       I += std::pow(LWQR.x(i), k)*LWQR.w(i);
     }
-    if(fabs(I-exval)/exval>1e-10){ // if not exact, stop
+    if(fabs(I-exval)>1e-10*fabs(exval)){ // if not exact, stop
       return k;
     }
   }
   return N;
 }
+#endif // TEMPLATE
 /* SAM_LISTING_END_4 */
 
 
@@ -180,6 +197,7 @@ int main() {
   //-------------------------------------------------------------
   /* SAM_LISTING_BEGIN_7 */
   std::cout << "TESTING LOG-WEIGHT QUADRATURE" << std::endl;
+  #if SOLUTION
   for(int j=1; j<30; j++){
     int orderfail = testLogWeightQR(j);
     if(orderfail >= j){
@@ -192,6 +210,9 @@ int main() {
   }
   /* SAM_LISTING_END_7 */
   std::cout << std::endl;
+#else // TEMPLATE
+  // TODO: Implement your code
+#endif // TEMPLATE
   
   return 0;
 
