@@ -5,7 +5,7 @@ project(HMAT_2D)
 add_subdirectory(include)
 add_subdirectory(src)
 
-add_executable(low_rank_test
+add_executable(low_rank_test_2D
                low_rank_test.cpp ${cpp_files} ${headers})
 
 add_executable(ctree_test
