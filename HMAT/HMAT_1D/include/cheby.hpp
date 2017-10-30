@@ -30,11 +30,9 @@ public:
     * \brief Getters
     */
     // return Chebyshew nodes on domain [xl,xr]
-    Eigen::VectorXd getNodes() const { return tk_;  }
+    Eigen::VectorXd getNodes() const { return tk_; }
     // return weights of Lagrange polynomial
-    Eigen::VectorXd getWghts() const {
-        return wk_;
-    }
+    Eigen::VectorXd getWghts() const { return wk_; }
 
     /**
     * \brief Setters

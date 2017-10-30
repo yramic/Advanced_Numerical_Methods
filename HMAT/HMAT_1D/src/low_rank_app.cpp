@@ -13,7 +13,108 @@
 #include "../include/ctree.hpp"
 #include "../include/kernel.hpp"
 #include "../include/node.hpp"
+#include "../include/point.hpp"
+#include <iostream>
+//#define ver1
+#define ver2
+#ifdef ver2
 
+// constructor
+LowRankApp::LowRankApp(Kernel kernel, const std::vector<Point> &GPoints, double eta, unsigned deg):
+    kernel_(kernel), GPoints_(GPoints), HP_(GPoints,eta,deg), deg_(deg)
+{ }
+
+// approximate matrix-vector multiplication
+Eigen::VectorXd LowRankApp::mvProd(const Eigen::VectorXd& c)
+{
+    // compute Far and Near Field relationships between Nodes of the Cluster Tree
+    HP_.setNearFar();
+    // compute far field contribution
+    Eigen::VectorXd f_approx = Eigen::VectorXd::Zero(c.size());
+    ff_contribution(f_approx, HP_.getFF(), c);
+    // compute near-field contribution
+    nf_contribution(f_approx, HP_.getNF(), c);
+
+    return f_approx;
+}
+
+// compute V-matrix of node
+Eigen::MatrixXd LowRankApp::setV(Node* x)
+{
+    std::vector<Point> node_points = x->getPoints();
+    int n = node_points.size();
+    Eigen::VectorXd tk = x->getTK(); // Chebyshew interpolation nodes
+    Eigen::VectorXd wk = x->getWK(); // weights of Lagrange polynomial
+
+    Eigen::MatrixXd V_node = Eigen::MatrixXd::Constant(n, deg_+1, 1);
+    // V-matrix computation
+    for(int i = 0; i<n; i++){
+        for(int j = 0; j<=deg_; j++){
+            for(int k=0; k<j; k++){
+                V_node(i,j) *= node_points[i].getX() - tk[k];
+            }
+            // Skip "k == j"
+            for(int k=j+1; k<=deg_; ++k) {
+                V_node(i,j) *= node_points[i].getX() - tk[k];
+            }
+            V_node(i,j) *= wk(j);
+        }
+    }
+    return V_node;
+}
+// compute V*c restricted to node indices
+Eigen::MatrixXd LowRankApp::setVc(Node* x, const Eigen::VectorXd& c)
+{
+    std::vector<Point> node_points = x->getPoints();
+    int n = node_points.size();
+    Eigen::VectorXd c_seg = Eigen::VectorXd::Zero(n);
+    for(int i=0; i<n; i++){     // get only the part of vector c we need
+        c_seg[i] = c(node_points[i].getId());
+    }
+    Eigen::MatrixXd Vx = setV(x);   // calculate the V matrix for the x node
+    Eigen::MatrixXd Vc = Vx.transpose() * c_seg;    // Vc matrix calculation
+    return Vc;
+}
+// compute far field contribution
+void LowRankApp::ff_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*,Node*>> ff_v, const Eigen::VectorXd& c)
+{
+    int n = ff_v.size();
+    for(int i = 0; i<n; i++){   // iterate for all the pairs of far field nodes
+        Node* xnode = ff_v[i].first;
+        Node* ynode = ff_v[i].second;
+        Eigen::MatrixXd Vc = setVc(ynode, c);
+        std::vector<Point> xp = xnode->getPoints();
+        std::vector<Point> yp = ynode->getPoints();
+        BlockCluster X_(xnode->getTK(), ynode->getTK(), deg_, kernel_);
+        Eigen::MatrixXd X = X_.getMatrix(); // matrix $X_{\sigma,\mu}$
+        Eigen::VectorXd XVc = Eigen::VectorXd::Zero(deg_+1);
+        XVc += X * Vc;
+        Eigen::MatrixXd Vx = setV(xnode);
+        Eigen::VectorXd f_seg(xp.size());
+        f_seg = Vx * XVc;
+        for(int j=0; j<xnode->getPoints().size(); j++){
+            f[xnode->getPoints()[j].getId()] += f_seg[j];   // add contribution of far field to "f"
+        }
+    }
+}
+// compute near-field contribution
+void LowRankApp::nf_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*,Node*>> nf_v, const Eigen::VectorXd& c)
+{
+    int n = nf_v.size();
+    for(int i = 0; i<n; i++){
+        Node* xnode = nf_v[i].first;
+        Node* ynode = nf_v[i].second;
+        for(int j=0; j<xnode->getPoints().size(); j++){
+            for(int k=0; k<ynode->getPoints().size(); k++){
+                f(xnode->getPoints()[j].getId()) += kernel_(xnode->getPoints()[j].getX(), ynode->getPoints()[k].getX()) * c(ynode->getPoints()[k].getId()); // add near field contribution
+            }
+        }
+    }
+}
+
+#endif
+
+#ifdef ver1
 // constructor
 LowRankApp::LowRankApp(Kernel kernel, const Eigen::VectorXd& x, const Eigen::VectorXd& y):
     kernel_(kernel), Tx_(x), Ty_(y)
@@ -35,7 +136,7 @@ Eigen::VectorXd LowRankApp::mvProd(const Eigen::VectorXd& c, double eta, unsigne
 
     // compute far field contribution
     Eigen::VectorXd f_approx = Eigen::VectorXd::Zero(c.size());
-    ff_contribution(f_approx, Tx_.getRoot(), deg);
+    //ff_contribution(f_approx, Tx_.getRoot(), deg);
     // compute near-field contribution
     nf_contribution(f_approx, Tx_.getRoot(), c);
 
@@ -107,3 +208,4 @@ void LowRankApp::nf_contribution(Eigen::VectorXd& f, Node* tx, const Eigen::Vect
         }
     }
 }
+#endif

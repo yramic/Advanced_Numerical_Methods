@@ -6,8 +6,8 @@
 #include <limits>
 
 // actual  constructor: creates the root of the Cluster Tree and the recursivly creates the leaves
-Node::Node(std::vector<Point> PPointsTree):
-    tl_child_(NULL), tr_child_(NULL), bl_child_(NULL), br_child_(NULL), PPointsTree_(PPointsTree), near_f_(vector_t()), far_f_(vector_t())//, x1_(-(std::numeric_limits<double>::max())), x2_(std::numeric_limits<double>::max()), y1_(-(std::numeric_limits<double>::max())), y2_(std::numeric_limits<double>::max())
+Node::Node(std::vector<Point> Points):
+    tl_child_(NULL), tr_child_(NULL), bl_child_(NULL), br_child_(NULL), PPointsTree_(Points), near_f_(vector_t()), far_f_(vector_t())//, x1_(-(std::numeric_limits<double>::max())), x2_(std::numeric_limits<double>::max()), y1_(-(std::numeric_limits<double>::max())), y2_(std::numeric_limits<double>::max())
 {
     setLeaves();
 }
