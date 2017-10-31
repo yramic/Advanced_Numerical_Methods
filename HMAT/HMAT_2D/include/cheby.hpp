@@ -11,40 +11,34 @@
 class Cheby
 {
 public:
-
     /*!
     * \brief Constructor
     * \param xl left coordinate of the interpolating domain
     * \param xr right coordinate of the interpolating domain
     */
     Cheby(double xl, double xr, unsigned deg);
-
     /*!
     * \brief Return Chebyshew nodes on domain [xl,xr]
     */
     Eigen::VectorXd getNodes() const {
         return tk_;
     }
-
     /*!
     * \brief Return weights of Lagrange polynomial
     */
     Eigen::VectorXd getWghts() const {
         return wk_;
     }
-
     /*!
     * \brief Compute Chebyshew nodes on domain [xl,xr]
     */
     void setNodes();
-
     /*!
     * \brief Compute weights of Lagrange polynomial
     */
     void setWghts();
 
 private:
-
     double xl_; //!< left  boundary of domain on which we compute the Chebyshew nodes
     double xr_; //!< right boundary of domain on which we compute the Chebyshew nodes
     unsigned deg_; //!< degree of Lagrange polynomial

@@ -2,7 +2,6 @@
 #include <Eigen/Dense>
 #include <cmath>
 
-
 // constructor
 Cheby::Cheby(double xl, double xr, unsigned deg):
     xl_(xl), xr_(xr), deg_(deg), tk_(Eigen::VectorXd::Zero(deg+1)), wk_(Eigen::VectorXd::Zero(deg+1))
@@ -10,7 +9,6 @@ Cheby::Cheby(double xl, double xr, unsigned deg):
     setNodes();
     setWghts();
 }
-
 
 // compute Chebyshew nodes on domain [xl,xr]
 void Cheby::setNodes()
@@ -21,7 +19,6 @@ void Cheby::setNodes()
         tk_(j) = (xl_+xr_)/2 + (xr_-xl_)/2 * cos((2.*j+1)/(2.*(deg_+1.))*M_PI);
     }
 }
-
 
 // compute weights of Lagrange polynomial
 void Cheby::setWghts()
