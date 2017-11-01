@@ -8,7 +8,7 @@
 
 
 /*!
-* \brief Master class for low-rank approximation
+* \brief Master class for low-rank approximation (Far and Near Field distribution computation)
 */
 class LowRankApp
 {

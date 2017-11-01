@@ -9,6 +9,12 @@
 #include <iostream>
 #include <chrono>
 
+/*
+ * Some of the definitions for the preprocessor must be deleted and also lots of comments that exist on the code.
+ * This file will be cleaned from comments and not needed code in the final version because now everything is used for debugging the program.
+ */
+
+
 //#define circle
 //#define vector16
 #define random1
