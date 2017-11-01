@@ -25,7 +25,6 @@ struct TriaPanel{
 };
 
 
-#if SOLUTION
 //-----------------------------------------------------------------------------
 /* SAM_LISTING_BEGIN_0 */
 Eigen::Vector3d transformx2BarCoord(const Eigen::Vector3d& a,
@@ -45,14 +44,12 @@ Eigen::Vector3d transformx2BarCoord(const Eigen::Vector3d& a,
   return coeffs;
 }
 /* SAM_LISTING_END_0 */
-#endif // SOLUTION
 
 
 //-----------------------------------------------------------------------------
 /* SAM_LISTING_BEGIN_1 */
 bool ProjectOnTria(const TriaPanel& T, const Eigen::Vector3d& x,
 		   Eigen::Vector3d& xp){
-#if SOLUTION
   // Retrieve vertices from triangle T
   const Eigen::Vector3d& a = T.getVertex(0);
   const Eigen::Vector3d& b = T.getVertex(1);
@@ -67,16 +64,11 @@ bool ProjectOnTria(const TriaPanel& T, const Eigen::Vector3d& x,
     return true;
   else
     return false;
-#else // TEMPLATE
-  // TODO: Implement your code
-  return true;
-#endif // TEMPLATE
 }
 /* SAM_LISTING_END_1 */
 
 
 //-----------------------------------------------------------------------------
-#if SOLUTION
 /* SAM_LISTING_BEGIN_2 */
 struct Rfunction{
   double phib;
@@ -118,7 +110,6 @@ struct Rfunction{
 
 };
 /* SAM_LISTING_END_2 */
-#endif // SOLUTION
 
 
 //-----------------------------------------------------------------------------
@@ -126,7 +117,6 @@ struct Rfunction{
 double integrateTiSing(const Eigen::Vector2d& b, const Eigen::Vector2d& c,
 		       double zeta, int n=6){
   double res=0;
-#if SOLUTION
   // Initialize R function for current triangle;
   Rfunction Rtheta(b,c);
   // Retrieve maximum angle
@@ -138,15 +128,11 @@ double integrateTiSing(const Eigen::Vector2d& b, const Eigen::Vector2d& c,
   for(int k=0; k<n; k++){
     res += (std::sqrt(Rtheta(xq(k))*Rtheta(xq(k))+zeta*zeta) - zeta)*wq(k);
   }
-#else // TEMPLATE
-    // TODO: Implement your code
-#endif // TEMPLATE
   return res;
 }
 /* SAM_LISTING_END_3 */
 
 
-#if SOLUTION
 //-----------------------------------------------------------------------------
 /* SAM_LISTING_BEGIN_4 */
 void transformCoordinates(const Eigen::Vector3d& a, const Eigen::Vector3d& b,
@@ -156,27 +142,12 @@ void transformCoordinates(const Eigen::Vector3d& a, const Eigen::Vector3d& b,
 	    << b.transpose() << " , " << c.transpose() << std::endl;
   Eigen::MatrixXd M(3,2);
   M << b-a, c-a;
-  // Use QR decomposition to get vectors for b and c on new basis
   Eigen::HouseholderQR< Eigen::MatrixXd > qr(M);
-  Eigen::Matrix2d R = qr.matrixQR().template triangularView<Eigen::Upper>();
-  // For simplicity, the rest of the code assumes that the transformation is on
-  // the first quadrant. We check whether this is satisfied and flip the triangle
-  // if not.
-  std::cout << R << std::endl;
-  if( R(0,0) < 0){
-    std::cout << " changed sign x " << std::endl;
-    R.row(0) *= -1;
-  }
-  if( R(1,1) < 0){
-    std::cout << " changed sign y " << std::endl;
-    R.row(1) *= -1;
-  }
-  // Finally, express vectors on new basis.
-  v1 = R.col(0); // v1 for b
-  v2 = R.col(1); // v2 for c
+  Eigen::MatrixXd R = qr.matrixQR().template triangularView<Eigen::Upper>();
+  v1 = R.col(0);
+  v2 = R.col(1);
 }
 /* SAM_LISTING_END_4 */
-#endif // SOLUTION
 
 
 //-----------------------------------------------------------------------------
@@ -184,7 +155,6 @@ void transformCoordinates(const Eigen::Vector3d& a, const Eigen::Vector3d& b,
 double integrateTSing(const TriaPanel& T, const Eigen::Vector3d& x,
 		      int n=6){
   double res = 0.;
-#if SOLUTION
   // get projection of x on triangle's plane
   Eigen::Vector3d xp;
   bool onTria = ProjectOnTria(T, x, xp);
@@ -351,9 +321,6 @@ double integrateTSing(const TriaPanel& T, const Eigen::Vector3d& x,
     } // end if not too close
     
   } // end if outside
-#else // TEMPLATE
-  // TODO: Implement your code
-#endif // TEMPLATE
   return res;
 }
 /* SAM_LISTING_END_5 */
@@ -383,7 +350,7 @@ int main() {
   Eigen::Vector3d x; x<< 0.75, 0.65, 0.;
   //double dist = distancePointToSegment(x, b1, c1);
   //std::cout << "distance " << dist << std::endl;
-  
+  /*
   // Test quadrature
   Eigen::Vector3d a, b, c;  
   a << 1., 1., 1.;
@@ -395,7 +362,6 @@ int main() {
   Eigen::VectorXd intx5(Nts), intx10(Nts), intx20(Nts);
   for(int ts=0; ts<Nts; ts++){
     Eigen::Vector3d xtau = a + tau(ts)*( 0.5*(b+c) - a);
-    std::cout << " tau = " << tau(ts) ;
     intx5(ts) = integrateTSing(T, xtau, 5);
     intx10(ts) = integrateTSing(T, xtau, 10);
     intx20(ts) = integrateTSing(T, xtau, 20);   
@@ -412,7 +378,7 @@ int main() {
   std::ofstream out_dt("dt.txt");
   out_dt << std::setprecision(18) << tau; 
   out_dt.close( );
-  
+  */
 
   // Second test
   Eigen::Vector3d ah, bh, ch;  
@@ -444,14 +410,12 @@ int main() {
   std::cout << " On 0.5*(a+c) " << std::endl;
   double exres = 1.676348272;
   std::cout << " Error for n = 5 "
-	    << fabs(integrateTSing(T0, 0.5*(ah + ch), 5) - exres );
-  /*
+	    << fabs(integrateTSing(T0, 0.5*(ah + ch), 5) - exres )
 	    << "\n Error for n = 10 "
     	    << fabs(integrateTSing(T0, 0.5*(ah + ch), 10) - exres )
 	    << "\n Error for n = 20 "
     	    << fabs(integrateTSing(T0, 0.5*(ah + ch), 20) - exres )
 	    << std::endl;
-  */
   
   return 0;
 
