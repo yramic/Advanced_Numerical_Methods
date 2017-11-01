@@ -23,7 +23,8 @@ int main() {
     double eta;
     PolynomialKernel P;
     LowRankApp HMat(&P, PPoints, n, eta, deg);
-    Eigen::MatrixXd V = HMat.setV_node(&t,deg);
+    t.setV_node(deg);
+    Eigen::MatrixXd V = t.getV_node();
     // alternate calculation of the V matrix of this Node
     double x1,x2,y1,y2;                 // construction of Bounding Box of this Node
     x1 = PPoints.begin()->getX();

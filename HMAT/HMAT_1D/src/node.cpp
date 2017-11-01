@@ -50,7 +50,45 @@ void Node::setLeaves(int& id)
     wk_ = cb.getWghts();                                // Weights of Lagrange polynomial
   }
 }
-
+// compute V-matrix of node
+void Node::setV()
+{
+    if(V_node_.cols()==0 && V_node_.rows()==0){
+        int n = node_points_.size();
+        V_node_ = Eigen::MatrixXd::Constant(n, deg_+1, 1);
+        // V-matrix computation
+        for(int i = 0; i<n; i++){
+            for(int j = 0; j<=deg_; j++){
+                for(int k=0; k<j; k++){
+                    V_node_(i,j) *= node_points_[i].getX() - tk_[k];
+                }
+                // Skip "k == j"
+                for(int k=j+1; k<=deg_; ++k) {
+                    V_node_(i,j) *= node_points_[i].getX() - tk_[k];
+                }
+                V_node_(i,j) *= wk_[j];
+            }
+        }
+    }
+    else{
+            return;
+    }
+}
+// compute V*c restricted to node indices
+void Node::setVc(const Eigen::VectorXd& c)
+{
+    if(Vc_node_.cols()==0 && Vc_node_.rows()==0){
+        int n = node_points_.size();
+        Eigen::VectorXd c_seg = Eigen::VectorXd::Zero(n);
+        for(int i=0; i<n; i++){     // get only the part of vector c we need
+            c_seg[i] = c(node_points_[i].getId());
+        }
+        Vc_node_ = V_node_.transpose() * c_seg;    // Vc matrix calculation
+    }
+    else{
+        return;
+    }
+}
 #endif
 #ifdef ver1
 // actual constructor: adds a tree below the node if left_index != right_index

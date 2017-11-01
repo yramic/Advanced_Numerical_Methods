@@ -29,13 +29,7 @@ public:
      * \param deg Degree of itnerpolation
      */
     Eigen::VectorXd mvProd(Eigen::VectorXd &c, double eta, unsigned deg);
-    // for debugging
-    /*!
-     * \brief Compute V matrix
-     * \param x The node to use for V matrix calculation
-     * \param deg Degree of interpolation
-     */
-    Eigen::MatrixXd setV_node(Node* x, unsigned deg);
+
 private:
     /*!
      * \brief Compute far field contribution
@@ -54,13 +48,6 @@ private:
      * \param f_aprox_nf_contr Number of near field contributions
      */
     void nf_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*,Node*>> nf_v, const Eigen::VectorXd& c, Eigen::VectorXd& f_aprox_nf_contr);
-
-    /*!
-     * \brief Compute V matrix
-     * \param x The node to use for V matrix calculation
-     * \param deg Degree of interpolation
-     */
-    //Eigen::MatrixXd setV_node(Node* x, unsigned deg);
 
     Kernel* kernel_;    //!< pointer for kernel
     HierarchicalPartitioning HP_;   //!< Hierarchical Partiotion class for constructing the tree and calculate near and far field nodes

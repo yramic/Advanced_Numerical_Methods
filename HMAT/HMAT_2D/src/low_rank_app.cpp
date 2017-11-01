@@ -36,84 +36,7 @@ Eigen::VectorXd LowRankApp::mvProd(Eigen::VectorXd& c, double eta, unsigned deg)
     return f_approx;
 }
 
-// compute V-matrix of node
-Eigen::MatrixXd LowRankApp::setV_node(Node* x, unsigned deg) //tt==PPointsTree??
-{
-    std::vector<Point> xpoints = x->getPPoints();
-    int ppts = xpoints.size();
-    Eigen::MatrixXd Vx = Eigen::MatrixXd::Constant(ppts, (deg+1)*(deg+1), 1);
 
-    for(unsigned i=0; i<=ppts-1; ++i) { // calculation of Vx combined with Vy
-        for(unsigned j1=0; j1<=deg; ++j1) {
-            for(unsigned k1=0; k1<j1; ++k1) {
-                for(unsigned j2=0; j2<=deg; ++j2) {
-                    Vx(i,j1*(deg+1) + j2) *= (xpoints[i].getX() - x->getTkx()[k1]);
-                }
-            }
-            // Skip "k1 == j1"
-            for(unsigned k1=j1+1; k1<=deg; ++k1) {
-                for(unsigned j2=0; j2<=deg; ++j2) {
-                    Vx(i,j1*(deg+1) + j2) *= (xpoints[i].getX() - x->getTkx()[k1]);
-                }
-            }
-            for(unsigned j2=0; j2<=deg; ++j2) {
-                for(unsigned k2=0; k2<j2; ++k2) {
-                    Vx(i,j1*(deg+1) + j2) *= (xpoints[i].getY() - x->getTky()[k2]);
-                }
-                // Skip "k2 == j2"
-                for(unsigned k2=j2+1; k2<=deg; ++k2) {
-                    Vx(i,j1*(deg+1) + j2) *= (xpoints[i].getY() - x->getTky()[k2]);
-                }
-                Vx(i,j1*(deg+1) + j2) *= x->getWkx()[j1] * x->getWky()[j2];
-            }
-        }
-    }
-    return Vx;
-
-    // Alternate way of computing V matrix
-    /*Eigen::MatrixXd VnodeX = Eigen::MatrixXd::Constant(ppts, (deg+1), 1);
-    Eigen::MatrixXd VnodeY = Eigen::MatrixXd::Constant(ppts, (deg+1), 1);
-    for(unsigned i=0; i<=ppts-1; ++i) {
-        for(unsigned j=0; j<=deg; ++j) {
-            for(unsigned k=0; k<j; ++k) {
-                VnodeX(i,j) *= PPointsTree_[i].getX() - tkx[k];
-            }
-            // Skip "k == j"
-            for(unsigned k=j+1; k<=deg; ++k) {
-                VnodeX(i,j) *= PPointsTree_[i].getX() - tkx[k];
-            }
-            VnodeX(i,j) *= wkx(j);
-        }
-    }
-    for(unsigned i=0; i<=ppts-1; ++i) {
-        for(unsigned j=0; j<=deg; ++j) {
-            for(unsigned k=0; k<j; ++k) {
-                VnodeY(i,j) *= PPointsTree_[i].getY() - tky[k];
-            }
-            // Skip "k == j"
-            for(unsigned k=j+1; k<=deg; ++k) {
-                VnodeY(i,j) *= PPointsTree_[i].getY() - tky[k];
-            }
-            VnodeY(i,j) *= wky(j);
-        }
-    }*/
-
-    /*Eigen::MatrixXd V_node_new(ppts, (deg+1)*(deg+1));
-    for(unsigned i=0; i<=ppts-1; ++i) {
-        for(unsigned j=0; j<=deg; ++j) {
-            V_node_new.block(i, j*(deg+1), 1, deg+1) = VnodeX(i,j) * VnodeY.row(i);
-        }
-    }*/
-
-    /*std::cout << "VnodeX" << std::endl;
-    std::cout << VnodeX << std::endl;
-    std::cout << "VnodeY" << std::endl;
-    std::cout << VnodeY << std::endl;
-    std::cout << "V_Node" << std::endl;
-    std::cout << V_node_ << std::endl;
-    std::cout << "V_Node_new" << std::endl;
-    std::cout << V_node_new << std::endl;*/
-}
 
 // compute far field contribution
 void LowRankApp::ff_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*,Node*>> ff_v, unsigned deg, Eigen::VectorXd& c, Eigen::VectorXd& f_approx_ff_contr)
@@ -127,7 +50,9 @@ void LowRankApp::ff_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*
         std::cout << xnode->getTkx() << std::endl;
         BlockCluster X_(xnode->getTkx(), xnode->getTky(), ynode->getTkx(), ynode->getTky(), deg, kernel_);    // calculation of matrix $X_{\sigma,\mu}$
         Eigen::MatrixXd X = X_.getMatrix();
-        Eigen::MatrixXd Vy = setV_node(ynode, deg);
+        xnode->setV_node(deg);
+        ynode->setV_node(deg);
+        Eigen::MatrixXd Vy = ynode->getV_node();
         Eigen::MatrixXd Vm = Vy.transpose();
         int ny = ynode->getPPoints().size();
         Eigen::VectorXd c_seg(ny);
@@ -140,7 +65,7 @@ void LowRankApp::ff_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*
         Vc = Vm * c_seg;
         XVc += X * Vc;
         Eigen::MatrixXd Vs = Eigen::MatrixXd::Zero(xnode->getPPoints().size(),(deg+1)*(deg+1));                    // $V_{\sigma}$
-        Vs = setV_node(xnode, deg);
+        Vs = xnode->getV_node();
         Eigen::VectorXd f_seg(xnode->getPPoints().size());                                                       // add contribution of far field to "f"
         f_seg = Vs * XVc;
         for (int j = 0; j<xnode->getPPoints().size(); j++) {

@@ -35,10 +35,6 @@ public:
     Eigen::VectorXd mvProd(const Eigen::VectorXd& c);
 
 private:
-    // compute V-matrix of cluster
-    Eigen::MatrixXd setV( Node* x);
-    // compute V*c restricted to node indices
-    Eigen::MatrixXd setVc(Node* x, const Eigen::VectorXd& c);
     // compute far  field contribution
     void ff_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*,Node*>> ff_v, const Eigen::VectorXd &c);
     // compute near field contribution

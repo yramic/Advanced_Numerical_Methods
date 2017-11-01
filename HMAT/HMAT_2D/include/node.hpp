@@ -98,6 +98,12 @@ public:
         return PPointsTree_;
     }
     /*!
+     * \brief return the V matrix of this node
+     */
+    Eigen::MatrixXd getV_node() const{
+        return V_node_;
+    }
+    /*!
      * \brief return the id of this node
      */
     int getNodeID(){
@@ -142,6 +148,11 @@ public:
      * \param y2 y coordinate of top edge of cluster
      */
     void setLeaves(double x1, double x2, double y1, double y2);
+    /*!
+     * \brief Compute V matrix
+     * \param deg Degree of interpolation
+     */
+    void setV_node(unsigned deg);
     /*!
      * \brief Function to print the cluster tree for debugging
      * \param n Level of the node in the cluster tree(0 = root)
@@ -189,6 +200,7 @@ private:
     unsigned deg_;  //!< degree of interpolation
     Eigen::VectorXd tkx_, tky_; //!< Chebyshev Nodes
     Eigen::VectorXd wkx_, wky_; //!< Lagrange polynomial weights
+    Eigen::MatrixXd V_node_; //!< V matrix
     int nodeId_;    //!< id of the node in the cluster tree used for debugging
     friend class cTree;
  };

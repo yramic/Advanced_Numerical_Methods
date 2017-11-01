@@ -160,7 +160,85 @@ void Node::setLeaves(double x1, double x2, double y1, double y2)
         if (!br_PPoints.empty()) br_child_ = new Node(br_PPoints,medX,x2,y1,medY, deg_);
     }
 }
+// compute V-matrix of node
+void Node::setV_node(unsigned deg)
+{
+    if(V_node_.cols()==0 && V_node_.rows()==0){
+        int ppts = PPointsTree_.size();
+        V_node_ = Eigen::MatrixXd::Constant(ppts, (deg+1)*(deg+1), 1);
+        for(unsigned i=0; i<=ppts-1; ++i) { // calculation of Vx combined with Vy
+            for(unsigned j1=0; j1<=deg; ++j1) {
+                for(unsigned k1=0; k1<j1; ++k1) {
+                    for(unsigned j2=0; j2<=deg; ++j2) {
+                        V_node_(i,j1*(deg+1) + j2) *= (PPointsTree_[i].getX() - tkx_[k1]);
+                    }
+                }
+                // Skip "k1 == j1"
+                for(unsigned k1=j1+1; k1<=deg; ++k1) {
+                    for(unsigned j2=0; j2<=deg; ++j2) {
+                        V_node_(i,j1*(deg+1) + j2) *= (PPointsTree_[i].getX() - tkx_[k1]);
+                    }
+                }
+                for(unsigned j2=0; j2<=deg; ++j2) {
+                    for(unsigned k2=0; k2<j2; ++k2) {
+                        V_node_(i,j1*(deg+1) + j2) *= (PPointsTree_[i].getY() - tky_[k2]);
+                    }
+                    // Skip "k2 == j2"
+                    for(unsigned k2=j2+1; k2<=deg; ++k2) {
+                        V_node_(i,j1*(deg+1) + j2) *= (PPointsTree_[i].getY() - tky_[k2]);
+                    }
+                    V_node_(i,j1*(deg+1) + j2) *= wkx_[j1] * wky_[j2];
+                }
+            }
+        }
+    }
+    else{
+        return;
+    }
+    // Alternate way of computing V matrix
+    /*Eigen::MatrixXd VnodeX = Eigen::MatrixXd::Constant(ppts, (deg+1), 1);
+    Eigen::MatrixXd VnodeY = Eigen::MatrixXd::Constant(ppts, (deg+1), 1);
+    for(unsigned i=0; i<=ppts-1; ++i) {
+        for(unsigned j=0; j<=deg; ++j) {
+            for(unsigned k=0; k<j; ++k) {
+                VnodeX(i,j) *= PPointsTree_[i].getX() - tkx[k];
+            }
+            // Skip "k == j"
+            for(unsigned k=j+1; k<=deg; ++k) {
+                VnodeX(i,j) *= PPointsTree_[i].getX() - tkx[k];
+            }
+            VnodeX(i,j) *= wkx(j);
+        }
+    }
+    for(unsigned i=0; i<=ppts-1; ++i) {
+        for(unsigned j=0; j<=deg; ++j) {
+            for(unsigned k=0; k<j; ++k) {
+                VnodeY(i,j) *= PPointsTree_[i].getY() - tky[k];
+            }
+            // Skip "k == j"
+            for(unsigned k=j+1; k<=deg; ++k) {
+                VnodeY(i,j) *= PPointsTree_[i].getY() - tky[k];
+            }
+            VnodeY(i,j) *= wky(j);
+        }
+    }*/
 
+    /*Eigen::MatrixXd V_node_new(ppts, (deg+1)*(deg+1));
+    for(unsigned i=0; i<=ppts-1; ++i) {
+        for(unsigned j=0; j<=deg; ++j) {
+            V_node_new.block(i, j*(deg+1), 1, deg+1) = VnodeX(i,j) * VnodeY.row(i);
+        }
+    }*/
+
+    /*std::cout << "VnodeX" << std::endl;
+    std::cout << VnodeX << std::endl;
+    std::cout << "VnodeY" << std::endl;
+    std::cout << VnodeY << std::endl;
+    std::cout << "V_Node" << std::endl;
+    std::cout << V_node_ << std::endl;
+    std::cout << "V_Node_new" << std::endl;
+    std::cout << V_node_new << std::endl;*/
+}
 void Node::printree(int n)
 {
     std::cout << "Node " << n << std::endl;

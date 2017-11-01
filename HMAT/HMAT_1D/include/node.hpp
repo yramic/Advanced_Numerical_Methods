@@ -54,14 +54,16 @@ public:
     Node* getRChild() const {  return r_child_; }
     Eigen::VectorXd getTK() const { return tk_; }
     Eigen::VectorXd getWK() const { return wk_; }
-
+    Eigen::MatrixXd getV_Node() { return V_node_; }
+    Eigen::MatrixXd getVc_Node() { return Vc_node_; }
     int getId() const { return nodeId_; }
     /**
     * \brief Setters
     */
     // build tree recursively
     void setLeaves(int& id);
-
+    void setV();
+    void setVc(const Eigen::VectorXd& c);
   
 private:
     Node* l_child_;  // left  child of node
@@ -71,6 +73,8 @@ private:
     unsigned deg_;  // degree of interpolation
     Eigen::VectorXd tk_;    // Chebyshev interpolation nodes
     Eigen::VectorXd wk_;    // Weights of Lagrange polynomial
+    Eigen::MatrixXd V_node_ ;//= Eigen::MatrixXd::Zero(node_points_.size(),node_points_.size());
+    Eigen::MatrixXd Vc_node_;// = Eigen::MatrixXd::Zero(node_points_.size(),node_points_.size());
     friend class cTree;
  };
 #endif

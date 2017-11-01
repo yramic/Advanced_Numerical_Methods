@@ -38,43 +38,6 @@ Eigen::VectorXd LowRankApp::mvProd(const Eigen::VectorXd& c)
     return f_approx;
 }
 
-// compute V-matrix of node
-Eigen::MatrixXd LowRankApp::setV(Node* x)
-{
-    std::vector<Point> node_points = x->getPoints();
-    int n = node_points.size();
-    Eigen::VectorXd tk = x->getTK(); // Chebyshew interpolation nodes
-    Eigen::VectorXd wk = x->getWK(); // weights of Lagrange polynomial
-
-    Eigen::MatrixXd V_node = Eigen::MatrixXd::Constant(n, deg_+1, 1);
-    // V-matrix computation
-    for(int i = 0; i<n; i++){
-        for(int j = 0; j<=deg_; j++){
-            for(int k=0; k<j; k++){
-                V_node(i,j) *= node_points[i].getX() - tk[k];
-            }
-            // Skip "k == j"
-            for(int k=j+1; k<=deg_; ++k) {
-                V_node(i,j) *= node_points[i].getX() - tk[k];
-            }
-            V_node(i,j) *= wk(j);
-        }
-    }
-    return V_node;
-}
-// compute V*c restricted to node indices
-Eigen::MatrixXd LowRankApp::setVc(Node* x, const Eigen::VectorXd& c)
-{
-    std::vector<Point> node_points = x->getPoints();
-    int n = node_points.size();
-    Eigen::VectorXd c_seg = Eigen::VectorXd::Zero(n);
-    for(int i=0; i<n; i++){     // get only the part of vector c we need
-        c_seg[i] = c(node_points[i].getId());
-    }
-    Eigen::MatrixXd Vx = setV(x);   // calculate the V matrix for the x node
-    Eigen::MatrixXd Vc = Vx.transpose() * c_seg;    // Vc matrix calculation
-    return Vc;
-}
 // compute far field contribution
 void LowRankApp::ff_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*,Node*>> ff_v, const Eigen::VectorXd& c)
 {
@@ -82,14 +45,19 @@ void LowRankApp::ff_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*
     for(int i = 0; i<n; i++){   // iterate for all the pairs of far field nodes
         Node* xnode = ff_v[i].first;
         Node* ynode = ff_v[i].second;
-        Eigen::MatrixXd Vc = setVc(ynode, c);
+        //Eigen::MatrixXd Vc = setVc(ynode, c);
+        xnode->setV();
+        ynode->setV();
+        ynode->setVc(c);
+        Eigen::MatrixXd Vc = ynode->getVc_Node();
         std::vector<Point> xp = xnode->getPoints();
         std::vector<Point> yp = ynode->getPoints();
         BlockCluster X_(xnode->getTK(), ynode->getTK(), deg_, kernel_);
         Eigen::MatrixXd X = X_.getMatrix(); // matrix $X_{\sigma,\mu}$
         Eigen::VectorXd XVc = Eigen::VectorXd::Zero(deg_+1);
         XVc += X * Vc;
-        Eigen::MatrixXd Vx = setV(xnode);
+        //Eigen::MatrixXd Vx = setV(xnode);
+        Eigen::MatrixXd Vx = xnode->getV_Node();
         Eigen::VectorXd f_seg(xp.size());
         f_seg = Vx * XVc;
         for(int j=0; j<xnode->getPoints().size(); j++){
@@ -136,7 +104,7 @@ Eigen::VectorXd LowRankApp::mvProd(const Eigen::VectorXd& c, double eta, unsigne
 
     // compute far field contribution
     Eigen::VectorXd f_approx = Eigen::VectorXd::Zero(c.size());
-    //ff_contribution(f_approx, Tx_.getRoot(), deg);
+    ff_contribution(f_approx, Tx_.getRoot(), deg);
     // compute near-field contribution
     nf_contribution(f_approx, Tx_.getRoot(), c);
 
