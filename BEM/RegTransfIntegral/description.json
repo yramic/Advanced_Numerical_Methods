@@ -1,0 +1,8 @@
+{
+    "author" : "curzuato",
+    "email" : "carolina.urzua@sam.math.ethz.ch",
+    "contributors" : "",
+
+    "name": "RegTransfIntegral",
+    "all" : ["main.cpp"]
+}
