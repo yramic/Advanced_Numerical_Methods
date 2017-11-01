@@ -2,6 +2,7 @@
 #include "include/ctree.hpp"
 #include "include/node.hpp"
 #include "include/cheby.hpp"
+#include "include/low_rank_app.hpp"
 #include <iostream>
 
 int main() {
@@ -17,10 +18,13 @@ int main() {
         p.setV(v[i]);
         PPoints.push_back(p);
     }
-    Node t(PPoints);
     unsigned deg = 2;
-    t.setV_node(PPoints, deg);          // calculating the V matrix of this Node
-
+    Node t(PPoints,deg);
+    double eta;
+    PolynomialKernel P;
+    LowRankApp HMat(&P, PPoints, n, eta, deg);
+    t.setV_node(deg);
+    Eigen::MatrixXd V = t.getV_node();
     // alternate calculation of the V matrix of this Node
     double x1,x2,y1,y2;                 // construction of Bounding Box of this Node
     x1 = PPoints.begin()->getX();
@@ -95,11 +99,12 @@ int main() {
     // check if the two ways of calculation produce the same V matrix
     for(int i = 0; i<n; i++){
         for(int j = 0; j<deg*deg; j++){
-            if(std::abs(V_node_new(i,j) - t.getV_node()(i,j))>10*std::numeric_limits<double>::epsilon()) {
+            if(std::abs(V_node_new(i,j) - V(i,j))>10*std::numeric_limits<double>::epsilon()) {
                 std::cout << "Wrong" << std::endl;
                 return 0;
             }
         }
     }
     std::cout << "Correct" << std::endl;
+    return 0;
 }

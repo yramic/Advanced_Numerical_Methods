@@ -1,13 +1,14 @@
 #include "include/point.hpp"
 #include "include/ctree.hpp"
 #include "include/node.hpp"
+#include "include/hierarchical_partition.hpp"
 #include <iostream>
 
 void setNodeIds(Node* x, int& id){
     if (x == NULL) return;
     x->setNodeId(id);
     id++;
-    std::cout << id << std::endl;
+    //std::cout << id << std::endl;
     setNodeIds(x->getTl_Child(),id);
     setNodeIds(x->getTr_Child(),id);
     setNodeIds(x->getBl_Child(),id);
@@ -27,10 +28,13 @@ int main() {
         p.setV(v[i]);
         PPoints.push_back(p);
     }
-    cTree test_tree(PPoints);               // creating a tree
+    unsigned d = 2;
+    double eta = 2;
+    HierarchicalPartitioning HP(PPoints,eta,d);
+    //cTree test_tree(PPoints, d);               // creating a tree
     int id = 0;
-    int eta = 2;
-    setNodeIds(test_tree.getRoot(),id);     // setting ID in each node of the tree
+    setNodeIds(HP.getTx().getRoot(),id);     // setting ID in each node of the tree
     Eigen::MatrixXd cmatrix = Eigen::MatrixXd::Constant(id+1,id+1,0);   // matrix that rows and columns represent the IDs of the nodes that exist on the tree
-    test_tree.setNearFar(eta, test_tree, cmatrix);                      // set the near and far field of each node and add 1 for every comaprisson that is done in this process in the referring cell of the matrix
+    HP.setNearFar(cmatrix);                      // set the near and far field of each node and add 1 for every comaprisson that is done in this process in the referring cell of the matrix
+    std::cout << cmatrix << std::endl;
 }

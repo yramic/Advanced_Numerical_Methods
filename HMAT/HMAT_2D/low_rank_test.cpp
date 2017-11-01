@@ -9,15 +9,21 @@
 #include <iostream>
 #include <chrono>
 
-#define circle
+/*
+ * Some of the definitions for the preprocessor must be deleted and also lots of comments that exist on the code.
+ * This file will be cleaned from comments and not needed code in the final version because now everything is used for debugging the program.
+ */
+
+
+//#define circle
 //#define vector16
-//#define random1
+#define random1
 
 
 #define local
-//#define global
-//#define gsk
-//#define gauss
+#define global
+#define gsk
+#define gauss
 int main() {
 
     // Input
@@ -111,11 +117,12 @@ int main() {
 #endif
         PPoints.push_back(p);
     }
-    Eigen::VectorXd    c = Eigen::VectorXd::Random(n);  // random initialization of vector c
+    Eigen::VectorXd    c(n);
+    c= Eigen::VectorXd::Random(n);  // random initialization of vector c
 
     // vector c initialization for testing
 #ifdef vector16
-    Eigen::VectorXd c(n);
+    //Eigen::VectorXd c(n);
     c << 0.168182, -0.835255, 0.661581, -0.827464, 0.0385175, 0.559586, 0.745203, -0.624835, 0.273339, -0.327815, -0.528608, -0.320443, -0.731551, -0.600541, 0.474063, 0.98031;
 #endif
     // printing the Polygon Points
@@ -163,9 +170,9 @@ int main() {
 
     auto start2 = std::chrono::system_clock::now();
 
-    LowRankApp lra(&P, PPoints, n);         // initialization of low rank approximation for BEM approx for matrix multiplication
-
-    Eigen::VectorXd f_approx = lra.mvProd(c, eta, d);   // calculation of the low rank approximation
+    //LowRankApp lra(&P, PPoints, n);         // initialization of low rank approximation for BEM approx for matrix multiplication
+    LowRankApp HMat(&P, PPoints, n, eta, d);
+    Eigen::VectorXd f_approx = HMat.mvProd(c, eta, d);   // calculation of the low rank approximation
 
     auto end2 = std::chrono::system_clock::now();
     std::chrono::duration<double> time_diff2 = end2 - start2;

@@ -46,15 +46,12 @@ Eigen::VectorXd GlobalInterpolationApp::mvProd(Eigen::VectorXd& c, unsigned deg)
             for(unsigned k1=0; k1<j1; ++k1) {
                 for(unsigned j2=0; j2<=deg; ++j2) {
                     V(i,j1*(deg+1) + j2) *= (PPoints_[i].getX() - tkx[k1]);
-
-
                 }
             }
             // Skip "k1 == j1"
             for(unsigned k1=j1+1; k1<=deg; ++k1) {
                 for(unsigned j2=0; j2<=deg; ++j2) {
                     V(i,j1*(deg+1) + j2) *= (PPoints_[i].getX() - tkx[k1]);
-
                 }
             }
             for(unsigned j2=0; j2<=deg; ++j2) {

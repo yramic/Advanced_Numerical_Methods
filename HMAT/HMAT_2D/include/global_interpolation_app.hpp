@@ -11,7 +11,6 @@
 class GlobalInterpolationApp
 {
 public:
-
     /*!
      * \brief Constructor for 2D problem
      * \param kernel Kernel used for the matrix multiplication
