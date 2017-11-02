@@ -83,12 +83,7 @@ int main() {
   std::ofstream out_N("integrateTiSing_N.txt");
   out_N << N; 
   out_N.close( );
-
-  Eigen::Vector3d b1, c1; b1<< 1., 0., 0.; c1 << 0.5, 1., 0.;
-  Eigen::Vector3d x; x<< 0.75, 0.65, 0.;
-  //double dist = distancePointToSegment(x, b1, c1);
-  //std::cout << "distance " << dist << std::endl;
-  /*
+  
   // Test quadrature
   Eigen::Vector3d a, b, c;  
   a << 1., 1., 1.;
@@ -97,27 +92,30 @@ int main() {
   TriaPanel T(a, b, c);  
   int Nts = 100;
   Eigen::VectorXd tau = Eigen::VectorXd::LinSpaced(Nts, 0, 2);
-  Eigen::VectorXd intx5(Nts), intx10(Nts), intx20(Nts);
+  Eigen::VectorXd intx5(Nts), intx10(Nts), intx20(Nts), intx1000(Nts);
   for(int ts=0; ts<Nts; ts++){
     Eigen::Vector3d xtau = a + tau(ts)*( 0.5*(b+c) - a);
+    std::cout << " tau = " << tau(ts) ;
     intx5(ts) = integrateTSing(T, xtau, 5);
     intx10(ts) = integrateTSing(T, xtau, 10);
-    intx20(ts) = integrateTSing(T, xtau, 20);   
+    intx20(ts) = integrateTSing(T, xtau, 20);
+    intx1000(ts) = integrateTSing(T, xtau, 1000);   
   }
+  
   std::ofstream out_Intx5("intx5.txt");
-  out_Intx5 << std::setprecision(18) << intx5; 
+  out_Intx5 << std::setprecision(18) << (intx1000 - intx5).array().abs(); 
   out_Intx5.close( );
   std::ofstream out_Intx10("intx10.txt");
-  out_Intx10 << std::setprecision(18) << intx10; 
+  out_Intx10 << std::setprecision(18) << (intx1000 - intx10).array().abs();  
   out_Intx10.close( );
   std::ofstream out_Intx20("intx20.txt");
-  out_Intx20 << std::setprecision(18) << intx20; 
+  out_Intx20 << std::setprecision(18) << (intx1000 - intx20).array().abs(); 
   out_Intx20.close( );
   std::ofstream out_dt("dt.txt");
   out_dt << std::setprecision(18) << tau; 
   out_dt.close( );
-  */
-
+  
+  
   // Second test
   Eigen::Vector3d ah, bh, ch;  
   ah << 0., 0., 0.;
@@ -148,7 +146,7 @@ int main() {
   std::cout << " On 0.5*(a+c) " << std::endl;
   double exres = 1.676348272;
   std::cout << " Error for n = 5 "
-	    << fabs(integrateTSing(T0, 0.5*(ah + ch), 5) - exres )
+	    << fabs(integrateTSing(T0, 0.5*(ah + ch).eval(), 5) - exres )
 	    << "\n Error for n = 10 "
     	    << fabs(integrateTSing(T0, 0.5*(ah + ch), 10) - exres )
 	    << "\n Error for n = 20 "
