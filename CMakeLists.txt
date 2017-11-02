@@ -41,6 +41,17 @@ endif()
 ###########################################################################
 set(CMAKE_CXX_STANDARD 11)
 
+# IGNORE WARNINGS
+###########################################################################
+
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+    add_definitions(-Wno-deprecated-register -Wno-return-type-c-linkage -Wno-keyword-macro -Wno-missing-braces)
+endif()
+
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+    add_definitions(-Wno-deprecated-declarations -Wno-ignored-attributes -Wno-misleading-indentation -Wno-unknown-pragmas)
+endif()
+
 ###########################################################################
 #
 # FIND DEPENDENCIES
