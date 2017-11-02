@@ -29,10 +29,10 @@ Eigen::VectorXd LowRankApp::mvProd(Eigen::VectorXd& c, double eta, unsigned deg)
     ff_contribution(f_approx, HP_.getFF(), deg, c, f_approx_ff_contr);
     // compute near-field contribution
     nf_contribution(f_approx, HP_.getNF(), c, f_approx_nf_contr);
-    //std::cout << "Far Field Contribution for each row" << std::endl;
-    //std:: cout << f_approx_ff_contr << std::endl;
-    //std::cout << "Near Field Contribution for each row" << std::endl;
-    //std:: cout << f_approx_nf_contr << std::endl;
+    std::cout << "Far Field Contribution for each row" << std::endl;
+    std:: cout << f_approx_ff_contr << std::endl;
+    std::cout << "Near Field Contribution for each row" << std::endl;
+    std:: cout << f_approx_nf_contr << std::endl;
     return f_approx;
 }
 
@@ -47,7 +47,6 @@ void LowRankApp::ff_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*
         Node* ynode = ff_v[i].second;
         Eigen::VectorXd XVc = Eigen::VectorXd::Zero((deg +1)*(deg+1));                                          // auxiliary variable
         Eigen::VectorXd Vc((deg+1)*(deg+1));   // deg+1*deg+1                                                   // V*c restricted to the indices of **iter
-        std::cout << xnode->getTkx() << std::endl;
         BlockCluster X_(xnode->getTkx(), xnode->getTky(), ynode->getTkx(), ynode->getTky(), deg, kernel_);    // calculation of matrix $X_{\sigma,\mu}$
         Eigen::MatrixXd X = X_.getMatrix();
         xnode->setV_node(deg);
@@ -85,6 +84,7 @@ void LowRankApp::nf_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*
         for(int j=0; j<xnode->getPPoints().size(); j++){
             for(int k=0; k<ynode->getPPoints().size(); k++){
                 f(xnode->getPPoints()[j].getId()) += (*kernel_)(xnode->getPPoints()[j].getX(), xnode->getPPoints()[j].getY(), ynode->getPPoints()[k].getX(), ynode->getPPoints()[k].getY()) * c(ynode->getPPoints()[k].getId()); // add near field contribution
+                f_approx_nf_contr(xnode->getPPoints()[j].getId())++;
             }
         }
     }

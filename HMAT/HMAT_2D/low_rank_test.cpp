@@ -21,9 +21,9 @@
 
 
 #define local
-#define global
-#define gsk
-#define gauss
+//#define global
+//#define gsk
+//#define gauss
 int main() {
 
     // Input
@@ -32,7 +32,7 @@ int main() {
     //unsigned n; std::cin >> n;
 
     // initializing n for testing
-    unsigned n=10;
+    unsigned n=10000;
 #ifdef vector16
     n = 16;
 #endif
@@ -69,7 +69,6 @@ int main() {
         if(t2 < 0.5){
             ty = -ty;
         }
-        std::cout << "random1" << std::endl;
 #endif
 
 #ifdef circle
@@ -117,9 +116,14 @@ int main() {
 #endif
         PPoints.push_back(p);
     }
+    for(std::vector<Point>::iterator iter = PPoints.begin(); iter< PPoints.end(); iter++) std::cout << (*iter).getX() << std::endl;
+    std::cout << std::endl;
+    for(std::vector<Point>::iterator iter = PPoints.begin(); iter< PPoints.end(); iter++) std::cout << (*iter).getY() << std::endl;
+    std::cout << std::endl;
+
     Eigen::VectorXd    c(n);
     c= Eigen::VectorXd::Random(n);  // random initialization of vector c
-
+    std::cout << c << std::endl << std::endl;
     // vector c initialization for testing
 #ifdef vector16
     //Eigen::VectorXd c(n);
@@ -141,7 +145,7 @@ int main() {
     // initializing degree of interpolation for testing
     //unsigned d=1;
 
-    //std::vector<unsigned> t = {1,2,3,5,7,10,20,40,65,70,80,90,100};
+    //std::vector<unsigned> t = {1,2,3,5,7,10,20,40,80,100};
     std::vector<unsigned> t = {3};
     for(auto d : t){            // multiple runs of the program to check the behavior of the error for different degrees
     KernelGalerkin G;           // initialization of Galerkin kernel for 2d problem -1/(2*pi)*log||x-y||
@@ -159,7 +163,7 @@ int main() {
     Eigen::MatrixXd M(n,n);
     for(int i=0; i<n; ++i)
         for(int j=0; j<n; ++j)
-            M(i,j) = P(PPoints[i].getX(), PPoints[i].getY(), PPoints[j].getX(), PPoints[j].getY());
+            M(i,j) = G(PPoints[i].getX(), PPoints[i].getY(), PPoints[j].getX(), PPoints[j].getY());
     Eigen::VectorXd f_exact = M * c;
 
 
@@ -171,7 +175,7 @@ int main() {
     auto start2 = std::chrono::system_clock::now();
 
     //LowRankApp lra(&P, PPoints, n);         // initialization of low rank approximation for BEM approx for matrix multiplication
-    LowRankApp HMat(&P, PPoints, n, eta, d);
+    LowRankApp HMat(&G, PPoints, n, eta, d);
     Eigen::VectorXd f_approx = HMat.mvProd(c, eta, d);   // calculation of the low rank approximation
 
     auto end2 = std::chrono::system_clock::now();
@@ -204,12 +208,17 @@ int main() {
     Eigen::VectorXd diff = f_exact - f_approx;
 
     // printing for testing
-    std::cout << "f_exact   f_approx    diff" << std::endl;
-    for(int i=0; i<n; i++){
-        std::cout << f_exact(i) << "    " << f_approx(i) << "   " << diff(i) << std::endl;
-    }
+    std::cout << "f_exact" << std::endl;
+    std::cout << f_exact << std::endl;
+
+    std::cout << "f_approx" << std::endl;
+    std::cout << f_approx << std::endl;
+
+    std::cout << "diff" << std::endl;
+    std::cout << diff << std::endl;
     std::cout << "Approximation error (l-inf norm): " << diff.lpNorm<Eigen::Infinity>() << std::endl
               << "Approximation error (l-2 norm): "   << diff.lpNorm<2>() << std::endl
+              << "Relative Approximation error (l-2 norm): "   << diff.lpNorm<2>()/f_exact.lpNorm<2>() << std::endl
               << "Time needed for exact multiplication: "       << time_diff1.count() << " s" << std::endl
               << "Time needed for approximate multiplication: " << time_diff2.count() << " s" << std::endl;
 #endif
