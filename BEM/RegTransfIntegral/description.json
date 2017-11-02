@@ -4,5 +4,5 @@
     "contributors" : "",
 
     "name": "RegTransfIntegral",
-    "all" : ["main.cpp", "gauleg.hpp"]
+    "all" : ["main.cpp", "gauleg.hpp", "plot_convergenceQT.py"]
 }
