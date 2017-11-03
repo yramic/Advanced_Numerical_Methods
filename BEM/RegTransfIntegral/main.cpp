@@ -104,6 +104,15 @@ struct Rfunction{
     phiMax = std::acos( (B*B + C*C - A*A)/(2*B*C) );
     // Set radius when phi=0
     R0 = C;
+    if( fabs(M_PI - phib-phiMax) < 1e-08 || fabs(M_PI + phib+phiMax) < 1e-08){
+      std::cout << " Warning!! phib+phiMax too close to +-pi " << std::endl;
+    }
+    if( fabs(M_PI - phib) < 1e-08 || fabs(M_PI + phib) < 1e-08){
+      std::cout << " Warning!! phib too close to pi " << std::endl;
+    }
+    if( fabs(phib) < 1e-08){
+      std::cout << " Warning!! phib too close to 0 " << std::endl;
+    }
   }
 
   double getPhiMax(){
@@ -111,6 +120,12 @@ struct Rfunction{
   }
 
   double operator()(const double& phi){
+    if( fabs(M_PI - phib-phi) < 1e-08 || fabs(M_PI + phib+phi) < 1e-08){
+      std::cout << " Warning!! phib+phi too close to +-pi " << std::endl;
+    }
+    if( fabs(phib+phi) < 1e-08){
+      std::cout << " Warning!! phib+phi too close to 0 " << std::endl;
+    }
     // Apply formula derived from law of sines.
     return R0*sin(phib)/sin(phi+phib); 
   }
@@ -183,56 +198,31 @@ double integrateTSing(const TriaPanel& T, const Eigen::Vector3d& x,
   // Get barycentric coordinates of x
   const Eigen::Vector3d& coeff = transformx2BarCoord(vT[0],vT[1],vT[2],x);
 
+  // We set the tolerance~sqrt(machine precision) to avoid triangles that might 
+  // behave numerically as degenerate.
+  double tol = 1e-08;
   // if projection is inside the triangle T (interior point)
+  
   if(onTria){
-    // In this case, xp in an interior point of T and we split the triangle
-    // into three smaller triangles
-    /* 
-       vT(2)
-       /"\
-       / " \
-       /  "  \          T1 : { xp, vT(0), vT(1) }
-       /  xp   \         T2 : { xp, vT(1), vT(2) }
-       /  "  "   \        T3 : { xp, vT(2), vT(0) }
-       / "      "  \
-       /"___________"\
-       vT(0)          vT(1) 
-    */
-    for(int k=0; k<3; k++){
-      // Transform coordinates
-      Eigen::Vector2d v1,v2;
-      transformCoordinates(xp, vT[k], vT[(k+1)%3], v1, v2);
-      // Add result from integrating over the current small triangle
-      res += integrateTiSing(v1, v2, (x-xp).norm(), n);
-    }
-     
-  } // end if onTria
-  // If xp is not on T
-  else{
-    // xp outside of T could mean that it is at the boundary of T or in the exterior.
-    // Here we allow a larger tolerance than machine precision to avoid triangles
-    // that might behave numerically as degenerate.
-    double tol = 1e-10;
-    bool exterior = true;
-    // Check whether xp is close to one of the vertices
+   // Anyways check whether xp is close to the boundary of T
+    bool boundary = false;
+    // - Check if close to a vertex
     for(int i=0; i<3; i++){      
-      if( fabs(1 - coeff(i)) < tol && fabs(coeff((i+1)%3)) < tol
-	  && fabs(coeff((i+2)%3))< tol ){
-	// Then we are on vertex i. We don't split the triangle T but move the
+      if( fabs(1 - coeff(i)) < tol && !boundary){
+	// Then we are close to vertex i. We don't split the triangle T but move the
 	// given vertex to the origin and then integrate. Note that we can do it 
 	// analytically when x=xp (see 1.11.c). For generality we use quadrature
 	// for all cases.
 	Eigen::Vector2d v1,v2;
 	transformCoordinates(xp, vT[(i+1)%3], vT[(i+2)%3], v1, v2);
 	res = integrateTiSing(v1, v2, (x-xp).norm(), n);
-        exterior = false;
+        boundary = true;
       }
-    }// end for loop for vertices
-    
-    // Check whether xp is close to an edge. 
+    }    
+    // - Check if close to an edge
     for(int i=0; i<3; i++){
-      if ( fabs(coeff(i)) < tol && exterior ){
-	// Then we are on the edge opposite to the vertex i. We split the
+      if ( fabs(coeff(i)) < tol && !boundary){
+	// Then we are close to the edge opposite to the vertex i. We split the
 	// triangle T into two smaller triangles
 	/* 
 	   vT(i+2)
@@ -246,13 +236,86 @@ double integrateTSing(const TriaPanel& T, const Eigen::Vector3d& x,
 	   |"______\
   	   vT(i)    vT(i+1)
 	*/
-	//std::cout << ". I am at edge opposite to vertex " << i << std::endl;
 	for(int k=0; k<2; k++){
 	  // Transform coordinates
 	  Eigen::Vector2d v1,v2;
 	  transformCoordinates(xp, vT[(i-k+2)%3], vT[i], v1, v2);
+	  Rfunction Rtheta(v1,v2);
+	  int nq = n;
+	  if(n<100){
+	  int m = (int)(Rtheta.getPhiMax());
+	  nq = std::max(n, m*n);
+	}	
 	  // Add result from integrating over the current small triangle
-	  res += integrateTiSing(v1, v2, (x-xp).norm(), n);
+	  res += integrateTiSing(v1, v2, (x-xp).norm(), nq);
+	}
+        boundary = true;
+      }
+    }
+    // - If not close to boundary, we proceed as the standard interior point
+    if(!boundary){
+      // In this case, xp in an interior point of T and we split the triangle
+      // into three smaller triangles.
+      /* 
+	 vT(2)
+	 /"\
+	 / " \
+	 /  "  \          T1 : { xp, vT(0), vT(1) }
+	 /  xp   \         T2 : { xp, vT(1), vT(2) }
+	 /  "  "   \        T3 : { xp, vT(2), vT(0) }
+	 / "      "  \
+	 /"___________"\
+	 vT(0)          vT(1) 
+      */
+      for(int k=0; k<3; k++){
+	// Transform coordinates
+	Eigen::Vector2d v1,v2;
+	transformCoordinates(xp, vT[k], vT[(k+1)%3], v1, v2);
+	Rfunction Rtheta(v1,v2);
+	int nq = n;
+	if(n<100){
+	  int m = (int)(Rtheta.getPhiMax());
+	  nq = std::max(n, m*5);
+	}	  
+	// Add result from integrating over the current small triangle
+	res += integrateTiSing(v1, v2, (x-xp).norm(), nq);
+      }
+    }
+     
+  } // end if onTria
+  // If xp is not on T
+  else{
+    // xp outside of T could mean that it is at the boundary of T or in the exterior.
+    bool exterior = true;
+    // Check whether xp is close to one of the vertices
+    for(int i=0; i<3; i++){      
+      if( fabs(1 - coeff(i)) < tol && fabs(coeff((i+1)%3)) < tol
+	  && fabs(coeff((i+2)%3))< tol ){
+	// Then we are on vertex i. We proceed as above.
+	Eigen::Vector2d v1,v2;
+	transformCoordinates(xp, vT[(i+1)%3], vT[(i+2)%3], v1, v2);
+	res = integrateTiSing(v1, v2, (x-xp).norm(), n);
+        exterior = false;
+      }
+    }// end for loop for vertices
+    
+    // Check whether xp is close to an edge. 
+    for(int i=0; i<3; i++){
+      if ( fabs(coeff(i)) < tol && exterior ){
+	// Then we are on the edge opposite to the vertex i. We split the
+	// triangle T into two smaller triangles as explained above.
+	for(int k=0; k<2; k++){
+	  // Transform coordinates
+	  Eigen::Vector2d v1,v2;
+	  transformCoordinates(xp, vT[(i-k+2)%3], vT[i], v1, v2);
+	  Rfunction Rtheta(v1,v2);
+	  int nq = n;
+	  if(n<100){
+	    int m = (int)(Rtheta.getPhiMax());
+	    nq = std::max(n, m*n);
+	  }	
+	  // Add result from integrating over the current small triangle
+	  res += integrateTiSing(v1, v2, (x-xp).norm(), nq);
 	}
 	exterior = false;
       }
@@ -267,13 +330,20 @@ double integrateTSing(const TriaPanel& T, const Eigen::Vector3d& x,
       // find closest point to x which is on T.
       Eigen::Vector3d coeff2;
       for(int i=0; i<3; i++){
-	if(coeff(i)<=0){  coeff2(i) = 0;}
-	if(coeff(i)>=1){ coeff2(i) = 1;}
+	if(coeff(i)<=0.){ coeff2(i) = 0.;}
+	else if(coeff(i)>=1.){ coeff2(i) = 1.;}
 	else{ coeff2(i) = coeff(i);}
       }
       Eigen::Vector3d xpT = coeff2(0)*vT[0] + coeff2(1)*vT[1] + coeff2(2)*vT[2];
       // take distance to that point
       double distT_x = (x - xpT).norm();
+      // choose number of points according to the distance to X
+      int nq = 5*std::max(1, 1 - (int)log(distT_x) );
+      nq = std::max(nq, n); // don't loose accuracy!
+      // Get quadrature points and weights for [0, 1]
+      // to use tensor-Gauss quadrature
+      Eigen::RowVectorXd xq,wq;
+      std::tie(xq,wq) =  gauleg(0, 1, nq);
       // Define transformation from reference triangle K to T
       Eigen::MatrixXd Fk(3,2);
       Fk << vT[1]-vT[0], vT[2]-vT[0];
@@ -282,25 +352,11 @@ double integrateTSing(const TriaPanel& T, const Eigen::Vector3d& x,
 	Eigen::Vector3d phiKz = Fk*z + vT[0];
 	return phiKz;
       };
-      // Compute the area of T
-      double areaT = sqrt(fabs((Fk.transpose()*Fk).determinant()))*2;
-      // choose number of points accordingly
-      int nq = n;
-      /*
-      std::cout << " local distance " << distT_x << " gets "
-		<<std::max(1., 1+fabs(log(distT_x)));
-      std::cout << ". Using " << nq << " quadrature points" << std::endl;
-      */
-      // Get quadrature points and weights for [0, 1]
-      Eigen::RowVectorXd xq,wq;
-      std::tie(xq,wq) =  gauleg(0, 1, nq);
-
-      // to use tensor-Gauss quadrature
+      // Integrate
       double Iq = 0.;
       for(int l=0; l<nq; l++){
 	// Compute quadrature point on unit square
-	Eigen::Vector2d qp;
-	qp << xq(l), xq(l)*(1.-xq(l));
+	Eigen::Vector2d qp; qp << xq(l), xq(l)*(1.-xq(l));
 	// Multiply quadrature weight by determinants coming from transformations
 	double dy = wq(l)*(1.-xq(l))*sqrt(fabs((Fk.transpose()*Fk).determinant()));
 	// add contribution
@@ -317,11 +373,51 @@ double integrateTSing(const TriaPanel& T, const Eigen::Vector3d& x,
 }
 /* SAM_LISTING_END_5 */
 
+//------------------------------------------------------------------------------
+void testIntegrateTSing(const int& n){
+  // Test on reference triangle for x on vertices and edges (for which we 
+  // computed the exact solution using Maple).
+  Eigen::Vector3d ah, bh, ch;
+  ah << 0., 0., 0.;
+  bh << 1., 0., 0.;
+  ch << 0., 1., 0.; 
+  TriaPanel T0(ah, bh, ch);
+  
+  std::cout << " Testing for n = " << n << std::endl;
+
+  std::cout  << " Error on a :"
+	     << fabs(integrateTSing(T0, ah, n)  + sqrt(2)*log(sqrt(2)-1) )
+	     << std::endl;
+
+  std::cout << " Error on b :"
+	    << fabs(integrateTSing(T0, bh, n) + log(sqrt(2)-1) )
+	    << std::endl;
+
+  std::cout << " Error on c :"
+	    << fabs(integrateTSing(T0, ch, n) + log(sqrt(2)-1) )
+	    << std::endl;
+
+  std::cout << " Error on 0.5*(a+b) :" ;
+  double exres = 1.676348272;
+  std::cout << fabs(integrateTSing(T0, 0.5*(ah + bh), n) - exres )
+	    << std::endl;
+  
+  std::cout << " Error on 0.5*(b+c) :" ;
+  double exres2 = 0.5*( log(sqrt(2)+1) - 3*log(sqrt(2)-1) );
+  std::cout << fabs(integrateTSing(T0, 0.5*(bh + ch), n) - exres2 )
+	    << std::endl;
+  
+  std::cout << " Error on 0.5*(a+c) :" ;
+  std::cout << fabs(integrateTSing(T0, 0.5*(ah + ch), n) - exres )
+	    << std::endl  << std::endl;
+  
+}
 
 
 //-----------------------------------------------------------------------------
 int main() {
-  
+
+  // 1. Test convergence for integration over Ti
   Eigen::Vector2d b0, c0; b0<< 1., 0.; c0 << 0.5, 1.;
   double Iref = integrateTiSing(b0, c0, 0., 1000);
   Eigen::VectorXd error(19);
@@ -330,32 +426,42 @@ int main() {
     double I = integrateTiSing(b0, c0, 0., k);
     error(k-1) = fabs(I - Iref);
   }
-  //output for plot
+  // Output for plot
   std::ofstream out_errorQ("integrateTiSing_errors.txt");
   out_errorQ << std::setprecision(18) << error; 
   out_errorQ.close( );
   std::ofstream out_N("integrateTiSing_N.txt");
   out_N << N; 
   out_N.close( );
+
+  // 2. Test integration routine on reference triangle (help for debugging)
+  testIntegrateTSing(5);
+  testIntegrateTSing(10);
+  testIntegrateTSing(20);
   
-  // Test quadrature
+  // 3. Test for given triangle moving the point x
   Eigen::Vector3d a, b, c;  
   a << 1., 1., 1.;
   b << 2., 1., 0.;
   c << 0., 1., 0.; 
-  TriaPanel T(a, b, c);  
-  int Nts = 100;
+  TriaPanel T(a, b, c);
+
+  // We choose number of points to discretize [0, 2]
+  int Nts = 101;
   Eigen::VectorXd tau = Eigen::VectorXd::LinSpaced(Nts, 0, 2);
+  // Create vectors to save the results
   Eigen::VectorXd intx5(Nts), intx10(Nts), intx20(Nts), intx1000(Nts);
   for(int ts=0; ts<Nts; ts++){
     Eigen::Vector3d xtau = a + tau(ts)*( 0.5*(b+c) - a);
-    std::cout << " tau = " << tau(ts) ;
+    std::cout << " tau " << tau(ts) << " is ";
     intx5(ts) = integrateTSing(T, xtau, 5);
     intx10(ts) = integrateTSing(T, xtau, 10);
     intx20(ts) = integrateTSing(T, xtau, 20);
-    intx1000(ts) = integrateTSing(T, xtau, 1000);   
+    intx1000(ts) = integrateTSing(T, xtau, 1000);
+    
   }
   
+  // Output errors for plot
   std::ofstream out_Intx5("intx5.txt");
   out_Intx5 << std::setprecision(18) << (intx1000 - intx5).array().abs(); 
   out_Intx5.close( );
@@ -368,45 +474,11 @@ int main() {
   std::ofstream out_dt("dt.txt");
   out_dt << std::setprecision(18) << tau; 
   out_dt.close( );
+  std::ofstream out_IntxOK("intx1000.txt");
+  out_IntxOK << std::setprecision(18) << intx1000 ;
+  out_IntxOK.close( );
   
-  
-  // Second test
-  Eigen::Vector3d ah, bh, ch;  
-  ah << 0., 0., 0.;
-  bh << 1., 0., 0.;
-  ch << 0., 1., 0.; 
-  TriaPanel T0(ah, bh, ch);
-  std::cout << " On a " << std::endl;
-  std::cout << " Error for n = 5 "
-    << fabs(integrateTSing(T0, ah, 5)  + sqrt(2)*log(sqrt(2)-1) )
-	    << "\n Error for n = 10 "
-    << fabs(integrateTSing(T0, ah, 10) + sqrt(2)*log(sqrt(2)-1)  )
-	    << "\n Error for n = 20 "
-    << fabs(integrateTSing(T0, ah, 20) + sqrt(2)*log(sqrt(2)-1)  )
-	    << std::endl;
-
-  std::cout << " On b " << std::endl;
-  std::cout << " Error for n = 5 "    << fabs(integrateTSing(T0, bh, 5) + log(sqrt(2)-1) )
-	    << "\n Error for n = 10 " << fabs(integrateTSing(T0, bh, 10) + log(sqrt(2)-1) )
-	    << "\n Error for n = 20 " << fabs(integrateTSing(T0, bh, 20) + log(sqrt(2)-1) )
-	    << std::endl;
-
-  std::cout << " On c " << std::endl;
-  std::cout << " Error for n = 5 "    << fabs(integrateTSing(T0, ch, 5) + log(sqrt(2)-1) )
-	    << "\n Error for n = 10 " << fabs(integrateTSing(T0, ch, 10) + log(sqrt(2)-1) )
-	    << "\n Error for n = 20 " << fabs(integrateTSing(T0, ch, 20) + log(sqrt(2)-1) )
-	    << std::endl;
-
-  std::cout << " On 0.5*(a+c) " << std::endl;
-  double exres = 1.676348272;
-  std::cout << " Error for n = 5 "
-	    << fabs(integrateTSing(T0, 0.5*(ah + ch).eval(), 5) - exres )
-	    << "\n Error for n = 10 "
-    	    << fabs(integrateTSing(T0, 0.5*(ah + ch), 10) - exres )
-	    << "\n Error for n = 20 "
-    	    << fabs(integrateTSing(T0, 0.5*(ah + ch), 20) - exres )
-	    << std::endl;
-  
+    
   return 0;
 
 }
