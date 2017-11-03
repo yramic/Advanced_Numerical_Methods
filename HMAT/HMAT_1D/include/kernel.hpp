@@ -13,7 +13,7 @@
 
 
 /**
-* \brief Kernel functor $\frac{num}{|x-y|}$ if $x != y$, else 0
+* \brief Kernel functor \f$\frac{num}{|x-y|}\f$ if \f$x != y\f$, else 0
 */
 class Kernel
 {
@@ -21,6 +21,7 @@ public:
 
     /**
     * \brief Constructor
+    * \param num Numerator of the kernel function fraction
     */
     Kernel(double num):
         num_(num)
@@ -28,12 +29,14 @@ public:
 
     /**
     * \brief Functor
+    * \param x x coordinate of grid point
+    * \param y y coordinate of grid point
     */
     double operator()(double x, double y);
 
 private:
 
-    double num_; // numerator
+    double num_; //!< numerator
 };
 
 #endif // KERNEL_HPP

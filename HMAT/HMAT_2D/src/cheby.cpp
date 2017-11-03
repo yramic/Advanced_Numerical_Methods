@@ -29,7 +29,7 @@ void Cheby::setWghts()
         double hc = 1.;
         for(unsigned k=0; k<j; ++k)
             hc *= tk_[j] - tk_[k];
-        // Skip "k == j"
+        // Skip ``k == j''
         for(unsigned k=j+1; k<=deg_; ++k)
             hc *= tk_[j] - tk_[k];
 

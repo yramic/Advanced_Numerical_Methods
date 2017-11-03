@@ -6,14 +6,11 @@
 #include <Eigen/Dense>
 #include <vector>
 #include <iostream>
-//#define ver1
-#define ver2
-#ifdef ver2
 
-// add pointers to near and far field nodes of the tree
+// add pairs of pointers to Node of the Cluster Tree in the Near and Far Field Vectors of pairs
 void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree Ty)
 {
-    // if *xnode or *ynode is a leaf, we add it to the near field
+    // if *xnode or *ynode is a leaf, we add the pair (*xnode,*ynode) to the near field vector
     if((*xnode).getLChild() == NULL || (*ynode).getRChild() == NULL) {
         NearField_.push_back(std::make_pair(xnode,ynode));
     } else {
@@ -21,7 +18,7 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
         double xr = (*xnode).getPoints().back().getX();
         double yl = (*ynode).getPoints().front().getX();
         double yr = (*ynode).getPoints().back().getX();
-        // if the cluster corresponding to *xnode and *ynode is admissible, we add *ynode to the far field list of *xnode
+        // if the cluster corresponding to *xnode and *ynode is admissible, we add the pair (*xnode,*ynode) to the far field vector
         if(is_admissible(xl,xr,yl,yr, eta)) {
             // the line above checks the admissibility condition (eta)
             FarField_.push_back(std::make_pair(xnode,ynode));
@@ -33,4 +30,3 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
         }
     }
 }
-#endif

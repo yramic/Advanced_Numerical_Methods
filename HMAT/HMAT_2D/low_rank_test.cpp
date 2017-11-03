@@ -20,9 +20,9 @@
 #define random1
 
 
-#define local
-//#define global
-//#define gsk
+//#define local
+#define global
+#define gsk
 //#define gauss
 int main() {
 
@@ -32,7 +32,7 @@ int main() {
     //unsigned n; std::cin >> n;
 
     // initializing n for testing
-    unsigned n=10000;
+    unsigned n=20;
 #ifdef vector16
     n = 16;
 #endif
@@ -226,6 +226,7 @@ int main() {
 #ifdef global
     // Global Interpolation
     std::cout << std::endl << "Global Interpolation" << std::endl;
+    std::cout << "Number of points: "<< n << " Degree of interpolation: " << d << std::endl;
 #ifdef gsk
     std::cout << "Global Smooth Kernel (cos)" << std::endl;
 
@@ -259,6 +260,7 @@ int main() {
     }
     std::cout << "Approximation error (l-inf norm): " << diff_g.lpNorm<Eigen::Infinity>() << std::endl
               << "Approximation error (l-2 norm): "   << diff_g.lpNorm<2>() << std::endl
+              << "Relative Approximation error (l-2 norm): "   << diff_g.lpNorm<2>()/f_g_exact.lpNorm<2>() << std::endl
               << "Time needed for exact multiplication: "       << time_diff4.count() << " s" << std::endl
               << "Time needed for approximate multiplication: " << time_diff3.count() << " s" << std::endl;
 #endif
@@ -295,6 +297,7 @@ int main() {
     }
     std::cout << "Approximation error (l-inf norm): " << diff_gg.lpNorm<Eigen::Infinity>() << std::endl
               << "Approximation error (l-2 norm): "   << diff_gg.lpNorm<2>() << std::endl
+              << "Relative Approximation error (l-2 norm): "   << diff_gg.lpNorm<2>()/f_gg_exact.lpNorm<2>() << std::endl
               << "Time needed for exact multiplication: "       << time_diff6.count() << " s" << std::endl
               << "Time needed for approximate multiplication: " << time_diff5.count() << " s" << std::endl;
 #endif

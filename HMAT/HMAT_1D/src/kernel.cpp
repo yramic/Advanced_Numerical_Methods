@@ -2,7 +2,7 @@
 #include <cmath>
 #include <limits>
 
-
+// Kernel functor $\frac{num}{|x-y|}$ if $x != y$, else 0
 double Kernel::operator()(double x, double y)
 {
     if(std::abs(x-y) > std::numeric_limits<double>::epsilon())

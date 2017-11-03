@@ -10,66 +10,54 @@
  ***********************************************************************/
 #ifndef LOW_RANK_APP_HPP
 #define LOW_RANK_APP_HPP
-//#define ver1
-#define ver2
+
 #include "ctree.hpp"
 #include "kernel.hpp"
 #include "point.hpp"
 #include "hierarchical_partition.hpp"
 #include <Eigen/Dense>
 
-#ifdef ver2
 /**
-* \brief Master class for low-rank approximation
+* \brief Master class for low-rank approximation (Far and Near Field distribution computation)
 */
 class LowRankApp
 {
 public:
 
-    /**
-    * \brief Constructor
-    */
+    /*!
+     * \brief Constructor for 1D Low Rank Approximation
+     * \param kernel Kernel used for the matrix multiplication
+     * \param Gpoints Vector of points in space
+     * \param eta eta-admissibility constant
+     * \param deg Degree of interpolation
+     */
     LowRankApp(Kernel kernel, const std::vector<Point> &GPoints, double eta, unsigned deg);
 
-    // approximate matrix-vector multiplication
+    /*!
+     * \brief Approximate matrix-vector multiplication
+     * \param c Vector c
+     */
     Eigen::VectorXd mvProd(const Eigen::VectorXd& c);
 
 private:
-    // compute far  field contribution
+    /*!
+     * \brief Compute far field contribution
+     * \param f Output product vector
+     * \param ff_v Vector of Far Field Pairs
+     * \param c Vector c to multiply
+     */
     void ff_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*,Node*>> ff_v, const Eigen::VectorXd &c);
-    // compute near field contribution
+    /*!
+     * \brief Compute near field contribution
+     * \param f Output product vector
+     * \param nf_v Vector of Near Field pairs
+     * \param c Vector c to multiply
+     */
     void nf_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*,Node*>> nf_v, const Eigen::VectorXd& c);
 
-    unsigned deg_;  // degree of interpolation
-    Kernel kernel_; // kernel
-    HierarchicalPartitioning HP_;   // Hierarchical Partiotion class for constructing the tree and calculate near and far field nodes
-    std::vector<Point> GPoints_;    // Vector of points of the axis
+    unsigned deg_;  //!< degree of interpolation
+    Kernel kernel_; //!< kernel
+    HierarchicalPartitioning HP_;   //!< Hierarchical Partiotion class for constructing the tree and calculate near and far field nodes
+    std::vector<Point> GPoints_;    //!< Vector of points of the axis
 };
-#endif
-#ifdef ver1
-    /**
-    * \brief Master class for low-rank approximation
-    */
-    class LowRankApp
-    {
-    public:
-
-        /**
-        * \brief Constructor
-        */
-        LowRankApp(Kernel kernel, const Eigen::VectorXd& x, const Eigen::VectorXd& y);
-
-        // approximate matrix-vector multiplication
-        Eigen::VectorXd mvProd(const Eigen::VectorXd& c, double eta, unsigned deg);
-    private:
-        // compute far  field contribution
-        void ff_contribution(Eigen::VectorXd& f, Node* tx, unsigned deg);
-        // compute near field contribution
-        void nf_contribution(Eigen::VectorXd& f, Node* tx, const Eigen::VectorXd& c);
-
-        Kernel kernel_; // kernel
-        cTree Tx_; // cluster tree of x-values
-        cTree Ty_; // cluster tree of y-values
-    };
-#endif
 #endif // LOW_RANK_APP_HPP

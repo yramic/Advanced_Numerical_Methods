@@ -10,82 +10,43 @@
  ***********************************************************************/
 #ifndef BLOCK_CLUSTER_HPP
 #define BLOCK_CLUSTER_HPP
-//#define ver1
-#define ver2
+
 #include <Eigen/Dense>
 #include "kernel.hpp"
 
-#ifdef ver2
-/**
-* \brief Block cluster class to compute matrix $X_{\sigma,\mu}$
-*/
+/*!
+ * \brief Block cluster class to compute matrix \f$X_{\sigma,\mu}\f$
+ */
 class BlockCluster
 {
 public:
 
-    /**
-    * \brief Constructor
-    */
+    /*!
+     * \brief Constructor
+     * \param tkx Chebyshev nodes for the x axis
+     * \param tky Chebyshev nodes for the y axis
+     * \param deg degree of interpolation
+     * \param G Kernel Function
+     */
     BlockCluster(Eigen::VectorXd tkx, Eigen::VectorXd tky, unsigned deg, Kernel G);
 
-    /**
-    * \brief Getter
-    */
-    // return matrix $X_{\sigma,\mu}$, where $\sigma$ and $\mu$ denote the clusters
+    /*!
+     * \brief return matrix \f$X_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
+     */
     Eigen::MatrixXd getMatrix() const {
         return X_;
     }
 
-    /**
-    * \brief Setter
-    */
-    // compute matrix $X_{\sigma,\mu}$
+    /*!
+     * \brief compute matrix \f$X_{\sigma,\mu}\f$
+     */
     void setMatrix();
 
 private:
-    Eigen::VectorXd tkx_;   // Chebychev nodes for x axis
-    Eigen::VectorXd tky_;   // Chebyshev nodes for y axis
-    unsigned deg_; // degree of interpolating polynomial
-    Kernel G_; // kernel
-    Eigen::MatrixXd X_; // matrix $X_{\sigma,\mu}$, where $\sigma$ and $\mu$ denote the clusters
+    Eigen::VectorXd tkx_;   //!< Chebychev nodes for x axis
+    Eigen::VectorXd tky_;   //!< Chebyshev nodes for y axis
+    unsigned deg_; //!< degree of interpolating polynomial
+    Kernel G_; //!< kernel
+    Eigen::MatrixXd X_; //!< matrix \f$X_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
 };
-#endif
-#ifdef ver1
-    /**
-    * \brief Block cluster class to compute matrix $X_{\sigma,\mu}$
-    */
-    class BlockCluster
-    {
-    public:
-
-        /**
-        * \brief Constructor
-        */
-        BlockCluster(double xl, double xr, double yl, double yr, unsigned deg, Kernel G);
-
-        /**
-        * \brief Getter
-        */
-        // return matrix $X_{\sigma,\mu}$, where $\sigma$ and $\mu$ denote the clusters
-        Eigen::MatrixXd getMatrix() const {
-            return X_;
-        }
-
-        /**
-        * \brief Setter
-        */
-        // compute matrix $X_{\sigma,\mu}$
-        void setMatrix();
-
-    private:
-
-        double xl_;	// left  boundary of bounding box of *xcluster
-        double xr_;	// right boundary of bounding box of *xcluster
-        double yl_;	// left  boundary of bounding box of *ycluster
-        double yr_;	// right boundary of bounding box of *ycluster
-        unsigned deg_; // degree of interpolating polynomial
-        Kernel G_; // kernel
-        Eigen::MatrixXd X_; // matrix $X_{\sigma,\mu}$, where $\sigma$ and $\mu$ denote the clusters
-    };
-#endif
 #endif // BLOCK_CLUSTER_HPP

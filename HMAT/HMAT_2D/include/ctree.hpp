@@ -36,20 +36,8 @@ public:
     Node* getRoot() const {
         return root_;
     }
-    // I should delete this function maybe also
-    /*!
-    * \brief Make lists with boundaries of bounding boxes (just for testing)
-    */
-    void setLists(std::vector<double>& xlist, std::vector<double>& ylist) {
-        setLists_recursion(root_, xlist, ylist);
-    }
 
 private:
-    /*!
-    * \brief needed for "setLists(...)"
-    */
-    void setLists_recursion(Node* cluster, std::vector<double>& xlist, std::vector<double>& ylist);
-
     Node* root_; //!< pointer to node-root of "cTree"
     const std::vector<Point> PPointsTree_;  //!< vector that has all the Polygon Points
     friend class Node;
