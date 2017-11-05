@@ -47,7 +47,7 @@ The corresponding executable will be located in:
 
 Using:
 
-    $ make -j<number_ob_processes>
+    $ make -j<number_of_processes>
     
 may (or may not) speed up the compilation time.
 
