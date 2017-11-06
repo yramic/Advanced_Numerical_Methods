@@ -74,6 +74,20 @@ public:
      */
     void setCVc();
 
+    /*!
+     * \brief return pointer to xnode
+     */
+    Node* getXNode() {
+        return pair_.first;
+    }
+
+    /*!
+     * \brief return pointer to ynode
+     */
+    Node* getYNode() {
+        return pair_.second;
+    }
+
 private:
     unsigned deg_; //!< degree of interpolating polynomial
     Kernel     G_; //!< kernel

@@ -55,18 +55,16 @@ void LowRankApp::blockProcess(std::vector<BlockCluster> ff_v)
     }
 }
 
-// block-processing: compute vector CVc for all far field pairs and store it into xnode
-// all vectors CVc of an xnode can already be summed together
-void LowRankApp::ff_contribution(std::vector<std::pair<Node*,Node*>> ff_v, const Eigen::VectorXd& c, Eigen::VectorXd& f)
+// post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place
+void LowRankApp::postProcess(std::vector<std::pair<Node*,Node*>> ff_v, Eigen::VectorXd& f)
 {
-    int n = ff_v.size();
-    for(int i=0; i<n; i++){ // iterate for all the pairs of far field nodes
-
-        Eigen::MatrixXd Vx = xnode->getV_Node();
-        Eigen::VectorXd f_seg;
-        f_seg = Vx * XVc;
-        for(int j=0; j<xnode->getPoints().size(); j++){
-            f[xnode->getPoints()[j].getId()] += f_seg[j]; // add contribution of far field to ``f''
+    for(auto& pair : ff_v){ // iterate for all the pairs of far field nodes
+        Node* xnode = pair.getXNode();
+        Eigen::VectorXd CVc = xnode->getCVCv();
+        Eigen::MatrixXd  Vx = xnode->getV_Node();
+        Eigen::VectorXd f_seg = Vx * CVc;
+        for(int i=0; i<xnode->getPoints().size(); i++){
+            f[xnode->getPoints()[i].getId()] += f_seg[i]; // add contribution of far field to ``f''
         }
     }
 }
@@ -74,16 +72,9 @@ void LowRankApp::ff_contribution(std::vector<std::pair<Node*,Node*>> ff_v, const
 // compute far field contribution
 void LowRankApp::ff_contribution(std::vector<std::pair<Node*,Node*>> ff_v, const Eigen::VectorXd& c, Eigen::VectorXd& f)
 {
-    int n = ff_v.size();
-    for(int i=0; i<n; i++){ // iterate for all the pairs of far field nodes
-
-        Eigen::MatrixXd Vx = xnode->getV_Node();
-        Eigen::VectorXd f_seg;
-        f_seg = Vx * XVc;
-        for(int j=0; j<xnode->getPoints().size(); j++){
-            f[xnode->getPoints()[j].getId()] += f_seg[j]; // add contribution of far field to ``f''
-        }
-    }
+    preProcess(ff_v, c);
+    blockProcess(ff_v);
+    postProcess(ff_v, f);
 }
 
 // compute near-field contribution
