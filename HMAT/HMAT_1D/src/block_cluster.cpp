@@ -32,9 +32,9 @@ void BlockCluster::setMatrix()
     Eigen::VectorXd tky = pair_.second->getTK();
     C_.resize(tkx.size(),tky.size());
     // Compute collocation matrix for Chebychev nodes
-    for(unsigned i=0; i<=tkx.size(); ++i)
-        for(unsigned j=0; j<=tky.size(); ++j)
-            C_(i,j) = G_(tkx[i],tky[j]);
+    for(unsigned i=0; i<tkx.size(); ++i)
+        for(unsigned j=0; j<tky.size(); ++j)
+            C_(i,j) = G_(tkx(i),tky(j));
 }
 
 // set kernel
@@ -49,6 +49,7 @@ void BlockCluster::setV() {
 
 // compute Vc vector
 void BlockCluster::setVc(const Eigen::VectorXd& c) {
+    pair_.second->setV();   // ynode
     pair_.second->setVc(c); // ynode
 }
 

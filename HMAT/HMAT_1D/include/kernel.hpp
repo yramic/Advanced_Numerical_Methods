@@ -22,7 +22,7 @@ public:
     * \brief Default constructor
     */
     Kernel():
-        num_(0)
+        num_(0.)
     { }
 
     /**
