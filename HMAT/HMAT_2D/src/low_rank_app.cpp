@@ -27,12 +27,13 @@ Eigen::VectorXd LowRankApp::mvProd(Eigen::VectorXd& c, double eta, unsigned deg)
     // compute far field contribution
     Eigen::VectorXd f_approx = Eigen::VectorXd::Zero(c.size());
     ff_contribution(f_approx, HP_.getFF(), deg, c, f_approx_ff_contr);
+    std::cout << "Far Field Contribution for each row" << std::endl << std::flush;
+    //std:: cout << f_approx_ff_contr << std::endl << std::flush;
     // compute near-field contribution
     nf_contribution(f_approx, HP_.getNF(), c, f_approx_nf_contr);
-    std::cout << "Far Field Contribution for each row" << std::endl;
-    std:: cout << f_approx_ff_contr << std::endl;
-    std::cout << "Near Field Contribution for each row" << std::endl;
-    std:: cout << f_approx_nf_contr << std::endl;
+
+    std::cout << "Near Field Contribution for each row" << std::endl << std::flush;
+    //std:: cout << f_approx_nf_contr << std::endl << std::flush;
     return f_approx;
 }
 
