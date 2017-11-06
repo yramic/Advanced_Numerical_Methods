@@ -41,23 +41,64 @@
 #include <functional/grid_function_operations.hpp>
 #include <functional/dof_interpolator.hpp>
 //#include <functional/L_two_product_evaluator.hpp>
-// own includes ----------------------------------------------------------------
-#include "transmission_system_matrix.hpp"
 
 
 using namespace betl2;
 namespace big = betl2::input::gmsh;
 
+typedef Eigen::MatrixXd matrix_t;
+const std::string path = "../BEM/BETL-Transmission/meshes/";
+
 //------------------------------------------------------------------------------
-void solveTransmissionProblemSphere(const double& alpha, const int& N){
+matrix_t TransmissionSystemMatrix( const matrix_t&  V, const matrix_t&  K,
+				   const matrix_t&  W, const double & alpha){
+  matrix_t A(K.rows() + W.rows(), K.cols() + V.cols());
+#if SOLUTION
+  A.block(0, 0              , K.rows(), K.cols()) =  2.* K;
+  A.block(0, K.cols()       , V.rows(), V.cols()) = -(1./alpha + 1)*V;
+  A.block(K.rows(), 0       , W.rows(), W.cols()) = -(alpha + 1.)*W;
+  A.block(K.rows(), K.cols(), K.cols(), K.rows()) = - 2.*K.transpose();
+#else // TEMPLATE
+  // TODO: Compute block matrix A
+#endif // TEMPLATE
+  return A;
+}
+
+
+//------------------------------------------------------------------------------
+template<typename GRID_FACTORY, typename DH_LAGR0, typename DH_LAGR1>
+double computeEnergy(const Eigen::VectorXd& sol, const GRID_FACTORY gridFactory,
+		     const DH_LAGR0& dh_lagr0, const DH_LAGR1& dh_lagr1){
+  /*
+  // Extract Dirichlet and Neumann coefficients out of solution vector
+  const auto& UD_h  = sol.segment(0, dh_lagr1.numDofs());
+  const auto& UN_h  = sol.segment( dh_lagr1.numDofs(), dh_lagr0.numDofs());
+  // Use them to define Interpolation GridFunctions
+  typedef InterpolationGridFunction< GRID_FACTORY,
+				     typename DH_LAGR0::fespace_t,
+				     double> interp_lagr0_t;
+  typedef InterpolationGridFunction< GRID_FACTORY,
+				     typename DH_LAGR1::fespace_t,
+				     double> interp_lagr1_t;
+
+  interp_lagr1_t interp_TDu( gridFactory, dh_lagr1.fespace(), UD_h );
+  interp_lagr0_t interp_TNu( gridFactory, dh_lagr0.fespace(), UN_h );
+  // Energy = L2-inner product of traces.
+  return interp_TDu.inner(interp_TNu);
+  */
+  return 0.;
+}
+
+
+//------------------------------------------------------------------------------
+Eigen::VectorXd solveTransmissionProblem(const std::string meshname,
+					 const double& alpha){
   //============================================================================
   // READ MESH
   //============================================================================
   // Create input from mesh
-  const std::string path = "../BEM/BETL-Transmission/meshes/";
-  const std::string basename ="sphere_" + std::to_string(N);
-  std::cout << "Input from: " << basename << ".msh" << std::endl;
-  big::Input input( path+basename );
+  std::cout << "Input from: " << meshname << ".msh" << std::endl;
+  big::Input input( path+meshname );
   
   // Wrap input interface around the given input
   typedef betl2::input::InputInterface< big::Input > inpInterface_t;
@@ -223,10 +264,7 @@ void solveTransmissionProblemSphere(const double& alpha, const int& N){
   //============================================================================
   // SYSTEM MATRIX
   //============================================================================
-  typedef TransmissionSystemMatrix TransmissionSystemMatrix_t;
-  TransmissionSystemMatrix_t systemMatrix( V, K, W, alpha );
-  systemMatrix.compute();
-  auto A = systemMatrix.matrix();
+  matrix_t A =  TransmissionSystemMatrix( V, K, W, alpha );
 
 
   //============================================================================
@@ -295,8 +333,7 @@ void solveTransmissionProblemSphere(const double& alpha, const int& N){
   // SOLVE (USING DIRECT SOLVER)
   //============================================================================
   // Define the solver
-  typedef Eigen::ColPivHouseholderQR< TransmissionSystemMatrix_t::matrix_t
-				      > directSolver_t;
+  typedef Eigen::ColPivHouseholderQR< matrix_t > directSolver_t;
   directSolver_t solverA( A );   
   // Initialize the solver
   solverA.compute( A );   
@@ -304,15 +341,15 @@ void solveTransmissionProblemSphere(const double& alpha, const int& N){
   const auto& sol = solverA.solve( rhs );   
   std::cout << "Solved linear system Ax = rhs. " << std::endl;
 
+  std::cout << " Energy is : " << computeEnergy(sol, gridFactory, dh_lagrange0,
+						dh_lagrange1)
+	    << std::endl;
 
-  //============================================================================
-  // OUTPUT
-  //============================================================================
-  std::ofstream sol_out( "sol_" + basename + ".dat" ); 
-  sol_out << std::setprecision(18) << sol;  
-  sol_out.close();
-
+  return sol;
 }
+
+
+
 
 
 //------------------------------------------------------------------------------
@@ -324,7 +361,15 @@ int main( int argc, char* argv[] )
     double alpha = 2;
     
     for(int k=0; k<Nmax; k++){
-      solveTransmissionProblemSphere(alpha, levels(k));
+      const std::string basename ="sphere_" + std::to_string(levels(k));
+      const auto sol = solveTransmissionProblem(basename, alpha);
+      
+      //============================================================================
+      // OUTPUT
+      //============================================================================
+      std::ofstream sol_out( "sol_" + basename + ".dat" ); 
+      sol_out << std::setprecision(18) << sol;  
+      sol_out.close();
     }
 
   

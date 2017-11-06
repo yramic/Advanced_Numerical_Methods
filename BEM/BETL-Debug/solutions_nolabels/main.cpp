@@ -1,3 +1,9 @@
+//// 
+//// Copyright (C) 2017 SAM (D-MATH) @ ETH Zurich
+//// Author(s): curzuato < > 
+//// Contributors:  dcasati 
+//// This file is part of the AdvNumCSE repository.
+////
 #include <Eigen/Core>
 #include <Eigen/Dense>
 // system includes -------------------------------------------------------------
@@ -75,10 +81,8 @@ typedef Eigen::MatrixXd matrix_t;
 
 
 //------------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_0 */
 void computeV(const grid_factory_t& gridFactory, const dh_lagrange0_t& dh_lagrange0,
 	      const laplace_fs_t& laplace_fs, matrix_t& V ){
-  #if SOLUTION
   // GALERKIN KERNEL
   typedef bem::GalerkinKernel< laplace_fs_t, bem::FSLayer::SL,
 			       feb_lagr0_t, feb_lagr0_t > lagr_sl_kernel_t;
@@ -118,18 +122,12 @@ void computeV(const grid_factory_t& gridFactory, const dh_lagrange0_t& dh_lagran
   bem_op_V.compute( );
   V    = bem_op_V.matrix();
 
-#else // TEMPLATE
-  // TODO: Compute V
-#endif // TEMPLATE
 }
-/* SAM_LISTING_END_0 */
 
 
 //------------------------------------------------------------------------------
-  /* SAM_LISTING_BEGIN_2 */
 void computeW(const grid_factory_t& gridFactory, const dh_lagrange1_t& dh_lagrange1,
 	      const dh_div_t& dh_div, const laplace_fs_t& laplace_fs, matrix_t& W ){
-  #if SOLUTION
   // GALERKIN KERNEL
   typedef bem::GalerkinKernel< laplace_fs_t, bem::FSLayer::SL,
 			       feb_div_t  , feb_div_t   > div_sl_kernel_t;
@@ -180,11 +178,7 @@ void computeW(const grid_factory_t& gridFactory, const dh_lagrange1_t& dh_lagran
   const auto& C = cgrad_op.matrix();
 
   W = C * Vdiv * C.transpose();
-#else // TEMPLATE
-  // TODO: Compute W
-#endif // TEMPLATE
 }
-  /* SAM_LISTING_END_2 */
 
 
 //------------------------------------------------------------------------------
@@ -236,10 +230,8 @@ void computeK(const grid_factory_t& gridFactory, const dh_lagrange0_t& dh_lagran
 
 
 //------------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_1 */
 void debugV(const matrix_t& V){
   // Check V is spd by means of its eigenvalues
-  #if SOLUTION
   typedef Eigen::EigenSolver<matrix_t> eigenSolver_t;
   eigenSolver_t esV(V);
   Eigen::VectorXcd DV = esV.eigenvalues();
@@ -251,19 +243,11 @@ void debugV(const matrix_t& V){
     std::cout << " V has only non-negative eigenvalues !"  << std::endl;
   }
 
-  #else // TEMPLATE
-  
-  // TODO: Implement your code
-  
-#endif // TEMPLATE
 }
-  /* SAM_LISTING_END_1 */
 
 
 //------------------------------------------------------------------------------
-  /* SAM_LISTING_BEGIN_3 */
 void debugW(const matrix_t& W){
-  #if SOLUTION
   // Check that W is spd by means of its eigenvalues
   typedef Eigen::EigenSolver<matrix_t> eigenSolver_t;
   eigenSolver_t esW(W);
@@ -282,22 +266,14 @@ void debugW(const matrix_t& W){
   ones.setOnes();
   std::cout << " || W 1 || = " << (W*ones).norm() << std::endl;
 
-    #else // TEMPLATE
-  
-  // TODO: Implement your code
-  
-#endif // TEMPLATE
 }
-  /* SAM_LISTING_END_3 */
 
 
 //------------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_4 */
 Eigen::VectorXd computeDirichletResidual(const grid_factory_t& gridFactory,
 		      const dh_lagrange0_t& dh_lagrange0,
 		      const dh_lagrange1_t& dh_lagrange1,
 		      const laplace_fs_t& laplace_fs){
-#if SOLUTION
   // CREATE BEM OPERATORS
   matrix_t V, K;
   computeV(gridFactory, dh_lagrange0, laplace_fs, V);
@@ -335,25 +311,16 @@ Eigen::VectorXd computeDirichletResidual(const grid_factory_t& gridFactory,
   // COMPUTE DIRICHLET RESIDUAL ACCORDING TO (1.6.33)
   const Eigen::VectorXd res_D = 0.5*M *coeff_gD +  K * coeff_gD - V * coeff_gN;
 
-      #else // TEMPLATE
-  
-  // TODO: Implement your code
-  Eigen::VectorXd res_D;
-  
-#endif // TEMPLATE
   
   return res_D;
 }
-/* SAM_LISTING_END_4 */
 
 
 //------------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_5 */ 
 Eigen::VectorXd computeNeumannResidual(const grid_factory_t& gridFactory,
 		      const dh_lagrange0_t& dh_lagrange0,
 		      const dh_lagrange1_t& dh_lagrange1,
 		      const dh_div_t& dh_div, const laplace_fs_t& laplace_fs){
-#if SOLUTION
   // CREATE BEM OPERATORS
   matrix_t K, W;
   computeW(gridFactory, dh_lagrange1, dh_div, laplace_fs, W);
@@ -393,18 +360,10 @@ Eigen::VectorXd computeNeumannResidual(const grid_factory_t& gridFactory,
                                   - K.transpose() * coeff_gN ;
   return res_N;
 
-#else // TEMPLATE
-  
-  // TODO: Implement your code
-  Eigen::VectorXd res_D;
-  
-#endif // TEMPLATE
 }
-/* SAM_LISTING_END_5 */
 
 
 //------------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_6 */
 int main( int argc, char* argv[] )
 {
 
@@ -472,7 +431,6 @@ int main( int argc, char* argv[] )
     //============================================================================
     // RESIDUALS
     //============================================================================
-    #if SOLUTION
     const auto rD = computeDirichletResidual(gridFactory, dh_lagrange0, dh_lagrange1,
 					     laplace_fs);
 
@@ -481,10 +439,6 @@ int main( int argc, char* argv[] )
 
     rDNorm(k) = rD.lpNorm<Eigen::Infinity>();
     rNNorm(k) = rN.lpNorm<Eigen::Infinity>();
-    #else // TEMPLATE
-  
-  // TODO: Implement your code
-#endif // TEMPLATE
   }
 
   // Output
@@ -493,7 +447,7 @@ int main( int argc, char* argv[] )
   out_rdNorm.close( );
 
   std::ofstream out_rNNorm("BETL-Debug_rNnorm.txt");
-  out_rNNorm << rNNorm; 
+  out_rNNorm << rDNorm; 
   out_rNNorm.close( );
 
   std::ofstream out_N("BETL-Debug_levels.txt");
@@ -503,6 +457,5 @@ int main( int argc, char* argv[] )
   // that's it!
   return EXIT_SUCCESS;
 }
-    /* SAM_LISTING_END_6 */
     
 
