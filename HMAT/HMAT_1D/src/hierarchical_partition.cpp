@@ -1,8 +1,10 @@
-#include "../include/ctree.hpp"
-#include "../include/is_admissible.hpp"
-#include "../include/node.hpp"
+#include "../include/block_cluster.hpp"
 #include "../include/cheby.hpp"
+#include "../include/ctree.hpp"
+#include "../include/node.hpp"
+#include "../include/point.hpp"
 #include "../include/hierarchical_partition.hpp"
+#include "../include/is_admissible.hpp"
 #include <Eigen/Dense>
 #include <vector>
 #include <iostream>
@@ -12,7 +14,7 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
 {
     // if *xnode or *ynode is a leaf, we add the pair (*xnode,*ynode) to the near field vector
     if((*xnode).getLChild() == NULL || (*ynode).getRChild() == NULL) {
-        NearField_.push_back(std::make_pair(xnode,ynode));
+        NearField_.push_back(BlockCluster(xnode,ynode));
     } else {
         double xl = (*xnode).getPoints().front().getX();
         double xr = (*xnode).getPoints().back().getX();
@@ -29,4 +31,34 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
             setNearFar_recursion((*xnode).getRChild(), (*ynode).getRChild(), eta, Ty);
         }
     }
+}
+
+// return the bounding box corresponding to index i of the far-field vector
+std::pair<std::pair<double,double>,std::pair<double,double> > HierarchicalPartitioning::getBB(int i)
+{
+    Node* xnode = FarField_[i].first;
+    std::vector<Point> xpts = xnode->getPoints();
+    double xmin = xpts[0].getX();
+    double xmax = xpts[0].getX();
+    for(int j=1; j<xpts.size(); j++){
+        if(xpts[j].getX() < xmin){
+            xmin = xpts[j].getX();
+        }
+        if(xpts[j].getX() > xmax){
+            xmax = xpts[j].getX();
+        }
+    }
+    Node* ynode = FarField_[i].second;
+    std::vector<Point> ypts = ynode->getPoints();
+    double ymin = ypts[0].getX();
+    double ymax = ypts[0].getX();
+    for(int j=1; j<ypts.size(); j++){
+        if(ypts[j].getX() < ymin){
+            ymin = ypts[j].getX();
+        }
+        if(ypts[j].getX() > ymax){
+            ymax = ypts[j].getX();
+        }
+    }
+    return {{xmin,ymin},{xmax,ymax}};
 }

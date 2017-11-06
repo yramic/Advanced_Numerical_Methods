@@ -28,11 +28,11 @@ int main() {
 
     // Input
 
-    //std::cout << "Enter number of edges:" << std::endl;
-    //unsigned n; std::cin >> n;
+    std::cout << "Enter number of edges:" << std::endl;
+    unsigned n; std::cin >> n;
 
     // initializing n for testing
-    unsigned n=20;
+    //unsigned n=20;
 #ifdef vector16
     n = 16;
 #endif

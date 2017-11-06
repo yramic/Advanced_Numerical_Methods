@@ -8,20 +8,31 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/block_cluster.hpp"
-#include "../include/cheby.hpp"
+#include <Eigen/Dense>
+#include "../include/kernel.hpp"
+#include "../include/node.hpp"
 
 // Constructor
-BlockCluster::BlockCluster(Eigen::VectorXd tkx, Eigen::VectorXd tky, unsigned deg, Kernel G):
-    tkx_(tkx), tky_(tky), deg_(deg), G_(G), X_(Eigen::MatrixXd::Zero(deg+1,deg+1))
-{ setMatrix(); }
+BlockCluster::BlockCluster(Node* ndx, Node* ndy):
+    pair_(std::make_pair(ndx,ndy)), deg_(deg)
+{ }
+
+// Constructor
+BlockCluster::BlockCluster(Node* ndx, Node* ndy, Kernel G):
+    pair_(std::make_pair(ndx,ndy)), deg_(deg), G_(G)
+{
+    setMatrix();
+}
 
 // compute matrix $X_{\sigma,\mu}$
 void BlockCluster::setMatrix()
 {
+    Eigen::VectorXd tkx = pair_.first->getTK();
+    Eigen::VectorXd tky = pair_.second->getTK();
+    X_.resize(tkx.size(),tky.size());
     // Compute collocation matrix for Chebychev nodes
-    for(unsigned i=0; i<=deg_; ++i)
-        for(unsigned j=0; j<=deg_; ++j)
-            X_(i,j) = G_(tkx_[i],tky_[j]);
+    for(unsigned i=0; i<=tkx.size(); ++i)
+        for(unsigned j=0; j<=tky.size(); ++j)
+            X_(i,j) = G_(tkx[i],tky[j]);
 }
 

@@ -55,9 +55,9 @@ private:
      */
     void nf_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*,Node*>> nf_v, const Eigen::VectorXd& c);
 
-    unsigned deg_;  //!< degree of interpolation
+    unsigned  deg_; //!< degree of interpolation
     Kernel kernel_; //!< kernel
-    HierarchicalPartitioning HP_;   //!< Hierarchical Partiotion class for constructing the tree and calculate near and far field nodes
-    std::vector<Point> GPoints_;    //!< Vector of points of the axis
+    HierarchicalPartitioning HP_; //!< Hierarchical Partiotion class for constructing the tree and calculate near and far field nodes
+    std::vector<Point> GPoints_;  //!< Vector of points of the axis
 };
 #endif // LOW_RANK_APP_HPP

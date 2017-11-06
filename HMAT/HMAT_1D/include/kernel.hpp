@@ -11,7 +11,6 @@
 #ifndef KERNEL_HPP
 #define KERNEL_HPP
 
-
 /**
 * \brief Kernel functor \f$\frac{num}{|x-y|}\f$ if \f$x != y\f$, else 0
 */

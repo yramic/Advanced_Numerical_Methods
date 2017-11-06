@@ -8,8 +8,8 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/node.hpp"
 #include "../include/cheby.hpp"
+#include "../include/node.hpp"
 #include <Eigen/Dense>
 #include <iostream>
 
@@ -17,7 +17,6 @@
 Node::Node(std::vector<Point> points, int& id, unsigned deg):
   l_child_(NULL), r_child_(NULL), node_points_(points), nodeId_(id), deg_(deg)
 { setLeaves(id); }
-
 
 // destructor
 Node::~Node()
@@ -33,10 +32,10 @@ void Node::setLeaves(int& id)
 {
   if(node_points_.size() > 1) {
     std::vector<Point>::iterator it;                    // we assume that the points are in ascending order
-    it=node_points_.begin()+(node_points_.size()+1)/2;  // set  iterator in the middle of the vector of points in this node
+    it=node_points_.begin()+(node_points_.size()+1)/2;  // set iterator in the middle of the vector of points in this node
     std::vector<Point> lc,rc;                           // left and right child´s vectors
     lc.assign(node_points_.begin(), it);                // division of node´s points into it´s childs
-    rc.assign(it,node_points_.end());
+    rc.assign(it, node_points_.end());
     id++;                                               // increase the identification number of the nodes of the tree
     l_child_ = new Node(lc,id,deg_);                    // recursivly do the same for the left child
     id++;                                               // increase the identification number of the nodes of the tree

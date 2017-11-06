@@ -38,8 +38,8 @@ public:
         id_ = id;
     }
 private:
-    double x_;   //!< x coordinate of the point
-    unsigned id_;   //!< id of the point
+    double    x_; //!< x coordinate of the point
+    unsigned id_; //!< id of the point
 };
 
 #endif // POINT_H

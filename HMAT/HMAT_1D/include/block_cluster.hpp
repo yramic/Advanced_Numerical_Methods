@@ -13,6 +13,7 @@
 
 #include <Eigen/Dense>
 #include "kernel.hpp"
+#include "node.hpp"
 
 /*!
  * \brief Block cluster class to compute matrix \f$X_{\sigma,\mu}\f$
@@ -28,7 +29,16 @@ public:
      * \param deg degree of interpolation
      * \param G Kernel Function
      */
-    BlockCluster(Eigen::VectorXd tkx, Eigen::VectorXd tky, unsigned deg, Kernel G);
+    BlockCluster(Node* ndx, Node* ndy);
+
+    /*!
+     * \brief Constructor
+     * \param tkx Chebyshev nodes for the x axis
+     * \param tky Chebyshev nodes for the y axis
+     * \param deg degree of interpolation
+     * \param G Kernel Function
+     */
+    BlockCluster(Node* ndx, Node* ndy, Kernel G);
 
     /*!
      * \brief return matrix \f$X_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
@@ -42,11 +52,32 @@ public:
      */
     void setMatrix();
 
+    /*!
+     * \brief set kernel
+     */
+    void setKernel(Kernel G) {
+        G_ = G;
+    }
+
+    /*!
+     * \brief compute V matrix
+     */
+    void setV() {
+        pair_.first->setV();
+    }
+
+    /*!
+     * \brief compute Vc matrix
+     * \param c vector for multiplication with the matrix
+     */
+    void setVc(const Eigen::VectorXd& c) {
+        pair_.second->setVc(c);
+    }
+
 private:
-    Eigen::VectorXd tkx_;   //!< Chebychev nodes for x axis
-    Eigen::VectorXd tky_;   //!< Chebyshev nodes for y axis
     unsigned deg_; //!< degree of interpolating polynomial
     Kernel G_; //!< kernel
     Eigen::MatrixXd X_; //!< matrix \f$X_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
+    std::pair<Node*,Node*> pair_;
 };
 #endif // BLOCK_CLUSTER_HPP

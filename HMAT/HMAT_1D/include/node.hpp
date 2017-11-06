@@ -79,17 +79,17 @@ public:
      */
     int getId() const { return nodeId_; }
     /*!
-     * \brief Build tree recursively
+     * \brief build tree recursively
      * \param id ID of node
      */
     void setLeaves(int& id);
     /*!
-     * \brief Compute V matrix
+     * \brief compute V matrix
      */
     void setV();
     /*!
-     * \brief Compute Vc matrix
-     * \param c c vector for multiplication with the matrix
+     * \brief compute Vc matrix
+     * \param c vector for multiplication with the matrix
      */
     void setVc(const Eigen::VectorXd& c);
   

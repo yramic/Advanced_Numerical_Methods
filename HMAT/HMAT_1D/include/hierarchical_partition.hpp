@@ -1,6 +1,7 @@
 #ifndef HIERARCHICAL_PARTITION_HPP
 #define HIERARCHICAL_PARTITION_HPP
 
+#include "block_cluster.hpp"
 #include "ctree.hpp"
 #include "kernel.hpp"
 #include "point.hpp"
@@ -17,25 +18,30 @@ public:
      * \param eta eta-admissibility constant
      * \param deg Degree of itnerpolation
      */
-    HierarchicalPartitioning(const std::vector<Point> &GPoints, double eta, unsigned deg):
+    HierarchicalPartitioning(const std::vector<Point>& GPoints, double eta, unsigned deg):
         Tx_(GPoints,deg), Ty_(Tx_), eta_(eta), deg_(deg)
     {}
     /*!
      * \brief Return the Far Field pairs vector
      */
-    std::vector<std::pair<Node*,Node*>> getFF(){
+    std::vector<BlockCluster> getFF(){
         return FarField_;
     }
     /*!
      * \brief Return the Near Field pairs vector
      */
-    std::vector<std::pair<Node*,Node*>> getNF(){
+    std::vector<std::pair<Node*,Node*> > getNF(){
         return NearField_;
     }
     /*!
      * \brief Compute the Far and Near Field pairs
      */
     void setNearFar() { setNearFar_recursion(Tx_.getRoot(), Ty_.getRoot(), eta_, Ty_); }
+    /*!
+     * \brief Return the bounding box corresponding to index i of the far-field vector
+     */
+    std::pair<std::pair<double,double>,
+              std::pair<double,double> > getBB(int i);
 private:
     /*!
      * \brief Needed for "setNearFar(...)"
@@ -46,8 +52,9 @@ private:
      */
     void setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree Ty);
     cTree Tx_, Ty_; //!< Cluster trees for comparison
-    std::vector<std::pair<Node*,Node*>> FarField_, NearField_;  //!< Vectors for Near and Far Field vectors
+    std::vector<BlockCluster> FarField_; //!< Vector for Far  Field
+    std::vector<std::pair<Node*,Node*> > NearField_; //!< Vector for Near Field
     unsigned deg_;  //!< degree of interpolation
-    double eta_;    //!< eta-admissibility constant
+    double   eta_;  //!< eta-admissibility constant
 };
 #endif // HIERARCHICAL_PARTITION_HPP
