@@ -19,18 +19,18 @@ public:
      * \param deg Degree of itnerpolation
      */
     HierarchicalPartitioning(const std::vector<Point>& GPoints, double eta, unsigned deg):
-        Tx_(GPoints,deg), Ty_(Tx_), eta_(eta), deg_(deg)
+        Tx_(GPoints,deg), Ty_(Tx_), eta_(eta)
     {}
     /*!
      * \brief Return the Far Field pairs vector
      */
-    std::vector<BlockCluster> getFF(){
+    std::vector<BlockCluster> getFF() {
         return FarField_;
     }
     /*!
      * \brief Return the Near Field pairs vector
      */
-    std::vector<std::pair<Node*,Node*> > getNF(){
+    std::vector<std::pair<Node*,Node*> > getNF() {
         return NearField_;
     }
     /*!
@@ -52,9 +52,8 @@ private:
      */
     void setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree Ty);
     cTree Tx_, Ty_; //!< Cluster trees for comparison
-    std::vector<BlockCluster> FarField_; //!< Vector for Far  Field
+    std::vector<BlockCluster> FarField_; //!< Vector for Far Field
     std::vector<std::pair<Node*,Node*> > NearField_; //!< Vector for Near Field
-    unsigned deg_;  //!< degree of interpolation
-    double   eta_;  //!< eta-admissibility constant
+    double eta_;  //!< eta-admissibility constant
 };
 #endif // HIERARCHICAL_PARTITION_HPP

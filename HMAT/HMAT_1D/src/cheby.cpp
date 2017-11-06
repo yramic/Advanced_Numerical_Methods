@@ -8,8 +8,8 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/cheby.hpp"
 #include <Eigen/Dense>
+#include "../include/cheby.hpp"
 #include <cmath>
 
 // Constructor

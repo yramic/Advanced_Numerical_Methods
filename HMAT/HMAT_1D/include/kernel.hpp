@@ -19,6 +19,13 @@ class Kernel
 public:
 
     /**
+    * \brief Default constructor
+    */
+    Kernel():
+        num_(0)
+    { }
+
+    /**
     * \brief Constructor
     * \param num Numerator of the kernel function fraction
     */
@@ -34,7 +41,6 @@ public:
     double operator()(double x, double y);
 
 private:
-
     double num_; //!< numerator
 };
 

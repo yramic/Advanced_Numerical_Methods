@@ -1,10 +1,10 @@
+#include "../include/hierarchical_partition.hpp"
 #include "../include/block_cluster.hpp"
 #include "../include/cheby.hpp"
 #include "../include/ctree.hpp"
+#include "../include/is_admissible.hpp"
 #include "../include/node.hpp"
 #include "../include/point.hpp"
-#include "../include/hierarchical_partition.hpp"
-#include "../include/is_admissible.hpp"
 #include <Eigen/Dense>
 #include <vector>
 #include <iostream>
@@ -14,7 +14,7 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
 {
     // if *xnode or *ynode is a leaf, we add the pair (*xnode,*ynode) to the near field vector
     if((*xnode).getLChild() == NULL || (*ynode).getRChild() == NULL) {
-        NearField_.push_back(BlockCluster(xnode,ynode));
+        NearField_.push_back(std::make_pair(xnode,ynode));
     } else {
         double xl = (*xnode).getPoints().front().getX();
         double xr = (*xnode).getPoints().back().getX();
@@ -23,7 +23,7 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
         // if the cluster corresponding to *xnode and *ynode is admissible, we add the pair (*xnode,*ynode) to the far field vector
         if(is_admissible(xl,xr,yl,yr, eta)) {
             // the line above checks the admissibility condition (eta)
-            FarField_.push_back(std::make_pair(xnode,ynode));
+            FarField_.push_back(BlockCluster(xnode,ynode));
         } else { // else we consider the children of *xnode and *ynode and check whether their clusters are admissible
             setNearFar_recursion((*xnode).getLChild(), (*ynode).getLChild(), eta, Ty);
             setNearFar_recursion((*xnode).getRChild(), (*ynode).getLChild(), eta, Ty);
@@ -36,7 +36,7 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
 // return the bounding box corresponding to index i of the far-field vector
 std::pair<std::pair<double,double>,std::pair<double,double> > HierarchicalPartitioning::getBB(int i)
 {
-    Node* xnode = FarField_[i].first;
+    Node* xnode = FarField_[i].getXNode();
     std::vector<Point> xpts = xnode->getPoints();
     double xmin = xpts[0].getX();
     double xmax = xpts[0].getX();
@@ -48,7 +48,7 @@ std::pair<std::pair<double,double>,std::pair<double,double> > HierarchicalPartit
             xmax = xpts[j].getX();
         }
     }
-    Node* ynode = FarField_[i].second;
+    Node* ynode = FarField_[i].getYNode();
     std::vector<Point> ypts = ynode->getPoints();
     double ymin = ypts[0].getX();
     double ymax = ypts[0].getX();

@@ -26,7 +26,6 @@ public:
      * \brief Constructor
      * \param tkx Chebyshev nodes for the x axis
      * \param tky Chebyshev nodes for the y axis
-     * \param deg degree of interpolation
      * \param G Kernel Function
      */
     BlockCluster(Node* ndx, Node* ndy);
@@ -35,7 +34,6 @@ public:
      * \brief Constructor
      * \param tkx Chebyshev nodes for the x axis
      * \param tky Chebyshev nodes for the y axis
-     * \param deg degree of interpolation
      * \param G Kernel Function
      */
     BlockCluster(Node* ndx, Node* ndy, Kernel G);
@@ -89,8 +87,7 @@ public:
     }
 
 private:
-    unsigned deg_; //!< degree of interpolating polynomial
-    Kernel     G_; //!< kernel
+    Kernel G_; //!< kernel
     Eigen::MatrixXd C_; //!< matrix \f$C_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
     std::pair<Node*,Node*> pair_;
 };

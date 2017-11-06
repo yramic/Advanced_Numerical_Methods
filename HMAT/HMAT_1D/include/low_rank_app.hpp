@@ -41,19 +41,39 @@ public:
 
 private:
     /*!
-     * \brief Compute far field contribution
-     * \param f Output product vector
+     * \brief Pre-processing: initialize matrix V and vector Vc for all far field nodes
      * \param ff_v Vector of Far Field Pairs
      * \param c Vector c to multiply
      */
-    void ff_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*,Node*>> ff_v, const Eigen::VectorXd &c);
+    void preProcess(std::vector<BlockCluster> ff_v, const Eigen::VectorXd& c);
+
+    /*!
+     * \brief Block-processing: compute vector CVc for all far field pairs and store it into xnode
+     * \param ff_v Vector of Far Field Pairs
+     */
+    void blockProcess(std::vector<BlockCluster> ff_v);
+
+    /*!
+     * \brief Post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place
+     * \param ff_v Vector of Far Field Pairs
+     * \param f Output product vector
+     */
+    void postProcess(std::vector<BlockCluster> ff_v, Eigen::VectorXd& f);
+
+    /*!
+     * \brief Compute far field contribution
+     * \param ff_v Vector of Far Field Pairs
+     * \param c Vector c to multiply
+     * \param f Output product vector
+     */
+    void ff_contribution(std::vector<BlockCluster> ff_v, const Eigen::VectorXd& c, Eigen::VectorXd& f);
     /*!
      * \brief Compute near field contribution
-     * \param f Output product vector
      * \param nf_v Vector of Near Field pairs
      * \param c Vector c to multiply
+     * \param f Output product vector
      */
-    void nf_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*,Node*>> nf_v, const Eigen::VectorXd& c);
+    void nf_contribution(std::vector<std::pair<Node*,Node*>> nf_v, const Eigen::VectorXd& c, Eigen::VectorXd& f);
 
     unsigned  deg_; //!< degree of interpolation
     Kernel kernel_; //!< kernel

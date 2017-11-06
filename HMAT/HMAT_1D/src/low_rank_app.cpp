@@ -40,8 +40,8 @@ Eigen::VectorXd LowRankApp::mvProd(const Eigen::VectorXd& c)
 void LowRankApp::preProcess(std::vector<BlockCluster> ff_v, const Eigen::VectorXd& c)
 {
     for(auto& pair : ff_v){ // iterate for all the pairs of far field nodes
-        pair->setV();
-        pair->setVc(c);
+        pair.setV();
+        pair.setVc(c);
     }
 }
 
@@ -56,11 +56,11 @@ void LowRankApp::blockProcess(std::vector<BlockCluster> ff_v)
 }
 
 // post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place
-void LowRankApp::postProcess(std::vector<std::pair<Node*,Node*>> ff_v, Eigen::VectorXd& f)
+void LowRankApp::postProcess(std::vector<BlockCluster> ff_v, Eigen::VectorXd& f)
 {
     for(auto& pair : ff_v){ // iterate for all the pairs of far field nodes
         Node* xnode = pair.getXNode();
-        Eigen::VectorXd CVc = xnode->getCVCv();
+        Eigen::VectorXd CVc = xnode->getCVc_Node();
         Eigen::MatrixXd  Vx = xnode->getV_Node();
         Eigen::VectorXd f_seg = Vx * CVc;
         for(int i=0; i<xnode->getPoints().size(); i++){
@@ -70,7 +70,7 @@ void LowRankApp::postProcess(std::vector<std::pair<Node*,Node*>> ff_v, Eigen::Ve
 }
 
 // compute far field contribution
-void LowRankApp::ff_contribution(std::vector<std::pair<Node*,Node*>> ff_v, const Eigen::VectorXd& c, Eigen::VectorXd& f)
+void LowRankApp::ff_contribution(std::vector<BlockCluster> ff_v, const Eigen::VectorXd& c, Eigen::VectorXd& f)
 {
     preProcess(ff_v, c);
     blockProcess(ff_v);
@@ -78,7 +78,7 @@ void LowRankApp::ff_contribution(std::vector<std::pair<Node*,Node*>> ff_v, const
 }
 
 // compute near-field contribution
-void LowRankApp::nf_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*,Node*>> nf_v, const Eigen::VectorXd& c)
+void LowRankApp::nf_contribution(std::vector<std::pair<Node*,Node*> > nf_v, const Eigen::VectorXd& c, Eigen::VectorXd& f)
 {
     int n = nf_v.size();
     for(int i = 0; i<n; i++){

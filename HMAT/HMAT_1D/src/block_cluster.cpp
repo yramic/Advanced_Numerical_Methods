@@ -9,17 +9,18 @@
  * as this header is left intact.                                      *
  ***********************************************************************/
 #include <Eigen/Dense>
+#include "../include/block_cluster.hpp"
 #include "../include/kernel.hpp"
 #include "../include/node.hpp"
 
 // Constructor
 BlockCluster::BlockCluster(Node* ndx, Node* ndy):
-    pair_(std::make_pair(ndx,ndy)), deg_(deg)
+    pair_(std::make_pair(ndx,ndy))
 { }
 
 // Constructor
 BlockCluster::BlockCluster(Node* ndx, Node* ndy, Kernel G):
-    pair_(std::make_pair(ndx,ndy)), deg_(deg), G_(G)
+    pair_(std::make_pair(ndx,ndy)), G_(G)
 {
     setMatrix();
 }
