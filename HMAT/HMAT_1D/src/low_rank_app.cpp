@@ -35,7 +35,8 @@ Eigen::VectorXd LowRankApp::mvProd(const Eigen::VectorXd& c)
     return f_approx;
 }
 
-// pre-processing: initialize matrices V and vectors Vc for all pairs of far field nodes
+// pre-processing: initialize matrix V and vector Vc for all far field nodes
+// do these steps once for each node, not every time the node appears in a pair
 void LowRankApp::preProcess(std::vector<BlockCluster> ff_v, const Eigen::VectorXd& c)
 {
     for(auto& pair : ff_v){ // iterate for all the pairs of far field nodes
@@ -44,19 +45,29 @@ void LowRankApp::preProcess(std::vector<BlockCluster> ff_v, const Eigen::VectorX
     }
 }
 
-// pre-processing: initialize matrices V and vectors Vc for all pairs of far field nodes
-void LowRankApp::blockProcess(std::vector<BlockCluster> ff_v, const Eigen::VectorXd& c)
+// block-processing: compute vector CVc for all far field pairs and store it into xnode
+// all vectors CVc of an xnode can already be summed together
+void LowRankApp::blockProcess(std::vector<BlockCluster> ff_v)
+{
+    for(auto& pair : ff_v){ // iterate for all the pairs of far field nodes
+        pair.setKernel(kernel_);
+        pair.setCVc();
+    }
+}
+
+// block-processing: compute vector CVc for all far field pairs and store it into xnode
+// all vectors CVc of an xnode can already be summed together
+void LowRankApp::ff_contribution(std::vector<std::pair<Node*,Node*>> ff_v, const Eigen::VectorXd& c, Eigen::VectorXd& f)
 {
     int n = ff_v.size();
     for(int i=0; i<n; i++){ // iterate for all the pairs of far field nodes
 
-        Eigen::MatrixXd Vc = ynode->getVc_Node();
-        std::vector<Point> xp = xnode->getPoints();
-        std::vector<Point> yp = ynode->getPoints();
-        BlockCluster X_(xnode->getTK(), ynode->getTK(), deg_, kernel_);
-        Eigen::MatrixXd X = X_.getMatrix(); // matrix $X_{\sigma,\mu}$
-        Eigen::VectorXd XVc = Eigen::VectorXd::Zero(deg_+1);
-        XVc += X * Vc;
+        Eigen::MatrixXd Vx = xnode->getV_Node();
+        Eigen::VectorXd f_seg;
+        f_seg = Vx * XVc;
+        for(int j=0; j<xnode->getPoints().size(); j++){
+            f[xnode->getPoints()[j].getId()] += f_seg[j]; // add contribution of far field to ``f''
+        }
     }
 }
 
@@ -67,7 +78,7 @@ void LowRankApp::ff_contribution(std::vector<std::pair<Node*,Node*>> ff_v, const
     for(int i=0; i<n; i++){ // iterate for all the pairs of far field nodes
 
         Eigen::MatrixXd Vx = xnode->getV_Node();
-        Eigen::VectorXd f_seg(xp.size());
+        Eigen::VectorXd f_seg;
         f_seg = Vx * XVc;
         for(int j=0; j<xnode->getPoints().size(); j++){
             f[xnode->getPoints()[j].getId()] += f_seg[j]; // add contribution of far field to ``f''

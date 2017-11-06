@@ -71,9 +71,13 @@ public:
      */
     Eigen::MatrixXd getV_Node() { return V_node_; }
     /*!
-     * \brief return the Vc matrix
+     * \brief return the Vc vector
      */
-    Eigen::MatrixXd getVc_Node() { return Vc_node_; }
+    Eigen::VectorXd getVc_Node() { return Vc_node_; }
+    /*!
+     * \brief return the CVc vector
+     */
+    Eigen::VectorXd getCVc_Node() { return CVc_node_; }
     /*!
      * \brief return node´s ID
      */
@@ -88,10 +92,15 @@ public:
      */
     void setV();
     /*!
-     * \brief compute Vc matrix
+     * \brief compute Vc vector
      * \param c vector for multiplication with the matrix
      */
     void setVc(const Eigen::VectorXd& c);
+    /*!
+     * \brief update CVc vector
+     * \param c vector for multiplication with the matrix
+     */
+    void setCVc(const Eigen::VectorXd& CVc);
   
 private:
     Node* l_child_;  //!< left  child of node
@@ -101,8 +110,9 @@ private:
     unsigned deg_;  //!< degree of interpolation
     Eigen::VectorXd tk_;    //!< Chebyshev interpolation nodes
     Eigen::VectorXd wk_;    //!< Weights of Lagrange polynomial
-    Eigen::MatrixXd V_node_ ; //!< V matrix
-    Eigen::MatrixXd Vc_node_; //!< Vc matrix
+    Eigen::MatrixXd V_node_ ;  //!< V  matrix
+    Eigen::VectorXd Vc_node_;  //!< Vc vector
+    Eigen::VectorXd CVc_node_; //!< CVc vector
     friend class cTree;
  };
 #endif // NODE_HPP

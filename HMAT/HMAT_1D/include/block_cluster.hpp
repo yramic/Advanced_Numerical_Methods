@@ -44,40 +44,40 @@ public:
      * \brief return matrix \f$X_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
      */
     Eigen::MatrixXd getMatrix() const {
-        return X_;
+        return C_;
     }
 
     /*!
-     * \brief compute matrix \f$X_{\sigma,\mu}\f$
+     * \brief compute matrix \f$C_{\sigma,\mu}\f$
      */
     void setMatrix();
 
     /*!
      * \brief set kernel
      */
-    void setKernel(Kernel G) {
-        G_ = G;
-    }
+    void setKernel(Kernel G);
 
     /*!
      * \brief compute V matrix
      */
-    void setV() {
-        pair_.first->setV();
-    }
+    void setV();
 
     /*!
-     * \brief compute Vc matrix
+     * \brief compute Vc vector
      * \param c vector for multiplication with the matrix
      */
-    void setVc(const Eigen::VectorXd& c) {
-        pair_.second->setVc(c);
-    }
+    void setVc(const Eigen::VectorXd& c);
+
+    /*!
+     * \brief compute CVc vector and store it in xnode
+     * \param c vector for multiplication with the matrix
+     */
+    void setCVc();
 
 private:
     unsigned deg_; //!< degree of interpolating polynomial
-    Kernel G_; //!< kernel
-    Eigen::MatrixXd X_; //!< matrix \f$X_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
+    Kernel     G_; //!< kernel
+    Eigen::MatrixXd C_; //!< matrix \f$C_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
     std::pair<Node*,Node*> pair_;
 };
 #endif // BLOCK_CLUSTER_HPP
