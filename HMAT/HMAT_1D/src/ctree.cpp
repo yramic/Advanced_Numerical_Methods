@@ -9,7 +9,6 @@
  * as this header is left intact.                                      *
  ***********************************************************************/
 #include "../include/ctree.hpp"
-#include "../include/is_admissible.hpp"
 #include "../include/node.hpp"
 #include <Eigen/Dense>
 #include <vector>

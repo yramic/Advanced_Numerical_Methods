@@ -31,6 +31,11 @@ public:
      */
     virtual ~Node_Y();
     /*!
+     * \brief build tree recursively
+     * \param id ID of node
+     */
+    void setLeaves(int& id);
+    /*!
      * \brief compute fake V-matrix of ynode with uni-directional interpolation
      */
     void setV();

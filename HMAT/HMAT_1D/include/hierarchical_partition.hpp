@@ -32,7 +32,7 @@ public:
      * \param deg Degree of itnerpolation
      */
     HierarchicalPartitioning(const std::vector<Point>& GPoints, double eta, unsigned deg):
-        Tx_(GPoints,deg), Ty_(Tx_), eta_(eta)
+        Tx_(GPoints,deg), Ty_(GPoints,deg), eta_(eta)
     {}
     /*!
      * \brief Return the Far Field pairs vector
