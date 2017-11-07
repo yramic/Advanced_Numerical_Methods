@@ -20,19 +20,19 @@
 #define random1
 
 
-//#define local
-#define global
-#define gsk
+#define local
+//#define global
+//#define gsk
 //#define gauss
 int main() {
 
     // Input
 
-    std::cout << "Enter number of edges:" << std::endl;
-    unsigned n; std::cin >> n;
+    //std::cout << "Enter number of edges:" << std::endl;
+    //unsigned n; std::cin >> n;
 
     // initializing n for testing
-    //unsigned n=20;
+    unsigned n=20;
 #ifdef vector16
     n = 16;
 #endif
@@ -163,7 +163,7 @@ int main() {
     Eigen::MatrixXd M(n,n);
     for(int i=0; i<n; ++i)
         for(int j=0; j<n; ++j)
-            M(i,j) = G(PPoints[i].getX(), PPoints[i].getY(), PPoints[j].getX(), PPoints[j].getY());
+            M(i,j) = P(PPoints[i].getX(), PPoints[i].getY(), PPoints[j].getX(), PPoints[j].getY());
     Eigen::VectorXd f_exact = M * c;
 
 
@@ -175,7 +175,7 @@ int main() {
     auto start2 = std::chrono::system_clock::now();
 
     //LowRankApp lra(&P, PPoints, n);         // initialization of low rank approximation for BEM approx for matrix multiplication
-    LowRankApp HMat(&G, PPoints, n, eta, d);
+    LowRankApp HMat(&P, PPoints, n, eta, d);
     Eigen::VectorXd f_approx = HMat.mvProd(c, eta, d);   // calculation of the low rank approximation
 
     auto end2 = std::chrono::system_clock::now();

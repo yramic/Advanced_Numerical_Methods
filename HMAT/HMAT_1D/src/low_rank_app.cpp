@@ -54,12 +54,20 @@ void LowRankApp::blockProcess(std::vector<BlockCluster> ff_v)
         pair.setCVc();
     }
 }
-
+bool checkpointers(Node* x, Node*y) { return x<y; }
 // post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place
 void LowRankApp::postProcess(std::vector<BlockCluster> ff_v, Eigen::VectorXd& f)
 {
-    for(auto& pair : ff_v){ // iterate for all the pairs of far field nodes
-        Node* xnode = pair.getXNode();
+    std::vector<Node*> ff_xnodes;
+    for(int i=0;i<ff_v.size();i++){
+        ff_xnodes.push_back(ff_v[i].getXNode());
+    }
+    std::sort(ff_xnodes.begin(),ff_xnodes.end(),checkpointers);
+    auto last = std::unique(ff_xnodes.begin(), ff_xnodes.end());
+    ff_xnodes.erase(last, ff_xnodes.end());
+    //for(auto& pair : ff_v){ // iterate for all the pairs of far field nodes
+    for(int j=0; j<ff_xnodes.size();j++){
+        Node* xnode = ff_xnodes[j];
         Eigen::VectorXd CVc = xnode->getCVc_Node();
         Eigen::MatrixXd  Vx = xnode->getV_Node();
         Eigen::VectorXd f_seg = Vx * CVc;
