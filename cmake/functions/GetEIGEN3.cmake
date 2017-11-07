@@ -2,11 +2,7 @@ include(ExternalProject) # To download Eigen if it is missing
 
 find_package(EIGEN3)
 
-# Added the following requirement for BEtl2 to work
-#if(EIGEN3_VERSION VERSION_GREATER 3.2.7 OR EIGEN3_VERSION VERSION_EQUAL 3.2.7)
-#  message("Eigen version >= 3.2.7 is not supported. Downloading 3.2.7 instead.")
-#  set(EIGEN3_FOUND FALSE)
-#endif()
+# Added the following requirement to check assignment with different versions of Eigen
 if(EIGEN3_VERSION VERSION_LESS 3.3.0)
   message("Old Eigen version. Downloading 3.3.4 instead.")
   set(EIGEN3_FOUND FALSE)
@@ -18,8 +14,7 @@ if(${EIGEN3_FOUND})
   add_custom_target(Eigen) # dependency dummy
 
 else()
-  #  if not found system wide download. Changed eigen version from 3.3.4 to 3.2.7
-  # for Betl2 to work
+  #  if not found system wide download. 
     SET(DOWNLOADING_EIGEN ON)
     message("-- Downloading Eigen3")
     ExternalProject_Add(

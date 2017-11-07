@@ -415,7 +415,6 @@ Eigen::VectorXd computeNeumannResidual(const grid_factory_t& gridFactory,
   // COMPUTE NEUMANN RESIDUAL ACCORDING TO (1.6.33)
   const Eigen::VectorXd res_N = -W * coeff_gD + 0.5*M.transpose()* coeff_gN
                                   - K.transpose() * coeff_gN ;
-  return res_N;
 
 #else // TEMPLATE
   
@@ -444,9 +443,11 @@ Eigen::VectorXd computeNeumannResidual(const grid_factory_t& gridFactory,
 						 dh_lagrange0.fespace( ) );
 
   // TODO: Implement your code
-  Eigen::VectorXd res_D;
+  Eigen::VectorXd res_N;
     
 #endif // TEMPLATE
+  
+  return res_N;
 }
 /* SAM_LISTING_END_5 */
 

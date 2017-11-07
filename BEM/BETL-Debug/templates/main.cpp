@@ -233,7 +233,8 @@ Eigen::VectorXd computeNeumannResidual(const grid_factory_t& gridFactory,
 						 dh_lagrange0.fespace( ) );
 
   // TODO: Implement your code
-  Eigen::VectorXd res_D;
+  Eigen::VectorXd res_N;
+  return res_N;
     
 }
 /* SAM_LISTING_END_5 */
