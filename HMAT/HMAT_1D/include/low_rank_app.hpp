@@ -42,10 +42,11 @@ public:
 private:
     /*!
      * \brief Pre-processing: initialize matrix V and vector Vc for all far field nodes
-     * \param ff_v Vector of Far Field Pairs
+     * \param ff_v_x Vector of Far Field XNodes
+     * \param ff_v_y Vector of Far Field YNodes
      * \param c Vector c to multiply
      */
-    void preProcess(std::vector<BlockCluster> ff_v, const Eigen::VectorXd& c);
+    void preProcess(std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y, const Eigen::VectorXd& c);
 
     /*!
      * \brief Block-processing: compute vector CVc for all far field pairs and store it into xnode
@@ -55,25 +56,30 @@ private:
 
     /*!
      * \brief Post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place
-     * \param ff_v Vector of Far Field Pairs
+     * \param ff_v_x Vector of Far Field XNodes
      * \param f Output product vector
      */
-    void postProcess(std::vector<BlockCluster> ff_v, Eigen::VectorXd& f);
+    void postProcess(std::vector<Node*> ff_v_x, Eigen::VectorXd& f);
 
     /*!
      * \brief Compute far field contribution
      * \param ff_v Vector of Far Field Pairs
+     * \param ff_v Vector of Far Field unique xnodes
+     * \param ff_v Vector of Far Field unique ynodes
      * \param c Vector c to multiply
      * \param f Output product vector
      */
-    void ff_contribution(std::vector<BlockCluster> ff_v, const Eigen::VectorXd& c, Eigen::VectorXd& f);
+    void ff_contribution(std::vector<BlockCluster> ff_v,
+                         std::vector<Node *> ff_v_x, std::vector<Node *> ff_v_y,
+                         const Eigen::VectorXd& c, Eigen::VectorXd& f);
     /*!
      * \brief Compute near field contribution
      * \param nf_v Vector of Near Field pairs
      * \param c Vector c to multiply
      * \param f Output product vector
      */
-    void nf_contribution(std::vector<std::pair<Node*,Node*>> nf_v, const Eigen::VectorXd& c, Eigen::VectorXd& f);
+    void nf_contribution(std::vector<std::pair<Node*,Node*> > nf_v,
+                         const Eigen::VectorXd& c, Eigen::VectorXd& f);
 
     unsigned  deg_; //!< degree of interpolation
     Kernel kernel_; //!< kernel

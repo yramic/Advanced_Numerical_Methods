@@ -104,6 +104,14 @@ public:
         return V_node_;
     }
     /*!
+     * \brief return the Vc vector
+     */
+    Eigen::VectorXd getVc_Node() { return Vc_node_; }
+    /*!
+     * \brief return the CVc vector
+     */
+    Eigen::VectorXd getCVc_Node() { return CVc_node_; }
+    /*!
      * \brief return the id of this node
      */
     int getNodeID(){
@@ -154,6 +162,16 @@ public:
      */
     void setV_node(unsigned deg);
     /*!
+     * \brief compute Vc vector
+     * \param c vector for multiplication with the matrix
+     */
+    void setVc(const Eigen::VectorXd& c);
+    /*!
+     * \brief update CVc vector
+     * \param c vector for multiplication with the matrix
+     */
+    void setCVc(const Eigen::VectorXd& CVc);
+    /*!
      * \brief Function to print the cluster tree for debugging
      * \param n Level of the node in the cluster tree(0 = root)
      */
@@ -201,7 +219,9 @@ private:
     Eigen::VectorXd tkx_, tky_; //!< Chebyshev Nodes
     Eigen::VectorXd wkx_, wky_; //!< Lagrange polynomial weights
     Eigen::MatrixXd V_node_; //!< V matrix
-    int nodeId_;    //!< id of the node in the cluster tree used for debugging
+    Eigen::VectorXd Vc_node_;  //!< Vc vector
+    Eigen::VectorXd CVc_node_; //!< CVc vector
+    int nodeId_;    //!< id of the node in the cluster tree
     friend class cTree;
  };
 

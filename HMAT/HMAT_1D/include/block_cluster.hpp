@@ -39,7 +39,7 @@ public:
     BlockCluster(Node* ndx, Node* ndy, Kernel G);
 
     /*!
-     * \brief return matrix \f$X_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
+     * \brief return matrix \f$C_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
      */
     Eigen::MatrixXd getMatrix() const {
         return C_;
@@ -56,21 +56,10 @@ public:
     void setKernel(Kernel G);
 
     /*!
-     * \brief compute V matrix
-     */
-    void setV();
-
-    /*!
-     * \brief compute Vc vector
-     * \param c vector for multiplication with the matrix
-     */
-    void setVc(const Eigen::VectorXd& c);
-
-    /*!
      * \brief compute CVc vector and store it in xnode
      * \param c vector for multiplication with the matrix
      */
-    void setCVc();
+    void setCVc(Kernel G);
 
     /*!
      * \brief return pointer to xnode

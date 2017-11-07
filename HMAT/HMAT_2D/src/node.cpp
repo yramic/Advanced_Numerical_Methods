@@ -32,7 +32,7 @@ bool sortY(Point a, Point b) { return a.getY()<b.getY(); }
 void Node::setLeaves()
 {
     if(!PPointsTree_.empty() && PPointsTree_.size()>1){ // in the beggining the space must be divided based on the max coordinates of the points
-        double medX,medY,maxX,minX,maxY,minY;
+        double maxX,minX,maxY,minY;
         maxX = PPointsTree_.begin()->getX();
         minX = PPointsTree_.begin()->getX();
         maxY = PPointsTree_.begin()->getY();
@@ -114,8 +114,6 @@ void Node::setLeaves()
 void Node::setLeaves(double x1, double x2, double y1, double y2)
 {
     if(!PPointsTree_.empty() && PPointsTree_.size()>1){ // below the root level the space [x1,x2]x[y1,y2] must be divided in quadrants recursivly
-        double medX = x1+(x2-x1)/2;
-        double medY = y1+(y2-y1)/2;
         double x1,x2,y1,y2;                 // construction of Bounding Box of this Node
         x1 = PPointsTree_.begin()->getX();
         x2 = PPointsTree_.begin()->getX();
