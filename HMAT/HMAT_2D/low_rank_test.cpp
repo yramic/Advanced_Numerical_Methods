@@ -16,8 +16,8 @@
 
 
 //#define circle
-//#define vector16
-#define random1
+#define vector16
+//#define random1
 
 
 #define local

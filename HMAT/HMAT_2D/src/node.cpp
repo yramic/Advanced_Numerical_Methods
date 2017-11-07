@@ -7,15 +7,8 @@
 
 // actual  constructor: creates the root of the Cluster Tree and the recursivly creates the leaves
 Node::Node(std::vector<Point> Points, unsigned deg):
-    tl_child_(NULL), tr_child_(NULL), bl_child_(NULL), br_child_(NULL), deg_(deg), PPointsTree_(Points)
+    tl_child_(NULL), tr_child_(NULL), bl_child_(NULL), br_child_(NULL), deg_(deg), PPointsTree_(Points), CVc_node_(Eigen::VectorXd::Zero((deg+1)*(deg+1)))
 { setLeaves(); }
-
-// recursive constructor for the leaves of the Cluster Tree
-Node::Node(std::vector<Point> PPointsTree, double x1, double x2, double y1, double y2, unsigned deg):
-    tl_child_(NULL), tr_child_(NULL), bl_child_(NULL), br_child_(NULL), PPointsTree_(PPointsTree), x1_(x1), x2_(x2), y1_(y1), y2_(y2), deg_(deg)
-{
-    setLeaves(x1,x2,y1,y2);
-}
 
 // destructor
 Node::~Node()
@@ -25,174 +18,81 @@ Node::~Node()
     if(bl_child_ != NULL) delete bl_child_;
     if(br_child_ != NULL) delete br_child_;
 }
-bool sortX(Point a, Point b) { return a.getX()<b.getX(); }
-bool sortY(Point a, Point b) { return a.getY()<b.getY(); }
+
+// calculate the rectangle defined by the points of the node
+void Node::getRect(){
+    double maxX,minX,maxY,minY;
+    maxX = PPointsTree_.begin()->getX();
+    minX = PPointsTree_.begin()->getX();
+    maxY = PPointsTree_.begin()->getY();
+    minY = PPointsTree_.begin()->getY();
+    for (std::vector<Point>::iterator it=PPointsTree_.begin()+1; it!=PPointsTree_.end(); it++){
+        if (it->getX()>maxX) {
+            maxX = it->getX();
+        }
+        else if (it->getX()<minX) {
+            minX = it->getX();
+        }
+        if (it->getY()>maxY) {
+            maxY = it->getY();
+        }
+        else if (it->getY()<minY) {
+            minY = it->getY();
+        }
+    }
+    x1_ = minX;
+    x2_ = maxX;
+    y1_ = minY;
+    y2_ = maxY;
+}
 
 // build tree recursively
 void Node::setLeaves()
 {
-    if(!PPointsTree_.empty() && PPointsTree_.size()>1){ // in the beggining the space must be divided based on the max coordinates of the points
-        double maxX,minX,maxY,minY;
-        maxX = PPointsTree_.begin()->getX();
-        minX = PPointsTree_.begin()->getX();
-        maxY = PPointsTree_.begin()->getY();
-        minY = PPointsTree_.begin()->getY();
-        for (std::vector<Point>::iterator it=PPointsTree_.begin()+1; it!=PPointsTree_.end(); it++){
-            if (it->getX()>maxX) {
-                maxX = it->getX();
-            }
-            else if (it->getX()<minX) {
-                minX = it->getX();
-            }
-            if (it->getY()>maxY) {
-                maxY = it->getY();
-            }
-            else if (it->getY()<minY) {
-                minY = it->getY();
-            }
-        }
-        x1_ = x1_b_ = minX;
-        x2_ = x2_b_ = maxX;
-        y1_ = y1_b_ = minY;
-        y2_ = y2_b_ = maxY;
-
-        //medX = minX+(maxX-minX)/2;                      // the space is devided in 4 quadrants and the point of each quadrant is saved in a vector on the coresponding Node
-        //medY = minY+(maxY-minY)/2;
-
-        std::sort(PPointsTree_.begin(),PPointsTree_.end(),sortX);
+    if(!PPointsTree_.empty() && PPointsTree_.size()>1){ // if there are points in the PPointsTree vector of points then they are equaly divided into the node´s children
+        auto checkX = [](Point a, Point b) -> bool { return a.getX()<b.getX(); };
+        std::sort(PPointsTree_.begin(),PPointsTree_.end(),checkX);
         std::vector<Point>::iterator it;
         it=PPointsTree_.begin()+(PPointsTree_.size()+1)/2;  // set  iterator in the middle of the vector of points in this node
-        std::vector<Point> l_points,r_points;               // left and right child´s vectors
-        l_points.assign(PPointsTree_.begin(), it);                // division of node´s points into it´s childs
+        std::vector<Point> l_points,r_points;               // sorting of points in left and right based on the points´ y coordinates
+        l_points.assign(PPointsTree_.begin(), it);
         r_points.assign(it,PPointsTree_.end());
-        std::sort(l_points.begin(),l_points.end(),sortY);
-        std::sort(r_points.begin(),r_points.end(),sortY);
-        std::vector<Point> tl_PPoints, tr_PPoints, bl_PPoints, br_PPoints;
-        /*for (std::vector<Point>::iterator it=PPointsTree_.begin(); it!=PPointsTree_.end(); it++){
-            if (it->getX()<=medX && it->getY()<=medY) {
-                bl_PPoints.push_back(*it);
-            }
-            else if (it->getX()>medX && it->getY()<medY) {
-                br_PPoints.push_back(*it);
-            }
-            else if (it->getX()<=medX && it->getY()>=medY) {
-                tl_PPoints.push_back(*it);
-            }
-            else if (it->getX()>medX && it->getY()>medY) {
-                tr_PPoints.push_back(*it);
-            }
-            else {
-                bl_PPoints.push_back(*it);
-            }
-        }*/
+        auto checkY = [](Point a, Point b) -> bool { return a.getY()<b.getY(); };
+        std::sort(l_points.begin(),l_points.end(),checkY);   // sorting of left and right vectors in top and bottom based on points´ y coordinates
+        std::sort(r_points.begin(),r_points.end(),checkY);
+        std::vector<Point> tl_PPoints, tr_PPoints, bl_PPoints, br_PPoints;  // creation of children nodes´ points vectors
         it=l_points.begin()+(l_points.size()+1)/2;
         tl_PPoints.assign(it,l_points.end());
         bl_PPoints.assign(l_points.begin(),it);
         it=r_points.begin()+(r_points.size()+1)/2;
         tr_PPoints.assign(it,r_points.end());
         br_PPoints.assign(r_points.begin(),it);
-        // fix for points of a bbox being a segment
+        getRect(); // calculate the rectangle defined by the points of the node
+        // fix for the rectangle if it is a segment
         if(std::abs(x1_-x2_)<10*std::numeric_limits<double>::epsilon()){
-            x2_b_++;
+            x2_++;
         }
         if(std::abs(y1_-y2_)<10*std::numeric_limits<double>::epsilon()){
-            y2_b_++;
+            y2_++;
         }
-        Cheby cbx(x1_b_, x2_b_, deg_);
-        Cheby cby(y1_b_, y2_b_, deg_);
+        Cheby cbx(x1_, x2_, deg_);   // Chebvchev interpolation on the edges of the rectangle
+        Cheby cby(y1_, y2_, deg_);
         tkx_ = cbx.getNodes(); // Chebyshew nodes for x axis
         wkx_ = cbx.getWghts(); // weights of Lagrange polynomial for x axis
         tky_ = cby.getNodes(); // Chebyshew nodes for y axis
         wky_ = cby.getWghts(); // weights of Lagrange polynomial for y axis
-        if (!tl_PPoints.empty()) tl_child_ = new Node(tl_PPoints,minX,medX,medY,maxY, deg_);   // recursive construction of the Cluster Tree levels below root
-        if (!tr_PPoints.empty()) tr_child_ = new Node(tr_PPoints,medX,maxX,medY,maxY, deg_);
-        if (!bl_PPoints.empty()) bl_child_ = new Node(bl_PPoints,minX,medX,minY,medY, deg_);
-        if (!br_PPoints.empty()) br_child_ = new Node(br_PPoints,medX,maxX,minY,medY, deg_);
+        if (!tl_PPoints.empty()) tl_child_ = new Node(tl_PPoints, deg_);   // recursive construction of the Cluster Tree levels below root
+        if (!tr_PPoints.empty()) tr_child_ = new Node(tr_PPoints, deg_);
+        if (!bl_PPoints.empty()) bl_child_ = new Node(bl_PPoints, deg_);
+        if (!br_PPoints.empty()) br_child_ = new Node(br_PPoints, deg_);
     }
 }
 
-void Node::setLeaves(double x1, double x2, double y1, double y2)
-{
-    if(!PPointsTree_.empty() && PPointsTree_.size()>1){ // below the root level the space [x1,x2]x[y1,y2] must be divided in quadrants recursivly
-        double x1,x2,y1,y2;                 // construction of Bounding Box of this Node
-        x1 = PPointsTree_.begin()->getX();
-        x2 = PPointsTree_.begin()->getX();
-        y1 = PPointsTree_.begin()->getY();
-        y2 = PPointsTree_.begin()->getY();
-        for (std::vector<Point>::iterator it=PPointsTree_.begin(); it!=PPointsTree_.end(); it++) {
-            if (it->getX()>x2) {
-                x2 = it->getX();
-            }
-            else if (it->getX()<x1) {
-                x1 = it->getX();
-            }
-            if (it->getY()>y2) {
-                y2 = it->getY();
-            }
-            else if (it->getY()<y1) {
-                y1 = it->getY();
-            }
-        }
-        x1_b_ = x1;
-        x2_b_ = x2;
-        y1_b_ = y1;
-        y2_b_ = y2;
-
-        std::sort(PPointsTree_.begin(),PPointsTree_.end(),sortX);
-        std::vector<Point>::iterator it;
-        it=PPointsTree_.begin()+(PPointsTree_.size()+1)/2;  // set  iterator in the middle of the vector of points in this node
-        std::vector<Point> l_points,r_points;               // left and right child´s vectors
-        l_points.assign(PPointsTree_.begin(), it);                // division of node´s points into it´s childs
-        r_points.assign(it,PPointsTree_.end());
-        std::sort(l_points.begin(),l_points.end(),sortY);
-        std::sort(r_points.begin(),r_points.end(),sortY);
-        std::vector<Point> tl_PPoints, tr_PPoints, bl_PPoints, br_PPoints;
-        /*for (std::vector<Point>::iterator it=PPointsTree_.begin(); it!=PPointsTree_.end(); it++){
-            if (it->getX()<=medX && it->getY()<=medY) {
-                bl_PPoints.push_back(*it);
-            }
-            else if (it->getX()>medX && it->getY()<medY) {
-                br_PPoints.push_back(*it);
-            }
-            else if (it->getX()<=medX && it->getY()>=medY) {
-                tl_PPoints.push_back(*it);
-            }
-            else if (it->getX()>medX && it->getY()>medY) {
-                tr_PPoints.push_back(*it);
-            }
-            else {
-                bl_PPoints.push_back(*it);
-            }
-        }*/
-        it=l_points.begin()+(l_points.size()+1)/2;
-        tl_PPoints.assign(it,l_points.end());
-        bl_PPoints.assign(l_points.begin(),it);
-        it=r_points.begin()+(r_points.size()+1)/2;
-        tr_PPoints.assign(it,r_points.end());
-        br_PPoints.assign(r_points.begin(),it);
-        // fix for points of a bbox being a segment
-        if(std::abs(x1-x2)<10*std::numeric_limits<double>::epsilon()){
-            x2_b_++;
-        }
-        if(std::abs(y1-y2)<10*std::numeric_limits<double>::epsilon()){
-            y2_b_++;
-        }
-        Cheby cbx(x1_b_, x2_b_, deg_);
-        Cheby cby(y1_b_, y2_b_, deg_);
-        tkx_ = cbx.getNodes(); // Chebyshew nodes for x axis
-        wkx_ = cbx.getWghts(); // weights of Lagrange polynomial for x axis
-        tky_ = cby.getNodes(); // Chebyshew nodes for y axis
-        wky_ = cby.getWghts(); // weights of Lagrange polynomial for y axis
-        if (!tl_PPoints.empty()) tl_child_ = new Node(tl_PPoints,x1,medX,medY,y2, deg_);
-        if (!tr_PPoints.empty()) tr_child_ = new Node(tr_PPoints,medX,x2,medY,y2, deg_);
-        if (!bl_PPoints.empty()) bl_child_ = new Node(bl_PPoints,x1,medX,y1,medY, deg_);
-        if (!br_PPoints.empty()) br_child_ = new Node(br_PPoints,medX,x2,y1,medY, deg_);
-    }
-}
 // compute V-matrix of node
-void Node::setV_node(unsigned deg)
+void Node::setV()
 {
-    if(V_node_.cols()==0 && V_node_.rows()==0){
+    //if(V_node_.cols()==0 && V_node_.rows()==0){
+        unsigned deg = tkx_.size()-1;
         int ppts = PPointsTree_.size();
         V_node_ = Eigen::MatrixXd::Constant(ppts, (deg+1)*(deg+1), 1);
         for(unsigned i=0; i<=ppts-1; ++i) { // calculation of Vx combined with Vy
@@ -220,10 +120,10 @@ void Node::setV_node(unsigned deg)
                 }
             }
         }
-    }
-    else{
+    //}
+    /*else{
         return;
-    }
+    }*/
     // Alternate way of computing V matrix
     /*Eigen::MatrixXd VnodeX = Eigen::MatrixXd::Constant(ppts, (deg+1), 1);
     Eigen::MatrixXd VnodeY = Eigen::MatrixXd::Constant(ppts, (deg+1), 1);
@@ -268,6 +168,24 @@ void Node::setV_node(unsigned deg)
     std::cout << "V_Node_new" << std::endl;
     std::cout << V_node_new << std::endl;*/
 }
+
+// compute V*c restricted to node indices
+void Node::setVc(const Eigen::VectorXd& c)
+{
+    int n = PPointsTree_.size();
+    Eigen::VectorXd c_seg = Eigen::VectorXd::Zero(n);
+    for(int i=0; i<n; i++){ // get only the part of vector c needed
+        c_seg[i] = c(PPointsTree_[i].getId());
+    }
+    Vc_node_ = V_node_.transpose() * c_seg; // Vc matrix calculation
+}
+
+// update C*V*c restricted to node indices
+void Node::setCVc(const Eigen::VectorXd& CVc)
+{
+    CVc_node_ += CVc;
+}
+
 void Node::printree(int n)
 {
     std::cout << "Node " << n << std::endl;
