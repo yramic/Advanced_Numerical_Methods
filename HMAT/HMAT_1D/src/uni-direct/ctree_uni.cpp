@@ -8,19 +8,19 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/ctree.hpp"
-#include "../include/node.hpp"
+#include "../../include/ctree.hpp"
+#include "../../include/uni-direct/node_Y.hpp"
 #include <Eigen/Dense>
 #include <vector>
 
 // Actual constructor
 template<>
-cTree<Node>::cTree(const std::vector<Point>& GPoints, unsigned deg):
+cTree<Node_Y>::cTree(const std::vector<Point>& GPoints, unsigned deg):
     root_(NULL)
 {
     unsigned n = GPoints.size();
     if(n > 1) { // build the tree
         int node_id = 0;
-        root_ = new Node(GPoints, node_id, deg); // root is a node, leaves are added
+        root_ = new Node_Y(GPoints, node_id, deg); // root is a node, leaves are added
     }
 }

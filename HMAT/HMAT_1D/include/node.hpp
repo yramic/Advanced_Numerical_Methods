@@ -11,24 +11,13 @@
 #ifndef NODE_HPP
 #define NODE_HPP
 
-#include "point.hpp"
-
 #include <Eigen/Dense>
-/***********************************************************************
- *                                                                     *
- * Code for Course "Advanced Numerical Methods for CSE"                *
- * (Prof. Dr. R. Hiptmair)                                             * 
- * Author:                                                             *
- * Date:                                                               *
- * (C) Seminar for Applied Mathematics, ETH Zurich                     *
- * This code can be freely used for non-commercial purposes as long    *
- * as this header is left intact.                                      *
- ***********************************************************************/
+#include "point.hpp"
 #include <vector>
 
 // forward declaration to avoid cross-referencing
+template<typename NODE>
 class cTree;
-
 
 /**
 * \brief Node of a cluster tree ("cTree" class)
@@ -55,7 +44,6 @@ public:
      * \brief Destructor
      */
     virtual ~Node();
-
     /*!
      * \brief return vector of node´s points
      */
@@ -112,7 +100,7 @@ public:
      */
     void setCVc(const Eigen::VectorXd& CVc);
   
-private:
+protected:
     Node* l_child_;  //!< left  child of node
     Node* r_child_;  //!< right child of node
     std::vector<Point> node_points_;    //!< points of the node
@@ -123,6 +111,8 @@ private:
     Eigen::MatrixXd V_node_ ;  //!< V  matrix
     Eigen::VectorXd Vc_node_;  //!< Vc vector
     Eigen::VectorXd CVc_node_; //!< CVc vector
+    template<typename NODE>
     friend class cTree;
- };
+};
+
 #endif // NODE_HPP

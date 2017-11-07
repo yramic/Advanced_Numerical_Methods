@@ -12,3 +12,9 @@ set(cpp_files
     PARENT_SCOPE
 )
 
+add_subdirectory(uni-direct)
+set(  cpp_files_uni
+    ${cpp_files_uni}
+    PARENT_SCOPE
+)
+

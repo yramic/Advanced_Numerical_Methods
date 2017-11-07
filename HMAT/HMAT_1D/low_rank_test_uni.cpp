@@ -1,6 +1,8 @@
 #include "include/kernel.hpp"
 #include "include/low_rank_app.hpp"
 #include "include/point.hpp"
+#include "include/uni-direct/block_cluster_Y.hpp"
+#include "include/uni-direct/node_Y.hpp"
 
 #include <Eigen/Dense>
 #include <chrono>
@@ -58,7 +60,7 @@ int main() {
 
     auto start2 = std::chrono::system_clock::now();
 
-    LowRankApp<> HMat(G,GPoints,eta,d);
+    LowRankApp<BlockCluster_Y, Node_Y> HMat(G,GPoints,eta,d);
     Eigen::VectorXd f_approx = HMat.mvProd(c);
 
     auto end2 = std::chrono::system_clock::now();

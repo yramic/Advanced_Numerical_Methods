@@ -75,7 +75,7 @@ public:
         return pair_.second;
     }
 
-private:
+protected:
     Kernel G_; //!< kernel
     Eigen::MatrixXd C_; //!< matrix \f$C_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
     std::pair<Node*,Node*> pair_;

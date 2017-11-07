@@ -8,14 +8,14 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/hierarchical_partition.hpp"
-#include "../include/block_cluster.hpp"
-#include "../include/block_nearf.hpp"
-#include "../include/cheby.hpp"
-#include "../include/ctree.hpp"
-#include "../include/is_admissible.hpp"
-#include "../include/node.hpp"
-#include "../include/point.hpp"
+#include "../../include/hierarchical_partition.hpp"
+#include "../../include/uni-direct/block_cluster_Y.hpp"
+#include "../../include/block_nearf.hpp"
+#include "../../include/cheby.hpp"
+#include "../../include/ctree.hpp"
+#include "../../include/is_admissible.hpp"
+#include "../../include/uni-direct/node_Y.hpp"
+#include "../../include/point.hpp"
 #include <Eigen/Dense>
 #include <algorithm>
 #include <iostream>
@@ -23,7 +23,7 @@
 
 // add pairs of pointers to Node of the Cluster Tree in the Near and Far Field Vectors of pairs
 template<>
-void HierarchicalPartitioning<BlockCluster,Node>::setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree<Node> Ty)
+void HierarchicalPartitioning<BlockCluster_Y,Node_Y>::setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree<Node_Y> Ty)
 {
     // if *xnode or *ynode is a leaf, we add the pair (*xnode,*ynode) to the near field vector
     if((*xnode).getLChild() == NULL || (*ynode).getRChild() == NULL) {
@@ -36,7 +36,7 @@ void HierarchicalPartitioning<BlockCluster,Node>::setNearFar_recursion(Node* xno
         // if the cluster corresponding to *xnode and *ynode is admissible, we add the pair (*xnode,*ynode) to the far field vector
         if(is_admissible(xl,xr,yl,yr, eta)) {
             // the line above checks the admissibility condition (eta)
-            FarField_.push_back(new BlockCluster(xnode,ynode));
+            FarField_.push_back(new BlockCluster_Y(xnode,ynode));
             FarField_xnds_.push_back(xnode); FarField_ynds_.push_back(ynode);
         } else { // else we consider the children of *xnode and *ynode and check whether their clusters are admissible
             setNearFar_recursion((*xnode).getLChild(), (*ynode).getLChild(), eta, Ty);
@@ -49,7 +49,7 @@ void HierarchicalPartitioning<BlockCluster,Node>::setNearFar_recursion(Node* xno
 
 // compute the Far and Near Field pairs
 template<>
-void HierarchicalPartitioning<BlockCluster,Node>::setNearFar()
+void HierarchicalPartitioning<BlockCluster_Y,Node_Y>::setNearFar()
 {
     setNearFar_recursion(Tx_.getRoot(), Ty_.getRoot(), eta_, Ty_);
     auto checkpointers = [](Node* x, Node* y) -> bool { return x<y; };
@@ -62,7 +62,7 @@ void HierarchicalPartitioning<BlockCluster,Node>::setNearFar()
 // return the bounding box corresponding to index i of the far-field vector
 template<>
 std::pair<std::pair<double,double>,
-          std::pair<double,double> > HierarchicalPartitioning<BlockCluster,Node>::getBB(int i)
+          std::pair<double,double> > HierarchicalPartitioning<BlockCluster_Y,Node_Y>::getBB(int i)
 {
     Node* xnode = FarField_[i]->getXNode();
     std::vector<Point> xpts = xnode->getPoints();
