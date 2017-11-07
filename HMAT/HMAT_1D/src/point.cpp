@@ -8,44 +8,16 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#ifndef POINT_H
-#define POINT_H
+#include "../include/point.hpp"
 
-#include <Eigen/Dense>
-#include <vector>
-/*!
-* \brief Class for point attributes
-*/
-class Point
+// set x coordinate
+void Point::setX(double x)
 {
-public:
-    /*!
-    * \brief Default Constructor
-    */
-    Point(): x_(0),id_(0){}
-    /*!
-    * \brief Return x coordinate of this point
-    */
-    double getX() const {
-        return x_;
-    }
-    /*!
-    * \brief Return id of this point
-    */
-    double getId() const {
-        return id_;
-    }
-    /*!
-    * \brief Set x coordinate
-    */
-    void setX(double x);
-    /*!
-    * \brief Set id
-    */
-    void setId(double id);
-private:
-    double    x_; //!< x coordinate of the point
-    unsigned id_; //!< id of the point
-};
+    x_ = x;
+}
 
-#endif // POINT_H
+// set id
+void Point::setId(double id)
+{
+    id_ = id;
+}

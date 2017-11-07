@@ -1,3 +1,13 @@
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             *
+ * Author:                                                             *
+ * Date:                                                               *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
 #ifndef HIERARCHICAL_PARTITION_HPP
 #define HIERARCHICAL_PARTITION_HPP
 
@@ -28,6 +38,18 @@ public:
         return FarField_;
     }
     /*!
+     * \brief Return the Far Field vector of unique pointer to xnodes
+     */
+    std::vector<Node*> getFFxnds() {
+        return FarField_xnds_;
+    }
+    /*!
+     * \brief Return the Far Field vector of unique pointer to ynodes
+     */
+    std::vector<Node*> getFFynds() {
+        return FarField_ynds_;
+    }
+    /*!
      * \brief Return the Near Field pairs vector
      */
     std::vector<std::pair<Node*,Node*> > getNF() {
@@ -36,7 +58,7 @@ public:
     /*!
      * \brief Compute the Far and Near Field pairs
      */
-    void setNearFar() { setNearFar_recursion(Tx_.getRoot(), Ty_.getRoot(), eta_, Ty_); }
+    void setNearFar();
     /*!
      * \brief Return the bounding box corresponding to index i of the far-field vector
      */
@@ -52,7 +74,9 @@ private:
      */
     void setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree Ty);
     cTree Tx_, Ty_; //!< Cluster trees for comparison
-    std::vector<BlockCluster> FarField_; //!< Vector for Far Field
+    std::vector<BlockCluster> FarField_;       //!< Vector for Far Field
+    std::vector<Node*>        FarField_xnds_; //!< Vector for Far Field XNodes
+    std::vector<Node*>        FarField_ynds_; //!< Vector for Far Field YNodes
     std::vector<std::pair<Node*,Node*> > NearField_; //!< Vector for Near Field
     double eta_;  //!< eta-admissibility constant
 };

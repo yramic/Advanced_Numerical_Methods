@@ -1,3 +1,13 @@
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             *
+ * Author:                                                             *
+ * Date:                                                               *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
 #include "../include/hierarchical_partition.hpp"
 #include "../include/block_cluster.hpp"
 #include "../include/cheby.hpp"
@@ -6,8 +16,20 @@
 #include "../include/node.hpp"
 #include "../include/point.hpp"
 #include <Eigen/Dense>
-#include <vector>
+#include <algorithm>
 #include <iostream>
+#include <vector>
+
+// compute the Far and Near Field pairs
+void HierarchicalPartitioning::setNearFar()
+{
+    setNearFar_recursion(Tx_.getRoot(), Ty_.getRoot(), eta_, Ty_);
+    auto checkpointers = [](Node* x, Node* y) -> bool { return x<y; };
+    std::sort(FarField_xnds_.begin(), FarField_xnds_.end(), checkpointers);
+    FarField_xnds_.erase(std::unique(FarField_xnds_.begin(), FarField_xnds_.end()), FarField_xnds_.end());
+    std::sort(FarField_ynds_.begin(), FarField_ynds_.end(), checkpointers);
+    FarField_ynds_.erase(std::unique(FarField_ynds_.begin(), FarField_ynds_.end()), FarField_ynds_.end());
+}
 
 // add pairs of pointers to Node of the Cluster Tree in the Near and Far Field Vectors of pairs
 void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree Ty)
@@ -24,6 +46,7 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
         if(is_admissible(xl,xr,yl,yr, eta)) {
             // the line above checks the admissibility condition (eta)
             FarField_.push_back(BlockCluster(xnode,ynode));
+            FarField_xnds_.push_back(xnode); FarField_ynds_.push_back(ynode);
         } else { // else we consider the children of *xnode and *ynode and check whether their clusters are admissible
             setNearFar_recursion((*xnode).getLChild(), (*ynode).getLChild(), eta, Ty);
             setNearFar_recursion((*xnode).getRChild(), (*ynode).getLChild(), eta, Ty);

@@ -42,21 +42,11 @@ void BlockCluster::setKernel(Kernel G) {
     G_ = G;
 }
 
-// compute V matrix
-void BlockCluster::setV() {
-    pair_.first->setV(); // xnode
-}
-
-// compute Vc vector
-void BlockCluster::setVc(const Eigen::VectorXd& c) {
-    pair_.second->setV();   // ynode
-    pair_.second->setVc(c); // ynode
-}
-
 // compute CVc vector and store it into xnode
-void BlockCluster::setCVc() {
-    setMatrix(); // here because needed for each pair of nodes,
-                 // cannot be moved to pre-processing
+void BlockCluster::setCVc(Kernel G) {
+    setKernel(G);
+    setMatrix( ); // here because needed for each pair of nodes,
+                  // cannot be moved to pre-processing
     Eigen::VectorXd  Vc = pair_.second->getVc_Node();
     Eigen::VectorXd CVc = C_ * Vc;
     pair_.first->setCVc(CVc); // xnode
