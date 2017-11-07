@@ -25,6 +25,8 @@ Node::~Node()
     if(bl_child_ != NULL) delete bl_child_;
     if(br_child_ != NULL) delete br_child_;
 }
+bool sortX(Point a, Point b) { return a.getX()<b.getX(); }
+bool sortY(Point a, Point b) { return a.getY()<b.getY(); }
 
 // build tree recursively
 void Node::setLeaves()
@@ -54,10 +56,19 @@ void Node::setLeaves()
         y1_ = y1_b_ = minY;
         y2_ = y2_b_ = maxY;
 
-        medX = minX+(maxX-minX)/2;                      // the space is devided in 4 quadrants and the point of each quadrant is saved in a vector on the coresponding Node
-        medY = minY+(maxY-minY)/2;
+        //medX = minX+(maxX-minX)/2;                      // the space is devided in 4 quadrants and the point of each quadrant is saved in a vector on the coresponding Node
+        //medY = minY+(maxY-minY)/2;
+
+        std::sort(PPointsTree_.begin(),PPointsTree_.end(),sortX);
+        std::vector<Point>::iterator it;
+        it=PPointsTree_.begin()+(PPointsTree_.size()+1)/2;  // set  iterator in the middle of the vector of points in this node
+        std::vector<Point> l_points,r_points;               // left and right child´s vectors
+        l_points.assign(PPointsTree_.begin(), it);                // division of node´s points into it´s childs
+        r_points.assign(it,PPointsTree_.end());
+        std::sort(l_points.begin(),l_points.end(),sortY);
+        std::sort(r_points.begin(),r_points.end(),sortY);
         std::vector<Point> tl_PPoints, tr_PPoints, bl_PPoints, br_PPoints;
-        for (std::vector<Point>::iterator it=PPointsTree_.begin(); it!=PPointsTree_.end(); it++){
+        /*for (std::vector<Point>::iterator it=PPointsTree_.begin(); it!=PPointsTree_.end(); it++){
             if (it->getX()<=medX && it->getY()<=medY) {
                 bl_PPoints.push_back(*it);
             }
@@ -73,7 +84,13 @@ void Node::setLeaves()
             else {
                 bl_PPoints.push_back(*it);
             }
-        }
+        }*/
+        it=l_points.begin()+(l_points.size()+1)/2;
+        tl_PPoints.assign(it,l_points.end());
+        bl_PPoints.assign(l_points.begin(),it);
+        it=r_points.begin()+(r_points.size()+1)/2;
+        tr_PPoints.assign(it,r_points.end());
+        br_PPoints.assign(r_points.begin(),it);
         // fix for points of a bbox being a segment
         if(std::abs(x1_-x2_)<10*std::numeric_limits<double>::epsilon()){
             x2_b_++;
@@ -123,8 +140,16 @@ void Node::setLeaves(double x1, double x2, double y1, double y2)
         y1_b_ = y1;
         y2_b_ = y2;
 
+        std::sort(PPointsTree_.begin(),PPointsTree_.end(),sortX);
+        std::vector<Point>::iterator it;
+        it=PPointsTree_.begin()+(PPointsTree_.size()+1)/2;  // set  iterator in the middle of the vector of points in this node
+        std::vector<Point> l_points,r_points;               // left and right child´s vectors
+        l_points.assign(PPointsTree_.begin(), it);                // division of node´s points into it´s childs
+        r_points.assign(it,PPointsTree_.end());
+        std::sort(l_points.begin(),l_points.end(),sortY);
+        std::sort(r_points.begin(),r_points.end(),sortY);
         std::vector<Point> tl_PPoints, tr_PPoints, bl_PPoints, br_PPoints;
-        for (std::vector<Point>::iterator it=PPointsTree_.begin(); it!=PPointsTree_.end(); it++){
+        /*for (std::vector<Point>::iterator it=PPointsTree_.begin(); it!=PPointsTree_.end(); it++){
             if (it->getX()<=medX && it->getY()<=medY) {
                 bl_PPoints.push_back(*it);
             }
@@ -140,7 +165,13 @@ void Node::setLeaves(double x1, double x2, double y1, double y2)
             else {
                 bl_PPoints.push_back(*it);
             }
-        }
+        }*/
+        it=l_points.begin()+(l_points.size()+1)/2;
+        tl_PPoints.assign(it,l_points.end());
+        bl_PPoints.assign(l_points.begin(),it);
+        it=r_points.begin()+(r_points.size()+1)/2;
+        tr_PPoints.assign(it,r_points.end());
+        br_PPoints.assign(r_points.begin(),it);
         // fix for points of a bbox being a segment
         if(std::abs(x1-x2)<10*std::numeric_limits<double>::epsilon()){
             x2_b_++;
