@@ -447,7 +447,7 @@ int main( int argc, char* argv[] )
   out_rdNorm.close( );
 
   std::ofstream out_rNNorm("BETL-Debug_rNnorm.txt");
-  out_rNNorm << rDNorm; 
+  out_rNNorm << rNNorm; 
   out_rNNorm.close( );
 
   std::ofstream out_N("BETL-Debug_levels.txt");

@@ -56,14 +56,10 @@ const std::string path = "../BEM/BETL-Transmission/meshes/";
 matrix_t TransmissionSystemMatrix( const matrix_t&  V, const matrix_t&  K,
 				   const matrix_t&  W, const double & alpha){
   matrix_t A(K.rows() + W.rows(), K.cols() + V.cols());
-#if SOLUTION
   A.block(0, 0              , K.rows(), K.cols()) =  2.* K;
   A.block(0, K.cols()       , V.rows(), V.cols()) = -(1./alpha + 1)*V;
   A.block(K.rows(), 0       , W.rows(), W.cols()) = -(alpha + 1.)*W;
   A.block(K.rows(), W.cols(), K.cols(), K.rows()) = - 2.*K.transpose();
-#else // TEMPLATE
-  // TODO: Compute block matrix A
-#endif // TEMPLATE
   return A;
 }
 /* SAM_LISTING_END_0 */
@@ -74,7 +70,6 @@ matrix_t TransmissionSystemMatrix( const matrix_t&  V, const matrix_t&  K,
 template<typename GRID_FACTORY, typename DH_LAGR0, typename DH_LAGR1>
 double computeEnergy(const Eigen::VectorXd& sol, const GRID_FACTORY gridFactory,
 		     const DH_LAGR0& dh_lagr0, const DH_LAGR1& dh_lagr1){
-  #if SOLUTION
   // Extract Dirichlet and Neumann coefficients out of solution vector
   const auto& TDu_h  = sol.segment(0, dh_lagr1.numDofs());
   const auto& TNu_h  = sol.segment(dh_lagr1.numDofs(), dh_lagr0.numDofs());
@@ -100,10 +95,6 @@ double computeEnergy(const Eigen::VectorXd& sol, const GRID_FACTORY gridFactory,
   const auto& M = id_op01.matrix();
   return TNu_h.transpose()*M*TDu_h;
   */
-  #else // TEMPLATE
-  // TODO: Implement your code
-  return 0.;
-#endif // TEMPLATE
 }
 /* SAM_LISTING_END_2 */
 
@@ -112,7 +103,6 @@ double computeEnergy(const Eigen::VectorXd& sol, const GRID_FACTORY gridFactory,
 /* SAM_LISTING_BEGIN_1 */
 Eigen::VectorXd solveTransmissionProblem(const std::string meshname,
 					 const double& alpha){
-#if SOLUTION
   //============================================================================
   // READ MESH
   //============================================================================
@@ -351,11 +341,6 @@ Eigen::VectorXd solveTransmissionProblem(const std::string meshname,
 
   return sol;
 
-#else // TEMPLATE
-  // TODO: Implement your code
- Eigen:;VectorXd sol;
-  return sol;
-#endif // TEMPLATE
 }
 /* SAM_LISTING_END_1 */
 
