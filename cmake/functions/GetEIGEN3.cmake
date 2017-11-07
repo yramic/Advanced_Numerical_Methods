@@ -4,10 +4,11 @@ find_package(EIGEN3)
 
 if(${EIGEN3_FOUND})
 
-    include_directories(${EIGEN3_INCLUDE_DIR})
+  include_directories(${EIGEN3_INCLUDE_DIR})
+  add_custom_target(Eigen) # dependency dummy
 
 else()
-
+  #  if not found system wide download. 
     SET(DOWNLOADING_EIGEN ON)
     message("-- Downloading Eigen3")
     ExternalProject_Add(

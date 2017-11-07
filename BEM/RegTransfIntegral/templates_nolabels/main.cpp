@@ -42,7 +42,6 @@ bool ProjectOnTria(const TriaPanel& T, const Eigen::Vector3d& x,
 
 
 
-
 //-----------------------------------------------------------------------------
 double integrateTiSing(const Eigen::Vector2d& b, const Eigen::Vector2d& c,
 		       double zeta, int n=6){
@@ -61,6 +60,7 @@ double integrateTSing(const TriaPanel& T, const Eigen::Vector3d& x,
   // TODO: Implement your code
   return res;
 }
+
 
 
 //------------------------------------------------------------------------------
@@ -112,14 +112,18 @@ int main() {
   double Iref = integrateTiSing(b0, c0, 0., 1000);
   Eigen::VectorXd error(19);
   Eigen::VectorXi N = Eigen::VectorXi::LinSpaced(19,1,19);
+
+  
   // TODO: Implement your code
   // Output for plot
+
   std::ofstream out_errorQ("integrateTiSing_errors.txt");
   out_errorQ << std::setprecision(18) << error; 
   out_errorQ.close( );
   std::ofstream out_N("integrateTiSing_N.txt");
   out_N << N; 
   out_N.close( );
+
 
   // You may use testIntegrateTSing(n); to test integrateTSing for a toy case
   
@@ -128,8 +132,10 @@ int main() {
   a << 1., 1., 1.;
   b << 2., 1., 0.;
   c << 0., 1., 0.; 
+
   TriaPanel T(a, b, c);
   // TODO: Implement your code
+
   
   return 0;
 

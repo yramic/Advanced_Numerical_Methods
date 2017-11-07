@@ -384,9 +384,11 @@ int main() {
     double I = integrateTiSing(b0, c0, 0., k);
     error(k-1) = fabs(I - Iref);
   }
+
   #else // TEMPLATE
   // TODO: Implement your code
 #endif // TEMPLATE
+
   // Output for plot
   std::ofstream out_errorQ("integrateTiSing_errors.txt");
   out_errorQ << std::setprecision(18) << error; 
@@ -394,6 +396,7 @@ int main() {
   std::ofstream out_N("integrateTiSing_N.txt");
   out_N << N; 
   out_N.close( );
+
 
 #if SOLUTION
   // 2. Test integration routine on reference triangle (help for debugging)
@@ -422,6 +425,7 @@ int main() {
     intx20(ts) = integrateTSing(T, xtau, 20);
     intx1000(ts) = integrateTSing(T, xtau, 1000);    
   }  
+
   // Output errors for plot
   std::ofstream out_Intx5("intx5.txt");
   out_Intx5 << std::setprecision(18) << (intx1000 - intx5).array().abs(); 
@@ -435,10 +439,12 @@ int main() {
   std::ofstream out_dt("dt.txt");
   out_dt << std::setprecision(18) << tau; 
   out_dt.close( );
+  
   #else // TEMPLATE
   // TODO: Implement your code
 #endif // TEMPLATE
   
+
   return 0;
 
 }
