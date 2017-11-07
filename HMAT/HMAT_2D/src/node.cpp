@@ -104,10 +104,10 @@ void Node::setLeaves()
         wkx_ = cbx.getWghts(); // weights of Lagrange polynomial for x axis
         tky_ = cby.getNodes(); // Chebyshew nodes for y axis
         wky_ = cby.getWghts(); // weights of Lagrange polynomial for y axis
-        if (!tl_PPoints.empty()) tl_child_ = new Node(tl_PPoints,minX,medX,medY,maxY, deg_);   // recursive construction of the Cluster Tree levels below root
-        if (!tr_PPoints.empty()) tr_child_ = new Node(tr_PPoints,medX,maxX,medY,maxY, deg_);
-        if (!bl_PPoints.empty()) bl_child_ = new Node(bl_PPoints,minX,medX,minY,medY, deg_);
-        if (!br_PPoints.empty()) br_child_ = new Node(br_PPoints,medX,maxX,minY,medY, deg_);
+//        if (!tl_PPoints.empty()) tl_child_ = new Node(tl_PPoints,minX,medX,medY,maxY, deg_); // recursive construction of the Cluster Tree levels below root
+//        if (!tr_PPoints.empty()) tr_child_ = new Node(tr_PPoints,medX,maxX,medY,maxY, deg_);
+//        if (!bl_PPoints.empty()) bl_child_ = new Node(bl_PPoints,minX,medX,minY,medY, deg_);
+//        if (!br_PPoints.empty()) br_child_ = new Node(br_PPoints,medX,maxX,minY,medY, deg_);
     }
 }
 
@@ -183,10 +183,10 @@ void Node::setLeaves(double x1, double x2, double y1, double y2)
         wkx_ = cbx.getWghts(); // weights of Lagrange polynomial for x axis
         tky_ = cby.getNodes(); // Chebyshew nodes for y axis
         wky_ = cby.getWghts(); // weights of Lagrange polynomial for y axis
-        if (!tl_PPoints.empty()) tl_child_ = new Node(tl_PPoints,x1,medX,medY,y2, deg_);
-        if (!tr_PPoints.empty()) tr_child_ = new Node(tr_PPoints,medX,x2,medY,y2, deg_);
-        if (!bl_PPoints.empty()) bl_child_ = new Node(bl_PPoints,x1,medX,y1,medY, deg_);
-        if (!br_PPoints.empty()) br_child_ = new Node(br_PPoints,medX,x2,y1,medY, deg_);
+//        if (!tl_PPoints.empty()) tl_child_ = new Node(tl_PPoints,x1,medX,medY,y2, deg_);
+//        if (!tr_PPoints.empty()) tr_child_ = new Node(tr_PPoints,medX,x2,medY,y2, deg_);
+//        if (!bl_PPoints.empty()) bl_child_ = new Node(bl_PPoints,x1,medX,y1,medY, deg_);
+//        if (!br_PPoints.empty()) br_child_ = new Node(br_PPoints,medX,x2,y1,medY, deg_);
     }
 }
 // compute V-matrix of node

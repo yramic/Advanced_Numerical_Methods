@@ -10,6 +10,7 @@
  ***********************************************************************/
 #include "../include/hierarchical_partition.hpp"
 #include "../include/block_cluster.hpp"
+#include "../include/block_nearf.hpp"
 #include "../include/cheby.hpp"
 #include "../include/ctree.hpp"
 #include "../include/is_admissible.hpp"
@@ -36,7 +37,7 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
 {
     // if *xnode or *ynode is a leaf, we add the pair (*xnode,*ynode) to the near field vector
     if((*xnode).getLChild() == NULL || (*ynode).getRChild() == NULL) {
-        NearField_.push_back(std::make_pair(xnode,ynode));
+        NearField_.push_back(BlockNearF(xnode,ynode));
     } else {
         double xl = (*xnode).getPoints().front().getX();
         double xr = (*xnode).getPoints().back().getX();

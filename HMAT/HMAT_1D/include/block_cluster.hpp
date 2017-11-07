@@ -24,19 +24,19 @@ public:
 
     /*!
      * \brief Constructor
-     * \param tkx Chebyshev nodes for the x axis
-     * \param tky Chebyshev nodes for the y axis
+     * \param ndx XNode
+     * \param ndy YNode
      * \param G Kernel Function
      */
-    BlockCluster(Node* ndx, Node* ndy);
+    BlockCluster(Node* xnode, Node* ynode);
 
     /*!
      * \brief Constructor
-     * \param tkx Chebyshev nodes for the x axis
-     * \param tky Chebyshev nodes for the y axis
+     * \param ndx XNode
+     * \param ndy YNode
      * \param G Kernel Function
      */
-    BlockCluster(Node* ndx, Node* ndy, Kernel G);
+    BlockCluster(Node* xnode, Node* ynode, Kernel G);
 
     /*!
      * \brief return matrix \f$C_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters

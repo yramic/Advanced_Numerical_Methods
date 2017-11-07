@@ -14,13 +14,13 @@
 #include "../include/node.hpp"
 
 // Constructor
-BlockCluster::BlockCluster(Node* ndx, Node* ndy):
-    pair_(std::make_pair(ndx,ndy))
+BlockCluster::BlockCluster(Node* xnode, Node* ynode):
+    pair_(std::make_pair(xnode,ynode))
 { }
 
 // Constructor
-BlockCluster::BlockCluster(Node* ndx, Node* ndy, Kernel G):
-    pair_(std::make_pair(ndx,ndy)), G_(G)
+BlockCluster::BlockCluster(Node* xnode, Node* ynode, Kernel G):
+    pair_(std::make_pair(xnode,ynode)), G_(G)
 {
     setMatrix();
 }
