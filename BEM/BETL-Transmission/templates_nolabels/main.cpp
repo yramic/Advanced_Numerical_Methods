@@ -53,7 +53,7 @@ using namespace betl2;
 namespace big = betl2::input::gmsh;
 
 typedef Eigen::MatrixXd matrix_t;
-const std::string path = "../BEM/BETL-Transmission/meshes/";
+const std::string path = "../../meshes/";
 
 
 //------------------------------------------------------------------------------

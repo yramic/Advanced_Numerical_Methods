@@ -377,7 +377,7 @@ int main( int argc, char* argv[] )
   Eigen::VectorXi levels(4);
   Eigen::VectorXd rDNorm(4), rNNorm(4);
   levels << 32, 128, 512, 2048;
-  const std::string path = "../BEM/BETL-Debug/meshes/";
+  const std::string path = "../../meshes/";
     
   for(int k=0; k<4; k++){
 
