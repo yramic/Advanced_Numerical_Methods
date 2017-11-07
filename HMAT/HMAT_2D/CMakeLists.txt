@@ -6,16 +6,21 @@ add_subdirectory(include)
 add_subdirectory(src)
 
 add_executable(low_rank_test_2D
-               low_rank_test.cpp ${cpp_files} ${headers})
+               low_rank_test.cpp
+               ${cpp_files} ${headers})
 
 add_executable(ctree_test
-               ctree_test.cpp ${cpp_files} ${headers})
+               ctree_test.cpp
+               ${cpp_files} ${headers})
 
 add_executable(vnode_matrix_test
-               vnode_matrix_test.cpp ${cpp_files} ${headers})
+               vnode_matrix_test.cpp
+               ${cpp_files} ${headers})
 
 add_executable(is_admissible_test
-               is_admissible_test.cpp ${cpp_files} ${headers})
+               is_admissible_test.cpp
+               ${cpp_files} ${headers})
 
 add_executable(nearfar_test
-               nearfar_test.cpp ${cpp_files} ${headers})
+               nearfar_test.cpp
+               ${cpp_files} ${headers})
