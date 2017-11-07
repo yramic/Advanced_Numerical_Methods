@@ -15,12 +15,13 @@
 #include <vector>
 #include "point.hpp"
 
-// forward declaration to avoid cross-referencing
-class Node;
+// forward declarations to avoid cross-referencing
+class Node; class NodeY;
 
 /**
 * \brief Cluster tree class
 */
+template<typename NODE = Node>
 class cTree
 {
 public:
@@ -48,5 +49,6 @@ public:
 private:
     Node* root_; //!< pointer to node-root of ``cTree''
     friend class Node;
+    friend class NodeY;
 };
 #endif // CTREE_HPP

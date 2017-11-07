@@ -8,20 +8,20 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/ctree.hpp"
-#include "../include/is_admissible.hpp"
-#include "../include/node.hpp"
 #include <Eigen/Dense>
-#include <vector>
+#include "../../include/uni-direct/block_cluster_uni.hpp"
 
-// Actual constructor
-template<>
-cTree<Node>::cTree(const std::vector<Point>& GPoints, unsigned deg):
-    root_(NULL)
+// compute matrix $C_{\sigma,\mu}$ for uni-directional interpolation
+void BlockClusterUni::setMatrix()
 {
-    unsigned n = GPoints.size();
-    if(n > 1) { // build the tree
-        int node_id = 0;
-        root_ = new Node(GPoints, node_id, deg); // root is a node, leaves are added
-    }
+    Eigen::VectorXd tkx = pair_.first->getTK();
+    C_.resize(tkx.size(),
+              pair_.second->getPoints().size());
+    // Compute collocation matrix
+    // for Chebychev nodes along x-dimension
+    // and for grid points along y-dimension
+    for(unsigned i=0; i<tkx.size(); ++i)
+        for(unsigned j=0; j<pair_.second->getPoints().size(); ++j)
+            C_(i,j) = G_(tkx(i),
+                         pair_.second->getPoints()[j].getX());
 }

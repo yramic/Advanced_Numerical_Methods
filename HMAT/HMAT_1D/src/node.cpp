@@ -8,9 +8,9 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/cheby.hpp"
-#include "../include/node.hpp"
 #include <Eigen/Dense>
+#include "../include/node.hpp"
+#include "../include/cheby.hpp"
 #include <iostream>
 
 // actual constructor: adds a tree below the node if left_index != right_index

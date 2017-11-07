@@ -8,20 +8,23 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/ctree.hpp"
-#include "../include/is_admissible.hpp"
-#include "../include/node.hpp"
-#include <Eigen/Dense>
-#include <vector>
+#ifndef BLOCK_CLUSTER_UNI_HPP
+#define BLOCK_CLUSTER_UNI_HPP
 
-// Actual constructor
-template<>
-cTree<Node>::cTree(const std::vector<Point>& GPoints, unsigned deg):
-    root_(NULL)
+#include <Eigen/Dense>
+#include "../block_cluster.hpp"
+
+/*!
+ * \brief Block cluster class to compute matrix \f$X_{\sigma,\mu}\f$ for uni-directional interpolation
+ */
+class BlockClusterUni : public BlockCluster
 {
-    unsigned n = GPoints.size();
-    if(n > 1) { // build the tree
-        int node_id = 0;
-        root_ = new Node(GPoints, node_id, deg); // root is a node, leaves are added
-    }
-}
+    using BlockCluster::BlockCluster; // C++11 inheritance of constructors
+
+public:
+    /*!
+     * \brief compute matrix $C_{\sigma,\mu}$ for uni-directional interpolation
+     */
+    void setMatrix();
+};
+#endif // BLOCK_CLUSTER_UNI_HPP

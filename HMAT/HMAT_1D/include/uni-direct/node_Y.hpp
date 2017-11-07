@@ -8,20 +8,32 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/ctree.hpp"
-#include "../include/is_admissible.hpp"
-#include "../include/node.hpp"
-#include <Eigen/Dense>
-#include <vector>
+#ifndef NODE_Y_HPP
+#define NODE_Y_HPP
 
-// Actual constructor
-template<>
-cTree<Node>::cTree(const std::vector<Point>& GPoints, unsigned deg):
-    root_(NULL)
+#include <Eigen/Dense>
+#include "../node.hpp"
+
+// forward declaration to avoid cross-referencing
+template<typename NODE>
+class cTree;
+
+/**
+* \brief Node_Y of a cluster tree ("cTree" class) for uni-directional interpolation
+*/
+class Node_Y : public Node
 {
-    unsigned n = GPoints.size();
-    if(n > 1) { // build the tree
-        int node_id = 0;
-        root_ = new Node(GPoints, node_id, deg); // root is a node, leaves are added
-    }
-}
+    using Node::Node; // C++11 inheritance of constructors
+
+public:
+    /*!
+     * \brief Destructor
+     */
+    virtual ~Node_Y();
+    /*!
+     * \brief compute fake V-matrix of ynode with uni-directional interpolation
+     */
+    void setV();
+};
+
+#endif // NODE_Y_HPP

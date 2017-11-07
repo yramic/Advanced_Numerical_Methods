@@ -8,20 +8,24 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/ctree.hpp"
-#include "../include/is_admissible.hpp"
-#include "../include/node.hpp"
 #include <Eigen/Dense>
-#include <vector>
+#include "../../include/uni-direct/node_Y.hpp"
+#include "../../include/cheby.hpp"
+#include <iostream>
 
-// Actual constructor
-template<>
-cTree<Node>::cTree(const std::vector<Point>& GPoints, unsigned deg):
-    root_(NULL)
+// destructor
+Node_Y::~Node_Y()
 {
-    unsigned n = GPoints.size();
-    if(n > 1) { // build the tree
-        int node_id = 0;
-        root_ = new Node(GPoints, node_id, deg); // root is a node, leaves are added
-    }
+    if((l_child_ == NULL) && (r_child_ == NULL))
+        std::cout << "leaves destroyed" << std::endl;
+    if(l_child_ != NULL) delete l_child_;
+    if(r_child_ != NULL) delete r_child_;
+}
+
+// compute fake V-matrix of ynode with uni-directional interpolation
+//(just the identity)
+void Node_Y::setV()
+{
+    int n = node_points_.size();
+    V_node_ = Eigen::MatrixXd::Identity(n, n);
 }

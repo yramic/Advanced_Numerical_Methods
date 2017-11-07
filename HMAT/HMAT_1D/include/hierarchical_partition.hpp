@@ -20,6 +20,8 @@
 /*!
  * \brief Master class for doing the Hierarchical Partitioning of the Cluster Tree
  */
+template<typename BLOCK_CLUSTER = BlockCluster,
+         typename NODE = Node>
 class HierarchicalPartitioning
 {
 public:
@@ -35,17 +37,17 @@ public:
     /*!
      * \brief Return the Far Field pairs vector
      */
-    std::vector<BlockCluster> getFF() {
+    std::vector<BlockCluster*> getFF() {
         return FarField_;
     }
     /*!
-     * \brief Return the Far Field vector of unique pointer to xnodes
+     * \brief Return the Far Field vector of unique pointers to xnodes
      */
     std::vector<Node*> getFFxnds() {
         return FarField_xnds_;
     }
     /*!
-     * \brief Return the Far Field vector of unique pointer to ynodes
+     * \brief Return the Far Field vector of unique pointers to ynodes
      */
     std::vector<Node*> getFFynds() {
         return FarField_ynds_;
@@ -53,7 +55,7 @@ public:
     /*!
      * \brief Return the Near Field pairs vector
      */
-    std::vector<BlockNearF> getNF() {
+    std::vector<BlockNearF*> getNF() {
         return NearField_;
     }
     /*!
@@ -73,12 +75,13 @@ private:
      * \param eta eta admissibility variable
      * \param Ty Tree for reference in the recursion
      */
-    void setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree Ty);
-    cTree Tx_, Ty_; //!< Cluster trees for comparison
-    std::vector<BlockCluster> FarField_;      //!< Vector for Far Field
-    std::vector<Node*>        FarField_xnds_; //!< Vector for Far Field XNodes
-    std::vector<Node*>        FarField_ynds_; //!< Vector for Far Field YNodes
-    std::vector<BlockNearF>  NearField_;      //!< Vector for Near Field
+    void setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree<NODE> Ty);
+    cTree<Node> Tx_; //!< Cluster tree of xnodes
+    cTree<NODE> Ty_; //!< Cluster tree of ynodes
+    std::vector<BlockCluster*> FarField_;      //!< Vector for Far Field
+    std::vector<Node*>         FarField_xnds_; //!< Vector for Far Field XNodes
+    std::vector<Node*>         FarField_ynds_; //!< Vector for Far Field YNodes
+    std::vector<BlockNearF*>  NearField_;      //!< Vector for Near Field
     double eta_;  //!< eta-admissibility constant
 };
 #endif // HIERARCHICAL_PARTITION_HPP

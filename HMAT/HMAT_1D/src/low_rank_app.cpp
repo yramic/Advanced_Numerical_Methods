@@ -18,12 +18,82 @@
 #include <iostream>
 
 // constructor
-LowRankApp::LowRankApp(Kernel kernel, const std::vector<Point> &GPoints, double eta, unsigned deg):
+template<>
+LowRankApp<BlockCluster,Node>::LowRankApp(Kernel kernel, const std::vector<Point> &GPoints, double eta, unsigned deg):
     kernel_(kernel), GPoints_(GPoints), HP_(GPoints,eta,deg), deg_(deg)
 { }
 
+// pre-processing: initialize matrix V and vector Vc for all far field nodes
+// do these steps once for each node, not every time the node appears in a pair
+template<>
+void LowRankApp<BlockCluster,Node>::preProcess(std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y, const Eigen::VectorXd& c)
+{
+    for(auto& xnode : ff_v_x){ // iterate for all the far field xnodes
+        xnode->setV();
+    }
+    for(auto& ynode : ff_v_y){ // iterate for all the far field ynodes
+        ynode->setV();
+        ynode->setVc(c);
+    }
+}
+
+// block-processing: compute vector CVc for all far field pairs and store it into xnode
+// all vectors CVc of an xnode can already be summed together
+template<>
+void LowRankApp<BlockCluster,Node>::blockProcess(std::vector<BlockCluster*> ff_v)
+{
+    for(auto& pair : ff_v){ // iterate for all the pairs of far field nodes
+        pair->setCVc(kernel_);
+    }
+}
+
+// post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place
+template<>
+void LowRankApp<BlockCluster,Node>::postProcess(std::vector<Node*> ff_v_x, Eigen::VectorXd& f)
+{
+    for(auto& xnode : ff_v_x){ // iterate for all the far field xnodes
+        Eigen::VectorXd CVc = xnode->getCVc_Node();
+        Eigen::MatrixXd  Vx = xnode->getV_Node();
+        Eigen::VectorXd f_seg = Vx * CVc;
+        for(int i=0; i<xnode->getPoints().size(); i++){
+            f[xnode->getPoints()[i].getId()] += f_seg[i]; // add contribution of far field to ``f''
+        }
+    }
+}
+
+// compute far field contribution
+template<>
+void LowRankApp<BlockCluster,Node>::ff_contribution(std::vector<BlockCluster*> ff_v,
+                                                    std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y,
+                                                    const Eigen::VectorXd& c, Eigen::VectorXd& f)
+{
+    preProcess(ff_v_x, ff_v_y, c);
+    blockProcess(ff_v);
+    postProcess(ff_v_x, f);
+}
+
+// compute near-field contribution
+template<>
+void LowRankApp<BlockCluster,Node>::nf_contribution(std::vector<BlockNearF*> nf_v,
+                                                    const Eigen::VectorXd& c, Eigen::VectorXd& f)
+{
+    for(auto& pair : nf_v){ // iterate for all the near field xnodes
+        Node* xnode = pair->getXNode();
+        Node* ynode = pair->getYNode();
+        pair->setKernel(kernel_);
+        pair->setMatrix();
+        Eigen::MatrixXd C = pair->getMatrix();
+        for(int i=0; i<xnode->getPoints().size(); i++){
+            for(int j=0; j<ynode->getPoints().size(); j++){
+                f(xnode->getPoints()[i].getId()) += C(i,j) * c(ynode->getPoints()[j].getId()); // add near field contribution to ``f''
+            }
+        }
+    }
+}
+
 // approximate matrix-vector multiplication
-Eigen::VectorXd LowRankApp::mvProd(const Eigen::VectorXd& c)
+template<>
+Eigen::VectorXd LowRankApp<BlockCluster,Node>::mvProd(const Eigen::VectorXd& c)
 {
     // compute Far and Near Field relationships between Nodes of the Cluster Tree
     HP_.setNearFar();
@@ -37,67 +107,4 @@ Eigen::VectorXd LowRankApp::mvProd(const Eigen::VectorXd& c)
                     c, f_approx);
 
     return f_approx;
-}
-
-// pre-processing: initialize matrix V and vector Vc for all far field nodes
-// do these steps once for each node, not every time the node appears in a pair
-void LowRankApp::preProcess(std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y, const Eigen::VectorXd& c)
-{
-    for(auto& xnode : ff_v_x){ // iterate for all the far field xnodes
-        xnode->setV();
-    }
-    for(auto& ynode : ff_v_y){ // iterate for all the far field ynodes
-        ynode->setV();
-        ynode->setVc(c);
-    }
-}
-
-// block-processing: compute vector CVc for all far field pairs and store it into xnode
-// all vectors CVc of an xnode can already be summed together
-void LowRankApp::blockProcess(std::vector<BlockCluster> ff_v)
-{
-    for(auto& pair : ff_v){ // iterate for all the pairs of far field nodes
-        pair.setCVc(kernel_);
-    }
-}
-
-// post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place
-void LowRankApp::postProcess(std::vector<Node*> ff_v_x, Eigen::VectorXd& f)
-{
-    for(auto& xnode : ff_v_x){ // iterate for all the far field xnodes
-        Eigen::VectorXd CVc = xnode->getCVc_Node();
-        Eigen::MatrixXd  Vx = xnode->getV_Node();
-        Eigen::VectorXd f_seg = Vx * CVc;
-        for(int i=0; i<xnode->getPoints().size(); i++){
-            f[xnode->getPoints()[i].getId()] += f_seg[i]; // add contribution of far field to ``f''
-        }
-    }
-}
-
-// compute far field contribution
-void LowRankApp::ff_contribution(std::vector<BlockCluster> ff_v,
-                                 std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y,
-                                 const Eigen::VectorXd& c, Eigen::VectorXd& f)
-{
-    preProcess(ff_v_x, ff_v_y, c);
-    blockProcess(ff_v);
-    postProcess(ff_v_x, f);
-}
-
-// compute near-field contribution
-void LowRankApp::nf_contribution(std::vector<BlockNearF> nf_v,
-                                 const Eigen::VectorXd& c, Eigen::VectorXd& f)
-{
-    for(auto& pair : nf_v){ // iterate for all the near field xnodes
-        Node* xnode = pair.getXNode();
-        Node* ynode = pair.getYNode();
-        pair.setKernel(kernel_);
-        pair.setMatrix();
-        Eigen::MatrixXd C = pair.getMatrix();
-        for(int i=0; i<xnode->getPoints().size(); i++){
-            for(int j=0; j<ynode->getPoints().size(); j++){
-                f(xnode->getPoints()[i].getId()) += C(i,j) * c(ynode->getPoints()[j].getId()); // add near field contribution to ``f''
-            }
-        }
-    }
 }

@@ -16,11 +16,14 @@
 #include "block_nearf.hpp"
 #include "hierarchical_partition.hpp"
 #include "kernel.hpp"
+#include "node.hpp"
 #include "point.hpp"
 
 /**
 * \brief Master class for low-rank approximation (Far and Near Field distribution computation)
 */
+template<typename BLOCK_CLUSTER = BlockCluster,
+         typename NODE = Node>
 class LowRankApp
 {
 public:
@@ -40,7 +43,7 @@ public:
      */
     Eigen::VectorXd mvProd(const Eigen::VectorXd& c);
 
-private:
+protected:
     /*!
      * \brief Pre-processing: initialize matrix V and vector Vc for all far field nodes
      * \param ff_v_x Vector of Far Field XNodes
@@ -53,7 +56,7 @@ private:
      * \brief Block-processing: compute vector CVc for all far field pairs and store it into xnode
      * \param ff_v Vector of Far Field Pairs
      */
-    void blockProcess(std::vector<BlockCluster> ff_v);
+    void blockProcess(std::vector<BlockCluster*> ff_v);
 
     /*!
      * \brief Post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place
@@ -70,7 +73,7 @@ private:
      * \param c Vector c to multiply
      * \param f Output product vector
      */
-    void ff_contribution(std::vector<BlockCluster> ff_v,
+    void ff_contribution(std::vector<BlockCluster*> ff_v,
                          std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y,
                          const Eigen::VectorXd& c, Eigen::VectorXd& f);
     /*!
@@ -79,12 +82,13 @@ private:
      * \param c Vector c to multiply
      * \param f Output product vector
      */
-    void nf_contribution(std::vector<BlockNearF> nf_v,
+    void nf_contribution(std::vector<BlockNearF*> nf_v,
                          const Eigen::VectorXd& c, Eigen::VectorXd& f);
 
     unsigned  deg_; //!< degree of interpolation
     Kernel kernel_; //!< kernel
-    HierarchicalPartitioning HP_; //!< Hierarchical Partiotion class for constructing the tree and calculate near and far field nodes
-    std::vector<Point> GPoints_;  //!< Vector of points of the axis
+    HierarchicalPartitioning<BLOCK_CLUSTER,NODE> HP_; //!< Hierarchical Partiotion class for constructing the tree and calculate near and far field nodes
+    std::vector<Point> GPoints_; //!< Vector of points of the axis
 };
+
 #endif // LOW_RANK_APP_HPP
