@@ -21,7 +21,7 @@ class Node; class NodeY;
 /**
 * \brief Cluster tree class
 */
-template<typename NODE = Node>
+template<typename NODE_Y = Node>
 class cTree
 {
 public:

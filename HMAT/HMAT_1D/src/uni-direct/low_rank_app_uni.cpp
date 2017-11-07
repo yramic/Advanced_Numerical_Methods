@@ -32,8 +32,9 @@ void LowRankApp<BlockCluster_Y,Node_Y>::preProcess(std::vector<Node*> ff_v_x, st
         xnode->setV();
     }
     for(auto& ynode : ff_v_y){ // iterate for all the far field ynodes
-        ynode->setV();
-        ynode->setVc(c);
+        Node_Y* ynode_ = static_cast<Node_Y*>(ynode);
+        ynode_->setV();
+        ynode_->setVc(c);
     }
 }
 
@@ -43,7 +44,11 @@ template<>
 void LowRankApp<BlockCluster_Y,Node_Y>::blockProcess(std::vector<BlockCluster*> ff_v)
 {
     for(auto& pair : ff_v){ // iterate for all the pairs of far field nodes
-        pair->setCVc(kernel_);
+        BlockCluster_Y* pair_ = static_cast<BlockCluster_Y*>(pair);
+        pair_->setKernel(kernel_);
+        pair_->setMatrix(); // here because needed for each pair of nodes,
+                            // cannot be moved to pre-processing
+        pair_->setCVc();
     }
 }
 

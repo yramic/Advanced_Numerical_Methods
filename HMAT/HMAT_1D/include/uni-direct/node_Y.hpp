@@ -27,6 +27,13 @@ class Node_Y : public Node
 
 public:
     /*!
+     * \brief Actual constructor
+     * \param points Vector of points that is contained in the node
+     * \param id ID of the node in the cTree
+     * \param deg Degree of interpolation
+     */
+    Node_Y(std::vector<Point> points, int& id, unsigned deg);
+    /*!
      * \brief Destructor
      */
     virtual ~Node_Y();

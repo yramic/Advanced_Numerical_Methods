@@ -23,7 +23,7 @@
 * \brief Master class for low-rank approximation (Far and Near Field distribution computation)
 */
 template<typename BLOCK_CLUSTER = BlockCluster,
-         typename NODE = Node>
+         typename NODE_Y = Node>
 class LowRankApp
 {
 public:
@@ -87,7 +87,7 @@ protected:
 
     unsigned  deg_; //!< degree of interpolation
     Kernel kernel_; //!< kernel
-    HierarchicalPartitioning<BLOCK_CLUSTER,NODE> HP_; //!< Hierarchical Partiotion class for constructing the tree and calculate near and far field nodes
+    HierarchicalPartitioning<BLOCK_CLUSTER,NODE_Y> HP_; //!< Hierarchical Partiotion class for constructing the tree and calculate near and far field nodes
     std::vector<Point> GPoints_; //!< Vector of points of the axis
 };
 

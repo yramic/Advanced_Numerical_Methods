@@ -13,6 +13,15 @@
 #include "../../include/cheby.hpp"
 #include <iostream>
 
+// actual constructor: adds a tree below the node if left_index != right_index
+Node_Y::Node_Y(std::vector<Point> points, int& id, unsigned deg)
+{
+    l_child_ = NULL; r_child_ = NULL;
+    node_points_ = points; nodeId_ = id; deg_ = deg;
+    CVc_node_ = Eigen::VectorXd::Zero(deg+1);
+    setLeaves(id);
+}
+
 // destructor
 Node_Y::~Node_Y()
 {

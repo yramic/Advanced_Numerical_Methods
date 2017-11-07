@@ -57,9 +57,8 @@ public:
 
     /*!
      * \brief compute CVc vector and store it in xnode
-     * \param c vector for multiplication with the matrix
      */
-    void setCVc(Kernel G);
+    void setCVc();
 
     /*!
      * \brief return pointer to xnode

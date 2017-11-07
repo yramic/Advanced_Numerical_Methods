@@ -43,7 +43,10 @@ template<>
 void LowRankApp<BlockCluster,Node>::blockProcess(std::vector<BlockCluster*> ff_v)
 {
     for(auto& pair : ff_v){ // iterate for all the pairs of far field nodes
-        pair->setCVc(kernel_);
+        pair->setKernel(kernel_);
+        pair->setMatrix(); // here because needed for each pair of nodes,
+                           // cannot be moved to pre-processing
+        pair->setCVc();
     }
 }
 

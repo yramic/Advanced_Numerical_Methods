@@ -21,7 +21,7 @@
  * \brief Master class for doing the Hierarchical Partitioning of the Cluster Tree
  */
 template<typename BLOCK_CLUSTER = BlockCluster,
-         typename NODE = Node>
+         typename NODE_Y = Node>
 class HierarchicalPartitioning
 {
 public:
@@ -75,9 +75,9 @@ private:
      * \param eta eta admissibility variable
      * \param Ty Tree for reference in the recursion
      */
-    void setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree<NODE> Ty);
-    cTree<Node> Tx_; //!< Cluster tree of xnodes
-    cTree<NODE> Ty_; //!< Cluster tree of ynodes
+    void setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree<NODE_Y> Ty);
+    cTree<Node>   Tx_; //!< Cluster tree of xnodes
+    cTree<NODE_Y> Ty_; //!< Cluster tree of ynodes
     std::vector<BlockCluster*> FarField_;      //!< Vector for Far Field
     std::vector<Node*>         FarField_xnds_; //!< Vector for Far Field XNodes
     std::vector<Node*>         FarField_ynds_; //!< Vector for Far Field YNodes
