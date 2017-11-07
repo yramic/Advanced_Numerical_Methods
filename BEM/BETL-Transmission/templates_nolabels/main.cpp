@@ -46,7 +46,6 @@
 #include <functional/interpolation_grid_function.hpp>
 #include <functional/grid_function_operations.hpp>
 #include <functional/dof_interpolator.hpp>
-//#include <functional/L_two_product_evaluator.hpp>
 #include <analytical_functions/linear_excitation_field.hpp>
 
 
@@ -78,8 +77,93 @@ double computeEnergy(const Eigen::VectorXd& sol, const GRID_FACTORY gridFactory,
 //------------------------------------------------------------------------------
 Eigen::VectorXd solveTransmissionProblem(const std::string meshname,
 					 const double& alpha){
+  //============================================================================
+  // READ MESH
+  //============================================================================
+  // Create input from mesh
+  std::cout << "Input from: " << meshname << ".msh" << std::endl;
+  big::Input input( path+meshname );
+  
+  // Wrap input interface around the given input
+  typedef betl2::input::InputInterface< big::Input > inpInterface_t;
+  inpInterface_t inpInterface( input );
+
+  
+  //============================================================================
+  // CREATE GRID FROM INPUT MESH
+  //============================================================================
+  // Instantiate the grid implementation
+  typedef betl2::surfaceGrid::hybrid::Grid grid_t;
+  typedef std::shared_ptr< eth::grid::Grid<grid_t::gridTraits_t> > grid_ptr_t;
+  grid_ptr_t grid_ptr( new grid_t( inpInterface ) );
+  
+  // Create a grid view factory
+  typedef eth::grids::utils::GridViewFactory< grid_t,
+					      eth::grid::GridViewTypes::LeafView
+					      > grid_factory_t;
+  grid_factory_t gridFactory( grid_ptr );
+
+  
+  //============================================================================
+  // THE DISCRETE FE-SPACES
+  //============================================================================
+  const fe::ApproxOrder order = fe::Linear;
+  typedef fe::FEBasis< order-1, fe::FEBasisType::Lagrange > feb_lagr0_t;
+  typedef fe::FEBasis< order  , fe::FEBasisType::Lagrange > feb_lagr1_t;
+  typedef fe::FEBasis< order  , fe::FEBasisType::Div      > feb_div_t;
+  
+  // 2 - Define the dofhandler types
+  typedef betl2::fe::DofHandler< feb_lagr0_t,fe::FESContinuity::Discontinuous,
+                                 grid_factory_t > dh_lagrange0_t;
+  typedef betl2::fe::DofHandler< feb_lagr1_t,fe::FESContinuity::Continuous,
+                                 grid_factory_t > dh_lagrange1_t;
+  typedef betl2::fe::DofHandler< feb_div_t,fe::FESContinuity::Continuous,
+				 grid_factory_t > dh_div_t;
+  
+  // - Instantiate dofhandler objects
+  dh_lagrange0_t dh_lagrange0;
+  dh_lagrange1_t dh_lagrange1;
+  dh_div_t       dh_div;
+
+  // - Distribute the degrees of freedom
+  dh_lagrange0.distributeDofs( gridFactory );
+  dh_lagrange1.distributeDofs( gridFactory );
+  dh_div.distributeDofs      ( gridFactory );
+  int lagr0_numDofs = dh_lagrange0.numDofs();
+  int lagr1_numDofs = dh_lagrange1.numDofs();
+  std::cout << "Created " << lagr1_numDofs << " dofs (lagrange1).\n"
+	    << "Created " << lagr0_numDofs << " dofs (lagrange0).\n"
+	    << "Created " << dh_div.numDofs() << " dofs (div)." << std::endl;
+
+
   // TODO: Implement your code
- Eigen:;VectorXd sol;
+
+  //============================================================================
+  // CREATE ANALYTICAL GRID FUNCTION FOR TRACES OF INCIDENT FIELD UINC
+  //============================================================================
+  typedef analytical::LinearExcitationField incident_field_t;
+  typedef bem::AnalyticalGridFunction< grid_factory_t, incident_field_t,
+				       Trace::Dirichlet > analytical_TDuinc_t;
+  typedef bem::AnalyticalGridFunction< grid_factory_t, incident_field_t,
+				       Trace::Neumann   > analytical_TNuinc_t;
+  
+  const incident_field_t    uinc;
+  const analytical_TDuinc_t analytical_TDuinc( gridFactory, uinc );
+  const analytical_TNuinc_t analytical_TNuinc( gridFactory, uinc );
+
+
+  //============================================================================
+  // CREATE COEFFICIENTS VECTOR FOR GRID-FUNCTIONS OF THE TRACES OF UINC
+  //============================================================================
+  const auto  coeff_TDui  = DofInterpolator()( analytical_TDuinc,
+					       dh_lagrange1.fespace() );
+
+  const auto  coeff_TNui  = DofInterpolator()( analytical_TNuinc,
+					       dh_lagrange0.fespace() );
+
+  // TODO: Implement your code
+
+  Eigen::VectorXd sol;
   return sol;
 }
 

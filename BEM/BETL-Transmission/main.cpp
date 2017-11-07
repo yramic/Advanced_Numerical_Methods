@@ -40,7 +40,6 @@
 #include <functional/interpolation_grid_function.hpp>
 #include <functional/grid_function_operations.hpp>
 #include <functional/dof_interpolator.hpp>
-//#include <functional/L_two_product_evaluator.hpp>
 #include <analytical_functions/linear_excitation_field.hpp>
 
 
@@ -79,27 +78,13 @@ double computeEnergy(const Eigen::VectorXd& sol, const GRID_FACTORY gridFactory,
   const auto& TDu_h  = sol.segment(0, dh_lagr1.numDofs());
   const auto& TNu_h  = sol.segment(dh_lagr1.numDofs(), dh_lagr0.numDofs());
   
-  // Use them to define Interpolation GridFunctions
-  typedef InterpolationGridFunction< GRID_FACTORY,
-				     typename DH_LAGR0::fespace_t,
-				     double> interp_lagr0_t;
-  typedef InterpolationGridFunction< GRID_FACTORY,
-				     typename DH_LAGR1::fespace_t,
-				     double> interp_lagr1_t;
-
-  interp_lagr1_t interp_TDu( gridFactory, dh_lagr1.fespace(), TDu_h );
-  interp_lagr0_t interp_TNu( gridFactory, dh_lagr0.fespace(), TNu_h );
-  
-  // Energy = L2-inner product of traces.
-  return interp_TDu.inner(interp_TNu);
-  /*
   typedef IdentityOperator<  typename DH_LAGR0::fespace_t,
 			     typename DH_LAGR1::fespace_t> id_op01_t;
   id_op01_t id_op01( dh_lagr0.fespace(), dh_lagr1.fespace() );
   id_op01.compute( );
   const auto& M = id_op01.matrix();
   return TNu_h.transpose()*M*TDu_h;
-  */
+  
   #else // TEMPLATE
   // TODO: Implement your code
   return 0.;
@@ -112,7 +97,6 @@ double computeEnergy(const Eigen::VectorXd& sol, const GRID_FACTORY gridFactory,
 /* SAM_LISTING_BEGIN_1 */
 Eigen::VectorXd solveTransmissionProblem(const std::string meshname,
 					 const double& alpha){
-#if SOLUTION
   //============================================================================
   // READ MESH
   //============================================================================
@@ -172,6 +156,7 @@ Eigen::VectorXd solveTransmissionProblem(const std::string meshname,
 	    << "Created " << dh_div.numDofs() << " dofs (div)." << std::endl;
 
 
+  #if SOLUTION
   //============================================================================
   // FUNDAMENTAL SOLUTION FOR LAPLACE EQUATION
   //============================================================================
@@ -292,18 +277,13 @@ Eigen::VectorXd solveTransmissionProblem(const std::string meshname,
   //============================================================================
   // CREATE ANALYTICAL GRID FUNCTION FOR TRACES OF INCIDENT FIELD UINC
   //============================================================================
-  typedef analytical::FundsolFunctor< laplace_fs_t > fundsol_functor_t;
-  //typedef analytical::LinearExcitationField fundsol_functor_t;
-  typedef bem::AnalyticalGridFunction< grid_factory_t, fundsol_functor_t,
+  typedef analytical::LinearExcitationField incident_field_t;
+  typedef bem::AnalyticalGridFunction< grid_factory_t, incident_field_t,
 				       Trace::Dirichlet > analytical_TDuinc_t;
-  typedef bem::AnalyticalGridFunction< grid_factory_t, fundsol_functor_t,
+  typedef bem::AnalyticalGridFunction< grid_factory_t, incident_field_t,
 				       Trace::Neumann   > analytical_TNuinc_t;
-
-  typedef utils::MakeMatrix<double,3,1> matrix_maker;
-  const auto source = matrix_maker()( { 1.1, 1.2, 1.03 } );
   
-  const fundsol_functor_t   uinc( laplace_fs, source );
-  //const fundsol_functor_t   uinc;
+  const incident_field_t    uinc;
   const analytical_TDuinc_t analytical_TDuinc( gridFactory, uinc );
   const analytical_TNuinc_t analytical_TNuinc( gridFactory, uinc );
 
@@ -353,7 +333,33 @@ Eigen::VectorXd solveTransmissionProblem(const std::string meshname,
 
 #else // TEMPLATE
   // TODO: Implement your code
- Eigen:;VectorXd sol;
+
+  //============================================================================
+  // CREATE ANALYTICAL GRID FUNCTION FOR TRACES OF INCIDENT FIELD UINC
+  //============================================================================
+  typedef analytical::LinearExcitationField incident_field_t;
+  typedef bem::AnalyticalGridFunction< grid_factory_t, incident_field_t,
+				       Trace::Dirichlet > analytical_TDuinc_t;
+  typedef bem::AnalyticalGridFunction< grid_factory_t, incident_field_t,
+				       Trace::Neumann   > analytical_TNuinc_t;
+  
+  const incident_field_t    uinc;
+  const analytical_TDuinc_t analytical_TDuinc( gridFactory, uinc );
+  const analytical_TNuinc_t analytical_TNuinc( gridFactory, uinc );
+
+
+  //============================================================================
+  // CREATE COEFFICIENTS VECTOR FOR GRID-FUNCTIONS OF THE TRACES OF UINC
+  //============================================================================
+  const auto  coeff_TDui  = DofInterpolator()( analytical_TDuinc,
+					       dh_lagrange1.fespace() );
+
+  const auto  coeff_TNui  = DofInterpolator()( analytical_TNuinc,
+					       dh_lagrange0.fespace() );
+
+  // TODO: Implement your code
+
+  Eigen::VectorXd sol;
   return sol;
 #endif // TEMPLATE
 }

@@ -338,6 +338,30 @@ Eigen::VectorXd computeDirichletResidual(const grid_factory_t& gridFactory,
       #else // TEMPLATE
   
   // TODO: Implement your code
+
+  // CREATE ANALYTICAL GRID FUNCTION FOR TRACES
+  typedef analytical::FundsolFunctor< laplace_fs_t > fundsol_functor_t;
+
+  typedef bem::AnalyticalGridFunction< grid_factory_t, fundsol_functor_t,
+				       Trace::Dirichlet > analytical_dirichlet_t;
+  typedef bem::AnalyticalGridFunction< grid_factory_t, fundsol_functor_t,
+				       Trace::Neumann   > analytical_neumann_t;
+
+  typedef utils::MakeMatrix<double,3,1> matrix_maker;
+  const auto source = matrix_maker()( { 1.1, 1.2, 1.03 } );
+  
+  const fundsol_functor_t      fundsol_functor( laplace_fs, source );
+  const analytical_dirichlet_t analytical_dirichlet( gridFactory, fundsol_functor );
+  const analytical_neumann_t   analytical_neumann  ( gridFactory, fundsol_functor );
+
+  // CREATE COEFFICIENTS VECTOR FOR GRID-FUNCTIONS OF THE TRACES
+  const auto  coeff_gD      = DofInterpolator()( analytical_dirichlet,
+						 dh_lagrange1.fespace( ));
+
+  const auto  coeff_gN      = DofInterpolator()( analytical_neumann,
+						 dh_lagrange0.fespace( ) );
+
+  // TODO: Implement your code
   Eigen::VectorXd res_D;
   
 #endif // TEMPLATE
@@ -396,8 +420,32 @@ Eigen::VectorXd computeNeumannResidual(const grid_factory_t& gridFactory,
 #else // TEMPLATE
   
   // TODO: Implement your code
-  Eigen::VectorXd res_D;
+
+  // CREATE ANALYTICAL GRID FUNCTION FOR TRACES
+  typedef analytical::FundsolFunctor< laplace_fs_t > fundsol_functor_t;
+
+  typedef bem::AnalyticalGridFunction< grid_factory_t, fundsol_functor_t,
+				       Trace::Dirichlet > analytical_dirichlet_t;
+  typedef bem::AnalyticalGridFunction< grid_factory_t, fundsol_functor_t,
+				       Trace::Neumann   > analytical_neumann_t;
+
+  typedef utils::MakeMatrix<double,3,1> matrix_maker;
+  const auto source = matrix_maker()( { 1.1, 1.2, 1.03 } );
   
+  const fundsol_functor_t      fundsol_functor( laplace_fs, source );
+  const analytical_dirichlet_t analytical_dirichlet( gridFactory, fundsol_functor );
+  const analytical_neumann_t   analytical_neumann  ( gridFactory, fundsol_functor );
+
+  // CREATE COEFFICIENTS VECTOR FOR GRID-FUNCTIONS OF THE TRACES
+  const auto  coeff_gD      = DofInterpolator()( analytical_dirichlet,
+						 dh_lagrange1.fespace( ));
+
+  const auto  coeff_gN      = DofInterpolator()( analytical_neumann,
+						 dh_lagrange0.fespace( ) );
+
+  // TODO: Implement your code
+  Eigen::VectorXd res_D;
+    
 #endif // TEMPLATE
 }
 /* SAM_LISTING_END_5 */
