@@ -10,6 +10,7 @@
  ***********************************************************************/
 #include "../include/low_rank_app.hpp"
 #include "../include/block_cluster.hpp"
+#include "../include/block_nearf.hpp"
 #include "../include/ctree.hpp"
 #include "../include/kernel.hpp"
 #include "../include/node.hpp"
@@ -59,7 +60,7 @@ void LowRankApp::blockProcess(std::vector<BlockCluster> ff_v)
         pair.setCVc(kernel_);
     }
 }
-bool checkpointers(Node* x, Node*y) { return x<y; }
+
 // post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place
 void LowRankApp::postProcess(std::vector<Node*> ff_v_x, Eigen::VectorXd& f)
 {
@@ -84,16 +85,18 @@ void LowRankApp::ff_contribution(std::vector<BlockCluster> ff_v,
 }
 
 // compute near-field contribution
-void LowRankApp::nf_contribution(std::vector<std::pair<Node*,Node*> > nf_v,
+void LowRankApp::nf_contribution(std::vector<BlockNearF> nf_v,
                                  const Eigen::VectorXd& c, Eigen::VectorXd& f)
 {
-    int n = nf_v.size();
-    for(int i = 0; i<n; i++){
-        Node* xnode = nf_v[i].first;
-        Node* ynode = nf_v[i].second;
-        for(int j=0; j<xnode->getPoints().size(); j++){
-            for(int k=0; k<ynode->getPoints().size(); k++){
-                f(xnode->getPoints()[j].getId()) += kernel_(xnode->getPoints()[j].getX(), ynode->getPoints()[k].getX()) * c(ynode->getPoints()[k].getId()); // add near field contribution to ``f''
+    for(auto& pair : nf_v){ // iterate for all the near field xnodes
+        Node* xnode = pair.getXNode();
+        Node* ynode = pair.getYNode();
+        pair.setKernel(kernel_);
+        pair.setMatrix();
+        Eigen::MatrixXd C = pair.getMatrix();
+        for(int i=0; i<xnode->getPoints().size(); i++){
+            for(int j=0; j<ynode->getPoints().size(); j++){
+                f(xnode->getPoints()[i].getId()) += C(i,j) * c(ynode->getPoints()[j].getId()); // add near field contribution to ``f''
             }
         }
     }

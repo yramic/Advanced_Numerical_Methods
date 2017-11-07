@@ -11,11 +11,12 @@
 #ifndef LOW_RANK_APP_HPP
 #define LOW_RANK_APP_HPP
 
-#include "ctree.hpp"
+#include <Eigen/Dense>
+#include "block_cluster.hpp"
+#include "block_nearf.hpp"
+#include "hierarchical_partition.hpp"
 #include "kernel.hpp"
 #include "point.hpp"
-#include "hierarchical_partition.hpp"
-#include <Eigen/Dense>
 
 /**
 * \brief Master class for low-rank approximation (Far and Near Field distribution computation)
@@ -70,7 +71,7 @@ private:
      * \param f Output product vector
      */
     void ff_contribution(std::vector<BlockCluster> ff_v,
-                         std::vector<Node *> ff_v_x, std::vector<Node *> ff_v_y,
+                         std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y,
                          const Eigen::VectorXd& c, Eigen::VectorXd& f);
     /*!
      * \brief Compute near field contribution
@@ -78,7 +79,7 @@ private:
      * \param c Vector c to multiply
      * \param f Output product vector
      */
-    void nf_contribution(std::vector<std::pair<Node*,Node*> > nf_v,
+    void nf_contribution(std::vector<BlockNearF> nf_v,
                          const Eigen::VectorXd& c, Eigen::VectorXd& f);
 
     unsigned  deg_; //!< degree of interpolation

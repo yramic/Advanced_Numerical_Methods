@@ -39,6 +39,16 @@ void Node::getRect(){
         else if (it->getY()<minY) {
             minY = it->getY();
         }
+        Cheby cbx(x1_b_, x2_b_, deg_);
+        Cheby cby(y1_b_, y2_b_, deg_);
+        tkx_ = cbx.getNodes(); // Chebyshew nodes for x axis
+        wkx_ = cbx.getWghts(); // weights of Lagrange polynomial for x axis
+        tky_ = cby.getNodes(); // Chebyshew nodes for y axis
+        wky_ = cby.getWghts(); // weights of Lagrange polynomial for y axis
+//        if (!tl_PPoints.empty()) tl_child_ = new Node(tl_PPoints,minX,medX,medY,maxY, deg_); // recursive construction of the Cluster Tree levels below root
+//        if (!tr_PPoints.empty()) tr_child_ = new Node(tr_PPoints,medX,maxX,medY,maxY, deg_);
+//        if (!bl_PPoints.empty()) bl_child_ = new Node(bl_PPoints,minX,medX,minY,medY, deg_);
+//        if (!br_PPoints.empty()) br_child_ = new Node(br_PPoints,medX,maxX,minY,medY, deg_);
     }
     x1_ = minX;
     x2_ = maxX;
@@ -81,6 +91,7 @@ void Node::setLeaves()
         wkx_ = cbx.getWghts(); // weights of Lagrange polynomial for x axis
         tky_ = cby.getNodes(); // Chebyshew nodes for y axis
         wky_ = cby.getWghts(); // weights of Lagrange polynomial for y axis
+
         if (!tl_PPoints.empty()) tl_child_ = new Node(tl_PPoints, deg_);   // recursive construction of the Cluster Tree levels below root
         if (!tr_PPoints.empty()) tr_child_ = new Node(tr_PPoints, deg_);
         if (!bl_PPoints.empty()) bl_child_ = new Node(bl_PPoints, deg_);

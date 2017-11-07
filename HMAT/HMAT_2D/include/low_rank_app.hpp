@@ -68,7 +68,7 @@ private:
      * \param f Output product vector
      * \param f_aprox_nf_contr Number of near field contributions
      */
-    void nf_contribution(std::vector<std::pair<Node*,Node*> > nf_v,
+    void nf_contribution(std::vector<BlockNearF> nf_v,
                          const Eigen::VectorXd& c, Eigen::VectorXd& f, Eigen::VectorXd& f_aprox_nf_contr);
 
     /*!

@@ -121,17 +121,18 @@ void LowRankApp::ff_contribution(std::vector<BlockCluster> ff_v,
 }
 
 // compute near-field contribution
-void LowRankApp::nf_contribution(std::vector<std::pair<Node*,Node*> > nf_v,
+void LowRankApp::nf_contribution(std::vector<BlockNearF> nf_v,
                                  const Eigen::VectorXd& c, Eigen::VectorXd& f, Eigen::VectorXd& f_approx_nf_contr)
 {
-    int n = nf_v.size();
-    for(int i = 0; i<n; i++){
-        Node* xnode = nf_v[i].first;
-        Node* ynode = nf_v[i].second;
-        for(int j=0; j<xnode->getPPoints().size(); j++){
-            for(int k=0; k<ynode->getPPoints().size(); k++){
-                f(xnode->getPPoints()[j].getId()) += (*kernel_)(xnode->getPPoints()[j].getX(), xnode->getPPoints()[j].getY(), ynode->getPPoints()[k].getX(), ynode->getPPoints()[k].getY()) * c(ynode->getPPoints()[k].getId()); // add near field contribution
-                f_approx_nf_contr(xnode->getPPoints()[j].getId())++;
+    for(auto& pair : nf_v){ // iterate for all the near field xnodes
+        Node* xnode = pair.getXNode();
+        Node* ynode = pair.getYNode();
+        //pair.setKernel(kernel_);
+        pair.setMatrix(kernel_);
+        Eigen::MatrixXd C = pair.getMatrix();
+        for(int i=0; i<xnode->getPPoints().size(); i++){
+            for(int j=0; j<ynode->getPPoints().size(); j++){
+                f(xnode->getPPoints()[i].getId()) += C(i,j) * c(ynode->getPPoints()[j].getId()); // add near field contribution to ``f''
             }
         }
     }

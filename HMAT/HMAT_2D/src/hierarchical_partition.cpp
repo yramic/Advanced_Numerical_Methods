@@ -3,6 +3,7 @@
 #include "../include/node.hpp"
 #include "../include/cheby.hpp"
 #include "../include/hierarchical_partition.hpp"
+#include "../include/block_nearf.hpp"
 #include <Eigen/Dense>
 #include <vector>
 #include <iostream>
@@ -42,7 +43,7 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
     AdmissibilityH adm;
     if((*ynode).getPPoints().size()<=1 || (*xnode).getPPoints().size()<=1){
             //(*ynode).near_f_.push_back(xnode);
-            NearField_.push_back(std::make_pair(xnode,ynode));
+            NearField_.push_back(BlockNearF(xnode,ynode));
     }
     else {
         // if the cluster corresponding to *xnode and *ynode is admissible, we add them to the far field list of each one
@@ -83,7 +84,7 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
     AdmissibilityH adm;
     if((*ynode).getPPoints().size()<=1 || (*xnode).getPPoints().size()<=1){
         //(*ynode).near_f_.push_back(xnode);
-        NearField_.push_back(std::make_pair(xnode,ynode));
+        NearField_.push_back(BlockNearF(xnode,ynode));
         cmatrix((*ynode).getNodeID(),(*xnode).getNodeID())++;
     }
     else {

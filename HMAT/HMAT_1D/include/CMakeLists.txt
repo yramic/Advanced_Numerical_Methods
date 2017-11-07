@@ -1,5 +1,6 @@
 set(headers
     ${CMAKE_CURRENT_LIST_DIR}/block_cluster.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/block_nearf.hpp
     ${CMAKE_CURRENT_LIST_DIR}/cheby.hpp
     ${CMAKE_CURRENT_LIST_DIR}/ctree.hpp
     ${CMAKE_CURRENT_LIST_DIR}/hierarchical_partition.hpp

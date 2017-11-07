@@ -8,17 +8,17 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#ifndef BLOCK_CLUSTER_HPP
-#define BLOCK_CLUSTER_HPP
+#ifndef BLOCK_NEARF_HPP
+#define BLOCK_NEARF_HPP
 
 #include <Eigen/Dense>
 #include "kernel.hpp"
 #include "node.hpp"
 
 /*!
- * \brief Block cluster class to compute matrix \f$X_{\sigma,\mu}\f$
+ * \brief Helper class to compute near field block matrices
  */
-class BlockCluster
+class BlockNearF
 {
 public:
 
@@ -26,9 +26,8 @@ public:
      * \brief Constructor
      * \param ndx XNode
      * \param ndy YNode
-     * \param G Kernel Function
      */
-    BlockCluster(Node* xnode, Node* ynode);
+    BlockNearF(Node* xnode, Node* ynode);
 
     /*!
      * \brief Constructor
@@ -36,30 +35,19 @@ public:
      * \param ndy YNode
      * \param G Kernel Function
      */
-    BlockCluster(Node* xnode, Node* ynode, Kernel G);
+    BlockNearF(Node* xnode, Node* ynode, Kernel* G);
 
     /*!
-     * \brief return matrix \f$C_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
+     * \brief return near field block matrix
      */
     Eigen::MatrixXd getMatrix() const {
         return C_;
     }
 
     /*!
-     * \brief compute matrix \f$C_{\sigma,\mu}\f$
+     * \brief compute near field block matrix
      */
-    void setMatrix();
-
-    /*!
-     * \brief set kernel
-     */
-    void setKernel(Kernel G);
-
-    /*!
-     * \brief compute CVc vector and store it in xnode
-     * \param c vector for multiplication with the matrix
-     */
-    void setCVc(Kernel G);
+    void setMatrix(Kernel* G);
 
     /*!
      * \brief return pointer to xnode
@@ -76,8 +64,8 @@ public:
     }
 
 private:
-    Kernel G_; //!< kernel
-    Eigen::MatrixXd C_; //!< matrix \f$C_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
+    //Kernel G_; //!< kernel
+    Eigen::MatrixXd C_; //!< near field block matrix
     std::pair<Node*,Node*> pair_;
 };
-#endif // BLOCK_CLUSTER_HPP
+#endif // BLOCK_NEARF_HPP

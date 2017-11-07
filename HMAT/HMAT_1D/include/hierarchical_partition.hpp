@@ -12,6 +12,7 @@
 #define HIERARCHICAL_PARTITION_HPP
 
 #include "block_cluster.hpp"
+#include "block_nearf.hpp"
 #include "ctree.hpp"
 #include "kernel.hpp"
 #include "point.hpp"
@@ -52,7 +53,7 @@ public:
     /*!
      * \brief Return the Near Field pairs vector
      */
-    std::vector<std::pair<Node*,Node*> > getNF() {
+    std::vector<BlockNearF> getNF() {
         return NearField_;
     }
     /*!
@@ -74,10 +75,10 @@ private:
      */
     void setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree Ty);
     cTree Tx_, Ty_; //!< Cluster trees for comparison
-    std::vector<BlockCluster> FarField_;       //!< Vector for Far Field
+    std::vector<BlockCluster> FarField_;      //!< Vector for Far Field
     std::vector<Node*>        FarField_xnds_; //!< Vector for Far Field XNodes
     std::vector<Node*>        FarField_ynds_; //!< Vector for Far Field YNodes
-    std::vector<std::pair<Node*,Node*> > NearField_; //!< Vector for Near Field
+    std::vector<BlockNearF>  NearField_;      //!< Vector for Near Field
     double eta_;  //!< eta-admissibility constant
 };
 #endif // HIERARCHICAL_PARTITION_HPP

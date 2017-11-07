@@ -17,9 +17,7 @@ BlockCluster::BlockCluster(Node* ndx, Node* ndy):
 // Constructor
 BlockCluster::BlockCluster(Node* ndx, Node* ndy, Kernel* G):
     pair_(std::make_pair(ndx,ndy))
-{
-    setMatrix2D(G); //maybe not needed
-}
+{ }
 
 // compute matrix $C_{\sigma,\mu}$
 void BlockCluster::setMatrix2D(Kernel* G)
