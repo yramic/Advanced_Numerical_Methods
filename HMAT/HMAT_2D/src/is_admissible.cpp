@@ -6,16 +6,16 @@
 double AdmissibilityH::get_max(Node* a, Node* b)
 {
     double xa,ya,xb,yb,maxA,maxB;
-    xa = std::abs(a->getXr_b()-a->getXl_b());
-    ya = std::abs(a->getYr_b()-a->getYl_b());
+    xa = std::abs(a->getX1()-a->getX2());
+    ya = std::abs(a->getY1()-a->getY2());
     if(xa > ya){
         maxA = xa;
     }
     else {
         maxA = ya;
     }
-    xb = std::abs(b->getXr_b()-b->getXl_b());
-    yb = std::abs(b->getYr_b()-b->getYl_b());
+    xb = std::abs(b->getX1()-b->getX2());
+    yb = std::abs(b->getY1()-b->getY2());
     if(xb > yb){
         maxB = xb;
     }
@@ -38,42 +38,42 @@ double dist(double x, double y, double a, double b){
 // return the distance between 2 Boxes
 double AdmissibilityH::get_min(Node* a, Node* b)
 {
-    double x1 = a->getXl_b();
-    double x1b = a->getXr_b();
-    double x2 = b->getXl_b();
-    double x2b = b->getXr_b();
-    double y1 = a->getYl_b();
-    double y1b = a->getYr_b();
-    double y2 = b->getYl_b();
-    double y2b = b->getYr_b();
+    double x1a = a->getX1();
+    double x2a = a->getX2();
+    double x1b = b->getX1();
+    double x2b = b->getX2();
+    double y1a = a->getY1();
+    double y2a = a->getY2();
+    double y1b = b->getY1();
+    double y2b = b->getY2();
     bool left, right, bottom, top;
-    left = x2b < x1;
-    right = x1b < x2;
-    bottom = y2b < y1;
-    top = y1b < y2;
+    left = x2b < x1a;
+    right = x2a < x1b;
+    bottom = y2b < y1a;
+    top = y2a < y1b;
     if (top && left){
-        return dist(x1, y1b, x2b, y2);
+        return dist(x1a, y2a, x2b, y1b);
     }
     else if (left && bottom){
-        return dist(x1, y1, x2b, y2b);
+        return dist(x1a, y1a, x2b, y2b);
     }
     else if (bottom && right){
-        return dist(x1b, y1, x2, y2b);
+        return dist(x2a, y1a, x1b, y2b);
     }
     else if (right && top){
-        return dist(x1b, y1b, x2, y2);
+        return dist(x2a, y2a, x1b, y1b);
     }
     else if (left) {
-        return (x1 - x2b);
+        return (x1a - x2b);
     }
     else if (right) {
-        return (x2 - x1b);
+        return (x1b - x2a);
     }
     else if (bottom) {
-        return (y1 - y2b);
+        return (y1a - y2b);
     }
     else if (top) {
-        return (y2 - y1b);
+        return (y1b - y2a);
     }
     else {
         return 0;

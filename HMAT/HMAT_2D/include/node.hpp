@@ -70,26 +70,26 @@ public:
     /*!
      * \brief return Bounding Box Xl coordinate
      */
-    double getXl_b() const {
-        return x1_b_;
+    double getX1() const {
+        return x1_;
     }
     /*!
      * \brief return Bounding Box Xr coordinate
      */
-    double getXr_b() const {
-        return x2_b_;
+    double getX2() const {
+        return x2_;
     }
     /*!
      * \brief return Bounding Box Yl coordinate
      */
-    double getYl_b() const {
-        return y1_b_;
+    double getY1() const {
+        return y1_;
     }
     /*!
      * \brief return Bounding Box Yr coordinate
      */
-    double getYr_b() const {
-        return y2_b_;
+    double getY2() const {
+        return y2_;
     }
     /*!
      * \brief return the vector of points of this node
@@ -145,6 +145,11 @@ public:
         return wky_;
     }
     /*!
+     * \brief return rectangle of the cluster
+     */
+    //std::pair<std::pair<double,double>,std::pair<double,double>> getRect();
+    void getRect();
+    /*!
      * \brief Build tree recursively
      */
     void setLeaves();
@@ -160,7 +165,7 @@ public:
      * \brief Compute V matrix
      * \param deg Degree of interpolation
      */
-    void setV_node(unsigned deg);
+    void setV();
     /*!
      * \brief compute Vc vector
      * \param c vector for multiplication with the matrix
