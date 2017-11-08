@@ -61,7 +61,7 @@ int main() {
         PPoints.push_back(p);
     }
     unsigned d = 2;
-    cTree test_tree(PPoints, d);                       // creating the tree
+    cTree test_tree(PPoints, d);                    // creating the tree
     std::vector<Point> tree_vector, tree_vector_t;  // dummy vectors
     /*Point p;
     p.setId(-1);
@@ -75,5 +75,4 @@ int main() {
     bool correct = check(dfs_points,tree_vector);                       // function to check if the IDs of the points that are in the vector are the same with the IDs we are looking for
     if (correct) std::cout << "Correct" << std::endl;
     else std::cout << "Wrong" << std::endl;
-
 }
