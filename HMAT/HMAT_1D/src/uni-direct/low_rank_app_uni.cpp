@@ -19,7 +19,7 @@
 
 // constructor
 template<>
-LowRankApp<BlockCluster_Y,Node_Y>::LowRankApp(Kernel kernel, const std::vector<Point> &GPoints, double eta, unsigned deg):
+LowRankApp<BlockCluster_Y,Node_Y>::LowRankApp(Kernel* kernel, const std::vector<Point>& GPoints, double eta, unsigned deg):
     kernel_(kernel), GPoints_(GPoints), HP_(GPoints,eta,deg), deg_(deg)
 { }
 
@@ -45,9 +45,8 @@ void LowRankApp<BlockCluster_Y,Node_Y>::blockProcess(std::vector<BlockCluster*> 
 {
     for(auto& pair : ff_v){ // iterate for all the pairs of far field nodes
         BlockCluster_Y* pair_ = static_cast<BlockCluster_Y*>(pair);
-        pair_->setKernel(kernel_);
-        pair_->setMatrix(); // here because needed for each pair of nodes,
-                            // cannot be moved to pre-processing
+        pair_->setMatrix(kernel_); // here because needed for each pair of nodes,
+                                   // cannot be moved to pre-processing
         pair_->setCVc();
     }
 }
@@ -85,8 +84,7 @@ void LowRankApp<BlockCluster_Y,Node_Y>::nf_contribution(std::vector<BlockNearF*>
     for(auto& pair : nf_v){ // iterate for all the near field xnodes
         Node* xnode = pair->getXNode();
         Node* ynode = pair->getYNode();
-        pair->setKernel(kernel_);
-        pair->setMatrix();
+        pair->setMatrix(kernel_);
         Eigen::MatrixXd C = pair->getMatrix();
         for(int i=0; i<xnode->getPoints().size(); i++){
             for(int j=0; j<ynode->getPoints().size(); j++){

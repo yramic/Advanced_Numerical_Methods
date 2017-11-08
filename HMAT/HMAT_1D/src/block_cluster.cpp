@@ -8,25 +8,25 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include <Eigen/Dense>
 #include "../include/block_cluster.hpp"
 #include "../include/kernel.hpp"
 #include "../include/node.hpp"
+#include <Eigen/Dense>
 
 // Constructor
 BlockCluster::BlockCluster(Node* xnode, Node* ynode):
     pair_(std::make_pair(xnode,ynode))
 { }
 
-// Constructor
-BlockCluster::BlockCluster(Node* xnode, Node* ynode, Kernel G):
-    pair_(std::make_pair(xnode,ynode)), G_(G)
-{
-    setMatrix();
-}
+//// Constructor
+//BlockCluster::BlockCluster(Node* xnode, Node* ynode, Kernel G):
+//    pair_(std::make_pair(xnode,ynode)), G_(G)
+//{
+//    setMatrix();
+//}
 
 // compute matrix $C_{\sigma,\mu}$
-void BlockCluster::setMatrix()
+void BlockCluster::setMatrix(Kernel* G)
 {
     Eigen::VectorXd tkx = pair_.first->getTK();
     Eigen::VectorXd tky = pair_.second->getTK();
@@ -34,13 +34,7 @@ void BlockCluster::setMatrix()
     // Compute collocation matrix for Chebychev nodes
     for(unsigned i=0; i<tkx.size(); ++i)
         for(unsigned j=0; j<tky.size(); ++j)
-            C_(i,j) = G_(tkx(i),tky(j));
-}
-
-// set kernel
-void BlockCluster::setKernel(Kernel G)
-{
-    G_ = G;
+            C_(i,j) = (*G)(tkx(i),tky(j));
 }
 
 // compute CVc vector and store it into xnode

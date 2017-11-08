@@ -11,9 +11,9 @@
 #ifndef BLOCK_CLUSTER_HPP
 #define BLOCK_CLUSTER_HPP
 
-#include <Eigen/Dense>
 #include "kernel.hpp"
 #include "node.hpp"
+#include <Eigen/Dense>
 
 /*!
  * \brief Block cluster class to compute matrix \f$X_{\sigma,\mu}\f$
@@ -48,12 +48,7 @@ public:
     /*!
      * \brief compute matrix \f$C_{\sigma,\mu}\f$
      */
-    void setMatrix();
-
-    /*!
-     * \brief set kernel
-     */
-    void setKernel(Kernel G);
+    void setMatrix(Kernel* G);
 
     /*!
      * \brief compute CVc vector and store it in xnode
@@ -75,8 +70,7 @@ public:
     }
 
 protected:
-    Kernel G_; //!< kernel
-    Eigen::MatrixXd C_; //!< matrix \f$C_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
     std::pair<Node*,Node*> pair_;
+    Eigen::MatrixXd C_; //!< matrix \f$C_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
 };
 #endif // BLOCK_CLUSTER_HPP

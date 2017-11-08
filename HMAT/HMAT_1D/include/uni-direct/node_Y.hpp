@@ -11,8 +11,8 @@
 #ifndef NODE_Y_HPP
 #define NODE_Y_HPP
 
-#include <Eigen/Dense>
 #include "../node.hpp"
+#include <Eigen/Dense>
 
 // forward declaration to avoid cross-referencing
 template<typename NODE>

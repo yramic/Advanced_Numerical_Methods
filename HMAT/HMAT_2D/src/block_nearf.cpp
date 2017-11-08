@@ -32,6 +32,6 @@ void BlockNearF::setMatrix(Kernel* G)
     for(unsigned i=0; i<pair_.first->getPPoints().size(); ++i)
         for(unsigned j=0; j<pair_.second->getPPoints().size(); ++j)
             C_(i,j) = (*G)(pair_.first->getPPoints()[i].getX(),pair_.first->getPPoints()[i].getY(),
-                         pair_.second->getPPoints()[j].getX(),pair_.second->getPPoints()[j].getY());
+                           pair_.second->getPPoints()[j].getX(),pair_.second->getPPoints()[j].getY());
 }
 

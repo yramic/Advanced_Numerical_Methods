@@ -10,7 +10,9 @@ public:
     /*!
     * \brief Default Constructor
     */
-    Kernel() {}
+    Kernel():
+        num_(0.)
+    { }
     /*!
     * \brief Default Constructor
     */
@@ -20,15 +22,15 @@ public:
 
     /*!
     * \brief Virtual Functor
-    * \param x1 x coordinate of first point
-    * \param y1 y coordinate of first point
-    * \param x2 x coordinate of second point
-    * \param y2 y coordinate of second point
+    * \param x1 x-coordinate of first point
+    * \param y1 y-coordinate of first point
+    * \param x2 x-coordinate of second point
+    * \param y2 y-coordinate of second point
     */
     virtual double operator()(double x1, double y1, double x2, double y2) = 0;
 
 protected:
-    double num_; //!< numerator
+    double num_; //!< coefficient
 };
 
 
@@ -37,14 +39,15 @@ protected:
 */
 class KernelGalerkin: public Kernel
 {
-public:
+    using Kernel::Kernel; // C++11 inheritance of constructors
 
+public:
     /*!
     * \brief Functor for 2D
-    * \param x1 x coordinate of first point
-    * \param y1 y coordinate of first point
-    * \param x2 x coordinate of second point
-    * \param y2 y coordinate of second point
+    * \param x1 x-coordinate of first point
+    * \param y1 y-coordinate of first point
+    * \param x2 x-coordinate of second point
+    * \param y2 y-coordinate of second point
     */
     double operator()(double x1, double y1, double x2, double y2);
 };
@@ -54,14 +57,15 @@ public:
 */
 class SingularKernel: public Kernel
 {
-public:
+    using Kernel::Kernel; // C++11 inheritance of constructors
 
+public:
     /*!
     * \brief Functor for 2D Singular Kernel
-    * \param x1 x coordinate of first point
-    * \param y1 y coordinate of first point
-    * \param x2 x coordinate of second point
-    * \param y2 y coordinate of second point
+    * \param x1 x-coordinate of first point
+    * \param y1 y-coordinate of first point
+    * \param x2 x-coordinate of second point
+    * \param y2 y-coordinate of second point
     */
     double operator()(double x1, double y1, double x2, double y2);
 };
@@ -71,14 +75,15 @@ public:
 */
 class SingularKernelf: public Kernel
 {
-public:
+    using Kernel::Kernel; // C++11 inheritance of constructors
 
+public:
     /*!
     * \brief Functor for 2D Singular Kernel
-    * \param x1 x coordinate of first point
-    * \param y1 y coordinate of first point
-    * \param x2 x coordinate of second point
-    * \param y2 y coordinate of second point
+    * \param x1 x-coordinate of first point
+    * \param y1 y-coordinate of first point
+    * \param x2 x-coordinate of second point
+    * \param y2 y-coordinate of second point
     */
     double operator()(double x1, double y1, double x2, double y2);
 };
@@ -88,14 +93,15 @@ public:
 */
 class PolynomialKernel: public Kernel
 {
-public:
+    using Kernel::Kernel; // C++11 inheritance of constructors
 
+public:
     /*!
     * \brief Functor for 2D
-    * \param x1 x coordinate of first point
-    * \param y1 y coordinate of first point
-    * \param x2 x coordinate of second point
-    * \param y2 y coordinate of second point
+    * \param x1 x-coordinate of first point
+    * \param y1 y-coordinate of first point
+    * \param x2 x-coordinate of second point
+    * \param y2 y-coordinate of second point
     */
     double operator()(double x1, double y1, double x2, double y2);
 };
@@ -105,23 +111,15 @@ public:
 */
 class ConstantKernel: public Kernel
 {
+    using Kernel::Kernel; // C++11 inheritance of constructors
+
 public:
     /*!
-    * \brief Default Constructor
-    */
-    ConstantKernel(): Kernel() {}
-    /*!
-    * \brief Constructor for num
-    */
-    ConstantKernel(double num):
-        Kernel(num)
-    { }
-    /*!
     * \brief Functor for 2D
-    * \param x1 x coordinate of first point
-    * \param y1 y coordinate of first point
-    * \param x2 x coordinate of second point
-    * \param y2 y coordinate of second point
+    * \param x1 x-coordinate of first point
+    * \param y1 y-coordinate of first point
+    * \param x2 x-coordinate of second point
+    * \param y2 y-coordinate of second point
     */
     double operator()(double x1, double y1, double x2, double y2);
 };
@@ -131,13 +129,15 @@ public:
 */
 class GlobalSmoothKernel: public Kernel
 {
+    using Kernel::Kernel; // C++11 inheritance of constructors
+
 public:
     /**
     * \brief Functor for 2D
-    * \param x1 x coordinate of first point
-    * \param y1 y coordinate of first point
-    * \param x2 x coordinate of second point
-    * \param y2 y coordinate of second point
+    * \param x1 x-coordinate of first point
+    * \param y1 y-coordinate of first point
+    * \param x2 x-coordinate of second point
+    * \param y2 y-coordinate of second point
     */
     double operator()(double x1, double y1, double x2, double y2);
 };
@@ -147,15 +147,17 @@ public:
 */
 class GaussKernel: public Kernel
 {
+    using Kernel::Kernel; // C++11 inheritance of constructors
+
 public:
     /**
     * \brief Functor for 2D
-    * \param x1 x coordinate of first point
-    * \param y1 y coordinate of first point
-    * \param x2 x coordinate of second point
-    * \param y2 y coordinate of second point
+    * \param x1 x-coordinate of first point
+    * \param y1 y-coordinate of first point
+    * \param x2 x-coordinate of second point
+    * \param y2 y-coordinate of second point
     */
     double operator()(double x1, double y1, double x2, double y2);
 };
-#endif // KERNEL_HPP
 
+#endif // KERNEL_HPP

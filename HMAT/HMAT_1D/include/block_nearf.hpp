@@ -11,9 +11,9 @@
 #ifndef BLOCK_NEARF_HPP
 #define BLOCK_NEARF_HPP
 
-#include <Eigen/Dense>
 #include "kernel.hpp"
 #include "node.hpp"
+#include <Eigen/Dense>
 
 /*!
  * \brief Helper class to compute near field block matrices
@@ -48,12 +48,7 @@ public:
     /*!
      * \brief compute near field block matrix
      */
-    void setMatrix();
-
-    /*!
-     * \brief set kernel
-     */
-    void setKernel(Kernel G);
+    void setMatrix(Kernel* G);
 
     /*!
      * \brief return pointer to xnode
@@ -70,8 +65,7 @@ public:
     }
 
 private:
-    Kernel G_; //!< kernel
-    Eigen::MatrixXd C_; //!< near field block matrix
     std::pair<Node*,Node*> pair_;
+    Eigen::MatrixXd C_; //!< near field block matrix
 };
 #endif // BLOCK_NEARF_HPP

@@ -11,13 +11,13 @@
 #ifndef LOW_RANK_APP_HPP
 #define LOW_RANK_APP_HPP
 
-#include <Eigen/Dense>
 #include "block_cluster.hpp"
 #include "block_nearf.hpp"
 #include "hierarchical_partition.hpp"
 #include "kernel.hpp"
 #include "node.hpp"
 #include "point.hpp"
+#include <Eigen/Dense>
 
 /**
 * \brief Master class for low-rank approximation (Far and Near Field distribution computation)
@@ -35,7 +35,7 @@ public:
      * \param eta eta-admissibility constant
      * \param deg Degree of interpolation
      */
-    LowRankApp(Kernel kernel, const std::vector<Point> &GPoints, double eta, unsigned deg);
+    LowRankApp(Kernel* kernel, const std::vector<Point>& GPoints, double eta, unsigned deg);
 
     /*!
      * \brief Approximate matrix-vector multiplication
@@ -85,8 +85,8 @@ protected:
     void nf_contribution(std::vector<BlockNearF*> nf_v,
                          const Eigen::VectorXd& c, Eigen::VectorXd& f);
 
-    unsigned  deg_; //!< degree of interpolation
-    Kernel kernel_; //!< kernel
+    unsigned   deg_; //!< degree of interpolation
+    Kernel* kernel_; //!< kernel
     HierarchicalPartitioning<BLOCK_CLUSTER,NODE_Y> HP_; //!< Hierarchical Partiotion class for constructing the tree and calculate near and far field nodes
     std::vector<Point> GPoints_; //!< Vector of points of the axis
 };

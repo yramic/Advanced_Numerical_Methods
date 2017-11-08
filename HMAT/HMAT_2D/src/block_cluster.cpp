@@ -20,7 +20,7 @@ BlockCluster::BlockCluster(Node* ndx, Node* ndy, Kernel* G):
 { }
 
 // compute matrix $C_{\sigma,\mu}$
-void BlockCluster::setMatrix2D(Kernel* G)
+void BlockCluster::setMatrix(Kernel* G)
 {
     Eigen::VectorXd tk1x = pair_.first->getTkx();
     Eigen::VectorXd tk1y = pair_.first->getTky();
@@ -39,9 +39,8 @@ void BlockCluster::setMatrix2D(Kernel* G)
 }
 
 // compute CVc vector and store it into xnode
-void BlockCluster::setCVc(Kernel* G) {
-    setMatrix2D(G); // here because needed for each pair of nodes,
-                  // cannot be moved to pre-processing
+void BlockCluster::setCVc()
+{
     Eigen::VectorXd  Vc = pair_.second->getVc_Node();
     Eigen::VectorXd CVc = C_ * Vc;
     pair_.first->setCVc(CVc); // xnode

@@ -21,7 +21,10 @@ public:
     * \param deg Degree of itnerpolation
     */
     HierarchicalPartitioning(const std::vector<Point> &PPoints, double eta, unsigned deg);
-    std::vector<BlockCluster> getFF() {
+    /*!
+     * \brief Return the Far Field pairs vector
+     */
+    std::vector<BlockCluster*> getFF() {
         return FarField_;
     }
     /*!
@@ -39,7 +42,7 @@ public:
     /*!
      * \brief Return the Near Field pairs vector
      */
-    std::vector<BlockNearF> getNF() {
+    std::vector<BlockNearF*> getNF() {
         return NearField_;
     }
     /*!
@@ -83,11 +86,11 @@ private:
 
     cTree Tx_, Ty_; //!< Cluster trees for comparison
     //std::vector<std::pair<Node*,Node*>> FarField_, NearField_;  //!< Vectors for Near and Far Field Pairs
-    std::vector<BlockCluster> FarField_;       //!< Vector for Far Field
-    std::vector<Node*>        FarField_xnds_; //!< Vector for Far Field XNodes
-    std::vector<Node*>        FarField_ynds_; //!< Vector for Far Field YNodes
+    std::vector<BlockCluster*> FarField_;      //!< Vector for Far Field
+    std::vector<Node*>         FarField_xnds_; //!< Vector for Far Field XNodes
+    std::vector<Node*>         FarField_ynds_; //!< Vector for Far Field YNodes
     //std::vector<std::pair<Node*,Node*> > NearField_; //!< Vector for Near Field
-    std::vector<BlockNearF>  NearField_;      //!< Vector for Near Field
+    std::vector<BlockNearF*>  NearField_;      //!< Vector for Near Field
     double eta_;    //!< eta-admissibility constant
 };
 #endif // HIERARCHICAL_PARTITION_HPP

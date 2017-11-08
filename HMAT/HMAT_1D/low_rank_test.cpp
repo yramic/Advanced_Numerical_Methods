@@ -12,9 +12,9 @@ int main() {
 
     // Input
 
-//    std::cout << "Enter gridsize:" << std::endl;
-//    unsigned n; std::cin >> n;
-    unsigned n = 1000;
+    std::cout << "Enter gridsize:" << std::endl;
+    unsigned n; std::cin >> n;
+//    unsigned n = 1000;
 
     // grid points initialization
     Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(n, 0., (n-1.)/n);
@@ -28,17 +28,17 @@ int main() {
 //    unsigned d; std::cin >> d;
     unsigned d = 3;
 
-    Kernel G(1.); // Kernel initilization
+    KernelLog G(1.); // Kernel initilization
 
     std::vector<Point> GPoints; // initalizing Grid Points properties
     GPoints.reserve(n);
     int k = 0;
-    for (int i=0; i<n; i++){
-            Point p;
-            p.setId(k);
-            p.setX(grid[i]);
-            k++;
-            GPoints.push_back(p);
+    for(int i=0; i<n; ++i){
+        Point p;
+        p.setId(k);
+        p.setX(grid[i]);
+        k++;
+        GPoints.push_back(p);
     }
 
     // Compute exact matrix-vector product
@@ -58,7 +58,7 @@ int main() {
 
     auto start2 = std::chrono::system_clock::now();
 
-    LowRankApp<> HMat(G,GPoints,eta,d);
+    LowRankApp<> HMat(&G, GPoints, eta, d);
     Eigen::VectorXd f_approx = HMat.mvProd(c);
 
     auto end2 = std::chrono::system_clock::now();
