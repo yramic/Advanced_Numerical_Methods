@@ -98,7 +98,7 @@ private:
 
     Kernel* kernel_; //!< pointer for kernel
     HierarchicalPartitioning HP_; //!< Hierarchical Partiotion class for constructing the tree and calculate near and far field nodes
-    unsigned  deg_;  //!< degree of interpolation
+    unsigned   deg_; //!< degree of interpolation
 };
 
 #endif // LOW_RANK_APP_HPP
