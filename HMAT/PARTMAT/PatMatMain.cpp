@@ -57,7 +57,7 @@ PartMatrix<q>::PartMatrix(size_t _n,size_t _m):n(_n),m(_m) {}
 
 /* SAM_LISTING_BEGIN_2 */
 // Partitioned $n\times m$-matrix split in near-field and
-// far-field blocks.
+// far-field blocks, the latter of rank q
 template <int q>
 VectorXd PartMatrix<q>::operator * (const VectorXd &v) const {
   if (v.size() != m)
@@ -70,7 +70,7 @@ VectorXd PartMatrix<q>::operator * (const VectorXd &v) const {
     const size_t mB = B.j_idx.size();
     // Obtain values of argument vector corresponding to y-points
     VectorXd tmp(mB); for (int j=0;j<mB;j++) tmp(j) = v(B.j_idx[j]);
-    // Multiply vector with low-rank matrix
+    // Multiply vector with low-rank matrix: Effort \cob{$\sharp I_k+\sharp J_k$}
     VectorXd res(nB); res = B.U*(B.V.transpose()*tmp);
     // Store result in right components of x-vector
     for (int i=0; i<nB;i++) y(B.i_idx[i]) = res(i);
@@ -87,9 +87,7 @@ VectorXd PartMatrix<q>::operator * (const VectorXd &v) const {
     // Store result in right components of x-vector
     for (int i=0; i<nB;i++) y(B.i_idx[i]) = res(i);
   }
-  
-  // Move result vector
-  return(y);
+  return(y); // (Move) return result vector
 }
 /* SAM_LISTING_END_2 */
 
