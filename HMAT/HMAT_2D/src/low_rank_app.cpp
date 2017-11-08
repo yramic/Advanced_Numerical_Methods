@@ -76,11 +76,11 @@ void LowRankApp::postProcess(std::vector<Node*> ff_v_x, Eigen::VectorXd& f)
     }
 }
 
-void LowRankApp::calc_numb_approx_per_row(std::vector<BlockCluster> ff_v, Eigen::VectorXd& f_approx_ff_contr)
+void LowRankApp::calc_numb_approx_per_row(std::vector<BlockCluster*> ff_v, Eigen::VectorXd& f_approx_ff_contr)
 {
     for(auto& block : ff_v){ // iterate for all the far field xnodes
-        Node* xnode = block.getXNode();
-        Node* ynode = block.getYNode();
+        Node* xnode = block->getXNode();
+        Node* ynode = block->getYNode();
         for(int i=0; i<xnode->getPPoints().size(); i++){
             f_approx_ff_contr[xnode->getPPoints()[i].getId()] += ynode->getPPoints().size(); // add contribution of far field to ``f''
         }

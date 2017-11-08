@@ -33,7 +33,7 @@ public:
      * \param ff_v Vector of BlockClusters
      * \param f_approx_ff_contr Vector for saving the number of corresponding far field points for each row of the product vector
      */
-    void calc_numb_approx_per_row(std::vector<BlockCluster> ff_v, Eigen::VectorXd& f_approx_ff_contr);
+    void calc_numb_approx_per_row(std::vector<BlockCluster*> ff_v, Eigen::VectorXd& f_approx_ff_contr);
 private:
     /*!
      * \brief Compute far field contribution
