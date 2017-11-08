@@ -175,7 +175,7 @@ int main() {
     auto start2 = std::chrono::system_clock::now();
 
     //LowRankApp lra(&P, PPoints, n);         // initialization of low rank approximation for BEM approx for matrix multiplication
-    LowRankApp HMat(&P, PPoints, n, eta, d);
+    LowRankApp HMat(&P, PPoints, eta, d);
     Eigen::VectorXd f_approx = HMat.mvProd(c, eta, d);   // calculation of the low rank approximation
 
     auto end2 = std::chrono::system_clock::now();
