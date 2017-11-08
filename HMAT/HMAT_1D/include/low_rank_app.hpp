@@ -11,13 +11,13 @@
 #ifndef LOW_RANK_APP_HPP
 #define LOW_RANK_APP_HPP
 
-#include <Eigen/Dense>
 #include "block_cluster.hpp"
 #include "block_nearf.hpp"
 #include "hierarchical_partition.hpp"
 #include "kernel.hpp"
 #include "node.hpp"
 #include "point.hpp"
+#include <Eigen/Dense>
 
 /**
 * \brief Master class for low-rank approximation (Far and Near Field distribution computation)

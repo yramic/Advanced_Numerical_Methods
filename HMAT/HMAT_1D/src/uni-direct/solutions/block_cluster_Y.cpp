@@ -8,23 +8,20 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#ifndef BLOCK_CLUSTER_Y_HPP
-#define BLOCK_CLUSTER_Y_HPP
-
-#include "../block_cluster.hpp"
+#include "../../../include/uni-direct/block_cluster_Y.hpp"
 #include <Eigen/Dense>
 
-/*!
- * \brief Block cluster class to compute matrix \f$X_{\sigma,\mu}\f$ for uni-directional interpolation
- */
-class BlockCluster_Y : public BlockCluster
+// compute matrix $C_{\sigma,\mu}$ for uni-directional interpolation
+void BlockCluster_Y::setMatrix()
 {
-    using BlockCluster::BlockCluster; // C++11 inheritance of constructors
-
-public:
-    /*!
-     * \brief compute matrix $C_{\sigma,\mu}$ for uni-directional interpolation
-     */
-    void setMatrix();
-};
-#endif // BLOCK_CLUSTER_Y_HPP
+    Eigen::VectorXd tkx = pair_.first->getTK();
+    C_.resize(tkx.size(),
+              pair_.second->getPoints().size());
+    // Compute collocation matrix
+    // for Chebychev nodes along x-dimension
+    // and for grid points along y-dimension
+    for(unsigned i=0; i<tkx.size(); ++i)
+        for(unsigned j=0; j<pair_.second->getPoints().size(); ++j)
+            C_(i,j) = G_(tkx(i),
+                         pair_.second->getPoints()[j].getX());
+}

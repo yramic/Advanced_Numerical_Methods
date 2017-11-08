@@ -17,4 +17,8 @@ set(  cpp_files_uni
     ${cpp_files_uni}
     PARENT_SCOPE
 )
+set(  cpp_files_uni_sols
+    ${cpp_files_uni_sols}
+    PARENT_SCOPE
+)
 

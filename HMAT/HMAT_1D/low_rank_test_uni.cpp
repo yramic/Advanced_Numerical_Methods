@@ -1,8 +1,8 @@
-#include "include/kernel.hpp"
-#include "include/low_rank_app.hpp"
-#include "include/point.hpp"
-#include "include/uni-direct/block_cluster_Y.hpp"
-#include "include/uni-direct/node_Y.hpp"
+#include "../HMAT_1D/include/kernel.hpp"
+#include "../HMAT_1D/include/low_rank_app.hpp"
+#include "../HMAT_1D/include/point.hpp"
+#include "../HMAT_1D/include/uni-direct/block_cluster_Y.hpp"
+#include "../HMAT_1D/include/uni-direct/node_Y.hpp"
 
 #include <Eigen/Dense>
 #include <chrono>

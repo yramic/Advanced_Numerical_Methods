@@ -11,9 +11,9 @@
 #ifndef BLOCK_CLUSTER_HPP
 #define BLOCK_CLUSTER_HPP
 
-#include <Eigen/Dense>
 #include "kernel.hpp"
 #include "node.hpp"
+#include <Eigen/Dense>
 
 /*!
  * \brief Block cluster class to compute matrix \f$X_{\sigma,\mu}\f$

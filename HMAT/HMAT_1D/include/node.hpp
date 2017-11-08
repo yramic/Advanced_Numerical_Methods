@@ -11,8 +11,8 @@
 #ifndef NODE_HPP
 #define NODE_HPP
 
-#include <Eigen/Dense>
 #include "point.hpp"
+#include <Eigen/Dense>
 #include <vector>
 
 // forward declaration to avoid cross-referencing

@@ -8,10 +8,10 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include <Eigen/Dense>
 #include "../include/block_cluster.hpp"
 #include "../include/kernel.hpp"
 #include "../include/node.hpp"
+#include <Eigen/Dense>
 
 // Constructor
 BlockCluster::BlockCluster(Node* xnode, Node* ynode):
