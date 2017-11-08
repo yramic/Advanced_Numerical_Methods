@@ -16,8 +16,8 @@
 
 
 //#define circle
-#define vector16
-//#define random1
+//#define vector16
+#define random1
 
 
 #define local
@@ -145,8 +145,8 @@ int main() {
     // initializing degree of interpolation for testing
     //unsigned d=1;
 
-    //std::vector<unsigned> t = {1,2,3,5,7,10,20,40,80,100};
-    std::vector<unsigned> t = {3};
+    std::vector<unsigned> t = {1,2,3,5,7,10,20,40,80};
+    //std::vector<unsigned> t = {3};
     for(auto d : t){            // multiple runs of the program to check the behavior of the error for different degrees
     KernelGalerkin G;           // initialization of Galerkin kernel for 2d problem -1/(2*pi)*log||x-y||
     PolynomialKernel P;         // Polynomial Kernel initialization
@@ -163,7 +163,7 @@ int main() {
     Eigen::MatrixXd M(n,n);
     for(int i=0; i<n; ++i)
         for(int j=0; j<n; ++j)
-            M(i,j) = P(PPoints[i].getX(), PPoints[i].getY(), PPoints[j].getX(), PPoints[j].getY());
+            M(i,j) = G(PPoints[i].getX(), PPoints[i].getY(), PPoints[j].getX(), PPoints[j].getY());
     Eigen::VectorXd f_exact = M * c;
 
 
@@ -175,7 +175,7 @@ int main() {
     auto start2 = std::chrono::system_clock::now();
 
     //LowRankApp lra(&P, PPoints, n);         // initialization of low rank approximation for BEM approx for matrix multiplication
-    LowRankApp HMat(&P, PPoints, eta, d);
+    LowRankApp HMat(&G, PPoints, eta, d);
     Eigen::VectorXd f_approx = HMat.mvProd(c, eta, d);   // calculation of the low rank approximation
 
     auto end2 = std::chrono::system_clock::now();
@@ -216,9 +216,9 @@ int main() {
 
     std::cout << "diff" << std::endl;
     std::cout << diff << std::endl;
-    std::cout << "Approximation error (l-inf norm): " << diff.lpNorm<Eigen::Infinity>() << std::endl
-              << "Approximation error (l-2 norm): "   << diff.lpNorm<2>() << std::endl
-              << "Relative Approximation error (l-2 norm): "   << diff.lpNorm<2>()/f_exact.lpNorm<2>() << std::endl
+    std::cout << "Approximation error between f_exact and f_approx (l-inf norm of vector diff): " << diff.lpNorm<Eigen::Infinity>() << std::endl
+              << "Approximation error between f_exact and f_approx (l-2 norm of vector diff): "   << diff.lpNorm<2>() << std::endl
+              << "Relative Approximation error between f_exact and f_approx (l-2 norm of diff/l-2 norm of f_exact): "   << diff.lpNorm<2>()/f_exact.lpNorm<2>() << std::endl
               << "Time needed for exact multiplication: "       << time_diff1.count() << " s" << std::endl
               << "Time needed for approximate multiplication: " << time_diff2.count() << " s" << std::endl;
 #endif

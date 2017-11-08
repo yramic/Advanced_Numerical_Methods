@@ -7,7 +7,7 @@
 #include <Eigen/Dense>
 
 // constructor for solving the 2D problem
-LowRankApp::LowRankApp(Kernel* kernel, const std::vector<Point>& pp, double eta, unsigned deg):
+LowRankApp::LowRankApp(Kernel* kernel, const std::vector<Point> &pp, double eta, unsigned deg):
     kernel_(kernel), HP_(pp,eta,deg), deg_(deg)
 { }
 
@@ -29,13 +29,13 @@ Eigen::VectorXd LowRankApp::mvProd(Eigen::VectorXd& c, double eta, unsigned deg)
                     HP_.getFFxnds(), HP_.getFFynds(),
                     c, f_approx, f_approx_ff_contr);
     std::cout << "Far Field Contribution for each row" << std::endl << std::flush;
-    //std:: cout << f_approx_ff_contr << std::endl << std::flush;
+    std:: cout << f_approx_ff_contr << std::endl << std::flush;
     // compute near-field contribution
     nf_contribution(HP_.getNF(),
                     c, f_approx, f_approx_nf_contr);
 
     std::cout << "Near Field Contribution for each row" << std::endl << std::flush;
-    //std:: cout << f_approx_nf_contr << std::endl << std::flush;
+    std:: cout << f_approx_nf_contr << std::endl << std::flush;
     return f_approx;
 }
 
@@ -76,41 +76,16 @@ void LowRankApp::postProcess(std::vector<Node*> ff_v_x, Eigen::VectorXd& f)
     }
 }
 
-/*// compute far field contribution
-void LowRankApp::ff_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*,Node*>> ff_v, unsigned deg, Eigen::VectorXd& c, Eigen::VectorXd& f_approx_ff_contr)
+void LowRankApp::calc_numb_approx_per_row(std::vector<BlockCluster> ff_v, Eigen::VectorXd& f_approx_ff_contr)
 {
-    int n = ff_v.size();
-    for(int i = 0; i<n; i++){   // iterate for all the pairs of far field nodes
-        Node* xnode = ff_v[i].first;
-        Node* ynode = ff_v[i].second;
-        Eigen::VectorXd XVc = Eigen::VectorXd::Zero((deg +1)*(deg+1));                                          // auxiliary variable
-        Eigen::VectorXd Vc((deg+1)*(deg+1));   // deg+1*deg+1                                                   // V*c restricted to the indices of **iter
-        BlockCluster X_(xnode->getTkx(), xnode->getTky(), ynode->getTkx(), ynode->getTky(), deg, kernel_);    // calculation of matrix $X_{\sigma,\mu}$
-        Eigen::MatrixXd X = X_.getMatrix();
-        xnode->setV_node(deg);
-        ynode->setV_node(deg);
-        Eigen::MatrixXd Vy = ynode->getV_node();
-        Eigen::MatrixXd Vm = Vy.transpose();
-        int ny = ynode->getPPoints().size();
-        Eigen::VectorXd c_seg(ny);
-        for(int j=0; j<ny; j++){
-            c_seg[j] = c[ynode->getPPoints()[j].getId()];
-            for (int k = 0; k<xnode->getPPoints().size(); k++) {
-                f_approx_ff_contr[xnode->getPPoints()[k].getId()]++;
-            }
-        }
-        Vc = Vm * c_seg;
-        XVc += X * Vc;
-        Eigen::MatrixXd Vs = Eigen::MatrixXd::Zero(xnode->getPPoints().size(),(deg+1)*(deg+1));                    // $V_{\sigma}$
-        Vs = xnode->getV_node();
-        Eigen::VectorXd f_seg(xnode->getPPoints().size());                                                       // add contribution of far field to "f"
-        f_seg = Vs * XVc;
-        for (int j = 0; j<xnode->getPPoints().size(); j++) {
-            f[xnode->getPPoints()[j].getId()] += f_seg[j];
+    for(auto& block : ff_v){ // iterate for all the far field xnodes
+        Node* xnode = block.getXNode();
+        Node* ynode = block.getYNode();
+        for(int i=0; i<xnode->getPPoints().size(); i++){
+            f_approx_ff_contr[xnode->getPPoints()[i].getId()] += ynode->getPPoints().size(); // add contribution of far field to ``f''
         }
     }
-
-}*/
+}
 
 // compute far field contribution
 void LowRankApp::ff_contribution(std::vector<BlockCluster*> ff_v,
@@ -120,6 +95,7 @@ void LowRankApp::ff_contribution(std::vector<BlockCluster*> ff_v,
     preProcess(ff_v_x, ff_v_y, c);
     blockProcess(ff_v);
     postProcess(ff_v_x, f);
+    calc_numb_approx_per_row(ff_v, f_approx_ff_contr);
 }
 
 // compute near-field contribution
@@ -134,6 +110,7 @@ void LowRankApp::nf_contribution(std::vector<BlockNearF*> nf_v,
         for(int i=0; i<xnode->getPPoints().size(); i++){
             for(int j=0; j<ynode->getPPoints().size(); j++){
                 f(xnode->getPPoints()[i].getId()) += C(i,j) * c(ynode->getPPoints()[j].getId()); // add near field contribution to ``f''
+                f_approx_nf_contr(xnode->getPPoints()[i].getId())++;
             }
         }
     }
