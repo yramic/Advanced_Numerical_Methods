@@ -8,9 +8,9 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
+#include "../../../include/uni-direct/node_Y.hpp"
+#include "../../../include/cheby.hpp"
 #include <Eigen/Dense>
-#include "../../include/uni-direct/node_Y.hpp"
-#include "../../include/cheby.hpp"
 #include <iostream>
 
 // actual constructor: adds a tree below the node if left_index != right_index
@@ -56,6 +56,5 @@ void Node_Y::setLeaves(int& id)
 //(just the identity)
 void Node_Y::setV()
 {
-    int n = node_points_.size();
-    V_node_ = Eigen::MatrixXd::Identity(n, n);
+    // TODO
 }

@@ -11,3 +11,9 @@ set(cpp_files_uni_sols
     PARENT_SCOPE
 )
 
+set(cpp_files_uni_tmps
+    ${CMAKE_CURRENT_LIST_DIR}/templates/block_cluster_Y.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/templates/node_Y.cpp
+    PARENT_SCOPE
+)
+
