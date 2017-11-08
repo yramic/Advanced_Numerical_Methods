@@ -6,7 +6,7 @@
 #include <iostream>
 
 int main() {
-    /*unsigned n=16;  // number of points
+    unsigned n=16;  // number of points
     std::vector<int> x = {24,22,73,63,14,17,39,99,83,41,40,4,83,30,65,23}, y = {24,55,87,91,30,1,9,28,67,85,10,84,57,72,86,56}, v = {66,63,27,46,83,58,46,8,95,57,2,79,34,21,64,95};
     std::vector<Point> PPoints; // initalizing Polygon Points properties
     PPoints.reserve(n);
@@ -20,10 +20,11 @@ int main() {
     }
     unsigned deg = 2;
     Node t(PPoints,deg);
+    t.setV();
     double eta;
-    PolynomialKernel P;
-    LowRankApp HMat(&P, PPoints, n, eta, deg);
-    t.setV_node(deg);
+    //PolynomialKernel P;
+    //LowRankApp HMat(&P, PPoints, n, eta, deg);
+    //t.setV_node(deg);
     Eigen::MatrixXd V = t.getV_node();
     // alternate calculation of the V matrix of this Node
     double x1,x2,y1,y2;                 // construction of Bounding Box of this Node
@@ -77,6 +78,7 @@ int main() {
             VnodeX(i,j) *= wkx(j);
         }
     }
+    std::cout << VnodeX << std::endl << std::endl;
     for(unsigned i=0; i<=n-1; ++i) {
         for(unsigned j=0; j<=deg; ++j) {
             for(unsigned k=0; k<j; ++k) {
@@ -89,6 +91,8 @@ int main() {
             VnodeY(i,j) *= wky(j);
         }
     }
+    std::cout << VnodeY << std::endl;
+
     // calculate the V node
     Eigen::MatrixXd V_node_new(n, (deg+1)*(deg+1));
     for(unsigned i=0; i<=n-1; ++i) {
@@ -106,5 +110,5 @@ int main() {
         }
     }
     std::cout << "Correct" << std::endl;
-    return 0;*/
+    return 0;
 }

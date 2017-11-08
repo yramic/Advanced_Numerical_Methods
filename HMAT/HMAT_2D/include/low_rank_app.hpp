@@ -21,7 +21,7 @@ public:
      * \param eta eta variable of admissibility
      * \param deg Degree of interpolation
      */
-    LowRankApp(Kernel* kernel,const std::vector<Point> &pp, int n, double eta, unsigned deg);
+    LowRankApp(Kernel* kernel,const std::vector<Point> &pp, double eta, unsigned deg);
     /*!
      * \brief Approximate matrix-vector multiplication
      * \param c Vector c
@@ -29,7 +29,12 @@ public:
      * \param deg Degree of itnerpolation
      */
     Eigen::VectorXd mvProd(Eigen::VectorXd &c, double eta, unsigned deg);
-
+    /*!
+     * \brief Calculation of number of corresponding far field points for each row of the product vector
+     * \param ff_v Vector of BlockClusters
+     * \param f_approx_ff_contr Vector for saving the number of corresponding far field points for each row of the product vector
+     */
+    void calc_numb_approx_per_row(std::vector<BlockCluster> ff_v, Eigen::VectorXd& f_approx_ff_contr);
 private:
     /*!
      * \brief Compute far field contribution
