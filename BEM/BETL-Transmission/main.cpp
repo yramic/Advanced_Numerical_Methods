@@ -56,6 +56,11 @@ matrix_t TransmissionSystemMatrix( const matrix_t&  V, const matrix_t&  K,
 				   const matrix_t&  W, const double & alpha){
   matrix_t A(K.rows() + W.rows(), K.cols() + V.cols());
 #if SOLUTION
+  if( K.rows() != V.rows() || K.cols() != W.cols() || V.cols() != K.rows() ||
+      W.rows() != K.cols() ){
+    std::cerr << " dimensions mismatch " << std::endl;
+    exit( -1 );
+  }
   A.block(0, 0              , K.rows(), K.cols()) =  2.* K;
   A.block(0, K.cols()       , V.rows(), V.cols()) = -(1./alpha + 1)*V;
   A.block(K.rows(), 0       , W.rows(), W.cols()) = -(alpha + 1.)*W;

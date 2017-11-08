@@ -4,5 +4,5 @@
     "contributors" : "",
 
     "name": "BETL-Debug",
-    "all" : ["main.cpp"]
+    "all" : ["main.cpp", "demo.cpp", "plot_convergence_residuum.py"]
 }

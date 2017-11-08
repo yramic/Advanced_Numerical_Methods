@@ -363,8 +363,9 @@ Eigen::VectorXd computeNeumannResidual(const grid_factory_t& gridFactory,
   // COMPUTE NEUMANN RESIDUAL ACCORDING TO (1.6.33)
   const Eigen::VectorXd res_N = -W * coeff_gD + 0.5*M.transpose()* coeff_gN
                                   - K.transpose() * coeff_gN ;
-  return res_N;
 
+  
+  return res_N;
 }
 /* SAM_LISTING_END_5 */
 
@@ -377,7 +378,7 @@ int main( int argc, char* argv[] )
   Eigen::VectorXi levels(4);
   Eigen::VectorXd rDNorm(4), rNNorm(4);
   levels << 32, 128, 512, 2048;
-  const std::string path = "../../meshes/";
+  const std::string path = "../BEM/BETL-Debug/meshes/";
     
   for(int k=0; k<4; k++){
 

@@ -1,3 +1,9 @@
+//// 
+//// Copyright (C) 2017 SAM (D-MATH) @ ETH Zurich
+//// Author(s): curzuato < > 
+//// Contributors:  dcasati 
+//// This file is part of the AdvNumCSE repository.
+////
 #include <Eigen/Core>
 #include <Eigen/Dense>
 // system includes -------------------------------------------------------------
@@ -27,78 +33,29 @@
 #include <bem_integration/galerkin_integrator.hpp>
 // fundamental solutions -------------------------------------------------------
 #include <fundsol/fundsol.hpp>
-#include <analytical_functions/fundsol_functor.hpp>
 // bem operator ----------------------------------------------------------------
 #include <bem_operator/bem_operator.hpp>
 // sparse operators ------------------------------------------------------------
 #include <sparse_operators/identity_operator.hpp>
 #include <sparse_operators/combinatorial_gradient.hpp>
-// utility functions -----------------------------------------------------------
-#include <utils/make_matrix.hpp>
-// grid function related includes ----------------------------------------------
-#include <functional/analytical_grid_function.hpp>
-#include <functional/interpolation_grid_function.hpp>
-#include <functional/grid_function_operations.hpp>
-#include <functional/dof_interpolator.hpp>
-#include <analytical_functions/linear_excitation_field.hpp>
 
 
 using namespace betl2;
 namespace big = betl2::input::gmsh;
 
-typedef Eigen::MatrixXd matrix_t;
-const std::string path = "../BEM/BETL-Transmission/meshes/";
-
 
 //------------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_0 */
-matrix_t TransmissionSystemMatrix( const matrix_t&  V, const matrix_t&  K,
-				   const matrix_t&  W, const double & alpha){
-  matrix_t A(K.rows() + W.rows(), K.cols() + V.cols());
-  if( K.rows() != V.rows() || K.cols() != W.cols() || V.cols() != K.rows() ||
-      W.rows() != K.cols() ){
-    std::cerr << " dimensions mismatch " << std::endl;
-    exit( -1 );
-  }
-  A.block(0, 0              , K.rows(), K.cols()) =  2.* K;
-  A.block(0, K.cols()       , V.rows(), V.cols()) = -(1./alpha + 1)*V;
-  A.block(K.rows(), 0       , W.rows(), W.cols()) = -(alpha + 1.)*W;
-  A.block(K.rows(), W.cols(), K.cols(), K.rows()) = - 2.*K.transpose();
-  return A;
-}
-/* SAM_LISTING_END_0 */
-
-
-//------------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_2 */
-template<typename GRID_FACTORY, typename DH_LAGR0, typename DH_LAGR1>
-double computeEnergy(const Eigen::VectorXd& sol, const GRID_FACTORY gridFactory,
-		     const DH_LAGR0& dh_lagr0, const DH_LAGR1& dh_lagr1){
-  // Extract Dirichlet and Neumann coefficients out of solution vector
-  const auto& TDu_h  = sol.segment(0, dh_lagr1.numDofs());
-  const auto& TNu_h  = sol.segment(dh_lagr1.numDofs(), dh_lagr0.numDofs());
-  
-  typedef IdentityOperator<  typename DH_LAGR0::fespace_t,
-			     typename DH_LAGR1::fespace_t> id_op01_t;
-  id_op01_t id_op01( dh_lagr0.fespace(), dh_lagr1.fespace() );
-  id_op01.compute( );
-  const auto& M = id_op01.matrix();
-  return TNu_h.transpose()*M*TDu_h;
-  
-}
-/* SAM_LISTING_END_2 */
-
-
-//------------------------------------------------------------------------------
-/* SAM_LISTING_BEGIN_1 */
-Eigen::VectorXd solveTransmissionProblem(const std::string meshname,
-					 const double& alpha){
+int main( int argc, char* argv[] )
+{
   //============================================================================
   // READ MESH
   //============================================================================
-  // Create input from mesh
-  std::cout << "Input from: " << meshname << ".msh" << std::endl;
-  big::Input input( path+meshname );
+  // Parse the command line to get name of mesh
+  const std::string basename = betl2::parseCommandLine( argc, argv );
+  
+  // Create input from it
+  std::cout << "Input from: " << basename << ".msh" << std::endl;
+  big::Input input( basename );
   
   // Wrap input interface around the given input
   typedef betl2::input::InputInterface< big::Input > inpInterface_t;
@@ -123,7 +80,13 @@ Eigen::VectorXd solveTransmissionProblem(const std::string meshname,
   //============================================================================
   // THE DISCRETE FE-SPACES
   //============================================================================
+  // Defining the discrete FE-spaces requires: Choosing the basis and creating 
+  // the dof hanfler for it ( see NPDE ).
+  // 1 - Define order of approximation. Here we choose Linear (constant and 
+  // quadratic are also available).
   const fe::ApproxOrder order = fe::Linear;
+  // Define bases for $\qbe, \sbe$ and edge functions (to be used when implementing
+  // the Hypersingular operator using integration by parts formula (1.3.92))
   typedef fe::FEBasis< order-1, fe::FEBasisType::Lagrange > feb_lagr0_t;
   typedef fe::FEBasis< order  , fe::FEBasisType::Lagrange > feb_lagr1_t;
   typedef fe::FEBasis< order  , fe::FEBasisType::Div      > feb_div_t;
@@ -145,16 +108,15 @@ Eigen::VectorXd solveTransmissionProblem(const std::string meshname,
   dh_lagrange0.distributeDofs( gridFactory );
   dh_lagrange1.distributeDofs( gridFactory );
   dh_div.distributeDofs      ( gridFactory );
-  int lagr0_numDofs = dh_lagrange0.numDofs();
-  int lagr1_numDofs = dh_lagrange1.numDofs();
-  std::cout << "Created " << lagr1_numDofs << " dofs (lagrange1).\n"
-	    << "Created " << lagr0_numDofs << " dofs (lagrange0).\n"
+  std::cout << "Created " << dh_lagrange1.numDofs() << " dofs (lagrange1).\n"
+	    << "Created " << dh_lagrange0.numDofs() << " dofs (lagrange0).\n"
 	    << "Created " << dh_div.numDofs() << " dofs (div)." << std::endl;
 
 
   //============================================================================
   // FUNDAMENTAL SOLUTION FOR LAPLACE EQUATION
   //============================================================================
+  // Define the fundamental solution to build the BEM operators. 
   typedef bem::FundSol< bem::FSType::LAPLACE, 3 > laplace_fs_t;
   laplace_fs_t laplace_fs;
 
@@ -162,6 +124,13 @@ Eigen::VectorXd solveTransmissionProblem(const std::string meshname,
   //============================================================================
   // GALERKIN KERNELS
   //============================================================================
+  // Define the kernel of the BEM operator using the fundamental solution and 
+  // the spaces to be used. We also need to specify the underlaying layer
+  // potential:
+  // - SL: Single Layer,  or
+  // - DL : Double Layer
+
+  // We need to define 3 GalerkinKernel-objects to build the 4 BEM operators:
   // - Kernel for V: Single layer with $\qbe$ for test and trial spaces
   typedef bem::GalerkinKernel< laplace_fs_t, bem::FSLayer::SL,
 			       feb_lagr0_t, feb_lagr0_t > lagr_sl_kernel_t;
@@ -179,6 +148,9 @@ Eigen::VectorXd solveTransmissionProblem(const std::string meshname,
   //============================================================================
   // THE SINGULARITY DETECTOR
   //============================================================================
+  // Define the singularity detector in order to identify the different singularity
+  // situations on the given grid (as discussed in section 1.5.3: coinciding panels,
+  // adjacent panels, common vertex and panels with positive distance). 
   typedef bem::GalerkinSingularityDetector<grid_factory_t> singularity_detector_t;
   singularity_detector_t singularity_detector( gridFactory );
 
@@ -186,6 +158,8 @@ Eigen::VectorXd solveTransmissionProblem(const std::string meshname,
   //============================================================================
   // DEFINE QUADRATURE
   //============================================================================
+  // Define the quadrature rule by setting number of points for each case (positive
+  // distance and singular cases)
   const int numQPtsTria = 12;
   const int numQPtsQuad = 12;
   const int numSingQPts = 12;
@@ -208,16 +182,29 @@ Eigen::VectorXd solveTransmissionProblem(const std::string meshname,
   //============================================================================
   // BEM INTEGRATORS
   //============================================================================
+  // The following boolean value is optional. If not given it is assumed to be
+  // true. It indicates whether the gram determinants are to be included into the 
+  // integral or not.
+  // In general, these determinants are mandatory. However, certain linear
+  // combinations of scalar potentials might be used to express potentials related
+  // to edge functions. In that particular case, the gram determinants cancel out
+  // and should(must!) be neglected (but this is not the case here, so set it true).
+  const bool withGram = true;
   // Define integrator to be used with the kernels above.
   typedef bem::IntegrationTraits< quadrature_rule_t,
                                   grid_factory_t, 
                                   singularity_detector_t, 
-                                  cache_t > integrationTraits;
+                                  cache_t, 
+                                  withGram, /* on element X */
+                                  withGram  /* on element Y */ > integrationTraits;
 
   typedef bem::GalerkinIntegrator< lagr_sl_kernel_t,
 				   integrationTraits > lagr_sl_integrator_t;
   typedef bem::GalerkinIntegrator< lagr_dl_kernel_t,
 				   integrationTraits > lagr_dl_integrator_t;
+  // An integrator for edge functions: In this case the withGram-flag within
+  // 'integrationTraits' has no effect since integrators for edge-functions neglect
+  // the Gram determinants in any case.
   typedef bem::GalerkinIntegrator< div_sl_kernel_t,
 				   integrationTraits > div_sl_integrator_t;
 
@@ -231,12 +218,20 @@ Eigen::VectorXd solveTransmissionProblem(const std::string meshname,
   //============================================================================
   // BEM OPERATORS
   //============================================================================
+  // We create our BEM operators using the integrators defined above and the
+  // required FE-spaces. We retrieve these spaces from the dofhandler constructed
+  // for each one of them.
+  
   // - V 
   typedef BemOperator< lagr_sl_integrator_t,
                        typename dh_lagrange0_t::fespace_t > bem_op_V_t;
   bem_op_V_t   bem_op_V  ( lagr_sl_integrator , dh_lagrange0.fespace() );
+  sec_timer_t timer_op_V;
   bem_op_V.compute( );
+  std::cout << "Computation of <V phi, phi>, phi in H^{-1/2} took: "
+	    << timer_op_V << std::endl;
   const auto& V    = bem_op_V.matrix();
+  std::cout<< "Dim check: V is " << V.rows() << " x " << V.cols() << std::endl;
 
   // - K
   typedef BemOperator< lagr_dl_integrator_t,
@@ -244,107 +239,52 @@ Eigen::VectorXd solveTransmissionProblem(const std::string meshname,
                        typename dh_lagrange1_t::fespace_t > bem_op_K_t;
   bem_op_K_t   bem_op_K  ( lagr_dl_integrator , dh_lagrange0.fespace(),
 			   dh_lagrange1.fespace() );
+  sec_timer_t timer_op_K;
   bem_op_K.compute( );
+  std::cout << "Computation of <K psi, phi>, phi in H^{-1/2}, psi in H^{1/2} took: " 
+            << timer_op_K << std::endl;
   const auto& K    = bem_op_K.matrix();
+  std::cout<< "Dim check: K is " << K.rows() << " x " << K.cols() << std::endl;
 
   // - W (using integration by parts):
+  // (i) Single layer operator with div basis functions
   typedef BemOperator< div_sl_integrator_t,
                        typename dh_div_t::fespace_t > bem_op_div_t;
   bem_op_div_t bem_op_div( div_sl_integrator, dh_div.fespace() );
+  sec_timer_t timer_op_div;
   bem_op_div.compute( );
+  std::cout << "Computation of <V u, u>, u in H^{-1/2}(div) took: "
+	    << timer_op_div << std::endl;
   const auto& Vdiv = bem_op_div.matrix();
 
+  // (ii) Discrete embedding from H(lagrange) to H(div) ( representing grad X n 
+  // on formula 1.3.92).
   typedef CombinatorialGradient< typename dh_lagrange1_t::fespace_t,
                                  typename dh_div_t      ::fespace_t > cgrad_op_t;
   cgrad_op_t cgrad_op( dh_lagrange1.fespace(), dh_div.fespace() );
   cgrad_op.compute( cache );
   const auto& C = cgrad_op.matrix();
 
+  // (iii) Then we combine these ingredients to build the matrix for W:
   const auto& W = C * Vdiv * C.transpose();
+  std::cout<< "Dim check: W is " << W.rows() << " x " << W.cols() << std::endl;
 
-
-  //============================================================================
-  // SYSTEM MATRIX
-  //============================================================================
-  matrix_t A =  TransmissionSystemMatrix( V, K, W, alpha );
-
-
-  //============================================================================
-  // CREATE ANALYTICAL GRID FUNCTION FOR TRACES OF INCIDENT FIELD UINC
-  //============================================================================
-  typedef analytical::LinearExcitationField incident_field_t;
-  typedef bem::AnalyticalGridFunction< grid_factory_t, incident_field_t,
-				       Trace::Dirichlet > analytical_TDuinc_t;
-  typedef bem::AnalyticalGridFunction< grid_factory_t, incident_field_t,
-				       Trace::Neumann   > analytical_TNuinc_t;
   
-  const incident_field_t    uinc;
-  const analytical_TDuinc_t analytical_TDuinc( gridFactory, uinc );
-  const analytical_TNuinc_t analytical_TNuinc( gridFactory, uinc );
-
-
   //============================================================================
-  // CREATE COEFFICIENTS VECTOR FOR GRID-FUNCTIONS OF THE TRACES OF UINC
+  // CREATE MASS-MATRIX
   //============================================================================
-  const auto  coeff_TDui  = DofInterpolator()( analytical_TDuinc,
-					       dh_lagrange1.fespace() );
+  // We can create the mass matrix $\qbe/ \sbe$ via the IdentityOperator, by
+  // specifying these FE-spaces
+  typedef IdentityOperator< typename dh_lagrange0_t::fespace_t,
+                            typename dh_lagrange1_t::fespace_t > discrete_op_t;
+  discrete_op_t discrete_op( dh_lagrange0.fespace(), dh_lagrange1.fespace() );
+  discrete_op.compute( );
+  const auto& M = discrete_op.matrix();
+  std::cout<< "Dim check: M is " << M.rows() << " x " << M.cols() << std::endl;
 
-  const auto  coeff_TNui  = DofInterpolator()( analytical_TNuinc,
-					       dh_lagrange0.fespace() );
-
-
-  //============================================================================
-  // BUILD RIGHT HAND SIDE USING TRACES DEFINED ABOVE
-  //============================================================================
-  Eigen::VectorXd rhs(lagr0_numDofs + lagr1_numDofs,1);
-  // Mass matrix with test $\qbe$ and trial $\sbe$
-  typedef IdentityOperator< dh_lagrange0_t::fespace_t,
-			    dh_lagrange1_t::fespace_t > id_op01_t;
-  id_op01_t id_op01( dh_lagrange0.fespace(), dh_lagrange1.fespace() );
-  id_op01.compute( );
-  const auto& M = id_op01.matrix();
-  // Evaluate <TD0 uinc, v> and <TN0 uinc, v> (taking into account that TN0 = -TN)
-  rhs.segment(0            , lagr0_numDofs) = -M* coeff_TDui;
-  rhs.segment(lagr0_numDofs, lagr1_numDofs) = -M.transpose()*coeff_TNui;
-
-
-  //============================================================================
-  // SOLVE (USING DIRECT SOLVER)
-  //============================================================================
-  // Define the solver
-  typedef Eigen::ColPivHouseholderQR< matrix_t > directSolver_t;
-  directSolver_t solverA( A );   
-  // Initialize the solver
-  solverA.compute( A );   
-  // Solve the system
-  const auto& sol = solverA.solve( rhs );   
-  std::cout << "Solved linear system Ax = rhs. " << std::endl;
-
-  std::cout << " Energy is : " << computeEnergy(sol, gridFactory, dh_lagrange0,
-						dh_lagrange1)
-	    << std::endl;
-
-  return sol;
-
-}
-/* SAM_LISTING_END_1 */
-
-
-
-//------------------------------------------------------------------------------
-int main( int argc, char* argv[] )
-{
-    Eigen::VectorXi levels(4);
-    levels << 32, 128, 512, 2048;
-    int Nmax = 4;
-    double alpha = 2.;
-    
-    for(int k=0; k<Nmax; k++){
-      const std::string basename ="sphere_" + std::to_string(levels(k));
-      const auto sol = solveTransmissionProblem(basename, alpha);
-    }
 
   // that's it!
+  std::cout << "Done! " << std::endl;
   return EXIT_SUCCESS;
 }
 
