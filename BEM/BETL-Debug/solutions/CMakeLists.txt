@@ -137,3 +137,9 @@ target_link_libraries(main ${BETL2_LIBRARIES})
 add_dependencies(main Eigen)
 add_dependencies(main Betl2)
 
+set(SRCS demo.cpp)
+add_executable(demo ${SRCS})
+target_link_libraries(demo ${BETL2_LIBRARIES})
+add_dependencies(demo Eigen)
+add_dependencies(demo Betl2)
+
