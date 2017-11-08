@@ -17,16 +17,16 @@ int main() {
 //    unsigned n = 1000;
 
     // grid points initialization
-    Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(n, 0., (n-1.)/n);
+    Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(n, 0., 1.);
     Eigen::VectorXd    c = Eigen::VectorXd::Random(n);
 
-//    std::cout << "Enter admissibility constant:" << std::endl;
-//    double eta; std::cin >> eta;
-    double eta = 0.5;
+    std::cout << "Enter admissibility constant:" << std::endl;
+    double eta; std::cin >> eta;
+//    double eta = 0.5;
 
-//    std::cout << "Enter degree of interpolating polynomials:" << std::endl;
-//    unsigned d; std::cin >> d;
-    unsigned d = 3;
+    std::cout << "Enter degree of interpolating polynomials:" << std::endl;
+    unsigned d; std::cin >> d;
+//    unsigned d = 3;
 
     KernelLog G(1.); // Kernel initilization
 

@@ -12,6 +12,7 @@
 #include <Eigen/Dense>
 
 // compute matrix $C_{\sigma,\mu}$ for uni-directional interpolation
+/* SAM_LISTING_BEGIN_0 */
 void BlockCluster_Y::setMatrix(Kernel* G)
 {
     Eigen::VectorXd tkx = pair_.first->getTK();
@@ -25,3 +26,4 @@ void BlockCluster_Y::setMatrix(Kernel* G)
             C_(i,j) = (*G)(tkx(i),
                            pair_.second->getPoints()[j].getX());
 }
+/* SAM_LISTING_END_0 */
