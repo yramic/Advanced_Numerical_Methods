@@ -54,8 +54,10 @@ void Node_Y::setLeaves(int& id)
 
 // compute fake V-matrix of ynode with uni-directional interpolation
 //(just the identity)
+/* SAM_LISTING_BEGIN_0 */
 void Node_Y::setV()
 {
     int n = node_points_.size();
     V_node_ = Eigen::MatrixXd::Identity(n, n);
 }
+/* SAM_LISTING_END_0 */
