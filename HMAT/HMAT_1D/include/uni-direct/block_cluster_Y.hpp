@@ -25,6 +25,6 @@ public:
     /*!
      * \brief compute matrix $C_{\sigma,\mu}$ for uni-directional interpolation
      */
-    void setMatrix();
+    void setMatrix(Kernel* G);
 };
 #endif // BLOCK_CLUSTER_Y_HPP

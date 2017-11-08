@@ -13,3 +13,6 @@ add_library(hmat_1d_uni_sols SHARED ${headers} ${headers_uni} ${cpp_files_uni} $
 add_executable(low_rank_test_1D_uni_solution low_rank_test_uni.cpp)
 target_link_libraries(low_rank_test_1D_uni_solution hmat_1d hmat_1d_uni_sols)
 
+add_library(hmat_1d_sols SHARED ${headers} ${cpp_files} ${cpp_files_sols})
+add_executable(low_rank_test_1D_solution low_rank_test.cpp)
+target_link_libraries(low_rank_test_1D_solution hmat_1d_sols)

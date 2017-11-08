@@ -17,18 +17,17 @@ public:
      * \brief Constructor for 2D Low Rank Approximation
      * \param kernel Kernel used for the matrix multiplication
      * \param pp Vector of points in space
-     * \param n Number of points
      * \param eta eta variable of admissibility
      * \param deg Degree of interpolation
      */
-    LowRankApp(Kernel* kernel,const std::vector<Point> &pp, int n, double eta, unsigned deg);
+    LowRankApp(Kernel* kernel, const std::vector<Point>& pp, double eta, unsigned deg);
     /*!
      * \brief Approximate matrix-vector multiplication
      * \param c Vector c
      * \param eta eta variable of admissibility
      * \param deg Degree of itnerpolation
      */
-    Eigen::VectorXd mvProd(Eigen::VectorXd &c, double eta, unsigned deg);
+    Eigen::VectorXd mvProd(Eigen::VectorXd& c, double eta, unsigned deg);
 
 private:
     /*!
@@ -58,8 +57,8 @@ private:
      * \param f Output product vector
      * \param f_aprox_ff_contr Number of far field contributions
      */
-    void ff_contribution(std::vector<BlockCluster> ff_v,
-                         std::vector<Node *> ff_v_x, std::vector<Node *> ff_v_y,
+    void ff_contribution(std::vector<BlockCluster*> ff_v,
+                         std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y,
                          const Eigen::VectorXd& c, Eigen::VectorXd& f, Eigen::VectorXd& f_aprox_ff_contr);
     /*!
      * \brief Compute near field contribution
@@ -68,7 +67,7 @@ private:
      * \param f Output product vector
      * \param f_aprox_nf_contr Number of near field contributions
      */
-    void nf_contribution(std::vector<BlockNearF> nf_v,
+    void nf_contribution(std::vector<BlockNearF*> nf_v,
                          const Eigen::VectorXd& c, Eigen::VectorXd& f, Eigen::VectorXd& f_aprox_nf_contr);
 
     /*!
@@ -83,7 +82,7 @@ private:
      * \brief Block-processing: compute vector CVc for all far field pairs and store it into xnode
      * \param ff_v Vector of Far Field Pairs
      */
-    void blockProcess(std::vector<BlockCluster> ff_v);
+    void blockProcess(std::vector<BlockCluster*> ff_v);
 
     /*!
      * \brief Post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place
@@ -92,9 +91,9 @@ private:
      */
     void postProcess(std::vector<Node*> ff_v_x, Eigen::VectorXd& f);
 
-    Kernel* kernel_;    //!< pointer for kernel
-    HierarchicalPartitioning HP_;   //!< Hierarchical Partiotion class for constructing the tree and calculate near and far field nodes
-    unsigned deg_;  //!< degree of interpolation
+    Kernel* kernel_; //!< pointer for kernel
+    HierarchicalPartitioning HP_; //!< Hierarchical Partiotion class for constructing the tree and calculate near and far field nodes
+    unsigned  deg_;  //!< degree of interpolation
 };
 
 #endif // LOW_RANK_APP_HPP

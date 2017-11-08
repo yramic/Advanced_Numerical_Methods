@@ -35,7 +35,7 @@ public:
      * \param eta eta-admissibility constant
      * \param deg Degree of interpolation
      */
-    LowRankApp(Kernel kernel, const std::vector<Point> &GPoints, double eta, unsigned deg);
+    LowRankApp(Kernel* kernel, const std::vector<Point>& GPoints, double eta, unsigned deg);
 
     /*!
      * \brief Approximate matrix-vector multiplication
@@ -85,8 +85,8 @@ protected:
     void nf_contribution(std::vector<BlockNearF*> nf_v,
                          const Eigen::VectorXd& c, Eigen::VectorXd& f);
 
-    unsigned  deg_; //!< degree of interpolation
-    Kernel kernel_; //!< kernel
+    unsigned   deg_; //!< degree of interpolation
+    Kernel* kernel_; //!< kernel
     HierarchicalPartitioning<BLOCK_CLUSTER,NODE_Y> HP_; //!< Hierarchical Partiotion class for constructing the tree and calculate near and far field nodes
     std::vector<Point> GPoints_; //!< Vector of points of the axis
 };

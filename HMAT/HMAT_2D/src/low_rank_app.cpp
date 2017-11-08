@@ -7,7 +7,7 @@
 #include <Eigen/Dense>
 
 // constructor for solving the 2D problem
-LowRankApp::LowRankApp(Kernel* kernel, const std::vector<Point> &pp, int n, double eta, unsigned deg):
+LowRankApp::LowRankApp(Kernel* kernel, const std::vector<Point>& pp, double eta, unsigned deg):
     kernel_(kernel), HP_(pp,eta,deg), deg_(deg)
 { }
 
@@ -54,10 +54,12 @@ void LowRankApp::preProcess(std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y
 
 // block-processing: compute vector CVc for all far field pairs and store it into xnode
 // all vectors CVc of an xnode can already be summed together
-void LowRankApp::blockProcess(std::vector<BlockCluster> ff_v)
+void LowRankApp::blockProcess(std::vector<BlockCluster*> ff_v)
 {
     for(auto& pair : ff_v){ // iterate for all the pairs of far field nodes
-        pair.setCVc(kernel_);
+        pair->setMatrix(kernel_); // here because needed for each pair of nodes,
+                                  // cannot be moved to pre-processing
+        pair->setCVc();
     }
 }
 
@@ -111,7 +113,7 @@ void LowRankApp::ff_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*
 }*/
 
 // compute far field contribution
-void LowRankApp::ff_contribution(std::vector<BlockCluster> ff_v,
+void LowRankApp::ff_contribution(std::vector<BlockCluster*> ff_v,
                                  std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y,
                                  const Eigen::VectorXd& c, Eigen::VectorXd& f, Eigen::VectorXd& f_approx_ff_contr)
 {
@@ -121,15 +123,14 @@ void LowRankApp::ff_contribution(std::vector<BlockCluster> ff_v,
 }
 
 // compute near-field contribution
-void LowRankApp::nf_contribution(std::vector<BlockNearF> nf_v,
+void LowRankApp::nf_contribution(std::vector<BlockNearF*> nf_v,
                                  const Eigen::VectorXd& c, Eigen::VectorXd& f, Eigen::VectorXd& f_approx_nf_contr)
 {
     for(auto& pair : nf_v){ // iterate for all the near field xnodes
-        Node* xnode = pair.getXNode();
-        Node* ynode = pair.getYNode();
-        //pair.setKernel(kernel_);
-        pair.setMatrix(kernel_);
-        Eigen::MatrixXd C = pair.getMatrix();
+        Node* xnode = pair->getXNode();
+        Node* ynode = pair->getYNode();
+        pair->setMatrix(kernel_);
+        Eigen::MatrixXd C = pair->getMatrix();
         for(int i=0; i<xnode->getPPoints().size(); i++){
             for(int j=0; j<ynode->getPPoints().size(); j++){
                 f(xnode->getPPoints()[i].getId()) += C(i,j) * c(ynode->getPPoints()[j].getId()); // add near field contribution to ``f''
