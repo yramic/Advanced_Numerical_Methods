@@ -42,27 +42,19 @@ public:
     /*!
     * \brief Set x coordinate
     */
-    void setX( double x) {
-        x_ = x;
-    }
+    void setX( double x);
     /*!
     * \brief Set y coordinate
     */
-    void setY( double y) {
-        y_ = y;
-    }
+    void setY( double y);
     /*!
     * \brief Set id
     */
-    void setId( double id) {
-        id_ = id;
-    }
+    void setId( double id);
     /*!
     * \brief Set value
     */
-    void setV( double v) {
-        v_ = v;
-    }
+    void setV( double v);
 
 private:
     double x_,y_;   //!< x, y coordinate of the point

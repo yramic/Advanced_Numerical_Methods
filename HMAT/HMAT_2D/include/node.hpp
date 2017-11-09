@@ -2,12 +2,13 @@
 #define NODE_HPP
 
 #include <Eigen/Dense>
+#include <Eigen/SVD>
 #include <vector>
 #include "point.hpp"
 
 // forward declaration to avoid cross-referencing
 class cTree;
-
+//enum DecompositionOptions;
 
 /**
 * \brief Node of a cluster tree ("cTree" class)
@@ -147,7 +148,6 @@ public:
     /*!
      * \brief return rectangle of the cluster
      */
-    //std::pair<std::pair<double,double>,std::pair<double,double>> getRect();
     void getRect();
     /*!
      * \brief Build tree recursively

@@ -64,7 +64,6 @@ public:
     }
 
 private:
-    //Kernel G_; //!< kernel
     Eigen::MatrixXd C_; //!< near field block matrix
     std::pair<Node*,Node*> pair_;
 };

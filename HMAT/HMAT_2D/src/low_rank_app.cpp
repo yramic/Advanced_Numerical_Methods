@@ -74,6 +74,7 @@ void LowRankApp::postProcess(std::vector<Node*> ff_v_x, Eigen::VectorXd& f)
     }
 }
 
+// calculate the number of y points that are used for the far field contribution of each row of the product vector
 void LowRankApp::calc_numb_approx_per_row(std::vector<BlockCluster> ff_v, Eigen::VectorXd& f_approx_ff_contr)
 {
     for(auto& block : ff_v){ // iterate for all the far field xnodes
@@ -109,7 +110,8 @@ void LowRankApp::nf_contribution(std::vector<BlockNearF> nf_v,
         for(int i=0; i<xnode->getPPoints().size(); i++){
             for(int j=0; j<ynode->getPPoints().size(); j++){
                 f(xnode->getPPoints()[i].getId()) += C(i,j) * c(ynode->getPPoints()[j].getId()); // add near field contribution to ``f''
-                f_approx_nf_contr(xnode->getPPoints()[i].getId())++;
+                f_approx_nf_contr(xnode->getPPoints()[i].getId())++; // calculate the number of y points that are used for the near field contribution of each row of the product vector
+
             }
         }
     }

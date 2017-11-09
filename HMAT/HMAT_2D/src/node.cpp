@@ -1,9 +1,11 @@
 #include "../include/node.hpp"
 #include "../include/cheby.hpp"
-#include <Eigen/Dense>
-#include <iostream>
 #include "../include/point.hpp"
+#include <iostream>
 #include <limits>
+
+#define inertia
+//#define equal_clusters
 
 // actual  constructor: creates the root of the Cluster Tree and the recursivly creates the leaves
 Node::Node(std::vector<Point> Points, unsigned deg):
@@ -56,6 +58,44 @@ void Node::getRect(){
 void Node::setLeaves()
 {
     if(!PPointsTree_.empty() && PPointsTree_.size()>1){ // if there are points in the PPointsTree vector of points then they are equaly divided into the node´s children
+#ifdef inertia
+        Eigen::MatrixXd A(PPointsTree_.size(),2);
+        for(int i = 0; i < PPointsTree_.size(); i++){
+            A(i,0) = PPointsTree_[i].getX();
+            A(i,1) = PPointsTree_[i].getY();
+        }
+        Eigen::BDCSVD<Eigen::MatrixXd> svdOfA(A,Eigen::DecompositionOptions::ComputeEigenvectors | Eigen::DecompositionOptions::ComputeFullV);
+        Eigen::MatrixXd V = svdOfA.matrixV();
+        double sumX, sumY;
+        for(int i = 0; i < PPointsTree_.size(); i++){
+            sumX += PPointsTree_[i].getX();
+            sumY += PPointsTree_[i].getY();
+        }
+        double avgX = sumX/(double)PPointsTree_.size(), avgY = sumY/(double)PPointsTree_.size();
+        auto y = [](double x, double x1, double y1, double avgX, double avgY) -> double {return avgY+(x-avgX)*y1/x1; };
+        std::vector<Point> top_PPoints, bottom_PPoints, left_PPoints, right_PPoints;  // creation of children nodes´ points vectors
+        for(int i = 0; i < PPointsTree_.size(); i++){
+            double y1 = y(PPointsTree_[i].getX(),V(0,0),V(1,0),avgX,avgY);  // y value of the line that is defined by the point {avgX,avgY} and the vector corresponding to the biggest eigen value
+            double y2 = y(PPointsTree_[i].getX(),V(0,1),V(1,1),avgX,avgY);  // y value of the line that is defined by the point {avgX,avgY} and the vector corresponding to the second biggest eigen value
+            if(y2<=PPointsTree_[i].getY()){
+                if(y1<=PPointsTree_[i].getY()){
+                    top_PPoints.push_back(PPointsTree_[i]);
+                }
+                else{
+                    right_PPoints.push_back(PPointsTree_[i]);
+                }
+            }
+            else{
+                if(y1<=PPointsTree_[i].getY()){
+                    left_PPoints.push_back(PPointsTree_[i]);
+                }
+                else{
+                    bottom_PPoints.push_back(PPointsTree_[i]);
+                }
+            }
+        }
+#endif
+#ifdef equal_clusters
         auto checkX = [](Point a, Point b) -> bool { return a.getX()<b.getX(); };
         std::sort(PPointsTree_.begin(),PPointsTree_.end(),checkX);
         std::vector<Point>::iterator it;
@@ -73,6 +113,7 @@ void Node::setLeaves()
         it=r_points.begin()+(r_points.size()+1)/2;
         tr_PPoints.assign(it,r_points.end());
         br_PPoints.assign(r_points.begin(),it);
+#endif
         getRect(); // calculate the rectangle defined by the points of the node
         // fix for the rectangle if it is a segment
         if(std::abs(x1_-x2_)<10*std::numeric_limits<double>::epsilon()){
@@ -87,10 +128,18 @@ void Node::setLeaves()
         wkx_ = cbx.getWghts(); // weights of Lagrange polynomial for x axis
         tky_ = cby.getNodes(); // Chebyshew nodes for y axis
         wky_ = cby.getWghts(); // weights of Lagrange polynomial for y axis
+#ifdef equal_clusters
         if (!tl_PPoints.empty()) tl_child_ = new Node(tl_PPoints, deg_);   // recursive construction of the Cluster Tree levels below root
         if (!tr_PPoints.empty()) tr_child_ = new Node(tr_PPoints, deg_);
         if (!bl_PPoints.empty()) bl_child_ = new Node(bl_PPoints, deg_);
         if (!br_PPoints.empty()) br_child_ = new Node(br_PPoints, deg_);
+#endif
+#ifdef inertia
+        if (!top_PPoints.empty()) tl_child_ = new Node(top_PPoints, deg_);   // recursive construction of the Cluster Tree levels below root
+        if (!right_PPoints.empty()) tr_child_ = new Node(right_PPoints, deg_);
+        if (!bottom_PPoints.empty()) bl_child_ = new Node(bottom_PPoints, deg_);
+        if (!left_PPoints.empty()) br_child_ = new Node(left_PPoints, deg_);
+#endif
     }
 }
 
@@ -163,14 +212,6 @@ void Node::setV()
         }
     }
     V_node_ = V_node_new;*/
-    /*std::cout << "VnodeX" << std::endl;
-    std::cout << VnodeX << std::endl;
-    std::cout << "VnodeY" << std::endl;
-    std::cout << VnodeY << std::endl;
-    std::cout << "V_Node" << std::endl;
-    std::cout << V_node_ << std::endl;
-    std::cout << "V_Node_new" << std::endl;
-    std::cout << V_node_new << std::endl;*/
 }
 
 // compute V*c restricted to node indices

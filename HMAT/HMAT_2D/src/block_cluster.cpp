@@ -2,13 +2,6 @@
 #include "../include/cheby.hpp"
 #include <iostream>
 
-// constructor for BEM(2D)
-/*BlockCluster::BlockCluster(Eigen::VectorXd tk1x, Eigen::VectorXd tk1y, Eigen::VectorXd tk2x, Eigen::VectorXd tk2y, unsigned deg, Kernel* G):
-    tk1x_(tk1x), tk1y_(tk1y), tk2x_(tk2x), tk2y_(tk2y), deg_(deg), X_(Eigen::MatrixXd::Zero((deg+1)*(deg+1),(deg+1)*(deg+1)))
-{
-    setMatrix2D(G);
-}*/
-
 // Constructor
 BlockCluster::BlockCluster(Node* ndx, Node* ndy):
     pair_(std::make_pair(ndx,ndy))

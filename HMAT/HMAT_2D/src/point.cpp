@@ -1,10 +1,21 @@
 #include "../include/point.hpp"
 
-/*Point::Point():
-    x_(0),y_(0),id_(0),v_(0)
-{}*/
-
-/*Point::~Point()
-{
+// set X coordinate of the point
+void Point::setX( double x) {
+    x_ = x;
 }
-*/
+
+// set Y coordinate of the point
+void Point::setY( double y) {
+    y_ = y;
+}
+
+// set ID of the point
+void Point::setId( double id) {
+    id_ = id;
+}
+
+// set value of the point (not used)
+void Point::setV( double v) {
+    v_ = v;
+}

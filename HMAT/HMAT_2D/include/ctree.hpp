@@ -23,6 +23,7 @@ public:
     /*!
     * \brief Actual Constructor for 2D
     * \param PPointsTree Vector of Polygon Points
+    * \param deg Degree of interpolation
     */
     cTree(const std::vector<Point> &PPointsTree, unsigned deg);
     /*!
