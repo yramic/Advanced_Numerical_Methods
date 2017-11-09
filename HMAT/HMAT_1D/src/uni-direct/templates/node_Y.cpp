@@ -8,9 +8,10 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
+#include "../../../include/uni-direct/node_Y.hpp"
+#include "../../../include/cheby.hpp"
+#include "../../../include/point.hpp"
 #include <Eigen/Dense>
-#include "../../include/uni-direct/node_Y.hpp"
-#include "../../include/cheby.hpp"
 #include <iostream>
 
 // actual constructor: adds a tree below the node if left_index != right_index
@@ -54,8 +55,8 @@ void Node_Y::setLeaves(int& id)
 
 // compute fake V-matrix of ynode with uni-directional interpolation
 //(just the identity)
-void Node_Y::setV()
+unsigned Node_Y::setV()
 {
-    int n = node_points_.size();
-    V_node_ = Eigen::MatrixXd::Identity(n, n);
+    // TODO
+    return 0; // return no. of 'operations' performed
 }

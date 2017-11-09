@@ -4,5 +4,7 @@
     "contributors" : "Ralf Hiptmair",
 
     "name": "LogWeightedGaussRule",
-    "all" : ["main.cpp", "genLaguerreRule.hpp", "genLaguerreRule.cpp", "plot_convergenceQR.py"]
+    "all" : ["main.cpp", "plot_convergenceQR.py"],
+    "lib" : ["genLaguerreRule.hpp", "genLaguerreRule.cpp"],
+    "nocopyright":["genLaguerreRule.hpp", "genLaguerreRule.cpp"]
 }

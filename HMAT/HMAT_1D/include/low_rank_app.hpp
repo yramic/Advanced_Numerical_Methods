@@ -11,13 +11,13 @@
 #ifndef LOW_RANK_APP_HPP
 #define LOW_RANK_APP_HPP
 
-#include <Eigen/Dense>
 #include "block_cluster.hpp"
 #include "block_nearf.hpp"
 #include "hierarchical_partition.hpp"
 #include "kernel.hpp"
 #include "node.hpp"
 #include "point.hpp"
+#include <Eigen/Dense>
 
 /**
 * \brief Master class for low-rank approximation (Far and Near Field distribution computation)
@@ -35,13 +35,20 @@ public:
      * \param eta eta-admissibility constant
      * \param deg Degree of interpolation
      */
-    LowRankApp(Kernel kernel, const std::vector<Point> &GPoints, double eta, unsigned deg);
+    LowRankApp(Kernel* kernel, const std::vector<Point>& GPoints, double eta, unsigned deg);
 
     /*!
      * \brief Approximate matrix-vector multiplication
      * \param c Vector c
      */
     Eigen::VectorXd mvProd(const Eigen::VectorXd& c);
+
+    /*!
+     * \brief Count corresponding far field points for each row of the product vector
+     * \param ff_v Vector of BlockClusters
+     * \param f_approx_ff_contr Vector for saving the number of corresponding far field points for each row of the product vector
+     */
+    void calc_numb_approx_per_row(std::vector<BlockCluster*> ff_v, Eigen::VectorXd& f_approx_ff_contr);
 
 protected:
     /*!
@@ -75,7 +82,7 @@ protected:
      */
     void ff_contribution(std::vector<BlockCluster*> ff_v,
                          std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y,
-                         const Eigen::VectorXd& c, Eigen::VectorXd& f);
+                         const Eigen::VectorXd& c, Eigen::VectorXd& f, Eigen::VectorXd& f_approx_ff_contr);
     /*!
      * \brief Compute near field contribution
      * \param nf_v Vector of Near Field pairs
@@ -83,12 +90,13 @@ protected:
      * \param f Output product vector
      */
     void nf_contribution(std::vector<BlockNearF*> nf_v,
-                         const Eigen::VectorXd& c, Eigen::VectorXd& f);
+                         const Eigen::VectorXd& c, Eigen::VectorXd& f, Eigen::VectorXd& f_approx_nf_contr);
 
-    unsigned  deg_; //!< degree of interpolation
-    Kernel kernel_; //!< kernel
+    unsigned   deg_; //!< degree of interpolation
+    Kernel* kernel_; //!< kernel
     HierarchicalPartitioning<BLOCK_CLUSTER,NODE_Y> HP_; //!< Hierarchical Partiotion class for constructing the tree and calculate near and far field nodes
     std::vector<Point> GPoints_; //!< Vector of points of the axis
+    unsigned  nops_; //!< number of 'operations' performed
 };
 
 #endif // LOW_RANK_APP_HPP

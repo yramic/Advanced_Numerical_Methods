@@ -175,8 +175,8 @@ int main() {
     auto start2 = std::chrono::system_clock::now();
 
     //LowRankApp lra(&P, PPoints, n);         // initialization of low rank approximation for BEM approx for matrix multiplication
-    LowRankApp HMat(&P, PPoints, eta, d);
-    Eigen::VectorXd f_approx = HMat.mvProd(c, eta, d);   // calculation of the low rank approximation
+    LowRankApp HMat(&G, PPoints, eta, d);
+    Eigen::VectorXd f_approx = HMat.mvProd(c);   // calculation of the low rank approximation
 
     auto end2 = std::chrono::system_clock::now();
     std::chrono::duration<double> time_diff2 = end2 - start2;
@@ -191,7 +191,7 @@ int main() {
 //        for(unsigned i=0; i<nx; ++i) {
 
 //            x(i) = 1.;
-//            M_approx.col(i) = lra.mvProd(c, eta, d);
+//            M_approx.col(i) = lra.mvProd(c);
 //            x(i) = 0.;
 //        }
 
@@ -209,16 +209,19 @@ int main() {
 
     // printing for testing
     std::cout << "f_exact" << std::endl;
-    std::cout << f_exact << std::endl;
+    std::cout <<  f_exact  << std::endl;
 
     std::cout << "f_approx" << std::endl;
-    std::cout << f_approx << std::endl;
+    std::cout <<  f_approx  << std::endl;
 
     std::cout << "diff" << std::endl;
-    std::cout << diff << std::endl;
+    std::cout <<  diff  << std::endl;
+
+    std::cout << "Number of matrix operations performed for exact matrix: " << n*n << std::endl;
+
     std::cout << "Approximation error between f_exact and f_approx (l-inf norm of vector diff): " << diff.lpNorm<Eigen::Infinity>() << std::endl
               << "Approximation error between f_exact and f_approx (l-2 norm of vector diff): "   << diff.lpNorm<2>() << std::endl
-              << "Relative Approximation error between f_exact and f_approx (l-2 norm of diff/l-2 norm of f_exact): "   << diff.lpNorm<2>()/f_exact.lpNorm<2>() << std::endl
+              << "Relative Approximation error between f_exact and f_approx (l-2 norm of diff/l-2 norm of f_exact): " << diff.lpNorm<2>()/f_exact.lpNorm<2>() << std::endl
               << "Time needed for exact multiplication: "       << time_diff1.count() << " s" << std::endl
               << "Time needed for approximate multiplication: " << time_diff2.count() << " s" << std::endl;
 #endif

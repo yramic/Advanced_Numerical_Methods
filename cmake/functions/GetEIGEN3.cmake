@@ -2,12 +2,19 @@ include(ExternalProject) # To download Eigen if it is missing
 
 find_package(EIGEN3)
 
+if(EIGEN3_VERSION VERSION_LESS 3.3.0)
+  message("Eigen version 3.3 required, but ${EIGEN3_VERSION} found. Downloading 3.3.4 instead.")
+  set(EIGEN3_FOUND FALSE)
+endif()
+
+
 if(${EIGEN3_FOUND})
 
-    include_directories(${EIGEN3_INCLUDE_DIR})
+  include_directories(${EIGEN3_INCLUDE_DIR})
+  add_custom_target(Eigen) # dependency dummy
 
 else()
-
+  #  if not found system wide download. 
     SET(DOWNLOADING_EIGEN ON)
     message("-- Downloading Eigen3")
     ExternalProject_Add(

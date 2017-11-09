@@ -8,10 +8,10 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include <Eigen/Dense>
 #include "../include/block_nearf.hpp"
 #include "../include/kernel.hpp"
 #include "../include/node.hpp"
+#include <Eigen/Dense>
 
 // Constructor
 BlockNearF::BlockNearF(Node* xnode, Node* ynode):
@@ -24,7 +24,7 @@ BlockNearF::BlockNearF(Node* xnode, Node* ynode, Kernel* G):
 { }
 
 // compute near field block matrix
-void BlockNearF::setMatrix(Kernel* G)
+unsigned BlockNearF::setMatrix(Kernel* G)
 {
     C_.resize(pair_.first->getPPoints().size(),
               pair_.second->getPPoints().size());
@@ -32,6 +32,7 @@ void BlockNearF::setMatrix(Kernel* G)
     for(unsigned i=0; i<pair_.first->getPPoints().size(); ++i)
         for(unsigned j=0; j<pair_.second->getPPoints().size(); ++j)
             C_(i,j) = (*G)(pair_.first->getPPoints()[i].getX(),pair_.first->getPPoints()[i].getY(),
-                         pair_.second->getPPoints()[j].getX(),pair_.second->getPPoints()[j].getY());
+                           pair_.second->getPPoints()[j].getX(),pair_.second->getPPoints()[j].getY());
+    return C_.rows()*C_.cols(); // return no. of 'operations' performed
 }
 

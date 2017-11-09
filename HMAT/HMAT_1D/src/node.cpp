@@ -8,9 +8,9 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include <Eigen/Dense>
 #include "../include/node.hpp"
 #include "../include/cheby.hpp"
+#include <Eigen/Dense>
 #include <iostream>
 
 // actual constructor: adds a tree below the node if left_index != right_index
@@ -51,7 +51,7 @@ void Node::setLeaves(int& id)
 }
 
 // compute V-matrix of node
-void Node::setV()
+unsigned Node::setV()
 {
     int n = node_points_.size();
     V_node_ = Eigen::MatrixXd::Constant(n, deg_+1, 1);
@@ -68,10 +68,11 @@ void Node::setV()
             V_node_(i,j) *= wk_[j];
         }
     }
+    return n * (deg_+2)*(deg_+1)/2; // return no. of 'operations' performed
 }
 
 // compute V*c restricted to node indices
-void Node::setVc(const Eigen::VectorXd& c)
+unsigned Node::setVc(const Eigen::VectorXd& c)
 {
     int n = node_points_.size();
     Eigen::VectorXd c_seg = Eigen::VectorXd::Zero(n);
@@ -79,10 +80,12 @@ void Node::setVc(const Eigen::VectorXd& c)
         c_seg[i] = c(node_points_[i].getId());
     }
     Vc_node_ = V_node_.transpose() * c_seg; // Vc matrix calculation
+    return V_node_.rows()*V_node_.cols(); // return no. of 'operations' performed
 }
 
 // update C*V*c restricted to node indices
-void Node::setCVc(const Eigen::VectorXd& CVc)
+unsigned Node::setCVc(const Eigen::VectorXd& CVc)
 {
     CVc_node_ += CVc;
+    return CVc_node_.size(); // return no. of 'operations' performed
 }

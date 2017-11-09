@@ -11,8 +11,8 @@
 #ifndef NODE_Y_HPP
 #define NODE_Y_HPP
 
-#include <Eigen/Dense>
 #include "../node.hpp"
+#include <Eigen/Dense>
 
 // forward declaration to avoid cross-referencing
 template<typename NODE>
@@ -44,8 +44,9 @@ public:
     void setLeaves(int& id);
     /*!
      * \brief compute fake V-matrix of ynode with uni-directional interpolation
+     * \return no. of 'operations' performed
      */
-    void setV();
+    unsigned setV();
 };
 
 #endif // NODE_Y_HPP

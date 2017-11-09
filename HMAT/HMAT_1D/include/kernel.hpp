@@ -12,7 +12,7 @@
 #define KERNEL_HPP
 
 /**
-* \brief Kernel functor \f$\frac{num}{|x-y|}\f$ if \f$x != y\f$, else 0
+* \brief Kernel functor \f$\frac{C}{|x-y|}\f$ if \f$x != y\f$, else 0
 */
 class Kernel
 {
@@ -27,7 +27,7 @@ public:
 
     /**
     * \brief Constructor
-    * \param num Numerator of the kernel function fraction
+    * \param C Coefficient of the kernel function
     */
     Kernel(double num):
         num_(num)
@@ -35,13 +35,63 @@ public:
 
     /**
     * \brief Functor
-    * \param x x coordinate of grid point
-    * \param y y coordinate of grid point
+    * \param x x-coordinate of grid point
+    * \param y y-coordinate of grid point
+    */
+    virtual double operator()(double x, double y) = 0;
+
+protected:
+    double num_; //!< coefficient
+};
+
+
+
+/*!
+* \brief Kernel functor \f$C\log{\left|x-y\right|}\f$
+*/
+class KernelLog: public Kernel
+{
+    using Kernel::Kernel; // C++11 inheritance of constructors
+
+public:
+    /**
+    * \brief Functor
+    * \param x x-coordinate of grid point
+    * \param y y-coordinate of grid point
     */
     double operator()(double x, double y);
+};
 
-private:
-    double num_; //!< numerator
+/*!
+* \brief Kernel functor \f$\frac{C}{\left|x-y\right|}\f$
+*/
+class KernelInvDistance: public Kernel
+{
+    using Kernel::Kernel; // C++11 inheritance of constructors
+
+public:
+    /**
+    * \brief Functor
+    * \param x x-coordinate of grid point
+    * \param y y-coordinate of grid point
+    */
+    double operator()(double x, double y);
+};
+
+/*!
+* \brief Kernel functor \f$\frac{\cos(C\left|x-y\right|)}{\left|x-y\right|}\f$
+*/
+class KernelCosine: public Kernel
+{
+    using Kernel::Kernel; // C++11 inheritance of constructors
+
+public:
+    /**
+    * \brief Functor
+    * \param x x-coordinate of grid point
+    * \param y y-coordinate of grid point
+    */
+    double operator()(double x, double y);
 };
 
 #endif // KERNEL_HPP

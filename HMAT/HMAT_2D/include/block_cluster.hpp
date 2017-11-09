@@ -1,9 +1,9 @@
 #ifndef BLOCK_CLUSTER_HPP
 #define BLOCK_CLUSTER_HPP
 
-#include <Eigen/Dense>
 #include "kernel.hpp"
 #include "node.hpp"
+#include <Eigen/Dense>
 
 /*!
 * \brief Block cluster class to compute matrix \f$X_{\sigma,\mu}\f$
@@ -35,14 +35,15 @@ public:
     /*!
     * \brief compute matrix \f$C_{\sigma,\mu}\f$ for 2D
     * \param G any kind of derived kernel from base class Kernel
+    * \return no. of 'operations' performed
     */
-    void setMatrix2D(Kernel* G);
+    unsigned setMatrix(Kernel* G);
 
     /*!
      * \brief compute CVc vector and store it in xnode
-     * \param G any kind of derived kernel from base class Kernel
+     * \return no. of 'operations' performed
      */
-    void setCVc(Kernel* G);
+    unsigned setCVc();
 
     /*!
      * \brief return pointer to xnode

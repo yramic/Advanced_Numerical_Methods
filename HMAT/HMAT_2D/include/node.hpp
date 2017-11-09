@@ -1,10 +1,10 @@
 #ifndef NODE_HPP
 #define NODE_HPP
 
+#include "point.hpp"
 #include <Eigen/Dense>
 #include <Eigen/SVD>
 #include <vector>
-#include "point.hpp"
 
 // forward declaration to avoid cross-referencing
 class cTree;
@@ -164,18 +164,21 @@ public:
     /*!
      * \brief Compute V matrix
      * \param deg Degree of interpolation
+     * \return no. of 'operations' performed
      */
-    void setV();
+    unsigned setV();
     /*!
      * \brief compute Vc vector
      * \param c vector for multiplication with the matrix
+     * \return no. of 'operations' performed
      */
-    void setVc(const Eigen::VectorXd& c);
+    unsigned setVc(const Eigen::VectorXd& c);
     /*!
      * \brief update CVc vector
      * \param c vector for multiplication with the matrix
+     * \return no. of 'operations' performed
      */
-    void setCVc(const Eigen::VectorXd& CVc);
+    unsigned setCVc(const Eigen::VectorXd& CVc);
     /*!
      * \brief Function to print the cluster tree for debugging
      * \param n Level of the node in the cluster tree(0 = root)

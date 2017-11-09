@@ -4,5 +4,6 @@
     "contributors" : "",
 
     "name": "AnalyticReg",
-    "all" : ["ARmain.cpp", "PeriodicTrapezoidalQR.hpp", "plot_convergence.py"]
+    "solutions" : ["ARmain.cpp", "PeriodicTrapezoidalQR.hpp", "plot_convergence.py"],
+    "templates" : ["ARmain.cpp", "plot_convergence.py"]
 }

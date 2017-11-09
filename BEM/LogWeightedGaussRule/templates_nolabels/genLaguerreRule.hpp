@@ -1,9 +1,3 @@
-//// 
-//// Copyright (C) 2017 SAM (D-MATH) @ ETH Zurich
-//// Author(s): curzuato < > 
-//// Contributors:  dcasati 
-//// This file is part of the AdvNumCSE repository.
-////
 //****************************************************************************
 //
 //  Purpose:

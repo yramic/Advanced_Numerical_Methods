@@ -232,6 +232,9 @@ double integrateTSing(const TriaPanel& T, const Eigen::Vector3d& x,
   // If xp is not on T
   else{
     // xp outside of T could mean that it is at the boundary of T or in the exterior.
+    // Here we allow a larger tolerance than machine precision to avoid triangles
+    // that might behave numerically as degenerate.
+    double tol = 1e-10;
     bool exterior = true;
     // Check whether xp is close to one of the vertices
     for(int i=0; i<3; i++){      

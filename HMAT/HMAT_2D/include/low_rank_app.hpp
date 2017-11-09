@@ -24,17 +24,32 @@ public:
     /*!
      * \brief Approximate matrix-vector multiplication
      * \param c Vector c
-     * \param eta eta variable of admissibility
-     * \param deg Degree of itnerpolation
      */
-    Eigen::VectorXd mvProd(Eigen::VectorXd &c, double eta, unsigned deg);
+    Eigen::VectorXd mvProd(Eigen::VectorXd& c);
     /*!
-     * \brief Calculation of number of corresponding far field points for each row of the product vector
+     * \brief Count number of corresponding far field points for each row of the product vector
      * \param ff_v Vector of BlockClusters
      * \param f_approx_ff_contr Vector for saving the number of corresponding far field points for each row of the product vector
      */
-    void calc_numb_approx_per_row(std::vector<BlockCluster> ff_v, Eigen::VectorXd& f_approx_ff_contr);
+    void calc_numb_approx_per_row(std::vector<BlockCluster*> ff_v, Eigen::VectorXd& f_approx_ff_contr);
 private:
+    /*!
+     * \brief Compute far field contribution
+     * \param f Output product vector
+     * \param ff_v Vector of Far Field Pairs
+     * \param deg Degree of interpolation
+     * \param c Vector c to multiply
+     * \param f_aprox_ff_contr Number of far field contributions
+     */
+    //void ff_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*,Node*>> ff_v, unsigned deg, Eigen::VectorXd& c, Eigen::VectorXd& f_aprox_ff_contr);
+    /*!
+     * \brief Compute near field contribution
+     * \param f Output product vector
+     * \param nf_v Vector of Near Field pairs
+     * \param c Vector c to multiply
+     * \param f_aprox_nf_contr Number of near field contributions
+     */
+    //void nf_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*,Node*>> nf_v, const Eigen::VectorXd& c, Eigen::VectorXd& f_aprox_nf_contr);
     /*!
      * \brief Compute far field contribution
      * \param ff_v Vector of Far Field Pairs
@@ -44,8 +59,8 @@ private:
      * \param f Output product vector
      * \param f_aprox_ff_contr Number of far field contributions
      */
-    void ff_contribution(std::vector<BlockCluster> ff_v,
-                         std::vector<Node *> ff_v_x, std::vector<Node *> ff_v_y,
+    void ff_contribution(std::vector<BlockCluster*> ff_v,
+                         std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y,
                          const Eigen::VectorXd& c, Eigen::VectorXd& f, Eigen::VectorXd& f_aprox_ff_contr);
     /*!
      * \brief Compute near field contribution
@@ -54,9 +69,8 @@ private:
      * \param f Output product vector
      * \param f_aprox_nf_contr Number of near field contributions
      */
-    void nf_contribution(std::vector<BlockNearF> nf_v,
+    void nf_contribution(std::vector<BlockNearF*> nf_v,
                          const Eigen::VectorXd& c, Eigen::VectorXd& f, Eigen::VectorXd& f_aprox_nf_contr);
-
     /*!
      * \brief Pre-processing: initialize matrix V and vector Vc for all far field nodes
      * \param ff_v_x Vector of Far Field XNodes
@@ -64,13 +78,11 @@ private:
      * \param c Vector c to multiply
      */
     void preProcess(std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y, const Eigen::VectorXd& c);
-
     /*!
      * \brief Block-processing: compute vector CVc for all far field pairs and store it into xnode
      * \param ff_v Vector of Far Field Pairs
      */
-    void blockProcess(std::vector<BlockCluster> ff_v);
-
+    void blockProcess(std::vector<BlockCluster*> ff_v);
     /*!
      * \brief Post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place
      * \param ff_v_x Vector of Far Field XNodes
@@ -78,9 +90,10 @@ private:
      */
     void postProcess(std::vector<Node*> ff_v_x, Eigen::VectorXd& f);
 
-    Kernel* kernel_;    //!< pointer for kernel
-    HierarchicalPartitioning HP_;   //!< Hierarchical Partiotion class for constructing the tree and calculate near and far field nodes
-    unsigned deg_;  //!< degree of interpolation
+    Kernel* kernel_; //!< pointer for kernel
+    HierarchicalPartitioning HP_; //!< Hierarchical Partiotion class for constructing the tree and calculate near and far field nodes
+    unsigned   deg_; //!< degree of interpolation
+    unsigned  nops_; //!< number of 'operations' performed
 };
 
 #endif // LOW_RANK_APP_HPP

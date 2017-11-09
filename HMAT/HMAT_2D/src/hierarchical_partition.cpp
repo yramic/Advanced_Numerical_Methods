@@ -9,7 +9,7 @@
 #include <iostream>
 
 // Constructor: creates the cluster tree and
-HierarchicalPartitioning::HierarchicalPartitioning(const std::vector<Point> &GPoints, double eta, unsigned deg):
+HierarchicalPartitioning::HierarchicalPartitioning(const std::vector<Point>& GPoints, double eta, unsigned deg):
     Tx_(GPoints,deg), Ty_(Tx_), eta_(eta)
 {}
 // compute the Far and Near Field pairs
@@ -42,12 +42,14 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
     // admissibility for 4D Matrices
     AdmissibilityH adm;
     if((*ynode).getPPoints().size()<=1 || (*xnode).getPPoints().size()<=1){
-            NearField_.push_back(BlockNearF(xnode,ynode));
+            //(*ynode).near_f_.push_back(xnode);
+            NearField_.push_back(new BlockNearF(xnode,ynode));
     }
     else {
         // if the cluster corresponding to *xnode and *ynode is admissible, we add them to the far field list of each one
         if(adm.is_admissible(xnode, ynode, eta)) {
-            FarField_.push_back(BlockCluster(xnode,ynode));
+            //(*xnode).far_f_.push_back(ynode);
+            FarField_.push_back(new BlockCluster(xnode,ynode));
             FarField_xnds_.push_back(xnode); FarField_ynds_.push_back(ynode);
         } else {    // else we consider all the different combinations of the children of *xnode and *ynode and check whether their clusters are admissible
             setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getTl_Child(), eta, Ty);
@@ -82,14 +84,14 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
     AdmissibilityH adm;
     if((*ynode).getPPoints().size()<=1 || (*xnode).getPPoints().size()<=1){
         //(*ynode).near_f_.push_back(xnode);
-        NearField_.push_back(BlockNearF(xnode,ynode));
+        NearField_.push_back(new BlockNearF(xnode,ynode));
         cmatrix((*ynode).getNodeID(),(*xnode).getNodeID())++;
     }
     else {
         // if the cluster corresponding to *xnode and *ynode is admissible, we add them to the far field list of each one
         if(adm.is_admissible(xnode, ynode, eta)) {
             //(*xnode).far_f_.push_back(ynode);
-            FarField_.push_back(BlockCluster(xnode,ynode));
+            FarField_.push_back(new BlockCluster(xnode,ynode));
             cmatrix((*xnode).getNodeID(),(*ynode).getNodeID())++;
         } else {    // else we consider all the different combinations of the children of *xnode and *ynode and check whether their clusters are admissible
             setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getTl_Child(), eta, Ty, cmatrix);
@@ -115,7 +117,7 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
 // return the bounding box corresponding to index i of the far-field vector
 std::pair<std::pair<std::pair<double,double>,std::pair<double,double>>,std::pair<std::pair<double,double>,std::pair<double,double>> > HierarchicalPartitioning::getBB(int i)
 {
-    Node* xnode = FarField_[i].getXNode();
-    Node* ynode = FarField_[i].getYNode();
+    Node* xnode = FarField_[i]->getXNode();
+    Node* ynode = FarField_[i]->getYNode();
     return {{{xnode->getX1(),xnode->getY1()},{xnode->getX2(),xnode->getY2()}},{{ynode->getX1(),ynode->getY1()},{ynode->getX2(),ynode->getY2()}}};
 }
