@@ -12,7 +12,8 @@
 #include <Eigen/Dense>
 
 // compute matrix $C_{\sigma,\mu}$ for uni-directional interpolation
-void BlockCluster_Y::setMatrix(Kernel* G)
+unsigned BlockCluster_Y::setMatrix(Kernel* G)
 {
     // TODO
+    return 0; // return no. of 'operations' performed
 }

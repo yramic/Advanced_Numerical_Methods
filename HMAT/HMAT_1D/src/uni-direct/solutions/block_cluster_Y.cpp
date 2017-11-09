@@ -13,7 +13,7 @@
 
 // compute matrix $C_{\sigma,\mu}$ for uni-directional interpolation
 /* SAM_LISTING_BEGIN_0 */
-void BlockCluster_Y::setMatrix(Kernel* G)
+unsigned BlockCluster_Y::setMatrix(Kernel* G)
 {
     Eigen::VectorXd tkx = pair_.first->getTK();
     C_.resize(tkx.size(),
@@ -25,5 +25,6 @@ void BlockCluster_Y::setMatrix(Kernel* G)
         for(unsigned j=0; j<pair_.second->getPoints().size(); ++j)
             C_(i,j) = (*G)(tkx(i),
                            pair_.second->getPoints()[j].getX());
+    return C_.rows()*C_.cols(); // return no. of 'operations' performed
 }
 /* SAM_LISTING_END_0 */

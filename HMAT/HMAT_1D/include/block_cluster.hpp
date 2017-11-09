@@ -47,13 +47,15 @@ public:
 
     /*!
      * \brief compute matrix \f$C_{\sigma,\mu}\f$
+     * \return no. of 'operations' performed
      */
-    void setMatrix(Kernel* G);
+    unsigned setMatrix(Kernel* G);
 
     /*!
      * \brief compute CVc vector and store it in xnode
+     * \return no. of 'operations' performed
      */
-    void setCVc();
+    unsigned setCVc();
 
     /*!
      * \brief return pointer to xnode

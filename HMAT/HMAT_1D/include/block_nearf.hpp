@@ -47,8 +47,9 @@ public:
 
     /*!
      * \brief compute near field block matrix
+     * \return no. of 'operations' performed
      */
-    void setMatrix(Kernel* G);
+    unsigned setMatrix(Kernel* G);
 
     /*!
      * \brief return pointer to xnode

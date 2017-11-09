@@ -24,7 +24,8 @@ class BlockCluster_Y : public BlockCluster
 public:
     /*!
      * \brief compute matrix $C_{\sigma,\mu}$ for uni-directional interpolation
+     * \return no. of 'operations' performed
      */
-    void setMatrix(Kernel* G);
+    unsigned setMatrix(Kernel* G);
 };
 #endif // BLOCK_CLUSTER_Y_HPP

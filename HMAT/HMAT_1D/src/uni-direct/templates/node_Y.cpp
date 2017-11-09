@@ -54,7 +54,8 @@ void Node_Y::setLeaves(int& id)
 
 // compute fake V-matrix of ynode with uni-directional interpolation
 //(just the identity)
-void Node_Y::setV()
+unsigned Node_Y::setV()
 {
     // TODO
+    return 0; // return no. of 'operations' performed
 }

@@ -26,7 +26,7 @@ BlockCluster::BlockCluster(Node* xnode, Node* ynode):
 //}
 
 // compute matrix $C_{\sigma,\mu}$
-void BlockCluster::setMatrix(Kernel* G)
+unsigned BlockCluster::setMatrix(Kernel* G)
 {
     Eigen::VectorXd tkx = pair_.first->getTK();
     Eigen::VectorXd tky = pair_.second->getTK();
@@ -35,12 +35,15 @@ void BlockCluster::setMatrix(Kernel* G)
     for(unsigned i=0; i<tkx.size(); ++i)
         for(unsigned j=0; j<tky.size(); ++j)
             C_(i,j) = (*G)(tkx(i),tky(j));
+    return C_.rows()*C_.cols(); // return no. of 'operations' performed
 }
 
 // compute CVc vector and store it into xnode
-void BlockCluster::setCVc()
+unsigned BlockCluster::setCVc()
 {
     Eigen::VectorXd  Vc = pair_.second->getVc_Node();
     Eigen::VectorXd CVc = C_ * Vc;
-    pair_.first->setCVc(CVc); // xnode
+    unsigned nops = C_.rows()*C_.cols();
+    nops += pair_.first->setCVc(CVc); // xnode
+    return nops; // return no. of 'operations' performed
 }

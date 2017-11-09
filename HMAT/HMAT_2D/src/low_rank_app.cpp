@@ -16,15 +16,9 @@ Eigen::VectorXd LowRankApp::mvProd(Eigen::VectorXd& c, double eta, unsigned deg)
 {
     // compute the Near and Far Field Pairs
     HP_.setNearFar();
-    // number of Near and Far Field Pairs
-    int near = HP_.getNF().size(), far = HP_.getFF().size();
-    std::cout << "Near Field Nodes: " << near << " Far Field Nodes: " << far << std::endl;
-    std::cout << "Near Field Nodes: " << (double)near/(near+far)*100. << "% " << "Far Field Nodes: " << (double)far/(near+far)*100. << "%" << std::endl;
-    //PPointsTree_.getRoot()->printree(0); // printing the tree for testing
 
     Eigen::VectorXd f_approx_ff_contr = Eigen::VectorXd::Zero(c.size());
     Eigen::VectorXd f_approx_nf_contr = Eigen::VectorXd::Zero(c.size());
-
     // compute far field contribution
     Eigen::VectorXd f_approx = Eigen::VectorXd::Zero(c.size());
     ff_contribution(HP_.getFF(),
@@ -38,6 +32,12 @@ Eigen::VectorXd LowRankApp::mvProd(Eigen::VectorXd& c, double eta, unsigned deg)
                     c, f_approx, f_approx_nf_contr);
     std::cout << "Near Field Contribution for each row" << std::endl;
     std::cout << f_approx_nf_contr << std::endl;
+
+    // number of Near and Far Field Pairs
+    int near = HP_.getNF().size(), far = HP_.getFF().size();
+    std::cout << "Near Field Nodes: " << near << " Far Field Nodes: " << far << std::endl;
+    std::cout << "Near Field Nodes: " << (double)near/(near+far)*100. << "% " << "Far Field Nodes: " << (double)far/(near+far)*100. << "%" << std::endl;
+    //PPointsTree_.getRoot()->printree(0); // printing the tree for testing
 
     return f_approx;
 }

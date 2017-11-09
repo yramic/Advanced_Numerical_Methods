@@ -82,7 +82,7 @@ protected:
      */
     void ff_contribution(std::vector<BlockCluster*> ff_v,
                          std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y,
-                         const Eigen::VectorXd& c, Eigen::VectorXd& f);
+                         const Eigen::VectorXd& c, Eigen::VectorXd& f, Eigen::VectorXd& f_approx_ff_contr);
     /*!
      * \brief Compute near field contribution
      * \param nf_v Vector of Near Field pairs
@@ -90,12 +90,13 @@ protected:
      * \param f Output product vector
      */
     void nf_contribution(std::vector<BlockNearF*> nf_v,
-                         const Eigen::VectorXd& c, Eigen::VectorXd& f);
+                         const Eigen::VectorXd& c, Eigen::VectorXd& f, Eigen::VectorXd& f_approx_nf_contr);
 
     unsigned   deg_; //!< degree of interpolation
     Kernel* kernel_; //!< kernel
     HierarchicalPartitioning<BLOCK_CLUSTER,NODE_Y> HP_; //!< Hierarchical Partiotion class for constructing the tree and calculate near and far field nodes
     std::vector<Point> GPoints_; //!< Vector of points of the axis
+    unsigned  nops_; //!< number of 'operations' performed
 };
 
 #endif // LOW_RANK_APP_HPP

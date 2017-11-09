@@ -44,8 +44,9 @@ public:
     void setLeaves(int& id);
     /*!
      * \brief compute fake V-matrix of ynode with uni-directional interpolation
+     * \return no. of 'operations' performed
      */
-    void setV();
+    unsigned setV();
 };
 
 #endif // NODE_Y_HPP

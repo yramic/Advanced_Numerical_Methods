@@ -87,18 +87,21 @@ public:
     void setLeaves(int& id);
     /*!
      * \brief compute V matrix
+     * \return no. of 'operations' performed
      */
-    void setV();
+    unsigned setV();
     /*!
      * \brief compute Vc vector
      * \param c vector for multiplication with the matrix
+     * \return no. of 'operations' performed
      */
-    void setVc(const Eigen::VectorXd& c);
+    unsigned setVc(const Eigen::VectorXd& c);
     /*!
      * \brief update CVc vector
      * \param c vector for multiplication with the matrix
+     * \return no. of 'operations' performed
      */
-    void setCVc(const Eigen::VectorXd& CVc);
+    unsigned setCVc(const Eigen::VectorXd& CVc);
   
 protected:
     Node* l_child_;  //!< left  child of node
