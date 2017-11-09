@@ -68,7 +68,7 @@ unsigned Node::setV()
             V_node_(i,j) *= wk_[j];
         }
     }
-    return V_node_.rows()*V_node_.cols(); // return no. of 'operations' performed
+    return n * (deg_+2)*(deg_+1)/2; // return no. of 'operations' performed
 }
 
 // compute V*c restricted to node indices

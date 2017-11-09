@@ -24,6 +24,7 @@ class BlockCluster_Y : public BlockCluster
 public:
     /*!
      * \brief compute matrix $C_{\sigma,\mu}$ for uni-directional interpolation
+     * \param G any kind of derived kernel from base class Kernel
      * \return no. of 'operations' performed
      */
     unsigned setMatrix(Kernel* G);

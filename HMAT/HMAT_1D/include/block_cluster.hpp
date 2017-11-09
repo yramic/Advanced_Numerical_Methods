@@ -47,6 +47,7 @@ public:
 
     /*!
      * \brief compute matrix \f$C_{\sigma,\mu}\f$
+     * \param G any kind of derived kernel from base class Kernel
      * \return no. of 'operations' performed
      */
     unsigned setMatrix(Kernel* G);

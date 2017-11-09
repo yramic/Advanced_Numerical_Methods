@@ -8,12 +8,14 @@
 
 // constructor for solving the 2D problem
 LowRankApp::LowRankApp(Kernel* kernel, const std::vector<Point> &pp, double eta, unsigned deg):
-    kernel_(kernel), HP_(pp,eta,deg), deg_(deg)
+    kernel_(kernel), HP_(pp,eta,deg), deg_(deg), nops_(0)
 { }
 
 // approximate matrix-vector multiplication
-Eigen::VectorXd LowRankApp::mvProd(Eigen::VectorXd& c, double eta, unsigned deg)
+Eigen::VectorXd LowRankApp::mvProd(Eigen::VectorXd& c)
 {
+    nops_ = 0;
+
     // compute the Near and Far Field Pairs
     HP_.setNearFar();
 
@@ -39,6 +41,8 @@ Eigen::VectorXd LowRankApp::mvProd(Eigen::VectorXd& c, double eta, unsigned deg)
     std::cout << "Near Field Nodes: " << (double)near/(near+far)*100. << "% " << "Far Field Nodes: " << (double)far/(near+far)*100. << "%" << std::endl;
     //PPointsTree_.getRoot()->printree(0); // printing the tree for testing
 
+    std::cout << "Number of matrix operations performed for low-rank approximation: " << nops_ << std::endl;
+
     return f_approx;
 }
 
@@ -47,11 +51,11 @@ Eigen::VectorXd LowRankApp::mvProd(Eigen::VectorXd& c, double eta, unsigned deg)
 void LowRankApp::preProcess(std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y, const Eigen::VectorXd& c)
 {
     for(auto& xnode : ff_v_x){ // iterate for all the far field xnodes
-        xnode->setV();
+        nops_ += xnode->setV();
     }
     for(auto& ynode : ff_v_y){ // iterate for all the far field ynodes
-        ynode->setV();
-        ynode->setVc(c);
+        nops_ += ynode->setV();
+        nops_ += ynode->setVc(c);
     }
 }
 
@@ -60,9 +64,9 @@ void LowRankApp::preProcess(std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y
 void LowRankApp::blockProcess(std::vector<BlockCluster*> ff_v)
 {
     for(auto& pair : ff_v){ // iterate for all the pairs of far field nodes
-        pair->setMatrix(kernel_); // here because needed for each pair of nodes,
-                                  // cannot be moved to pre-processing
-        pair->setCVc();
+        nops_ += pair->setMatrix(kernel_); // here because needed for each pair of nodes,
+                                           // cannot be moved to pre-processing
+        nops_ += pair->setCVc();
     }
 }
 
@@ -73,6 +77,7 @@ void LowRankApp::postProcess(std::vector<Node*> ff_v_x, Eigen::VectorXd& f)
         Eigen::VectorXd CVc = xnode->getCVc_Node();
         Eigen::MatrixXd  Vx = xnode->getV_node();
         Eigen::VectorXd f_seg = Vx * CVc;
+        nops_ += Vx.rows()*Vx.cols();
         for(int i=0; i<xnode->getPPoints().size(); i++){
             f[xnode->getPPoints()[i].getId()] += f_seg[i]; // add contribution of far field to ``f''
         }
@@ -109,12 +114,13 @@ void LowRankApp::nf_contribution(std::vector<BlockNearF*> nf_v,
     for(auto& pair : nf_v){ // iterate for all the near field xnodes
         Node* xnode = pair->getXNode();
         Node* ynode = pair->getYNode();
-        pair->setMatrix(kernel_);
+        nops_ += pair->setMatrix(kernel_);
         Eigen::MatrixXd C = pair->getMatrix();
         for(int i=0; i<xnode->getPPoints().size(); i++){
             for(int j=0; j<ynode->getPPoints().size(); j++){
                 f(xnode->getPPoints()[i].getId()) += C(i,j) * c(ynode->getPPoints()[j].getId()); // add near field contribution to ``f''
                 ++f_approx_nf_contr(xnode->getPPoints()[i].getId());
+                nops_ += C.rows()*C.cols();
             }
         }
     }

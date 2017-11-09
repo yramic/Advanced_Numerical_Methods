@@ -10,6 +10,7 @@
  ***********************************************************************/
 #include "../../../include/uni-direct/node_Y.hpp"
 #include "../../../include/cheby.hpp"
+#include "../../../include/point.hpp"
 #include <Eigen/Dense>
 #include <iostream>
 

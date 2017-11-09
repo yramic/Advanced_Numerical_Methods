@@ -141,7 +141,7 @@ Eigen::VectorXd LowRankApp<BlockCluster_Y,Node_Y>::mvProd(const Eigen::VectorXd&
     std::cout << "Near Field Nodes: " << near << " Far Field Nodes: " << far << std::endl;
     std::cout << "Near Field Nodes: " << (double)near/(near+far)*100. << "% " << "Far Field Nodes: " << (double)far/(near+far)*100. << "%" << std::endl;
 
-    std::cout << "Number of matrix operations performed: " << nops_ << std::endl;
+    std::cout << "Number of matrix operations performed for low-rank approximation: " << nops_ << std::endl;
 
     return f_approx;
 }

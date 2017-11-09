@@ -64,13 +64,15 @@ int main() {
     auto end2 = std::chrono::system_clock::now();
     std::chrono::duration<double> time_diff2 = end2 - start2;
 
+    std::cout << "Number of matrix operations performed for exact matrix: " << n*n << std::endl;
+
     // Compute approximation error
 
     Eigen::VectorXd diff = f_exact - f_approx;
 
     std::cout << "Approximation error (l-inf norm): " << diff.lpNorm<Eigen::Infinity>() << std::endl
               << "Approximation error (l-2 norm): "   << diff.lpNorm<2>() << std::endl
-              << "Relative Approximation error (l-2 norm): "   << diff.lpNorm<2>()/f_exact.lpNorm<2>() << std::endl
+              << "Relative Approximation error (l-2 norm): "    << diff.lpNorm<2>()/f_exact.lpNorm<2>() << std::endl
               << "Time needed for exact multiplication: "       << time_diff1.count() << " s" << std::endl
               << "Time needed for approximate multiplication: " << time_diff2.count() << " s" << std::endl;
 }

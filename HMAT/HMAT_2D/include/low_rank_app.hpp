@@ -24,10 +24,8 @@ public:
     /*!
      * \brief Approximate matrix-vector multiplication
      * \param c Vector c
-     * \param eta eta variable of admissibility
-     * \param deg Degree of itnerpolation
      */
-    Eigen::VectorXd mvProd(Eigen::VectorXd &c, double eta, unsigned deg);
+    Eigen::VectorXd mvProd(Eigen::VectorXd& c);
     /*!
      * \brief Count number of corresponding far field points for each row of the product vector
      * \param ff_v Vector of BlockClusters
@@ -52,7 +50,6 @@ private:
      * \param f_aprox_nf_contr Number of near field contributions
      */
     //void nf_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*,Node*>> nf_v, const Eigen::VectorXd& c, Eigen::VectorXd& f_aprox_nf_contr);
-
     /*!
      * \brief Compute far field contribution
      * \param ff_v Vector of Far Field Pairs
@@ -74,7 +71,6 @@ private:
      */
     void nf_contribution(std::vector<BlockNearF*> nf_v,
                          const Eigen::VectorXd& c, Eigen::VectorXd& f, Eigen::VectorXd& f_aprox_nf_contr);
-
     /*!
      * \brief Pre-processing: initialize matrix V and vector Vc for all far field nodes
      * \param ff_v_x Vector of Far Field XNodes
@@ -82,13 +78,11 @@ private:
      * \param c Vector c to multiply
      */
     void preProcess(std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y, const Eigen::VectorXd& c);
-
     /*!
      * \brief Block-processing: compute vector CVc for all far field pairs and store it into xnode
      * \param ff_v Vector of Far Field Pairs
      */
     void blockProcess(std::vector<BlockCluster*> ff_v);
-
     /*!
      * \brief Post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place
      * \param ff_v_x Vector of Far Field XNodes
@@ -99,6 +93,7 @@ private:
     Kernel* kernel_; //!< pointer for kernel
     HierarchicalPartitioning HP_; //!< Hierarchical Partiotion class for constructing the tree and calculate near and far field nodes
     unsigned   deg_; //!< degree of interpolation
+    unsigned  nops_; //!< number of 'operations' performed
 };
 
 #endif // LOW_RANK_APP_HPP

@@ -1,9 +1,8 @@
 #include "../include/node.hpp"
 #include "../include/cheby.hpp"
+#include "../include/point.hpp"
 #include <Eigen/Dense>
 #include <iostream>
-#include "../include/point.hpp"
-#include <limits>
 
 // actual  constructor: creates the root of the Cluster Tree and the recursivly creates the leaves
 Node::Node(std::vector<Point> Points, unsigned deg):
@@ -95,38 +94,37 @@ void Node::setLeaves()
 }
 
 // compute V-matrix of node
-void Node::setV()
+unsigned Node::setV()
 {
-    unsigned deg = deg_;
     int ppts = PPointsTree_.size();
     auto checkID = [](Point a, Point b) -> bool { return a.getId()<b.getId(); };
     std::sort(PPointsTree_.begin(),PPointsTree_.end(),checkID);
-            V_node_ = Eigen::MatrixXd::Constant(ppts, (deg+1)*(deg+1), 1);
-            for(unsigned i=0; i<=ppts-1; ++i) { // calculation of Vx combined with Vy
-                for(unsigned j1=0; j1<=deg; ++j1) {
-                    for(unsigned k1=0; k1<j1; ++k1) {
-                        for(unsigned j2=0; j2<=deg; ++j2) {
-                            V_node_(i,j1*(deg+1) + j2) *= (PPointsTree_[i].getX() - tkx_[k1]);
-                        }
-                    }
-                    // Skip "k1 == j1"
-                    for(unsigned k1=j1+1; k1<=deg; ++k1) {
-                        for(unsigned j2=0; j2<=deg; ++j2) {
-                            V_node_(i,j1*(deg+1) + j2) *= (PPointsTree_[i].getX() - tkx_[k1]);
-                        }
-                    }
-                    for(unsigned j2=0; j2<=deg; ++j2) {
-                        for(unsigned k2=0; k2<j2; ++k2) {
-                            V_node_(i,j1*(deg+1) + j2) *= (PPointsTree_[i].getY() - tky_[k2]);
-                        }
-                        // Skip "k2 == j2"
-                        for(unsigned k2=j2+1; k2<=deg; ++k2) {
-                            V_node_(i,j1*(deg+1) + j2) *= (PPointsTree_[i].getY() - tky_[k2]);
-                        }
-                        V_node_(i,j1*(deg+1) + j2) *= wkx_[j1] * wky_[j2];
-                    }
+    V_node_ = Eigen::MatrixXd::Constant(ppts, (deg_+1)*(deg_+1), 1);
+    for(unsigned i=0; i<=ppts-1; ++i) { // calculation of Vx combined with Vy
+        for(unsigned j1=0; j1<=deg_; ++j1) {
+            for(unsigned k1=0; k1<j1; ++k1) {
+                for(unsigned j2=0; j2<=deg_; ++j2) {
+                    V_node_(i,j1*(deg_+1) + j2) *= (PPointsTree_[i].getX() - tkx_[k1]);
                 }
             }
+            // Skip "k1 == j1"
+            for(unsigned k1=j1+1; k1<=deg_; ++k1) {
+                for(unsigned j2=0; j2<=deg_; ++j2) {
+                    V_node_(i,j1*(deg_+1) + j2) *= (PPointsTree_[i].getX() - tkx_[k1]);
+                }
+            }
+            for(unsigned j2=0; j2<=deg_; ++j2) {
+                for(unsigned k2=0; k2<j2; ++k2) {
+                    V_node_(i,j1*(deg_+1) + j2) *= (PPointsTree_[i].getY() - tky_[k2]);
+                }
+                // Skip "k2 == j2"
+                for(unsigned k2=j2+1; k2<=deg_; ++k2) {
+                    V_node_(i,j1*(deg_+1) + j2) *= (PPointsTree_[i].getY() - tky_[k2]);
+                }
+                V_node_(i,j1*(deg_+1) + j2) *= wkx_[j1] * wky_[j2];
+            }
+        }
+    }
 
     // Alternate way of computing V matrix
     /*Eigen::MatrixXd VnodeX = Eigen::MatrixXd::Constant(ppts, (deg+1), 1);
@@ -171,10 +169,11 @@ void Node::setV()
     std::cout << V_node_ << std::endl;
     std::cout << "V_Node_new" << std::endl;
     std::cout << V_node_new << std::endl;*/
+    return ppts * (deg_+2)*(deg_+1)/2; // return no. of 'operations' performed
 }
 
 // compute V*c restricted to node indices
-void Node::setVc(const Eigen::VectorXd& c)
+unsigned Node::setVc(const Eigen::VectorXd& c)
 {
     int n = PPointsTree_.size();
     Eigen::VectorXd c_seg = Eigen::VectorXd::Zero(n);
@@ -182,12 +181,14 @@ void Node::setVc(const Eigen::VectorXd& c)
         c_seg[i] = c(PPointsTree_[i].getId());
     }
     Vc_node_ = V_node_.transpose() * c_seg; // Vc matrix calculation
+    return V_node_.rows()*V_node_.cols(); // return no. of 'operations' performed
 }
 
 // update C*V*c restricted to node indices
-void Node::setCVc(const Eigen::VectorXd& CVc)
+unsigned Node::setCVc(const Eigen::VectorXd& CVc)
 {
     CVc_node_ += CVc;
+    return CVc_node_.size(); // return no. of 'operations' performed
 }
 
 void Node::printree(int n)
