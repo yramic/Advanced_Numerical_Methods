@@ -38,7 +38,7 @@ macro(add_executable_advnumcse_betl2 _name)
 )
 	target_link_libraries(${target_name} ${BETL2_LIBRARIES})
        	add_dependencies(${target_name} Eigen)
-      	add_dependencies(${target_name} Betl2)
+        add_dependencies(${target_name} Betl2)
     endif()
 endmacro()
 

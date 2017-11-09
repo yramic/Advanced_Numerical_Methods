@@ -209,13 +209,13 @@ int main() {
 
     // printing for testing
     std::cout << "f_exact" << std::endl;
-    std::cout << f_exact << std::endl;
+    std::cout <<  f_exact  << std::endl;
 
     std::cout << "f_approx" << std::endl;
-    std::cout << f_approx << std::endl;
+    std::cout <<  f_approx  << std::endl;
 
     std::cout << "diff" << std::endl;
-    std::cout << diff << std::endl;
+    std::cout <<  diff  << std::endl;
 
     std::cout << "Number of matrix operations performed for exact matrix: " << n*n << std::endl;
 

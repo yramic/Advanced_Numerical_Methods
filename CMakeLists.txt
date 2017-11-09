@@ -83,7 +83,7 @@ include_directories("third_party")
 # SAFETY CHECKUPS
 ###########################################################################
 
-# There is too much hassle handling these corner cases, so we just require the 
+# There is too much hassle handling these corner cases, so we just require the
 # people who have Betl installed to undefine these
 if (DEFINED ENV{ETH_ROOT})
   message(FATAL_ERROR "EE: Environment variable ETH_ROOT found. Please unset using\n    unset ETH_ROOT")
@@ -97,7 +97,6 @@ endif()
 if (NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/Betl2/CMakeLists.txt)
   message(FATAL_ERROR "You have not downloaded the Betl2 submodule. Please do\n    cd ${CMAKE_SOURCE_DIR}/third_party/\n    git checkout Betl2;\n    cd Betl2;\n    git submodule init;\n    git submodule update --init --recursive\n\nRemember you have to have a gitlab.math.ethz.ch account for this. Go to https://www.gitlab.math.ethz.ch and log in to get an account, then send an email to the organizers to get access.")
 endif()
-
 
 if (NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/Betl2/3rd_Party/ethGenericGrid/CMakeLists.txt)
   message(FATAL_ERROR "You have not downloaded the ethGenericGrid submodule. Please do\n    cd ${CMAKE_SOURCE_DIR}/third_party/Betl2/3rd_Party\n    git checkout ethGenericGrid;\n    cd ethGenericGrid;\n    git submodule init;\n    git submodule update --init --recursive\nRemember you have to have a gitlab.math.ethz.ch account for this. Go to https://www.gitlab.math.ethz.ch and log in to get an account, then send an email to the organizers to get access.")
@@ -169,10 +168,9 @@ utils
 vtu_exporter
 eth_eth_base
 eth_interface
-${ETH_LIBRARIES} 
-${Boost_LIBRARIES} 
+${ETH_LIBRARIES}
+${Boost_LIBRARIES}
 )
-
 
 
 ###########################################################################
