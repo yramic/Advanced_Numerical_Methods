@@ -63,21 +63,34 @@ void LowRankApp<BlockCluster,Node>::postProcess(std::vector<Node*> ff_v_x, Eigen
     }
 }
 
+// count far-field ynodes contributing to each row of the approximate low-rank matrix
+void LowRankApp::calc_numb_approx_per_row(std::vector<BlockCluster*> ff_v, Eigen::VectorXd& f_approx_ff_contr)
+{
+    for(auto& pair : ff_v){ // iterate for all the pairs of far field nodes
+        Node* xnode = pair->getXNode();
+        Node* ynode = pair->getYNode();
+        for(int i=0; i<xnode->getPPoints().size(); i++){
+            f_approx_ff_contr(xnode->getPPoints()[i].getId()) += ynode->getPPoints().size();
+        }
+    }
+}
+
 // compute far field contribution
 template<>
 void LowRankApp<BlockCluster,Node>::ff_contribution(std::vector<BlockCluster*> ff_v,
                                                     std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y,
-                                                    const Eigen::VectorXd& c, Eigen::VectorXd& f)
+                                                    const Eigen::VectorXd& c, Eigen::VectorXd& f, Eigen::VectorXd& f_approx_ff_contr)
 {
     preProcess(ff_v_x, ff_v_y, c);
     blockProcess(ff_v);
     postProcess(ff_v_x, f);
+    calc_numb_approx_per_row(ff_v, f_approx_ff_contr);
 }
 
 // compute near-field contribution
 template<>
 void LowRankApp<BlockCluster,Node>::nf_contribution(std::vector<BlockNearF*> nf_v,
-                                                    const Eigen::VectorXd& c, Eigen::VectorXd& f)
+                                                    const Eigen::VectorXd& c, Eigen::VectorXd& f, Eigen::VectorXd& f_approx_nf_contr)
 {
     for(auto& pair : nf_v){ // iterate for all the near field xnodes
         Node* xnode = pair->getXNode();
@@ -87,6 +100,7 @@ void LowRankApp<BlockCluster,Node>::nf_contribution(std::vector<BlockNearF*> nf_
         for(int i=0; i<xnode->getPoints().size(); i++){
             for(int j=0; j<ynode->getPoints().size(); j++){
                 f(xnode->getPoints()[i].getId()) += C(i,j) * c(ynode->getPoints()[j].getId()); // add near field contribution to ``f''
+                ++f_approx_nf_contr(xnode->getPPoints()[i].getId());
             }
         }
     }
@@ -96,16 +110,26 @@ void LowRankApp<BlockCluster,Node>::nf_contribution(std::vector<BlockNearF*> nf_
 template<>
 Eigen::VectorXd LowRankApp<BlockCluster,Node>::mvProd(const Eigen::VectorXd& c)
 {
-    // compute Far and Near Field relationships between Nodes of the Cluster Tree
+    // compute the Near and Far Field Pairs
     HP_.setNearFar();
+    // number of Near and Far Field Pairs
+    int near = HP_.getNF().size(), far = HP_.getFF().size();
+    std::cout << "Near Field Nodes: " << near << " Far Field Nodes: " << far << std::endl;
+    std::cout << "Near Field Nodes: " << (double)near/(near+far)*100. << "% " << "Far Field Nodes: " << (double)far/(near+far)*100. << "%" << std::endl;
+
     // compute far field contribution
     Eigen::VectorXd f_approx = Eigen::VectorXd::Zero(c.size());
     ff_contribution(HP_.getFF(),
                     HP_.getFFxnds(), HP_.getFFynds(),
                     c, f_approx);
+    std::cout << "Far Field Contribution for each row" << std::endl;
+    std::cout << f_approx_ff_contr << std::endl;
+
     // compute near-field contribution
     nf_contribution(HP_.getNF(),
                     c, f_approx);
+    std::cout << "Near Field Contribution for each row" << std::endl;
+    std::cout << f_approx_nf_contr << std::endl;
 
     return f_approx;
 }

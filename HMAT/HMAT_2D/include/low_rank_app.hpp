@@ -29,7 +29,7 @@ public:
      */
     Eigen::VectorXd mvProd(Eigen::VectorXd &c, double eta, unsigned deg);
     /*!
-     * \brief Calculation of number of corresponding far field points for each row of the product vector
+     * \brief Count number of corresponding far field points for each row of the product vector
      * \param ff_v Vector of BlockClusters
      * \param f_approx_ff_contr Vector for saving the number of corresponding far field points for each row of the product vector
      */

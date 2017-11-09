@@ -43,6 +43,13 @@ public:
      */
     Eigen::VectorXd mvProd(const Eigen::VectorXd& c);
 
+    /*!
+     * \brief Count corresponding far field points for each row of the product vector
+     * \param ff_v Vector of BlockClusters
+     * \param f_approx_ff_contr Vector for saving the number of corresponding far field points for each row of the product vector
+     */
+    void calc_numb_approx_per_row(std::vector<BlockCluster*> ff_v, Eigen::VectorXd& f_approx_ff_contr);
+
 protected:
     /*!
      * \brief Pre-processing: initialize matrix V and vector Vc for all far field nodes
