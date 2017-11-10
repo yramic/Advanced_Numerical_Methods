@@ -37,11 +37,11 @@ int main() {
 
     std::cout << "Enter degree of interpolating polynomials:" << std::endl;
     unsigned d; std::cin >> d;
-//    unsigned d = 3;
+//    unsigned d = 2;
 
-    KernelCosine G(1.); // Kernel initilization
+    KernelLog G(100.); // Kernel initialization
 
-    std::vector<Point> GPoints; // initalizing Grid Points properties
+    std::vector<Point> GPoints; // initializing Grid Points properties
     GPoints.reserve(n);
     int k = 0;
     for(int i=0; i<n; ++i){
