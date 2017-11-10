@@ -35,4 +35,3 @@ unsigned BlockNearF::setMatrix(Kernel* G)
                            pair_.second->getPPoints()[j].getX(),pair_.second->getPPoints()[j].getY());
     return C_.rows()*C_.cols(); // return no. of 'operations' performed
 }
-

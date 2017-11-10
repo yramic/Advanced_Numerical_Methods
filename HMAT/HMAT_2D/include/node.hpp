@@ -124,21 +124,18 @@ public:
     Eigen::VectorXd getTkx() const {
         return tkx_;
     }
-
     /*!
      * \brief return Chebyshev Nodes for the y axis of the Bounding Box
      */
     Eigen::VectorXd getTky() const {
         return tky_;
     }
-
     /*!
      * \brief return weights of Lagrange polynomial for the x axis of the bounding box
      */
     Eigen::VectorXd getWkx() const {
         return wkx_;
     }
-
     /*!
      * \brief return weights of Lagrange polynomial for the y axis of the bounding box
      */
@@ -231,6 +228,6 @@ private:
     Eigen::VectorXd CVc_node_; //!< CVc vector
     int nodeId_;    //!< id of the node in the cluster tree
     friend class cTree;
- };
+};
 
 #endif // NODE_HPP

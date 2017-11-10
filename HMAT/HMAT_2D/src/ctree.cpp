@@ -20,4 +20,3 @@ cTree::cTree(const std::vector<Point> &PPoints, unsigned deg):
         root_ = new Node(PPoints,deg); // root is a node, leaves are added
     }
 }
-

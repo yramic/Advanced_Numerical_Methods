@@ -50,6 +50,6 @@ public:
      * \param eta eta admissibility variable
      */
     bool is_admissible(Node* x, Node* y, double eta);
-
 };
+
 #endif // IS_ADMISSIBLE_HPP

@@ -84,4 +84,3 @@ Eigen::VectorXd GlobalInterpolationApp::mvProd(Eigen::VectorXd& c, unsigned deg)
     f = V * X * Vc;
     return f;
 }
-

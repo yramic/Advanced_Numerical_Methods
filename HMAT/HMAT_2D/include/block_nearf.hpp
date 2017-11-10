@@ -65,8 +65,8 @@ public:
     }
 
 private:
-    Eigen::MatrixXd C_; //!< near field block matrix
     std::pair<Node*,Node*> pair_;
     Eigen::MatrixXd C_; //!< near field block matrix
 };
+
 #endif // BLOCK_NEARF_HPP

@@ -32,6 +32,7 @@ public:
     Eigen::MatrixXd getMatrix() const {
         return C_;
     }
+
     /*!
     * \brief compute matrix \f$C_{\sigma,\mu}\f$ for 2D
     * \param G any kind of derived kernel from base class Kernel

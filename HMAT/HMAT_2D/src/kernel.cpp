@@ -36,6 +36,7 @@ double SingularKernelf::operator()(double x1, double y1, double x2, double y2)
     double lvl1 = std::log(1/lvl);
     return lvl1;
 }
+
 // 2D Polynomial Kernel
 double PolynomialKernel::operator()(double x1, double y1, double x2, double y2)
 {
@@ -53,7 +54,6 @@ double GlobalSmoothKernel::operator()(double x1, double y1, double x2, double y2
 {
     return std::cos(std::sqrt(std::pow(x1 - x2, 2) + std::pow(y1 - y2, 2)));
 }
-
 
 // Gauss Kernel
 double GaussKernel::operator()(double x1, double y1, double x2, double y2)

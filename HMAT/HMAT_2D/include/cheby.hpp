@@ -3,7 +3,6 @@
 
 #include <Eigen/Dense>
 
-
 /**
 * \brief Compute Chebyshew nodes "tk_" and weights "wk_"
 * on domain [xl,xr] for a certain polynomial degree

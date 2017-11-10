@@ -93,4 +93,5 @@ private:
     std::vector<BlockNearF*>  NearField_;      //!< Vector for Near Field
     double eta_;    //!< eta-admissibility constant
 };
+
 #endif // HIERARCHICAL_PARTITION_HPP

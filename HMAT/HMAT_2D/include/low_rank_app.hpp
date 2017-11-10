@@ -32,24 +32,8 @@ public:
      * \param f_approx_ff_contr Vector for saving the number of corresponding far field points for each row of the product vector
      */
     void calc_numb_approx_per_row(std::vector<BlockCluster*> ff_v, Eigen::VectorXd& f_approx_ff_contr);
+
 private:
-    /*!
-     * \brief Compute far field contribution
-     * \param f Output product vector
-     * \param ff_v Vector of Far Field Pairs
-     * \param deg Degree of interpolation
-     * \param c Vector c to multiply
-     * \param f_aprox_ff_contr Number of far field contributions
-     */
-    //void ff_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*,Node*>> ff_v, unsigned deg, Eigen::VectorXd& c, Eigen::VectorXd& f_aprox_ff_contr);
-    /*!
-     * \brief Compute near field contribution
-     * \param f Output product vector
-     * \param nf_v Vector of Near Field pairs
-     * \param c Vector c to multiply
-     * \param f_aprox_nf_contr Number of near field contributions
-     */
-    //void nf_contribution(Eigen::VectorXd& f, std::vector<std::pair<Node*,Node*>> nf_v, const Eigen::VectorXd& c, Eigen::VectorXd& f_aprox_nf_contr);
     /*!
      * \brief Compute far field contribution
      * \param ff_v Vector of Far Field Pairs
