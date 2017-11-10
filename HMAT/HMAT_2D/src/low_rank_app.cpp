@@ -62,6 +62,7 @@ void LowRankApp::preProcess(std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y
     #pragma omp for
     for(int i = 0; i < ff_v_x.size(); i++){
         Node* xnode = ff_v_x[i];
+//#pragma omp atomic
         lsum += xnode->setV();
     }
 #pragma omp atomic
@@ -75,7 +76,9 @@ void LowRankApp::preProcess(std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y
     #pragma omp for
     for(int i = 0; i < ff_v_y.size(); i++){
         Node* ynode = ff_v_y[i];
+//#pragma omp atomic
         lsum += ynode->setV();
+//#pragma omp atomic
         lsum += ynode->setVc(c);
     }
 #pragma omp atomic
@@ -98,8 +101,10 @@ void LowRankApp::blockProcess(std::vector<BlockCluster*> ff_v)
 #pragma omp for
         for(int i = 0; i < ff_v.size(); i++){
             BlockCluster* pair = ff_v[i];
+//#pragma omp atomic
             lsum += pair->setMatrix(kernel_); // here because needed for each pair of nodes,
                                                // cannot be moved to pre-processing
+//#pragma omp atomic
             lsum += pair->setCVc();
         }
 #pragma omp atomic
@@ -111,7 +116,7 @@ void LowRankApp::blockProcess(std::vector<BlockCluster*> ff_v)
 // post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place
 void LowRankApp::postProcess(std::vector<Node*> ff_v_x, Eigen::VectorXd& f)
 {
-    for(auto& xnode : ff_v_x){ // iterate for all the far field xnodes
+    /*for(auto& xnode : ff_v_x){ // iterate for all the far field xnodes
         Eigen::VectorXd CVc = xnode->getCVc_Node();
         Eigen::MatrixXd  Vx = xnode->getV_node();
         Eigen::VectorXd f_seg = Vx * CVc;
@@ -119,7 +124,7 @@ void LowRankApp::postProcess(std::vector<Node*> ff_v_x, Eigen::VectorXd& f)
         for(int i=0; i<xnode->getPPoints().size(); i++){
             f[xnode->getPPoints()[i].getId()] += f_seg[i]; // add contribution of far field to ``f''
         }
-    }
+    }*/
 #pragma omp parallel
     {
         unsigned lsum = 0;
