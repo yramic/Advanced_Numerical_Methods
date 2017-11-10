@@ -3,6 +3,8 @@
 #include "../include/point.hpp"
 #include <iostream>
 
+#define inertia
+
 // actual  constructor: creates the root of the Cluster Tree and the recursivly creates the leaves
 Node::Node(std::vector<Point> Points, unsigned deg):
     tl_child_(NULL), tr_child_(NULL), bl_child_(NULL), br_child_(NULL), deg_(deg), PPointsTree_(Points), CVc_node_(Eigen::VectorXd::Zero((deg+1)*(deg+1)))

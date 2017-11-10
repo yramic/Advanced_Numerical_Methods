@@ -16,8 +16,8 @@
 
 
 //#define circle
-#define vector16
-//#define random1
+//#define vector16
+#define random1
 
 
 #define local
@@ -32,7 +32,7 @@ int main() {
     //unsigned n; std::cin >> n;
 
     // initializing n for testing
-    unsigned n=20;
+    unsigned n=20000;
 #ifdef vector16
     n = 16;
 #endif
@@ -175,7 +175,7 @@ int main() {
     auto start2 = std::chrono::system_clock::now();
 
     //LowRankApp lra(&P, PPoints, n);         // initialization of low rank approximation for BEM approx for matrix multiplication
-    LowRankApp HMat(&G, PPoints, eta, d);
+    LowRankApp HMat(&P, PPoints, eta, d);
     Eigen::VectorXd f_approx = HMat.mvProd(c);   // calculation of the low rank approximation
 
     auto end2 = std::chrono::system_clock::now();
