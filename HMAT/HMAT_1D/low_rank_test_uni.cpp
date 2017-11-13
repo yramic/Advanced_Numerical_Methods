@@ -20,10 +20,10 @@ int main() {
 //    unsigned n; std::cin >> n;
 //    unsigned n = 1000;
 
-    std::string filename = "test_hmat_1d_error_bi.txt";
+    std::string filename = "test_hmat_1d_error_uni.txt";
     std::ofstream myfile;
     myfile.open(filename);
-    for(unsigned n : {10, 50, 100, 500, 1000, 5000, 10000, 20000}) {
+    for(unsigned n : {10, 50, 100, 500, 1000, 5000/*, 10000, 20000*/}) {
 
     // grid points initialization
     Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(n, 0., 1.);
@@ -85,6 +85,6 @@ int main() {
               << "Time needed for exact multiplication: "       << time_diff1.count() << " s" << std::endl
               << "Time needed for approximate multiplication: " << time_diff2.count() << " s" << std::endl;
 
-    myfile << "time, " << n << ", " << std::setprecision(10) << time_diff1.count() - time_diff2.count() << std::endl;
+//    myfile << "time, " << n << ", " << std::setprecision(10) << time_diff1.count() - time_diff2.count() << std::endl;
     }
 }

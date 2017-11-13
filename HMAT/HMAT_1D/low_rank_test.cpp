@@ -22,7 +22,7 @@ int main() {
     std::string filename = "test_hmat_1d_error_bi.txt";
     std::ofstream myfile;
     myfile.open(filename);
-    for(unsigned n : {10, 50, 100, 500, 1000, 5000, 10000, 20000}) {
+    for(unsigned n : {10, 50, 100, 500, 1000, 5000/*, 10000, 20000*/}) {
 
     // grid points initialization
     Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(n, 0., 1.);
