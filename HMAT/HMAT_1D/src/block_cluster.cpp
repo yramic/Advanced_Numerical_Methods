@@ -12,6 +12,7 @@
 #include "../include/kernel.hpp"
 #include "../include/node.hpp"
 #include <Eigen/Dense>
+#include <iomanip>
 
 // Constructor
 BlockCluster::BlockCluster(Node* xnode, Node* ynode):
@@ -46,4 +47,12 @@ unsigned BlockCluster::setCVc()
     unsigned nops = C_.rows()*C_.cols();
     nops += pair_.first->setCVc(CVc); // xnode
     return nops; // return no. of 'operations' performed
+}
+
+// return matrix $V_{\sigma}C_{\sigma,\mu}V_{\mu}^\top$
+Eigen::MatrixXd BlockCluster::getVCV() const
+{
+    Eigen::MatrixXd Vsigma = pair_.first->getV_Node();
+    Eigen::MatrixXd Vmu    = pair_.second->getV_Node();
+    return Vsigma * C_ * Vmu.transpose();
 }

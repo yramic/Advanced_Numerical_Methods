@@ -18,6 +18,8 @@
 #include "node.hpp"
 #include "point.hpp"
 #include <Eigen/Dense>
+#include <fstream>
+#include <string>
 
 /**
 * \brief Master class for low-rank approximation (Far and Near Field distribution computation)
@@ -36,6 +38,16 @@ public:
      * \param deg Degree of interpolation
      */
     LowRankApp(Kernel* kernel, const std::vector<Point>& GPoints, double eta, unsigned deg);
+
+    /*!
+     * \brief Constructor for 1D Low Rank Approximation
+     * \param kernel Kernel used for the matrix multiplication
+     * \param Gpoints Vector of points in space
+     * \param eta eta-admissibility constant
+     * \param deg Degree of interpolation
+     * \param myfile Output file where to print errors in debug mode
+     */
+    LowRankApp(Kernel* kernel, const std::vector<Point>& GPoints, double eta, unsigned deg, const std::string& filename);
 
     /*!
      * \brief Approximate matrix-vector multiplication
@@ -64,6 +76,13 @@ protected:
      * \param ff_v Vector of Far Field Pairs
      */
     void blockProcess(std::vector<BlockCluster*> ff_v);
+
+    /*!
+     * \brief Debug-processing: compute approximate matrix VCV for all far field pairs,
+     * corresponding exact block C, and the error between them
+     * \param ff_v Vector of Far Field Pairs
+     */
+    void debugProcess(std::vector<BlockCluster*> ff_v);
 
     /*!
      * \brief Post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place
@@ -97,6 +116,8 @@ protected:
     HierarchicalPartitioning<BLOCK_CLUSTER,NODE_Y> HP_; //!< Hierarchical Partiotion class for constructing the tree and calculate near and far field nodes
     std::vector<Point> GPoints_; //!< Vector of points of the axis
     unsigned  nops_; //!< number of 'operations' performed
+    bool     debug_; //!< should debugProcess be performed?
+    std::ofstream myfile_; // where to print errors in debug mode
 };
 
 #endif // LOW_RANK_APP_HPP

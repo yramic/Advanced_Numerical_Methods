@@ -15,12 +15,21 @@
 #include "../include/kernel.hpp"
 #include "../include/node.hpp"
 #include "../include/point.hpp"
+#include <fstream>
+#include <iomanip>
 #include <iostream>
+#include <string>
 
 // constructor
 template<>
 LowRankApp<BlockCluster,Node>::LowRankApp(Kernel* kernel, const std::vector<Point>& GPoints, double eta, unsigned deg):
-    kernel_(kernel), GPoints_(GPoints), HP_(GPoints,eta,deg), deg_(deg), nops_(0)
+    kernel_(kernel), GPoints_(GPoints), HP_(GPoints,eta,deg), deg_(deg), nops_(0), debug_(false)
+{ }
+
+// constructor
+template<>
+LowRankApp<BlockCluster,Node>::LowRankApp(Kernel* kernel, const std::vector<Point>& GPoints, double eta, unsigned deg, const std::string& filename):
+    kernel_(kernel), GPoints_(GPoints), HP_(GPoints,eta,deg), deg_(deg), nops_(0), debug_(true), myfile_(filename.c_str(),std::ios::app)
 { }
 
 // pre-processing: initialize matrix V and vector Vc for all far field nodes
@@ -47,6 +56,30 @@ void LowRankApp<BlockCluster,Node>::blockProcess(std::vector<BlockCluster*> ff_v
                                            // cannot be moved to pre-processing
         nops_ += pair->setCVc();
     }
+}
+
+// debug-processing: compute approximate matrix VCV for all far field pairs,
+// orresponding exact block C, and the error between them
+template<>
+void LowRankApp<BlockCluster,Node>::debugProcess(std::vector<BlockCluster*> ff_v)
+{
+    double error_Frobenius = 0., error_max = 0.;
+    for(auto& pair : ff_v){ // iterate for all the pairs of far field nodes
+        Eigen::MatrixXd block_approx = pair->getVCV();
+        BlockNearF tmp(pair->getXNode(),
+                       pair->getYNode());
+        tmp.setMatrix(kernel_);
+        Eigen::MatrixXd block_exact = tmp.getMatrix();
+        Eigen::MatrixXd diff_blocks = block_exact - block_approx;
+        error_Frobenius += diff_blocks.norm() / std::sqrt(block_exact.rows()*block_exact.cols());
+        double error_tmp = diff_blocks.cwiseAbs().maxCoeff();
+        if(error_max < error_tmp) {
+           error_max = error_tmp;
+        }
+    }
+
+    myfile_ << "error_Frobenius, " << GPoints_.size() << ", " << std::setprecision(10) << error_Frobenius << std::endl;
+    myfile_ << "error_max, "       << GPoints_.size() << ", " << std::setprecision(10) << error_max       << std::endl;
 }
 
 // post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place
@@ -85,6 +118,9 @@ void LowRankApp<BlockCluster,Node>::ff_contribution(std::vector<BlockCluster*> f
 {
     preProcess(ff_v_x, ff_v_y, c);
     blockProcess(ff_v);
+    if(debug_) {
+        debugProcess(ff_v);
+    }
     postProcess(ff_v_x, f);
     calc_numb_approx_per_row(ff_v, f_approx_ff_contr);
 }

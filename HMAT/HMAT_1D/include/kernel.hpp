@@ -63,6 +63,23 @@ public:
 };
 
 /*!
+* \brief Kernel functor \f$x \cdot y\f$:
+* low-rank approximation should be exact!
+*/
+class KernelPolynomial: public Kernel
+{
+    using Kernel::Kernel; // C++11 inheritance of constructors
+
+public:
+    /**
+    * \brief Functor
+    * \param x x-coordinate of grid point
+    * \param y y-coordinate of grid point
+    */
+    double operator()(double x, double y);
+};
+
+/*!
 * \brief Kernel functor \f$\frac{C}{\left|x-y\right|}\f$
 */
 class KernelInvDistance: public Kernel

@@ -11,6 +11,12 @@ double KernelLog::operator()(double x, double y)
         return 0.;
 }
 
+// Kernel functor \f$x \cdot y\f$
+double KernelPolynomial::operator()(double x, double y)
+{
+    return num_*x*y;
+}
+
 // Kernel functor $\frac{num}{|x-y|}$ if $x != y$, else 0
 double KernelInvDistance::operator()(double x, double y)
 {

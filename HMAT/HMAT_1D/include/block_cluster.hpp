@@ -14,6 +14,7 @@
 #include "kernel.hpp"
 #include "node.hpp"
 #include <Eigen/Dense>
+#include <fstream>
 
 /*!
  * \brief Block cluster class to compute matrix \f$X_{\sigma,\mu}\f$
@@ -71,6 +72,12 @@ public:
     Node* getYNode() {
         return pair_.second;
     }
+
+    /*!
+     * \brief return matrix \f$V_{\sigma}C_{\sigma,\mu}V_{\mu}^\top\f$,
+     * where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
+     */
+    Eigen::MatrixXd getVCV() const;
 
 protected:
     std::pair<Node*,Node*> pair_;

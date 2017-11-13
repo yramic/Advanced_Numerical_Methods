@@ -8,34 +8,33 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <string>
 
 
 int main() {
 
     // Input
 
-    std::cout << "Enter gridsize:" << std::endl;
-    unsigned n; std::cin >> n;
+//    std::cout << "Enter gridsize:" << std::endl;
+//    unsigned n; std::cin >> n;
 //    unsigned n = 1000;
 
-//    std::ofstream myfile;
-//    myfile.open("test_hmat_1d_time_bi.txt");
-//    for(unsigned n : {10, 50, 100, 500, 1000, 5000, 10000, 20000}) {
-//    std::ofstream myfile;
-//    myfile.open("test_hmat_1d_error_bi.txt");
-//    for(unsigned n : {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}) {
+    std::string filename = "test_hmat_1d_error_bi.txt";
+    std::ofstream myfile;
+    myfile.open(filename);
+    for(unsigned n : {10, 50, 100, 500, 1000, 5000, 10000, 20000}) {
 
     // grid points initialization
     Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(n, 0., 1.);
     Eigen::VectorXd    c = Eigen::VectorXd::Random(n);
 
-    std::cout << "Enter admissibility constant:" << std::endl;
-    double eta; std::cin >> eta;
-//    double eta = 0.5;
+//    std::cout << "Enter admissibility constant:" << std::endl;
+//    double eta; std::cin >> eta;
+    double eta = 0.5;
 
-    std::cout << "Enter degree of interpolating polynomials:" << std::endl;
-    unsigned d; std::cin >> d;
-//    unsigned d = 2;
+//    std::cout << "Enter degree of interpolating polynomials:" << std::endl;
+//    unsigned q; std::cin >> q;
+    unsigned q = 2;
 
     KernelLog G(100.); // Kernel initialization
 
@@ -67,7 +66,7 @@ int main() {
 
     auto start2 = std::chrono::system_clock::now();
 
-    LowRankApp<> HMat(&G, GPoints, eta, d);
+    LowRankApp<> HMat(&G, GPoints, eta, q, filename);
     Eigen::VectorXd f_approx = HMat.mvProd(c);
 
     auto end2 = std::chrono::system_clock::now();
@@ -85,15 +84,6 @@ int main() {
               << "Time needed for exact multiplication: "       << time_diff1.count() << " s" << std::endl
               << "Time needed for approximate multiplication: " << time_diff2.count() << " s" << std::endl;
 
-//    myfile << "time, " << n << ", " << std::setprecision(10) << time_diff1.count() - time_diff2.count() << std::endl;
-
-//    Eigen::MatrixXd Mtilde(n,n);
-//    for(int i=0; i<n; ++i) {
-//        Mtilde.col(i) = HMat.mvProd(Eigen::VectorXd::Unit(n,i));
-//    }
-//    Eigen::MatrixXd diff_M = M - Mtilde;
-
-//    myfile << "error_Frobenius, " << n << ", " << std::setprecision(10) << diff_M.norm()/n << std::endl;
-//    myfile << "error_max, "       << n << ", " << std::setprecision(10) << diff_M.cwiseAbs().maxCoeff() << std::endl;
-//    }
+    myfile << "time, " << n << ", " << std::setprecision(10) << time_diff1.count() - time_diff2.count() << std::endl;
+    }
 }
