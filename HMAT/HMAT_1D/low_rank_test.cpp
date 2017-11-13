@@ -84,6 +84,6 @@ int main() {
               << "Time needed for exact multiplication: "       << time_diff1.count() << " s" << std::endl
               << "Time needed for approximate multiplication: " << time_diff2.count() << " s" << std::endl;
 
-    myfile << "time, " << n << ", " << std::setprecision(10) << time_diff1.count() - time_diff2.count() << std::endl;
+//    myfile << "time, " << n << ", " << std::setprecision(10) << time_diff1.count() - time_diff2.count() << std::endl;
     }
 }

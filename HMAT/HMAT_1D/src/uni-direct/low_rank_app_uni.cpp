@@ -20,11 +20,16 @@
 #include <iostream>
 #include <string>
 
+// constructor
+template<>
+LowRankApp<BlockCluster_Y,Node_Y>::LowRankApp(Kernel* kernel, const std::vector<Point>& GPoints, double eta, unsigned deg):
+    kernel_(kernel), GPoints_(GPoints), HP_(GPoints,eta,deg), deg_(deg), nops_(0), debug_(false)
+{ }
 
 // constructor
 template<>
-LowRankApp<BlockCluster_Y,Node_Y>::LowRankApp(Kernel* kernel, const std::vector<Point>& GPoints, double eta, unsigned deg, bool debug):
-    kernel_(kernel), GPoints_(GPoints), HP_(GPoints,eta,deg), deg_(deg), nops_(0), debug_(debug)
+LowRankApp<BlockCluster_Y,Node_Y>::LowRankApp(Kernel* kernel, const std::vector<Point>& GPoints, double eta, unsigned deg, const std::string& filename):
+    kernel_(kernel), GPoints_(GPoints), HP_(GPoints,eta,deg), deg_(deg), nops_(0), debug_(true), myfile_(filename.c_str(),std::ios::app)
 { }
 
 // pre-processing: initialize matrix V and vector Vc for all far field nodes
@@ -75,8 +80,8 @@ void LowRankApp<BlockCluster_Y,Node_Y>::debugProcess(std::vector<BlockCluster*> 
         }
     }
 
-    myfile_ << "error_Frobenius, " << GPoints_.size() << ", " << std::setprecision(10) << error_Frobenius << std::endl;
-    myfile_ << "error_max, "       << GPoints_.size() << ", " << std::setprecision(10) << error_max       << std::endl;
+    myfile_ << "error_Frobenius, " << GPoints_.size() << ", " << std::setprecision(10) << error_Frobenius/ff_v.size() << std::endl; // average error w.r.t. all blocks
+    myfile_ << "error_max, "       << GPoints_.size() << ", " << std::setprecision(10) << error_max                   << std::endl;
 }
 
 // post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place

@@ -78,8 +78,8 @@ void LowRankApp<BlockCluster,Node>::debugProcess(std::vector<BlockCluster*> ff_v
         }
     }
 
-    myfile_ << "error_Frobenius, " << GPoints_.size() << ", " << std::setprecision(10) << error_Frobenius << std::endl;
-    myfile_ << "error_max, "       << GPoints_.size() << ", " << std::setprecision(10) << error_max       << std::endl;
+    myfile_ << "error_Frobenius, " << GPoints_.size() << ", " << std::setprecision(10) << error_Frobenius/ff_v.size() << std::endl; // average error w.r.t. all blocks
+    myfile_ << "error_max, "       << GPoints_.size() << ", " << std::setprecision(10) << error_max                   << std::endl;
 }
 
 // post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place
