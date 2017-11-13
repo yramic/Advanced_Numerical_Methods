@@ -16,7 +16,10 @@
 Cheby::Cheby(double xl, double xr, unsigned deg):
     xl_(xl), xr_(xr), deg_(deg),
     tk_(Eigen::VectorXd::Zero(deg+1)), wk_(Eigen::VectorXd::Zero(deg+1))
-{ setNodes();  setWghts(); }
+{
+    setNodes();
+    setWghts();
+}
 
 // compute Chebyshew nodes on domain [xl,xr]
 void Cheby::setNodes()

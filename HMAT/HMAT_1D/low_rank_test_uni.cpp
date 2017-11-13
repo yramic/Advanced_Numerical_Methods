@@ -37,7 +37,7 @@ int main() {
 //    unsigned q; std::cin >> q;
     unsigned q = 2;
 
-    KernelLog G(100.); // Kernel initialization
+    KernelInvDistance G(100.); // Kernel initialization
 
     std::vector<Point> GPoints; // initializing Grid Points properties
     GPoints.reserve(n);
