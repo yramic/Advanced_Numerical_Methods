@@ -37,7 +37,7 @@ int main() {
 //    unsigned q; std::cin >> q;
     unsigned q = 2;
 
-    KernelInvDistance G(100.); // Kernel initialization
+    KernelLog G(100.); // Kernel initialization
 
     std::vector<Point> GPoints; // initializing Grid Points properties
     GPoints.reserve(n);
@@ -86,5 +86,15 @@ int main() {
               << "Time needed for approximate multiplication: " << time_diff2.count() << " s" << std::endl;
 
 //    myfile << "time, " << n << ", " << std::setprecision(10) << time_diff1.count() - time_diff2.count() << std::endl;
+
+//    Eigen::MatrixXd Mtilde(n,n);
+//    for(int i=0; i<n; ++i) {
+//        LowRankApp<> HMat_tmp(&G, GPoints, eta, q);
+//        Mtilde.col(i) = HMat_tmp.mvProd(Eigen::VectorXd::Unit(n,i));
+//    }
+//    Eigen::MatrixXd diff_M = M - Mtilde;
+
+//    myfile << "error_Frobenius, " << n << ", " << std::setprecision(10) << diff_M.norm()/n << std::endl;
+//    myfile << "error_max, "       << n << ", " << std::setprecision(10) << diff_M.cwiseAbs().maxCoeff() << std::endl;
     }
 }
