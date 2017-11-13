@@ -15,14 +15,14 @@ int main() {
 
     // Input
 
-//    std::cout << "Enter gridsize:" << std::endl;
-//    unsigned n; std::cin >> n;
+    std::cout << "Enter gridsize:" << std::endl;
+    unsigned n; std::cin >> n;
 //    unsigned n = 1000;
 
-    std::string filename = "test_hmat_1d_error_bi.txt";
-    std::ofstream myfile;
-    myfile.open(filename);
-    for(unsigned n : {10, 50, 100, 500, 1000, 5000/*, 10000, 20000*/}) {
+//    std::string filename = "test_hmat_1d_error_bi.txt";
+//    std::ofstream myfile;
+//    myfile.open(filename);
+//    for(unsigned n : {10, 50, 100, 500, 1000, 5000/*, 10000, 20000*/}) {
 
     // grid points initialization
     Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(n, 0., 1.);
@@ -66,7 +66,7 @@ int main() {
 
     auto start2 = std::chrono::system_clock::now();
 
-    LowRankApp<> HMat(&G, GPoints, eta, q, filename);
+    LowRankApp<> HMat(&G, GPoints, eta, q/*, filename*/);
     Eigen::VectorXd f_approx = HMat.mvProd(c);
 
     auto end2 = std::chrono::system_clock::now();
@@ -86,6 +86,7 @@ int main() {
 
 //    myfile << "time, " << n << ", " << std::setprecision(10) << time_diff1.count() - time_diff2.count() << std::endl;
 
+    // Alternative way to compute matrix error:
 //    Eigen::MatrixXd Mtilde(n,n);
 //    for(int i=0; i<n; ++i) {
 //        LowRankApp<> HMat_tmp(&G, GPoints, eta, q);
@@ -95,5 +96,5 @@ int main() {
 
 //    myfile << "error_Frobenius, " << n << ", " << std::setprecision(10) << diff_M.norm()/n << std::endl;
 //    myfile << "error_max, "       << n << ", " << std::setprecision(10) << diff_M.cwiseAbs().maxCoeff() << std::endl;
-    }
+//    }
 }
