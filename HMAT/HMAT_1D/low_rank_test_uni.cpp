@@ -29,13 +29,13 @@ int main() {
     Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(n, 0., 1.);
     Eigen::VectorXd    c = Eigen::VectorXd::Random(n);
 
-//    std::cout << "Enter admissibility constant:" << std::endl;
-//    double eta; std::cin >> eta;
-    double eta = 0.5;
+    std::cout << "Enter admissibility constant:" << std::endl;
+    double eta; std::cin >> eta;
+//    double eta = 0.5;
 
-//    std::cout << "Enter degree of interpolating polynomials:" << std::endl;
-//    unsigned q; std::cin >> q;
-    unsigned q = 2;
+    std::cout << "Enter degree of interpolating polynomials:" << std::endl;
+    unsigned q; std::cin >> q;
+//    unsigned q = 2;
 
     KernelLog G(100.); // Kernel initialization
 

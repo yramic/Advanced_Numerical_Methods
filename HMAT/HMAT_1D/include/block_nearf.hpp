@@ -31,14 +31,6 @@ public:
     BlockNearF(Node* xnode, Node* ynode);
 
     /*!
-     * \brief Constructor
-     * \param ndx XNode
-     * \param ndy YNode
-     * \param G Kernel Function
-     */
-    BlockNearF(Node* xnode, Node* ynode, Kernel G);
-
-    /*!
      * \brief return near field block matrix
      */
     Eigen::MatrixXd getMatrix() const {
