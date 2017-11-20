@@ -22,6 +22,7 @@
 HierarchicalPartitioning::HierarchicalPartitioning(const std::vector<Point>& GPoints, double eta, unsigned deg):
     Tx_(GPoints,deg), Ty_(Tx_), eta_(eta)
 {}
+
 // compute the Far and Near Field pairs
 void HierarchicalPartitioning::setNearFar()
 {
@@ -32,6 +33,7 @@ void HierarchicalPartitioning::setNearFar()
     std::sort(FarField_ynds_.begin(), FarField_ynds_.end(), checkpointers);
     FarField_ynds_.erase(std::unique(FarField_ynds_.begin(), FarField_ynds_.end()), FarField_ynds_.end());
 }
+
 // compute the Far and Near Field pairs
 void HierarchicalPartitioning::setNearFar(Eigen::MatrixXd& cmatrix)
 {
@@ -42,6 +44,7 @@ void HierarchicalPartitioning::setNearFar(Eigen::MatrixXd& cmatrix)
     std::sort(FarField_ynds_.begin(), FarField_ynds_.end(), checkpointers);
     FarField_ynds_.erase(std::unique(FarField_ynds_.begin(), FarField_ynds_.end()), FarField_ynds_.end());
 }
+
 // add pointers to near and far field nodes of the tree
 void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree &Ty)
 {
