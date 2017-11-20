@@ -8,9 +8,9 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/node.hpp"
-#include "../include/cheby.hpp"
-#include "../include/point.hpp"
+#include "../../include/node.hpp"
+#include "../../include/cheby.hpp"
+#include "../../include/point.hpp"
 #include <iostream>
 
 #define inertia

@@ -8,9 +8,9 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/global_interpolation_app.hpp"
-#include "../include/cheby.hpp"
-#include "../include/kernel.hpp"
+#include "../../include/global_interpolation_app.hpp"
+#include "../../include/cheby.hpp"
+#include "../../include/kernel.hpp"
 #include <iostream>
 #include <Eigen/Dense>
 

@@ -34,7 +34,7 @@ int main() {
 //    myfile.open(filename);
 //    for(unsigned n : {10, 50, 100, 500, 1000, 5000/*, 10000, 20000*/}) {
 
-    // grid points initialization
+    // initialization of grid points
     Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(n, 0., 1.);
     Eigen::VectorXd    c = Eigen::VectorXd::Random(n);
 
