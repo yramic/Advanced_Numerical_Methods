@@ -1,3 +1,13 @@
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             *
+ * Author: Ioannis Magkanaris                                          *
+ * Date: 11/2017                                                       *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
 #include "include/kernel.hpp"
 #include "include/low_rank_app.hpp"
 #include "include/global_interpolation_app.hpp"
@@ -9,21 +19,16 @@
 #include <iostream>
 #include <chrono>
 
-/*
- * Some of the definitions for the preprocessor must be deleted and also lots of comments that exist on the code.
- * This file will be cleaned from comments and not needed code in the final version because now everything is used for debugging the program.
- */
-
 
 //#define circle
 //#define vector16
 #define random1
 
-
 #define local
 //#define global
 //#define gsk
 //#define gauss
+
 int main() {
 
     // Input

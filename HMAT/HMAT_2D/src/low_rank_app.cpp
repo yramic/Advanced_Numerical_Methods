@@ -1,10 +1,20 @@
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             *
+ * Author: Ioannis Magkanaris                                          *
+ * Date: 11/2017                                                       *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
 #include "../include/low_rank_app.hpp"
 #include "../include/block_cluster.hpp"
 #include "../include/ctree.hpp"
 #include "../include/kernel.hpp"
 #include "../include/node.hpp"
-#include <iostream>
 #include <Eigen/Dense>
+#include <iostream>
 
 // constructor for solving the 2D problem
 LowRankApp::LowRankApp(Kernel* kernel, const std::vector<Point> &pp, double eta, unsigned deg):
@@ -50,85 +60,55 @@ Eigen::VectorXd LowRankApp::mvProd(Eigen::VectorXd& c)
 // do these steps once for each node, not every time the node appears in a pair
 void LowRankApp::preProcess(std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y, const Eigen::VectorXd& c)
 {
-    //omp_set_num_threads(8);
-    //int num_threads = omp_get_num_threads();
-    //std::cout << num_threads << std::endl;
-#pragma omp parallel
-{
-    /*for(auto& xnode : ff_v_x){ // iterate for all the far field xnodes
-        nops_ += xnode->setV();
-    }*/
-    unsigned lsum = 0;
-    #pragma omp for
-    for(int i = 0; i < ff_v_x.size(); i++){
-        Node* xnode = ff_v_x[i];
-//#pragma omp atomic
-        lsum += xnode->setV();
-    }
-#pragma omp atomic
-    nops_ += lsum;
+    #pragma omp parallel
+    {
+        unsigned lsum = 0;
+        #pragma omp for
+        for(int i = 0; i < ff_v_x.size(); i++){
+            Node* xnode = ff_v_x[i];
+            lsum += xnode->setV();
+        }
+        #pragma omp atomic
+        nops_ += lsum;
 
-    /*for(auto& ynode : ff_v_y){ // iterate for all the far field ynodes
-        nops_ += ynode->setV();
-        nops_ += ynode->setVc(c);
-    }*/
-    lsum = 0;
-    #pragma omp for
-    for(int i = 0; i < ff_v_y.size(); i++){
-        Node* ynode = ff_v_y[i];
-//#pragma omp atomic
-        lsum += ynode->setV();
-//#pragma omp atomic
-        lsum += ynode->setVc(c);
+        lsum = 0;
+        #pragma omp for
+        for(int i = 0; i < ff_v_y.size(); i++){
+            Node* ynode = ff_v_y[i];
+            lsum += ynode->setV();
+            lsum += ynode->setVc(c);
+        }
+        #pragma omp atomic
+        nops_ += lsum;
     }
-#pragma omp atomic
-    nops_ += lsum;
-}
 }
 
 // block-processing: compute vector CVc for all far field pairs and store it into xnode
 // all vectors CVc of an xnode can already be summed together
 void LowRankApp::blockProcess(std::vector<BlockCluster*> ff_v)
 {
-    /*for(auto& pair : ff_v){ // iterate for all the pairs of far field nodes
-        nops_ += pair->setMatrix(kernel_); // here because needed for each pair of nodes,
-                                           // cannot be moved to pre-processing
-        nops_ += pair->setCVc();
-    }*/
-#pragma omp parallel
+    #pragma omp parallel
     {
         unsigned lsum = 0;
-#pragma omp for
+        #pragma omp for
         for(int i = 0; i < ff_v.size(); i++){
             BlockCluster* pair = ff_v[i];
-//#pragma omp atomic
             lsum += pair->setMatrix(kernel_); // here because needed for each pair of nodes,
-                                               // cannot be moved to pre-processing
-//#pragma omp atomic
+                                              // cannot be moved to pre-processing
             lsum += pair->setCVc();
         }
-#pragma omp atomic
+        #pragma omp atomic
         nops_ += lsum;
     }
-
 }
 
 // post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place
 void LowRankApp::postProcess(std::vector<Node*> ff_v_x, Eigen::VectorXd& f)
 {
-    /*for(auto& xnode : ff_v_x){ // iterate for all the far field xnodes
-        Eigen::VectorXd CVc = xnode->getCVc_Node();
-        Eigen::MatrixXd  Vx = xnode->getV_node();
-        Eigen::VectorXd f_seg = Vx * CVc;
-        nops_ += Vx.rows()*Vx.cols();
-        for(int i=0; i<xnode->getPPoints().size(); i++){
-            f[xnode->getPPoints()[i].getId()] += f_seg[i]; // add contribution of far field to ``f''
-        }
-    }*/
-#pragma omp parallel
+    #pragma omp parallel
     {
         unsigned lsum = 0;
-#pragma omp for
+        #pragma omp for
         for(int i = 0; i < ff_v_x.size(); i++){
             Node* xnode = ff_v_x[i];
             Eigen::VectorXd CVc = xnode->getCVc_Node();
@@ -139,7 +119,7 @@ void LowRankApp::postProcess(std::vector<Node*> ff_v_x, Eigen::VectorXd& f)
                 f[xnode->getPPoints()[i].getId()] += f_seg[i]; // add contribution of far field to ``f''
             }
         }
-#pragma omp atomic
+        #pragma omp atomic
         nops_ += lsum;
     }
 }

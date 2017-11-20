@@ -1,7 +1,17 @@
-#include "include/point.hpp"
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             *
+ * Author: Ioannis Magkanaris                                          *
+ * Date: 11/2017                                                       *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
 #include "include/ctree.hpp"
-#include "include/node.hpp"
 #include "include/hierarchical_partition.hpp"
+#include "include/node.hpp"
+#include "include/point.hpp"
 #include <iostream>
 
 void setNodeIds(Node* x, int& id){
@@ -34,7 +44,7 @@ int main() {
     //cTree test_tree(PPoints, d);           // creating a tree
     int id = 0;
     setNodeIds(HP.getTx().getRoot(),id);     // setting ID in each node of the tree
-    Eigen::MatrixXd cmatrix = Eigen::MatrixXd::Constant(id+1,id+1,0); // matrix that rows and columns represent the IDs of the nodes that exist on the tree
-    HP.setNearFar(cmatrix);                  // set the near and far field of each node and add 1 for every comaprisson that is done in this process in the referring cell of the matrix
+    Eigen::MatrixXd cmatrix = Eigen::MatrixXd::Zero(id+1,id+1); // matrix that rows and columns represent the IDs of the nodes that exist on the tree
+    HP.setNearFar(cmatrix);                  // set the near and far field of each node and add 1 for every compression that is done in this process in the referring cell of the matrix
     std::cout << cmatrix << std::endl;
 }

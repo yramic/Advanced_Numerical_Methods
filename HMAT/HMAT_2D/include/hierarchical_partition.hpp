@@ -1,11 +1,21 @@
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             *
+ * Author: Ioannis Magkanaris                                          *
+ * Date: 11/2017                                                       *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
 #ifndef HIERARCHICAL_PARTITION_HPP
 #define HIERARCHICAL_PARTITION_HPP
 
+#include "block_cluster.hpp"
+#include "block_nearf.hpp"
 #include "ctree.hpp"
 #include "kernel.hpp"
 #include "point.hpp"
-#include "block_cluster.hpp"
-#include "block_nearf.hpp"
 #include <iostream>
 
 /*!
@@ -85,11 +95,9 @@ private:
     void setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree &Ty, Eigen::MatrixXd& cmatrix);
 
     cTree Tx_, Ty_; //!< Cluster trees for comparison
-    //std::vector<std::pair<Node*,Node*>> FarField_, NearField_;  //!< Vectors for Near and Far Field Pairs
     std::vector<BlockCluster*> FarField_;      //!< Vector for Far Field
     std::vector<Node*>         FarField_xnds_; //!< Vector for Far Field XNodes
     std::vector<Node*>         FarField_ynds_; //!< Vector for Far Field YNodes
-    //std::vector<std::pair<Node*,Node*> > NearField_; //!< Vector for Near Field
     std::vector<BlockNearF*>  NearField_;      //!< Vector for Near Field
     double eta_;    //!< eta-admissibility constant
 };

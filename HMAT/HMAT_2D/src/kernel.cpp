@@ -1,8 +1,18 @@
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             *
+ * Author: Ioannis Magkanaris                                          *
+ * Date: 11/2017                                                       *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
 #include "../include/kernel.hpp"
-#include <cmath>
-#include <limits>
-#include <iostream>
 #include "../include/cheby.hpp"
+#include <cmath>
+#include <iostream>
+#include <limits>
 
 // kernel for 2D problem of 2 vectors
 double KernelGalerkin::operator()(double x1, double y1, double x2, double y2)

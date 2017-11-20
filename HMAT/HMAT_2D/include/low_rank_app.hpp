@@ -1,11 +1,20 @@
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             *
+ * Author: Ioannis Magkanaris                                          *
+ * Date: 11/2017                                                       *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
 #ifndef LOW_RANK_APP_HPP
 #define LOW_RANK_APP_HPP
 
 #include "ctree.hpp"
-#include "kernel.hpp"
 #include "hierarchical_partition.hpp"
+#include "kernel.hpp"
 #include <Eigen/Dense>
-
 
 /*!
 * \brief Master class for low-rank approximation (Far and Near Field distribution computation)

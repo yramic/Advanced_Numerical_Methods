@@ -1,9 +1,19 @@
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             *
+ * Author: Ioannis Magkanaris                                          *
+ * Date: 11/2017                                                       *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
+#include "../include/hierarchical_partition.hpp"
+#include "../include/block_nearf.hpp"
+#include "../include/cheby.hpp"
 #include "../include/ctree.hpp"
 #include "../include/is_admissible.hpp"
 #include "../include/node.hpp"
-#include "../include/cheby.hpp"
-#include "../include/hierarchical_partition.hpp"
-#include "../include/block_nearf.hpp"
 #include <Eigen/Dense>
 #include <vector>
 #include <iostream>

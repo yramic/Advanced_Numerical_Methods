@@ -1,14 +1,22 @@
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             *
+ * Author: Ioannis Magkanaris                                          *
+ * Date: 11/2017                                                       *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
 #include "../include/global_interpolation_app.hpp"
-#include "../include/kernel.hpp"
 #include "../include/cheby.hpp"
+#include "../include/kernel.hpp"
 #include <iostream>
 #include <Eigen/Dense>
-
 
 GlobalInterpolationApp::GlobalInterpolationApp(Kernel* kernel, std::vector<Point> pp, int n):
     K_(kernel), PPoints_(pp)
 {}
-
 
 // approximate matrix-vector multiplication
 Eigen::VectorXd GlobalInterpolationApp::mvProd(Eigen::VectorXd& c, unsigned deg)

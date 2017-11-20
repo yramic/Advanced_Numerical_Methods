@@ -1,12 +1,22 @@
-#include "include/point.hpp"
-#include "include/ctree.hpp"
-#include "include/node.hpp"
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             *
+ * Author: Ioannis Magkanaris                                          *
+ * Date: 11/2017                                                       *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
 #include "include/cheby.hpp"
+#include "include/ctree.hpp"
 #include "include/low_rank_app.hpp"
+#include "include/node.hpp"
+#include "include/point.hpp"
 #include <iostream>
 
 int main() {
-    unsigned n=16;  // number of points
+    unsigned n=16; // number of points
     std::vector<int> x = {24,22,73,63,14,17,39,99,83,41,40,4,83,30,65,23}, y = {24,55,87,91,30,1,9,28,67,85,10,84,57,72,86,56}, v = {66,63,27,46,83,58,46,8,95,57,2,79,34,21,64,95};
     std::vector<Point> PPoints; // initalizing Polygon Points properties
     PPoints.reserve(n);
@@ -27,7 +37,7 @@ int main() {
     //t.setV_node(deg);
     Eigen::MatrixXd V = t.getV_node();
     // alternate calculation of the V matrix of this Node
-    double x1,x2,y1,y2;                 // construction of Bounding Box of this Node
+    double x1,x2,y1,y2; // construction of Bounding Box of this Node
     x1 = PPoints.begin()->getX();
     x2 = PPoints.begin()->getX();
     y1 = PPoints.begin()->getY();

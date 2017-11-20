@@ -1,3 +1,13 @@
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             *
+ * Author: Ioannis Magkanaris                                          *
+ * Date: 11/2017                                                       *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
 #ifndef GLOBAL_INTERPOLATION_APP_HPP
 #define GLOBAL_INTERPOLATION_APP_HPP
 
@@ -26,8 +36,8 @@ public:
     Eigen::VectorXd mvProd(Eigen::VectorXd &c, unsigned deg);
 
 private:
-    Kernel* K_;                     //!< Kernel pointer
-    std::vector<Point> PPoints_;    //!< Polygon Points
+    Kernel* K_;                  //!< Kernel pointer
+    std::vector<Point> PPoints_; //!< Polygon Points
 };
 
 #endif // GLOBAL_INTERPOLATION_APP_HPP

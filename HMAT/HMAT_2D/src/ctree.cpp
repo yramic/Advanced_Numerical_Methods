@@ -1,12 +1,17 @@
-/*!
-  * \author Daniele Casati, Ioannis Magkanaris
-  * \date 11/2017
-  * \mainpage Low Rank Approximation for BEM
-  */
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             *
+ * Author: Ioannis Magkanaris                                          *
+ * Date: 11/2017                                                       *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
 #include "../include/ctree.hpp"
-#include "../include/point.hpp"
 #include "../include/is_admissible.hpp"
 #include "../include/node.hpp"
+#include "../include/point.hpp"
 #include <Eigen/Dense>
 #include <vector>
 #include <iostream>

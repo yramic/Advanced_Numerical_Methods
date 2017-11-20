@@ -1,6 +1,15 @@
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             *
+ * Author: Ioannis Magkanaris                                          *
+ * Date: 11/2017                                                       *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
 #include "../include/is_admissible.hpp"
 #include <cmath>
-
 
 // find the biggest edge of each Bounding Box and compare it with the biggest node of the other Bounding Box
 double AdmissibilityH::get_max(Node* a, Node* b)

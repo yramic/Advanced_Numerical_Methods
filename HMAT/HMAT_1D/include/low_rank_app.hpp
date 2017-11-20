@@ -1,9 +1,9 @@
 /***********************************************************************
  *                                                                     *
  * Code for Course "Advanced Numerical Methods for CSE"                *
- * (Prof. Dr. R. Hiptmair)                                             * 
- * Author:                                                             *
- * Date:                                                               *
+ * (Prof. Dr. R. Hiptmair)                                             *
+ * Author: Daniele Casati                                              *
+ * Date: 11/2017                                                       *
  * (C) Seminar for Applied Mathematics, ETH Zurich                     *
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *

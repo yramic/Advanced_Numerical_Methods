@@ -1,3 +1,13 @@
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             *
+ * Author: Ioannis Magkanaris                                          *
+ * Date: 11/2017                                                       *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
 #ifndef BLOCK_CLUSTER_HPP
 #define BLOCK_CLUSTER_HPP
 
@@ -61,7 +71,7 @@ public:
     }
 private:
     std::pair<Node*,Node*> pair_;
-    Eigen::MatrixXd C_;     //!< Matrix \f$C_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
+    Eigen::MatrixXd C_; //!< Matrix \f$C_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
 };
 
 #endif // BLOCK_CLUSTER_HPP

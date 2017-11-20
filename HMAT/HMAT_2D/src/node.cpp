@@ -1,3 +1,13 @@
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             *
+ * Author: Ioannis Magkanaris                                          *
+ * Date: 11/2017                                                       *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
 #include "../include/node.hpp"
 #include "../include/cheby.hpp"
 #include "../include/point.hpp"
@@ -175,7 +185,8 @@ unsigned Node::setV()
     }
 
     // Alternate way of computing V matrix
-    /*Eigen::MatrixXd VnodeX = Eigen::MatrixXd::Constant(ppts, (deg+1), 1);
+/*
+    Eigen::MatrixXd VnodeX = Eigen::MatrixXd::Constant(ppts, (deg+1), 1);
     Eigen::MatrixXd VnodeY = Eigen::MatrixXd::Constant(ppts, (deg+1), 1);
     for(unsigned i=0; i<=ppts-1; ++i) {
         for(unsigned j=0; j<=deg; ++j) {
@@ -208,15 +219,9 @@ unsigned Node::setV()
             V_node_new.block(i, j*(deg+1), 1, deg+1) = VnodeX(i,j) * VnodeY.row(i);
         }
     }
-    V_node_ = V_node_new;*/
-    /*std::cout << "VnodeX" << std::endl;
-    std::cout << VnodeX << std::endl;
-    std::cout << "VnodeY" << std::endl;
-    std::cout << VnodeY << std::endl;
-    std::cout << "V_Node" << std::endl;
-    std::cout << V_node_ << std::endl;
-    std::cout << "V_Node_new" << std::endl;
-    std::cout << V_node_new << std::endl;*/
+    V_node_ = V_node_new;
+*/
+
     return ppts * (deg_+2)*(deg_+1)/2; // return no. of 'operations' performed
 }
 

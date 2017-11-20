@@ -1,3 +1,13 @@
+/***********************************************************************
+ *                                                                     *
+ * Code for Course "Advanced Numerical Methods for CSE"                *
+ * (Prof. Dr. R. Hiptmair)                                             *
+ * Author: Ioannis Magkanaris                                          *
+ * Date: 11/2017                                                       *
+ * (C) Seminar for Applied Mathematics, ETH Zurich                     *
+ * This code can be freely used for non-commercial purposes as long    *
+ * as this header is left intact.                                      *
+ ***********************************************************************/
 #ifndef NODE_HPP
 #define NODE_HPP
 
@@ -6,9 +16,10 @@
 #include <Eigen/SVD>
 #include <vector>
 
+
 // forward declaration to avoid cross-referencing
 class cTree;
-//enum DecompositionOptions;
+
 
 /**
 * \brief Node of a cluster tree ("cTree" class)
@@ -213,20 +224,20 @@ public:
     }
 
 private:
-    Node* tl_child_;  //!< top left child of node
-    Node* tr_child_;  //!< top right child of node
-    Node* bl_child_;  //!< bottom left child of node
-    Node* br_child_;  //!< bottom right child of node
+    Node* tl_child_; //!< top left child of node
+    Node* tr_child_; //!< top right child of node
+    Node* bl_child_; //!< bottom left child of node
+    Node* br_child_; //!< bottom right child of node
     std::vector<Point> PPointsTree_; //!< vector of median points of the polygone's edges
     double x1_,x2_,y1_,y2_; //!< cluster coordinates
     double x1_b_,x2_b_,y1_b_,y2_b_; //!< bounding box coordinates
-    unsigned deg_;  //!< degree of interpolation
+    unsigned deg_; //!< degree of interpolation
     Eigen::VectorXd tkx_, tky_; //!< Chebyshev Nodes
     Eigen::VectorXd wkx_, wky_; //!< Lagrange polynomial weights
     Eigen::MatrixXd V_node_; //!< V matrix
     Eigen::VectorXd Vc_node_;  //!< Vc vector
     Eigen::VectorXd CVc_node_; //!< CVc vector
-    int nodeId_;    //!< id of the node in the cluster tree
+    int nodeId_; //!< id of the node in the cluster tree
     friend class cTree;
 };
 
