@@ -63,42 +63,6 @@ public:
 };
 
 /*!
-* \brief Kernel functor \f$\log{\left|\vec{x}-\vec{y}\right|}\f$
-*/
-class SingularKernel: public Kernel
-{
-    using Kernel::Kernel; // C++11 inheritance of constructors
-
-public:
-    /*!
-    * \brief Functor for 2D Singular Kernel
-    * \param x1 x-coordinate of first point
-    * \param y1 y-coordinate of first point
-    * \param x2 x-coordinate of second point
-    * \param y2 y-coordinate of second point
-    */
-    double operator()(double x1, double y1, double x2, double y2);
-};
-
-/*!
-* \brief Kernel functor \f$\frac{1}{\log{\left|\vec{x}-\vec{y}\right|}}\f$
-*/
-class SingularKernelf: public Kernel
-{
-    using Kernel::Kernel; // C++11 inheritance of constructors
-
-public:
-    /*!
-    * \brief Functor for 2D Singular Kernel
-    * \param x1 x-coordinate of first point
-    * \param y1 y-coordinate of first point
-    * \param x2 x-coordinate of second point
-    * \param y2 y-coordinate of second point
-    */
-    double operator()(double x1, double y1, double x2, double y2);
-};
-
-/*!
 * \brief Kernel functor \f${x1}\times{x2}\times{y1}\times{y2}\f$
 */
 class PolynomialKernel: public Kernel

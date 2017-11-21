@@ -42,7 +42,7 @@ int main() {
     for(unsigned i=0; i<n; ++i) {
         Point p;
         p.setId(i);
-        p.setV(std::rand()%100); // values 0--100
+        p.setV(std::rand()%100); // values 0--n
 
 #ifdef random1
         tx = ((double)rand() / (double)(RAND_MAX));

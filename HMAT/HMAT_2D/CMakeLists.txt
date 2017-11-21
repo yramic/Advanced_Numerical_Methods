@@ -18,12 +18,12 @@ target_link_libraries(low_rank_test_2D_solution hmat_2d_sols)
 
 # Test target for cluster tree
 # Template target
-add_executable(ctree_test_template ctree_test.cpp)
-target_link_libraries(ctree_test_template hmat_2d_tmps)
+#add_executable(ctree_test_template ctree_test.cpp)
+#target_link_libraries(ctree_test_template hmat_2d_tmps)
 
-# Solution target
-add_executable(ctree_test_solution ctree_test.cpp)
-target_link_libraries(ctree_test_solution hmat_2d_sols)
+## Solution target
+#add_executable(ctree_test_solution ctree_test.cpp)
+#target_link_libraries(ctree_test_solution hmat_2d_sols)
 
 # Test target for admissibility condition
 # Template target
@@ -45,10 +45,10 @@ target_link_libraries(nearfar_test_solution hmat_2d_sols)
 
 # Test target for V-matrix per node
 # Template target
-add_executable(vnode_matrix_test_template vnode_matrix_test.cpp)
-target_link_libraries(vnode_matrix_test_template hmat_2d_tmps)
+#add_executable(vnode_matrix_test_template vnode_matrix_test.cpp)
+#target_link_libraries(vnode_matrix_test_template hmat_2d_tmps)
 
 # Solution target
-add_executable(vnode_matrix_test_solution vnode_matrix_test.cpp)
-target_link_libraries(vnode_matrix_test_solution hmat_2d_sols)
+#add_executable(vnode_matrix_test_solution vnode_matrix_test.cpp)
+#target_link_libraries(vnode_matrix_test_solution hmat_2d_sols)
 

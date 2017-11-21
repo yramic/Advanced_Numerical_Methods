@@ -68,11 +68,25 @@ void Node::setLeaves()
 {
     if(!PPointsTree_.empty() && PPointsTree_.size()>1) { // if there are points in the PPointsTree vector of points then they are equaly divided into the node´s children
 #ifdef equal_clusters
-    // TODO
+        // TODO
 #endif
 #ifdef inertia
-    // TODO
+        // TODO
 #endif
+        getRect(); // calculate the rectangle defined by the points of the node
+        // fix for the rectangle if it is a segment
+        if(std::abs(x1_-x2_)<10*std::numeric_limits<double>::epsilon()){
+            x2_++;
+        }
+        if(std::abs(y1_-y2_)<10*std::numeric_limits<double>::epsilon()){
+            y2_++;
+        }
+        Cheby cbx(x1_, x2_, deg_); // Chebvchev interpolation on the edges of the rectangle
+        Cheby cby(y1_, y2_, deg_);
+        tkx_ = cbx.getNodes(); // Chebyshew nodes for x axis
+        wkx_ = cbx.getWghts(); // weights of Lagrange polynomial for x axis
+        tky_ = cby.getNodes(); // Chebyshew nodes for y axis
+        wky_ = cby.getWghts(); // weights of Lagrange polynomial for y axis
     }
 }
 

@@ -18,7 +18,9 @@
 // actual  constructor: creates the root of the Cluster Tree and the recursivly creates the leaves
 Node::Node(std::vector<Point> Points, unsigned deg):
     tl_child_(NULL), tr_child_(NULL), bl_child_(NULL), br_child_(NULL), deg_(deg), PPointsTree_(Points), CVc_node_(Eigen::VectorXd::Zero((deg+1)*(deg+1)))
-{ setLeaves(); }
+{
+    setLeaves();
+}
 
 // destructor
 Node::~Node()
@@ -68,25 +70,34 @@ void Node::setLeaves()
 {
     if(!PPointsTree_.empty() && PPointsTree_.size()>1) { // if there are points in the PPointsTree vector of points then they are equaly divided into the node´s children
 #ifdef equal_clusters
+        /* SAM_LISTING_BEGIN_0 */
         auto checkX = [](Point a, Point b) -> bool { return a.getX()<b.getX(); };
         std::sort(PPointsTree_.begin(),PPointsTree_.end(),checkX);
         std::vector<Point>::iterator it;
-        it=PPointsTree_.begin()+(PPointsTree_.size()+1)/2; // set iterator in the middle of the vector of points in this node
-        std::vector<Point> l_points,r_points;              // sorting of points in left and right based on the points´ y coordinates
+        it=PPointsTree_.begin()+(PPointsTree_.size()+1)/2; // set iterator in the middle of the vector of points of this node
+                                                           // alternative: sort points by x-coordinates and split them in half
+        std::vector<Point> l_points,r_points;              // now sort l_points and r_points based on their y-coordinates
         l_points.assign(PPointsTree_.begin(), it);
-        r_points.assign(it,PPointsTree_.end());
+        r_points.assign(it, PPointsTree_.end());
         auto checkY = [](Point a, Point b) -> bool { return a.getY()<b.getY(); };
-        std::sort(l_points.begin(),l_points.end(),checkY); // sorting of left and right vectors in top and bottom based on points´ y coordinates
+        std::sort(l_points.begin(),l_points.end(),checkY); // sort left and right vectors into top and bottom based on the y-coordinates
         std::sort(r_points.begin(),r_points.end(),checkY);
-        std::vector<Point> tl_PPoints, tr_PPoints, bl_PPoints, br_PPoints; // creation of children nodes´ points vectors
+        std::vector<Point> tl_PPoints, tr_PPoints, bl_PPoints, br_PPoints; // creation of vectors of points of child nodes
         it=l_points.begin()+(l_points.size()+1)/2;
         tl_PPoints.assign(it,l_points.end());
         bl_PPoints.assign(l_points.begin(),it);
         it=r_points.begin()+(r_points.size()+1)/2;
         tr_PPoints.assign(it,r_points.end());
         br_PPoints.assign(r_points.begin(),it);
+
+        if (!tl_PPoints.empty()) tl_child_ = new Node(tl_PPoints, deg_); // recursive construction of the Cluster Tree levels below root
+        if (!tr_PPoints.empty()) tr_child_ = new Node(tr_PPoints, deg_);
+        if (!bl_PPoints.empty()) bl_child_ = new Node(bl_PPoints, deg_);
+        if (!br_PPoints.empty()) br_child_ = new Node(br_PPoints, deg_);
+        /* SAM_LISTING_BEGIN_0 */
 #endif
 #ifdef inertia
+        /* SAM_LISTING_BEGIN_1 */
         Eigen::MatrixXd A(PPointsTree_.size(),2);
         for(int i = 0; i < PPointsTree_.size(); i++){
             A(i,0) = PPointsTree_[i].getX();
@@ -101,24 +112,30 @@ void Node::setLeaves()
         }
         double avgX = sumX/(double)PPointsTree_.size(), avgY = sumY/(double)PPointsTree_.size();
         auto y = [](double x, double x1, double y1, double avgX, double avgY) -> double {return avgY+(x-avgX)*y1/x1; };
-        std::vector<Point> top_PPoints, bottom_PPoints, left_PPoints, right_PPoints; // creation of children nodes´ points vectors
+        std::vector<Point> top_PPoints, bottom_PPoints, left_PPoints, right_PPoints; // creation of vectors of points of child nodes
         for(int i = 0; i < PPointsTree_.size(); i++){
             double y1 = y(PPointsTree_[i].getX(),V(0,0),V(1,0),avgX,avgY); // y value of the line that is defined by the point {avgX,avgY} and the vector corresponding to the biggest eigen value
             double y2 = y(PPointsTree_[i].getX(),V(0,1),V(1,1),avgX,avgY); // y value of the line that is defined by the point {avgX,avgY} and the vector corresponding to the second biggest eigen value
             if(y2<=PPointsTree_[i].getY()){
                 if(y1<=PPointsTree_[i].getY()){
                     top_PPoints.push_back(PPointsTree_[i]);
-                } else{
+                } else {
                     right_PPoints.push_back(PPointsTree_[i]);
                 }
-            } else{
+            } else {
                 if(y1<=PPointsTree_[i].getY()){
                     left_PPoints.push_back(PPointsTree_[i]);
-                }  else{
+                } else {
                     bottom_PPoints.push_back(PPointsTree_[i]);
                 }
             }
         }
+
+        if (!top_PPoints.empty()) tl_child_ = new Node(top_PPoints, deg_); // recursive construction of the Cluster Tree levels below root
+        if (!right_PPoints.empty()) tr_child_ = new Node(right_PPoints, deg_);
+        if (!bottom_PPoints.empty()) bl_child_ = new Node(bottom_PPoints, deg_);
+        if (!left_PPoints.empty()) br_child_ = new Node(left_PPoints, deg_);
+        /* SAM_LISTING_BEGIN_1 */
 #endif
         getRect(); // calculate the rectangle defined by the points of the node
         // fix for the rectangle if it is a segment
@@ -134,18 +151,6 @@ void Node::setLeaves()
         wkx_ = cbx.getWghts(); // weights of Lagrange polynomial for x axis
         tky_ = cby.getNodes(); // Chebyshew nodes for y axis
         wky_ = cby.getWghts(); // weights of Lagrange polynomial for y axis
-#ifdef equal_clusters
-        if (!tl_PPoints.empty()) tl_child_ = new Node(tl_PPoints, deg_); // recursive construction of the Cluster Tree levels below root
-        if (!tr_PPoints.empty()) tr_child_ = new Node(tr_PPoints, deg_);
-        if (!bl_PPoints.empty()) bl_child_ = new Node(bl_PPoints, deg_);
-        if (!br_PPoints.empty()) br_child_ = new Node(br_PPoints, deg_);
-#endif
-#ifdef inertia
-        if (!top_PPoints.empty()) tl_child_ = new Node(top_PPoints, deg_); // recursive construction of the Cluster Tree levels below root
-        if (!right_PPoints.empty()) tr_child_ = new Node(right_PPoints, deg_);
-        if (!bottom_PPoints.empty()) bl_child_ = new Node(bottom_PPoints, deg_);
-        if (!left_PPoints.empty()) br_child_ = new Node(left_PPoints, deg_);
-#endif
     }
 }
 
