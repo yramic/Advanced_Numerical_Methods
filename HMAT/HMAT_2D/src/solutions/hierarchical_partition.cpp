@@ -26,7 +26,7 @@ HierarchicalPartitioning::HierarchicalPartitioning(const std::vector<Point>& GPo
 // compute the Far and Near Field pairs
 void HierarchicalPartitioning::setNearFar()
 {
-    setNearFar_recursion(Tx_.getRoot(), Ty_.getRoot(), eta_, Ty_);
+    setNearFar_recursion(Tx_.getRoot(), Ty_.getRoot(), eta_);
     auto checkpointers = [](Node* x, Node* y) -> bool { return x<y; };
     std::sort(FarField_xnds_.begin(), FarField_xnds_.end(), checkpointers);
     FarField_xnds_.erase(std::unique(FarField_xnds_.begin(), FarField_xnds_.end()), FarField_xnds_.end());
@@ -37,7 +37,7 @@ void HierarchicalPartitioning::setNearFar()
 // compute the Far and Near Field pairs
 void HierarchicalPartitioning::setNearFar(Eigen::MatrixXd& cmatrix)
 {
-    setNearFar_recursion(Tx_.getRoot(), Ty_.getRoot(), eta_, Ty_, cmatrix);
+    setNearFar_recursion(Tx_.getRoot(), Ty_.getRoot(), eta_, cmatrix);
     auto checkpointers = [](Node* x, Node* y) -> bool { return x<y; };
     std::sort(FarField_xnds_.begin(), FarField_xnds_.end(), checkpointers);
     FarField_xnds_.erase(std::unique(FarField_xnds_.begin(), FarField_xnds_.end()), FarField_xnds_.end());
@@ -46,7 +46,7 @@ void HierarchicalPartitioning::setNearFar(Eigen::MatrixXd& cmatrix)
 }
 
 // add pointers to near and far field nodes of the tree
-void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree &Ty)
+void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, double eta)
 {
     // if *xnode or *ynode don`t exist, we have got nothing to compare
     if(xnode == NULL || ynode == NULL) {
@@ -54,6 +54,7 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
     }
     // admissibility for 4D Matrices
     AdmissibilityH adm;
+    /* SAM_LISTING_BEGIN_0 */
     if((*ynode).getPPoints().size()<=1 || (*xnode).getPPoints().size()<=1) {
             //(*ynode).near_f_.push_back(xnode);
             NearField_.push_back(new BlockNearF(xnode,ynode));
@@ -63,29 +64,30 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
             //(*xnode).far_f_.push_back(ynode);
             FarField_.push_back(new BlockCluster(xnode,ynode));
             FarField_xnds_.push_back(xnode); FarField_ynds_.push_back(ynode);
-        } else {    // else we consider all the different combinations of the children of *xnode and *ynode and check whether their clusters are admissible
-            setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getTl_Child(), eta, Ty);
-            setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getTr_Child(), eta, Ty);
-            setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getBl_Child(), eta, Ty);
-            setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getBr_Child(), eta, Ty);
-            setNearFar_recursion((*xnode).getTr_Child(), (*ynode).getTl_Child(), eta, Ty);
-            setNearFar_recursion((*xnode).getTr_Child(), (*ynode).getTr_Child(), eta, Ty);
-            setNearFar_recursion((*xnode).getTr_Child(), (*ynode).getBl_Child(), eta, Ty);
-            setNearFar_recursion((*xnode).getTr_Child(), (*ynode).getBr_Child(), eta, Ty);
-            setNearFar_recursion((*xnode).getBl_Child(), (*ynode).getTl_Child(), eta, Ty);
-            setNearFar_recursion((*xnode).getBl_Child(), (*ynode).getTr_Child(), eta, Ty);
-            setNearFar_recursion((*xnode).getBl_Child(), (*ynode).getBl_Child(), eta, Ty);
-            setNearFar_recursion((*xnode).getBl_Child(), (*ynode).getBr_Child(), eta, Ty);
-            setNearFar_recursion((*xnode).getBr_Child(), (*ynode).getTl_Child(), eta, Ty);
-            setNearFar_recursion((*xnode).getBr_Child(), (*ynode).getTr_Child(), eta, Ty);
-            setNearFar_recursion((*xnode).getBr_Child(), (*ynode).getBl_Child(), eta, Ty);
-            setNearFar_recursion((*xnode).getBr_Child(), (*ynode).getBr_Child(), eta, Ty);
+        } else { // else we consider all the different combinations of the children of *xnode and *ynode and check whether their clusters are admissible
+            setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getTl_Child(), eta);
+            setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getTr_Child(), eta);
+            setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getBl_Child(), eta);
+            setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getBr_Child(), eta);
+            setNearFar_recursion((*xnode).getTr_Child(), (*ynode).getTl_Child(), eta);
+            setNearFar_recursion((*xnode).getTr_Child(), (*ynode).getTr_Child(), eta);
+            setNearFar_recursion((*xnode).getTr_Child(), (*ynode).getBl_Child(), eta);
+            setNearFar_recursion((*xnode).getTr_Child(), (*ynode).getBr_Child(), eta);
+            setNearFar_recursion((*xnode).getBl_Child(), (*ynode).getTl_Child(), eta);
+            setNearFar_recursion((*xnode).getBl_Child(), (*ynode).getTr_Child(), eta);
+            setNearFar_recursion((*xnode).getBl_Child(), (*ynode).getBl_Child(), eta);
+            setNearFar_recursion((*xnode).getBl_Child(), (*ynode).getBr_Child(), eta);
+            setNearFar_recursion((*xnode).getBr_Child(), (*ynode).getTl_Child(), eta);
+            setNearFar_recursion((*xnode).getBr_Child(), (*ynode).getTr_Child(), eta);
+            setNearFar_recursion((*xnode).getBr_Child(), (*ynode).getBl_Child(), eta);
+            setNearFar_recursion((*xnode).getBr_Child(), (*ynode).getBr_Child(), eta);
         }
     }
+    /* SAM_LISTING_BEGIN_0 */
 }
 
 // add pointers to near and far field nodes of the tree for debugging
-void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree &Ty, Eigen::MatrixXd& cmatrix)
+void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, double eta, Eigen::MatrixXd& cmatrix)
 {
     // if *xnode or *ynode don`t exist, we have got nothing to compare
     if(xnode == NULL || ynode == NULL) {
@@ -104,23 +106,23 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
             //(*xnode).far_f_.push_back(ynode);
             FarField_.push_back(new BlockCluster(xnode,ynode));
             cmatrix((*xnode).getNodeID(),(*ynode).getNodeID())++;
-        } else {    // else we consider all the different combinations of the children of *xnode and *ynode and check whether their clusters are admissible
-            setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getTl_Child(), eta, Ty, cmatrix);
-            setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getTr_Child(), eta, Ty, cmatrix);
-            setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getBl_Child(), eta, Ty, cmatrix);
-            setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getBr_Child(), eta, Ty, cmatrix);
-            setNearFar_recursion((*xnode).getTr_Child(), (*ynode).getTl_Child(), eta, Ty, cmatrix);
-            setNearFar_recursion((*xnode).getTr_Child(), (*ynode).getTr_Child(), eta, Ty, cmatrix);
-            setNearFar_recursion((*xnode).getTr_Child(), (*ynode).getBl_Child(), eta, Ty, cmatrix);
-            setNearFar_recursion((*xnode).getTr_Child(), (*ynode).getBr_Child(), eta, Ty, cmatrix);
-            setNearFar_recursion((*xnode).getBl_Child(), (*ynode).getTl_Child(), eta, Ty, cmatrix);
-            setNearFar_recursion((*xnode).getBl_Child(), (*ynode).getTr_Child(), eta, Ty, cmatrix);
-            setNearFar_recursion((*xnode).getBl_Child(), (*ynode).getBl_Child(), eta, Ty, cmatrix);
-            setNearFar_recursion((*xnode).getBl_Child(), (*ynode).getBr_Child(), eta, Ty, cmatrix);
-            setNearFar_recursion((*xnode).getBr_Child(), (*ynode).getTl_Child(), eta, Ty, cmatrix);
-            setNearFar_recursion((*xnode).getBr_Child(), (*ynode).getTr_Child(), eta, Ty, cmatrix);
-            setNearFar_recursion((*xnode).getBr_Child(), (*ynode).getBl_Child(), eta, Ty, cmatrix);
-            setNearFar_recursion((*xnode).getBr_Child(), (*ynode).getBr_Child(), eta, Ty, cmatrix);
+        } else { // else we consider all the different combinations of the children of *xnode and *ynode and check whether their clusters are admissible
+            setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getTl_Child(), eta, cmatrix);
+            setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getTr_Child(), eta, cmatrix);
+            setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getBl_Child(), eta, cmatrix);
+            setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getBr_Child(), eta, cmatrix);
+            setNearFar_recursion((*xnode).getTr_Child(), (*ynode).getTl_Child(), eta, cmatrix);
+            setNearFar_recursion((*xnode).getTr_Child(), (*ynode).getTr_Child(), eta, cmatrix);
+            setNearFar_recursion((*xnode).getTr_Child(), (*ynode).getBl_Child(), eta, cmatrix);
+            setNearFar_recursion((*xnode).getTr_Child(), (*ynode).getBr_Child(), eta, cmatrix);
+            setNearFar_recursion((*xnode).getBl_Child(), (*ynode).getTl_Child(), eta, cmatrix);
+            setNearFar_recursion((*xnode).getBl_Child(), (*ynode).getTr_Child(), eta, cmatrix);
+            setNearFar_recursion((*xnode).getBl_Child(), (*ynode).getBl_Child(), eta, cmatrix);
+            setNearFar_recursion((*xnode).getBl_Child(), (*ynode).getBr_Child(), eta, cmatrix);
+            setNearFar_recursion((*xnode).getBr_Child(), (*ynode).getTl_Child(), eta, cmatrix);
+            setNearFar_recursion((*xnode).getBr_Child(), (*ynode).getTr_Child(), eta, cmatrix);
+            setNearFar_recursion((*xnode).getBr_Child(), (*ynode).getBl_Child(), eta, cmatrix);
+            setNearFar_recursion((*xnode).getBr_Child(), (*ynode).getBr_Child(), eta, cmatrix);
         }
     }
 }

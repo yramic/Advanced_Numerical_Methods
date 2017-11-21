@@ -23,7 +23,7 @@
 
 // add pairs of pointers to Node of the Cluster Tree in the Near and Far Field Vectors of pairs
 template<>
-void HierarchicalPartitioning<BlockCluster_Y,Node_Y>::setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree<Node_Y> Ty)
+void HierarchicalPartitioning<BlockCluster_Y,Node_Y>::setNearFar_recursion(Node* xnode, Node* ynode, double eta)
 {
     // if *xnode or *ynode is a leaf, we add the pair (*xnode,*ynode) to the near field vector
     if((*xnode).getLChild() == NULL || (*ynode).getRChild() == NULL) {
@@ -39,10 +39,10 @@ void HierarchicalPartitioning<BlockCluster_Y,Node_Y>::setNearFar_recursion(Node*
             FarField_.push_back(new BlockCluster_Y(xnode,ynode));
             FarField_xnds_.push_back(xnode); FarField_ynds_.push_back(ynode);
         } else { // else we consider the children of *xnode and *ynode and check whether their clusters are admissible
-            setNearFar_recursion((*xnode).getLChild(), (*ynode).getLChild(), eta, Ty);
-            setNearFar_recursion((*xnode).getRChild(), (*ynode).getLChild(), eta, Ty);
-            setNearFar_recursion((*xnode).getLChild(), (*ynode).getRChild(), eta, Ty);
-            setNearFar_recursion((*xnode).getRChild(), (*ynode).getRChild(), eta, Ty);
+            setNearFar_recursion((*xnode).getLChild(), (*ynode).getLChild(), eta);
+            setNearFar_recursion((*xnode).getRChild(), (*ynode).getLChild(), eta);
+            setNearFar_recursion((*xnode).getLChild(), (*ynode).getRChild(), eta);
+            setNearFar_recursion((*xnode).getRChild(), (*ynode).getRChild(), eta);
         }
     }
 }
@@ -51,7 +51,7 @@ void HierarchicalPartitioning<BlockCluster_Y,Node_Y>::setNearFar_recursion(Node*
 template<>
 void HierarchicalPartitioning<BlockCluster_Y,Node_Y>::setNearFar()
 {
-    setNearFar_recursion(Tx_.getRoot(), Ty_.getRoot(), eta_, Ty_);
+    setNearFar_recursion(Tx_.getRoot(), Ty_.getRoot(), eta_);
     auto checkpointers = [](Node* x, Node* y) -> bool { return x<y; };
     std::sort(FarField_xnds_.begin(), FarField_xnds_.end(), checkpointers);
     FarField_xnds_.erase(std::unique(FarField_xnds_.begin(), FarField_xnds_.end()), FarField_xnds_.end());

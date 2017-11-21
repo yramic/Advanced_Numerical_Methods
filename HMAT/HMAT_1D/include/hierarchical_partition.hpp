@@ -73,9 +73,8 @@ private:
      * \param xnode First node for checking
      * \param ynode Second node for checking
      * \param eta eta admissibility variable
-     * \param Ty Tree for reference in the recursion
      */
-    void setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree<NODE_Y> Ty);
+    void setNearFar_recursion(Node* xnode, Node* ynode, double eta);
     cTree<Node>   Tx_; //!< Cluster tree of xnodes
     cTree<NODE_Y> Ty_; //!< Cluster tree of ynodes
     std::vector<BlockCluster*> FarField_;      //!< Vector for Far Field

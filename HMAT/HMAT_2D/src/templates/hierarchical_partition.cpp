@@ -26,7 +26,7 @@ HierarchicalPartitioning::HierarchicalPartitioning(const std::vector<Point>& GPo
 // compute the Far and Near Field pairs
 void HierarchicalPartitioning::setNearFar()
 {
-    setNearFar_recursion(Tx_.getRoot(), Ty_.getRoot(), eta_, Ty_);
+    setNearFar_recursion(Tx_.getRoot(), Ty_.getRoot(), eta_);
     auto checkpointers = [](Node* x, Node* y) -> bool { return x<y; };
     std::sort(FarField_xnds_.begin(), FarField_xnds_.end(), checkpointers);
     FarField_xnds_.erase(std::unique(FarField_xnds_.begin(), FarField_xnds_.end()), FarField_xnds_.end());
@@ -37,7 +37,7 @@ void HierarchicalPartitioning::setNearFar()
 // compute the Far and Near Field pairs
 void HierarchicalPartitioning::setNearFar(Eigen::MatrixXd& cmatrix)
 {
-    setNearFar_recursion(Tx_.getRoot(), Ty_.getRoot(), eta_, Ty_, cmatrix);
+    setNearFar_recursion(Tx_.getRoot(), Ty_.getRoot(), eta_, cmatrix);
     auto checkpointers = [](Node* x, Node* y) -> bool { return x<y; };
     std::sort(FarField_xnds_.begin(), FarField_xnds_.end(), checkpointers);
     FarField_xnds_.erase(std::unique(FarField_xnds_.begin(), FarField_xnds_.end()), FarField_xnds_.end());
@@ -46,14 +46,28 @@ void HierarchicalPartitioning::setNearFar(Eigen::MatrixXd& cmatrix)
 }
 
 // add pointers to near and far field nodes of the tree
-void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree &Ty)
+void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, double eta)
 {
+    // if *xnode or *ynode don`t exist, we have got nothing to compare
+    if(xnode == NULL || ynode == NULL) {
+        return;
+    }
+    // admissibility for 4D Matrices
+    AdmissibilityH adm;
+
     // TODO
 }
 
 // add pointers to near and far field nodes of the tree for debugging
-void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, double eta, cTree &Ty, Eigen::MatrixXd& cmatrix)
+void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, double eta, Eigen::MatrixXd& cmatrix)
 {
+    // if *xnode or *ynode don`t exist, we have got nothing to compare
+    if(xnode == NULL || ynode == NULL) {
+        return;
+    }
+    // admissibility for 4D Matrices
+    AdmissibilityH adm;
+
     // TODO
 }
 
