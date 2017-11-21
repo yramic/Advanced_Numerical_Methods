@@ -94,7 +94,7 @@ void Node::setLeaves()
         if (!tr_PPoints.empty()) tr_child_ = new Node(tr_PPoints, deg_);
         if (!bl_PPoints.empty()) bl_child_ = new Node(bl_PPoints, deg_);
         if (!br_PPoints.empty()) br_child_ = new Node(br_PPoints, deg_);
-        /* SAM_LISTING_BEGIN_0 */
+        /* SAM_LISTING_END_0 */
 #endif
 #ifdef inertia
         /* SAM_LISTING_BEGIN_1 */
@@ -135,7 +135,7 @@ void Node::setLeaves()
         if (!right_PPoints.empty()) tr_child_ = new Node(right_PPoints, deg_);
         if (!bottom_PPoints.empty()) bl_child_ = new Node(bottom_PPoints, deg_);
         if (!left_PPoints.empty()) br_child_ = new Node(left_PPoints, deg_);
-        /* SAM_LISTING_BEGIN_1 */
+        /* SAM_LISTING_END_1 */
 #endif
         getRect(); // calculate the rectangle defined by the points of the node
         // fix for the rectangle if it is a segment
@@ -225,7 +225,7 @@ unsigned Node::setV()
     }
     V_node_ = V_node_new;
 */
-    /* SAM_LISTING_BEGIN_2 */
+    /* SAM_LISTING_END_2 */
     return ppts * (deg_+2)*(deg_+1)/2; // return no. of 'operations' performed
 }
 

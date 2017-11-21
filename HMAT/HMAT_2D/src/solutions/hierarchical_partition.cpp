@@ -81,7 +81,7 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
             setNearFar_recursion((*xnode).getBr_Child(), (*ynode).getBr_Child(), eta);
         }
     }
-    /* SAM_LISTING_BEGIN_0 */
+    /* SAM_LISTING_END_0 */
 }
 
 // add pointers to near and far field nodes of the tree for debugging
