@@ -56,12 +56,10 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
     AdmissibilityH adm;
     /* SAM_LISTING_BEGIN_0 */
     if((*ynode).getPPoints().size()<=1 || (*xnode).getPPoints().size()<=1) {
-            //(*ynode).near_f_.push_back(xnode);
             NearField_.push_back(new BlockNearF(xnode,ynode));
     } else {
         // if the cluster corresponding to *xnode and *ynode is admissible, we add them to the far field list of each one
         if(adm.is_admissible(xnode, ynode, eta)) {
-            //(*xnode).far_f_.push_back(ynode);
             FarField_.push_back(new BlockCluster(xnode,ynode));
             FarField_xnds_.push_back(xnode); FarField_ynds_.push_back(ynode);
         } else { // else we consider all the different combinations of the children of *xnode and *ynode and check whether their clusters are admissible
@@ -96,14 +94,12 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
     // admissibility for 4D Matrices
     AdmissibilityH adm;
     if((*ynode).getPPoints().size()<=1 || (*xnode).getPPoints().size()<=1){
-        //(*ynode).near_f_.push_back(xnode);
         NearField_.push_back(new BlockNearF(xnode,ynode));
         cmatrix((*ynode).getNodeID(),(*xnode).getNodeID())++;
     }
     else {
         // if the cluster corresponding to *xnode and *ynode is admissible, we add them to the far field list of each one
         if(adm.is_admissible(xnode, ynode, eta)) {
-            //(*xnode).far_f_.push_back(ynode);
             FarField_.push_back(new BlockCluster(xnode,ynode));
             cmatrix((*xnode).getNodeID(),(*ynode).getNodeID())++;
         } else { // else we consider all the different combinations of the children of *xnode and *ynode and check whether their clusters are admissible

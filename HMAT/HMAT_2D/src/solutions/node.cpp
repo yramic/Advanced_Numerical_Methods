@@ -76,7 +76,7 @@ void Node::setLeaves()
         std::vector<Point>::iterator it;
         it=PPointsTree_.begin()+(PPointsTree_.size()+1)/2; // set iterator in the middle of the vector of points of this node
                                                            // alternative: sort points by x-coordinates and split them in half
-        std::vector<Point> l_points,r_points;              // now sort l_points and r_points based on their y-coordinates
+        std::vector<Point> l_points,r_points;              // now sort l\_points and r\_points based on their y-coordinates
         l_points.assign(PPointsTree_.begin(), it);
         r_points.assign(it, PPointsTree_.end());
         auto checkY = [](Point a, Point b) -> bool { return a.getY()<b.getY(); };
@@ -157,6 +157,7 @@ void Node::setLeaves()
 // compute V-matrix of node
 unsigned Node::setV()
 {
+    /* SAM_LISTING_BEGIN_2 */
     int ppts = PPointsTree_.size();
     auto checkID = [](Point a, Point b) -> bool { return a.getId()<b.getId(); };
     std::sort(PPointsTree_.begin(),PPointsTree_.end(),checkID);
@@ -224,7 +225,7 @@ unsigned Node::setV()
     }
     V_node_ = V_node_new;
 */
-
+    /* SAM_LISTING_BEGIN_2 */
     return ppts * (deg_+2)*(deg_+1)/2; // return no. of 'operations' performed
 }
 

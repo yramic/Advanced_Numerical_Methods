@@ -103,16 +103,19 @@ unsigned Node::setV()
 // compute V*c restricted to node indices
 unsigned Node::setVc(const Eigen::VectorXd& c)
 {
-    // TODO
-
+    int n = PPointsTree_.size();
+    Eigen::VectorXd c_seg = Eigen::VectorXd::Zero(n);
+    for(int i=0; i<n; i++){ // get only the part of vector c needed
+        c_seg[i] = c(PPointsTree_[i].getId());
+    }
+    Vc_node_ = V_node_.transpose() * c_seg; // Vc matrix calculation
     return V_node_.rows()*V_node_.cols(); // return no. of 'operations' performed
 }
 
 // update C*V*c restricted to node indices
 unsigned Node::setCVc(const Eigen::VectorXd& CVc)
 {
-    // TODO
-
+    CVc_node_ += CVc;
     return CVc_node_.size(); // return no. of 'operations' performed
 }
 
