@@ -20,11 +20,15 @@ plot([a(1),b(1)],[a(2),b(2)],'r-');
 a = c+V(:,2); b = c-V(:,2);
 plot([a(1),b(1)],[a(2),b(2)],'m-');
 
+% First "quadrant"
 pts1 = pts(:,find(((U(:,1) > 0) .* (U(:,2) > 0)) >0));
 plot(pts1(1,:),pts1(2,:),'r^');
+% Second "quadrant"
 pts1 = pts(:,find(((U(:,1) <= 0) .* (U(:,2) > 0)) >0));
 plot(pts1(1,:),pts1(2,:),'k^');
+% Third "quadrant"
 pts1 = pts(:,find(((U(:,1) > 0) .* (U(:,2) <= 0)) >0));
 plot(pts1(1,:),pts1(2,:),'r*');
+% Fourth "quadrant"
 pts1 = pts(:,find(((U(:,1) <= 0) .* (U(:,2) <= 0)) >0));
 plot(pts1(1,:),pts1(2,:),'k*');
