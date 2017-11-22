@@ -11,6 +11,8 @@
 #include "../include/node.hpp"
 #include "../include/cheby.hpp"
 #include "../include/segment.hpp"
+#include "../BEM/CppHilbert/Library/source/gaussQuadrature.h"
+#include "../BEM/CppHilbert/Library/source/gaussTable.h"
 #include <iostream>
 
 #define inertia
@@ -169,41 +171,67 @@ void Node::setSons()
 // compute V-matrix of node
 unsigned Node::setV()
 {
-    Eigen::MatrixXd VnodeX = Eigen::MatrixXd::Ones(segments_.size(), (deg+1));
-    Eigen::MatrixXd VnodeY = Eigen::MatrixXd::Ones(segments_.size(), (deg+1));
-    for(unsigned i=0; i<=ppts-1; ++i) {
-        for(unsigned j=0; j<=deg; ++j) {
-            for(unsigned k=0; k<j; ++k) {
-                VnodeX(i,j) *= PPointsTree_[i].getX() - tkx_[k];
-            }
-            // Skip "k == j"
-            for(unsigned k=j+1; k<=deg; ++k) {
-                VnodeX(i,j) *= PPointsTree_[i].getX() - tkx_[k];
-            }
-            VnodeX(i,j) *= wkx_(j);
-        }
-    }
-    for(unsigned i=0; i<=ppts-1; ++i) {
-        for(unsigned j=0; j<=deg; ++j) {
-            for(unsigned k=0; k<j; ++k) {
-                VnodeY(i,j) *= PPointsTree_[i].getY() - tky_[k];
-            }
-            // Skip "k == j"
-            for(unsigned k=j+1; k<=deg; ++k) {
-                VnodeY(i,j) *= PPointsTree_[i].getY() - tky_[k];
-            }
-            VnodeY(i,j) *= wky_(j);
-        }
-    }
+    unsigned order;
+    if(deg_ < 2)
+        order = 2;
+    else if(deg_ < 4)
+        order = 4;
+    else if(deg_ < 8)
+        order = 8;
+    else if(deg_ < 16)
+        order = 16;
+    else
+        order = 32;
 
-    Eigen::MatrixXd V_node_new(ppts, (deg+1)*(deg+1));
-    for(unsigned i=0; i<=ppts-1; ++i) {
-        for(unsigned j=0; j<=deg; ++j) {
-            V_node_new.block(i, j*(deg+1), 1, deg+1) = VnodeX(i,j) * VnodeY.row(i);
-        }
-    }
-    V_node_ = V_node_new;
+    const double* gauss_point = getGaussPoints(order);
+    const double* gauss_wht   = getGaussWeights(order);
 
+    unsigned segs = segments_.size();
+    V_node_ = Eigen::MatrixXd::Zero(segs, (deg+1)*(deg+1));
+    for(unsigned i=0; i<segs; ++i) {
+
+        Eigen::MatrixXd VnodeX = Eigen::MatrixXd::Ones(order, (deg+1));
+        Eigen::MatrixXd VnodeY = Eigen::MatrixXd::Ones(order, (deg+1));
+
+        for(unsigned j=0; j<order; ++j) {
+
+            /* transformation of quadrature nodes from [-1,1] to [a,b] */
+            Eigen::Vector2d tk = 0.5 * (b - a) * gauss_point[j] + 0.5 * (b + a);
+            Eigen::Vector2d wk = 0.5 * (b - a) * gauss_wht[j];
+
+
+            for(unsigned k=0; k<=deg; ++k) {
+                for(unsigned l=0; l<k; ++l) {
+                    VnodeX(j,k) *= PPointsTree_[j].getX() - tkx_[l];
+                }
+                // Skip "k == j"
+                for(unsigned k=k+1; k<=deg; ++k) {
+                    VnodeX(j,k) *= PPointsTree_[j].getX() - tkx_[k];
+                }
+                VnodeX(j,k) *= wkx_(k);
+            }
+
+
+            for(unsigned j=0; j<=deg; ++j) {
+                for(unsigned k=0; k<j; ++k) {
+                    VnodeY(j,j) *= PPointsTree_[j].getY() - tky_[k];
+                }
+                // Skip "k == j"
+                for(unsigned k=j+1; k<=deg; ++k) {
+                    VnodeY(j,j) *= PPointsTree_[j].getY() - tky_[k];
+                }
+                VnodeY(j,j) *= wky_(j);
+            }
+        }
+
+        Eigen::MatrixXd V_node_new(ppts, (deg+1)*(deg+1));
+        for(unsigned i=0; i<=ppts-1; ++i) {
+            for(unsigned j=0; j<=deg; ++j) {
+                V_node_new.block(i, j*(deg+1), 1, deg+1) = VnodeX(i,j) * VnodeY.row(i);
+            }
+        }
+        V_node_ = V_node_new;
+    }
 
 
 
