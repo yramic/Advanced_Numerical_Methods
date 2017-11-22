@@ -72,8 +72,8 @@ VectorXd PartMatrix<q>::operator * (const VectorXd &v) const {
     VectorXd tmp(mB); for (int j=0;j<mB;j++) tmp(j) = v(B.j_idx[j]);
     // Multiply vector with low-rank matrix: Effort \cob{$\sharp I_k+\sharp J_k$}
     VectorXd res(nB); res = B.U*(B.V.transpose()*tmp);
-    // Store result in right components of x-vector
-    for (int i=0; i<nB;i++) y(B.i_idx[i]) = res(i);
+    // Accumlate result into components of result vector
+    for (int i=0; i<nB;i++) y(B.i_idx[i]) += res(i);
   }
    // Traverse near field boxes
   for (const NearFieldBlock &B : nearField) {
@@ -84,8 +84,8 @@ VectorXd PartMatrix<q>::operator * (const VectorXd &v) const {
     VectorXd tmp(mB); for (int j=0;j<mB;j++) tmp(j) = v(B.j_idx[j]);
     // Multiply vector with local collocation matrix
     VectorXd res(nB); res = B.Mloc*tmp;
-    // Store result in right components of x-vector
-    for (int i=0; i<nB;i++) y(B.i_idx[i]) = res(i);
+    // Accumlate result into components of result vector
+    for (int i=0; i<nB;i++) y(B.i_idx[i]) += res(i);
   }
   return(y); // (Move) return result vector
 }
