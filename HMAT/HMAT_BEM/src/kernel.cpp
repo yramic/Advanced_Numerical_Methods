@@ -8,28 +8,12 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/point.hpp"
+#include "../include/kernel.hpp"
+#include "../BEM/CppHilbert/Library/source/buildV.hpp"
 
-// set X coordinate of the point
-void Point::setX(double x)
+// kernel for 2D problem of 2 vectors
+double KernelGalerkin::operator()(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
+                                  const Eigen::Vector2d& c, const Eigen::Vector2d& d, double eta)
 {
-    x_ = x;
-}
-
-// set Y coordinate of the point
-void Point::setY(double y)
-{
-    y_ = y;
-}
-
-// set ID of the point
-void Point::setId(unsigned id)
-{
-    id_ = id;
-}
-
-// set value of the point (not used)
-void Point::setV(double v)
-{
-    v_ = v;
+    return computeVij(a, b, c, d);
 }

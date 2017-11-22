@@ -11,7 +11,6 @@
 #include "../include/kernel.hpp"
 #include "../include/cheby.hpp"
 #include <cmath>
-#include <iostream>
 #include <limits>
 
 // kernel for 2D problem of 2 vectors

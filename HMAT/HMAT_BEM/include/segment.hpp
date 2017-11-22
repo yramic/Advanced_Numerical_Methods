@@ -8,8 +8,8 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#ifndef POINT_HPP
-#define POINT_HPP
+#ifndef SEGMENT_HPP
+#define SEGMENT_HPP
 
 #include <Eigen/Dense>
 #include <vector>
@@ -17,26 +17,28 @@
 /*!
 * \brief Class for point attributes
 */
-class Point
+class Segment
 {
 public:
     /*!
     * \brief Default Constructor
     */
-    Point():
-        x_(0),y_(0),id_(0),v_(0)
+    Segment():
+        a_(Eigen::Vector2d::Zero()),
+        b_(Eigen::Vector2d::Zero()),
+        id_(0), v_(0)
     {}
     /*!
     * \brief Return x coordinate of this point
     */
-    double getX() const {
-        return x_;
+    Eigen::Vector2d getX() const {
+        return a_;
     }
     /*!
     * \brief Return y coordinate of this point
     */
-    double getY() const {
-        return y_;
+    Eigen::Vector2d getY() const {
+        return b_;
     }
     /*!
     * \brief Return id of this point
@@ -45,32 +47,21 @@ public:
         return id_;
     }
     /*!
-    * \brief Return value of this point
-    */
-    double getV() const {
-        return v_;
-    }
-    /*!
     * \brief Set x coordinate
     */
-    void setX(double x);
+    void setA(const Eigen::Vector2d& a);
     /*!
     * \brief Set y coordinate
     */
-    void setY(double y);
+    void setB(const Eigen::Vector2d& b);
     /*!
     * \brief Set id
     */
     void setId(unsigned id);
-    /*!
-    * \brief Set value
-    */
-    void setV(double v);
 
 private:
-    double x_,y_; //!< x, y coordinate of the point
-    unsigned id_; //!< id of the point
-    double v_;
+    Eigen::Vector2d a_,b_; //!< a, b extremes of the segment
+    unsigned id_; //!< id of the segment
 };
 
-#endif // POINT_HPP
+#endif // SEGMENT_HPP

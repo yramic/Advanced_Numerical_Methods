@@ -8,28 +8,22 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/point.hpp"
+#include "../include/segment.hpp"
 
 // set X coordinate of the point
-void Point::setX(double x)
+void Segment::setA(const Eigen::Vector2d& a)
 {
-    x_ = x;
+    a_ = a;
 }
 
 // set Y coordinate of the point
-void Point::setY(double y)
+void Segment::setB(const Eigen::Vector2d& b)
 {
-    y_ = y;
+    b_ = b;
 }
 
 // set ID of the point
-void Point::setId(unsigned id)
+void Segment::setId(unsigned id)
 {
     id_ = id;
-}
-
-// set value of the point (not used)
-void Point::setV(double v)
-{
-    v_ = v;
 }

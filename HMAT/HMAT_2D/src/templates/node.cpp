@@ -18,7 +18,7 @@
 // actual  constructor: creates the root of the Cluster Tree and the recursivly creates the leaves
 Node::Node(std::vector<Point> Points, unsigned deg):
     tl_child_(NULL), tr_child_(NULL), bl_child_(NULL), br_child_(NULL), deg_(deg), PPointsTree_(Points), CVc_node_(Eigen::VectorXd::Zero((deg+1)*(deg+1)))
-{ setLeaves(); }
+{ setSons(); }
 
 // destructor
 Node::~Node()
@@ -64,7 +64,7 @@ void Node::getRect()
 }
 
 // build tree recursively
-void Node::setLeaves()
+void Node::setSons()
 {
     if(!PPointsTree_.empty() && PPointsTree_.size()>1) { // if there are points in the PPointsTree vector of points then they are equaly divided into the node´s children
 #ifdef equal_clusters

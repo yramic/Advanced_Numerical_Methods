@@ -8,28 +8,27 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/point.hpp"
+#include "include/is_admissible.hpp"
+#include "include/node.hpp"
+#include <iostream>
 
-// set X coordinate of the point
-void Point::setX(double x)
+int main()
 {
-    x_ = x;
-}
-
-// set Y coordinate of the point
-void Point::setY(double y)
-{
-    y_ = y;
-}
-
-// set ID of the point
-void Point::setId(unsigned id)
-{
-    id_ = id;
-}
-
-// set value of the point (not used)
-void Point::setV(double v)
-{
-    v_ = v;
+    AdmissibilityH adm;   // defining an admissibility rule
+    Node* x = new Node(); // defining two Nodes with their Bounding Boxes´ coordinates
+    Node* y = new Node();
+    x->setX1_b(7);
+    x->setX2_b(38);
+    x->setY1_b(62);
+    x->setY2_b(90);
+    y->setX1_b(11);
+    y->setX2_b(17);
+    y->setY1_b(30);
+    y->setY2_b(46);
+    double eta = 2;
+    if(adm.is_admissible(x,y,eta)) { // checking the admissibility between the two bounding boxes
+        std::cout << "Yes" << std::endl;
+    } else {
+        std::cout << "No"  << std::endl;
+    }
 }

@@ -11,7 +11,7 @@
 #ifndef NODE_HPP
 #define NODE_HPP
 
-#include "point.hpp"
+#include "segment.hpp"
 #include <Eigen/Dense>
 #include <Eigen/SVD>
 #include <vector>
@@ -32,25 +32,25 @@ public:
     /*!
     * \brief Default Constructor
     */
-    Node(): tl_child_(NULL), tr_child_(NULL), bl_child_(NULL), br_child_(NULL), PPointsTree_(std::vector<Point>()) { }
+    Node(): tl_child_(NULL), tr_child_(NULL), bl_child_(NULL), br_child_(NULL), segments_(std::vector<Segment>()) { }
     /*!
      * \brief Constructor for the 2D problem
-     * \details Actual  Constructor: creates the root of the Cluster Tree and then recursivly creates the leaves
-     * \param PPointsTree Vector of Polygon points
+     * \details Actual Constructor: creates the root of the Cluster Tree and then recursivly creates the leaves
+     * \param segments Vector of segments
      * \param deg Degree of interpolation
      */
-    Node(const std::vector<Point> PPointsTree, unsigned deg);
+    Node(const std::vector<Segment> segments, unsigned deg);
     /*!
      * \brief Constructor for the 2D problem
-     * \details Actual  Constructor: creates the leaves of the Cluster Tree
-     * \param PPointsTree Vector of Polygon points
+     * \details Actual Constructor: creates the leaves of the Cluster Tree
+     * \param segments Vector of segments
      * \param x1 x coordinate of left edge of cluster
      * \param x2 x coordinate of right edge of cluster
      * \param y1 y coordinate of bottom edge of cluster
      * \param y2 y coordinate of top edge of cluster
      * \param deg Degree of interpolation
      */
-    Node(const std::vector<Point> PPointsTree, double x1, double x2, double y1, double y2, unsigned deg);
+    Node(const std::vector<Segment> segments, double x1, double x2, double y1, double y2, unsigned deg);
     /*!
      * \brief Default Destructor
      */
@@ -104,10 +104,10 @@ public:
         return y2_;
     }
     /*!
-     * \brief return the vector of points of this node
+     * \brief return the vector of segments of this node
      */
-    std::vector<Point> getPPoints() const {
-        return PPointsTree_;
+    std::vector<Segment> getSegments() const {
+        return segments_;
     }
     /*!
      * \brief return the V matrix of this node
@@ -228,7 +228,7 @@ private:
     Node* tr_child_; //!< top right child of node
     Node* bl_child_; //!< bottom left child of node
     Node* br_child_; //!< bottom right child of node
-    std::vector<Point> PPointsTree_; //!< vector of median points of the polygone's edges
+    std::vector<Segment> segments_; //!< vector of segments
     double x1_,x2_,y1_,y2_; //!< cluster coordinates
     double x1_b_,x2_b_,y1_b_,y2_b_; //!< bounding box coordinates
     unsigned deg_; //!< degree of interpolation

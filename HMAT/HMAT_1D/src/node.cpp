@@ -17,7 +17,7 @@
 Node::Node(std::vector<Point> points, int& id, unsigned deg):
     l_child_(NULL), r_child_(NULL), node_points_(points), nodeId_(id), deg_(deg), CVc_node_(Eigen::VectorXd::Zero(deg+1))
 {
-    setLeaves(id);
+    setSons(id);
 }
 
 // destructor
@@ -30,7 +30,7 @@ Node::~Node()
 }
 
 // build tree recursively
-void Node::setLeaves(int& id)
+void Node::setSons(int& id)
 {
     if(node_points_.size() > 1) {
         std::vector<Point>::iterator it;                    // we assume that the points are in ascending order

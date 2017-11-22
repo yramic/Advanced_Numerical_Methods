@@ -20,8 +20,8 @@
 #include <iostream>
 
 
-#define random1
-//#define circle
+//#define random1
+#define circle
 
 #define local
 //#define global
@@ -37,7 +37,7 @@ int main() {
     // initialization of points
     std::vector<Point> points;
     points.reserve(n);
-    std::srand(std::time(0));    // initializing points properties randomly
+    std::srand(std::time(0)); // initializing points properties randomly
     double tx, ty;
     for(unsigned i=0; i<n; ++i) {
         Point p;

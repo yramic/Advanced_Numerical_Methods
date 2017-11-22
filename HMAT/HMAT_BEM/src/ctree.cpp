@@ -8,28 +8,20 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
+#include "../include/ctree.hpp"
+#include "../include/is_admissible.hpp"
+#include "../include/node.hpp"
 #include "../include/point.hpp"
+#include <Eigen/Dense>
+#include <vector>
+#include <iostream>
 
-// set X coordinate of the point
-void Point::setX(double x)
+// actual constructor
+cTree::cTree(const std::vector<Segment> &PPoints, unsigned deg):
+    root_(NULL), PPointsTree_(PPoints)
 {
-    x_ = x;
-}
-
-// set Y coordinate of the point
-void Point::setY(double y)
-{
-    y_ = y;
-}
-
-// set ID of the point
-void Point::setId(unsigned id)
-{
-    id_ = id;
-}
-
-// set value of the point (not used)
-void Point::setV(double v)
-{
-    v_ = v;
+    unsigned n = PPoints.size();
+    if(n > 0) { // build the tree
+        root_ = new Node(PPoints,deg); // root is a node, leaves are added
+    }
 }

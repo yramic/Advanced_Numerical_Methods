@@ -41,7 +41,7 @@ public:
      * \brief build tree recursively
      * \param id ID of node
      */
-    void setLeaves(int& id);
+    void setSons(int& id);
     /*!
      * \brief compute fake V-matrix of ynode with uni-directional interpolation
      * \return no. of 'operations' performed

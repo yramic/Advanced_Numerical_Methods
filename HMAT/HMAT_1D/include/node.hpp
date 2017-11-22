@@ -84,7 +84,7 @@ public:
      * \brief build tree recursively
      * \param id ID of node
      */
-    void setLeaves(int& id);
+    void setSons(int& id);
     /*!
      * \brief compute V matrix
      * \return no. of 'operations' performed
