@@ -112,7 +112,7 @@ void Node::setSons()
             A(1,i) = PPointsTree_[i].getY() - avgY;
         }
         Eigen::MatrixXd M = A * A.transpose();
-        Eigen::JacobiSVD<Eigen::MatrixXd> svdOfM(M); // 'M' is square, so no options are necessary
+        Eigen::JacobiSVD<Eigen::MatrixXd> svdOfM(M, Eigen::ComputeThinV); // 'M' is square, so ComputeFullV and ComputeThinV are the same
         Eigen::MatrixXd V = svdOfM.matrixV();
         auto y = [](double x, double x1, double y1, double avgX, double avgY) -> double { return avgY+(x-avgX)*y1/x1; };
         std::vector<Point> top_PPoints, bottom_PPoints, left_PPoints, right_PPoints; // creation of vectors of points of child nodes
