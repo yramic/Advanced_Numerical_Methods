@@ -17,8 +17,8 @@
 #include <iostream>
 
 // constructor for solving the 2D problem
-LowRankApp::LowRankApp(Kernel* kernel, const std::vector<Segment> &pp, double eta, unsigned deg):
-    kernel_(kernel), HP_(pp,eta,deg), deg_(deg), nops_(0)
+LowRankApp::LowRankApp(Kernel* kernel, const std::vector<Segment>& segments, double eta, unsigned deg):
+    kernel_(kernel), HP_(segments,eta,deg), deg_(deg), nops_(0)
 {
     assert(deg < 32);
 }

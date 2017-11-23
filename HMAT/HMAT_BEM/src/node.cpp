@@ -17,7 +17,7 @@ extern "C" {
 #include <Eigen/SVD>
 #include <iostream>
 
-#define inertia
+#define equal_clusters
 
 // actual  constructor: creates the root of the Cluster Tree and the recursivly creates the leaves
 Node::Node(std::vector<Segment> segments, unsigned deg):
@@ -199,6 +199,7 @@ unsigned Node::setV()
 
         Eigen::MatrixXd VnodeX = Eigen::MatrixXd::Ones(order, (deg_+1));
         Eigen::MatrixXd VnodeY = Eigen::MatrixXd::Ones(order, (deg_+1));
+        Eigen::MatrixXd V_node_tmp(order, (deg_+1)*(deg_+1));
 
         for(unsigned j=0; j<order; ++j) {
 
@@ -216,7 +217,6 @@ unsigned Node::setV()
                 }
                 VnodeX(j,k) *= wkx_(k);
             }
-            VnodeX.row(j) *= wk;
 
              for(unsigned k=0; k<=deg_; ++k) {
                 for(unsigned l=0; l<k; ++l) {
@@ -228,14 +228,11 @@ unsigned Node::setV()
                 }
                 VnodeY(j,k) *= wky_(k);
             }
-            VnodeY.row(j) *= wk;
-        }
 
-        Eigen::MatrixXd V_node_tmp(order, (deg_+1)*(deg_+1));
-        for(unsigned j=0; j<order; ++j) {
             for(unsigned k=0; k<=deg_; ++k) {
                 V_node_tmp.block(j, k*(deg_+1), 1, deg_+1) = VnodeX(j,k) * VnodeY.row(j);
             }
+            V_node_tmp.row(j) *= wk;
         }
 
         V_node_.row(i) = V_node_tmp.colwise().sum();

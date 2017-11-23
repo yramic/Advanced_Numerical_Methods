@@ -21,6 +21,83 @@
 
 int main() {
 
+//    std::vector<Segment> segments;
+//    {
+//        Segment s;
+//        s.setId(0);
+//        Eigen::Vector2d a, b;
+//        a << 0, 1;
+//        b << 0, 0;
+//        s.setA(a);
+//        s.setB(b);
+//        segments.push_back(s);
+//    }
+//    {
+//        Segment s;
+//        s.setId(1);
+//        Eigen::Vector2d a, b;
+//        a << 0, 0;
+//        b << 1, 0;
+//        s.setA(a);
+//        s.setB(b);
+//        segments.push_back(s);
+//    }
+//    unsigned n = 2;
+//    Node n(segments, 1);
+//    n.getRect();
+//    n.setV();
+//    std::cout << n.getV_node() << std::endl;
+
+//    unsigned n = 2;
+//    std::vector<Segment> segments;
+//    segments.reserve(n);
+//    std::srand(std::time(0)); // initializing points properties randomly
+//    double progress = 0.; double shift = 1./n;
+//    for(unsigned i=0; i<n; ++i) {
+//        {
+//            Segment s;
+//            s.setId(i*4);
+//            Eigen::Vector2d a, b;
+//            a << progress, 0.;
+//            b << progress+shift, 0.;
+//            s.setA(a);
+//            s.setB(b);
+//            segments.push_back(s);
+//        }
+//        {
+//            Segment s;
+//            s.setId(i*4+1);
+//            Eigen::Vector2d a, b;
+//            a << 0., progress;
+//            b << 0., progress+shift;
+//            s.setA(a);
+//            s.setB(b);
+//            segments.push_back(s);
+//        }
+//        {
+//            Segment s;
+//            s.setId(i*4+2);
+//            Eigen::Vector2d a, b;
+//            a << progress, 1.;
+//            b << progress+shift, 1.;
+//            s.setA(a);
+//            s.setB(b);
+//            segments.push_back(s);
+//        }
+//        {
+//            Segment s;
+//            s.setId(i*4+3);
+//            Eigen::Vector2d a, b;
+//            a << 1., progress;
+//            b << 1., progress+shift;
+//            s.setA(a);
+//            s.setB(b);
+//            segments.push_back(s);
+//        }
+//        progress += 1./n;
+//    }
+//    n = segments.size();
+
     // Input
 
 //    std::cout << "Enter gridsize:" << std::endl;
@@ -81,6 +158,12 @@ int main() {
     std::chrono::duration<double> time_diff2 = end2 - start2;
 
     Eigen::VectorXd diff = f_exact - f_approx;
+
+    Eigen::MatrixXd Mtilde(n,n);
+    for(int i=0; i<n; ++i) {
+        LowRankApp HMat_tmp(&G, segments, eta, q);
+        Mtilde.col(i) = HMat_tmp.mvProd(Eigen::VectorXd::Unit(n,i));
+    }
 
     // Compute approximation error
 

@@ -13,7 +13,7 @@
 #include "../../include/point.hpp"
 #include <iostream>
 
-#define inertia
+#define equal_clusters
 
 // actual  constructor: creates the root of the Cluster Tree and the recursivly creates the leaves
 Node::Node(std::vector<Point> Points, unsigned deg):
