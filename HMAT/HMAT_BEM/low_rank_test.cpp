@@ -34,7 +34,6 @@ int main() {
     for(unsigned i=1; i<n; ++i) {
         Segment s;
         s.setId(i);
-        s.setV(std::rand()%100); // values 0--n
 
         double angle = M_PI*2/n;
         Eigen::Vector2d a, b;

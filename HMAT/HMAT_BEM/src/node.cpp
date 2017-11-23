@@ -11,8 +11,9 @@
 #include "../include/node.hpp"
 #include "../include/cheby.hpp"
 #include "../include/segment.hpp"
+extern "C" {
 #include "../BEM/CppHilbert/Library/source/gaussQuadrature.h"
-#include "../BEM/CppHilbert/Library/source/gaussTable.h"
+}
 #include <Eigen/SVD>
 #include <iostream>
 
@@ -86,25 +87,25 @@ void Node::getRect()
 void Node::setSons()
 {
     if(!segments_.empty() && segments_.size()>1) { // if there are points in the PPointsTree vector of points then they are equaly divided into the node´s children
-//#ifdef equal_clusters
+#ifdef equal_clusters
         /* SAM_LISTING_BEGIN_0 */
         auto checkX = [](Segment a, Segment b) -> bool { return a.getMean().x() < b.getMean().x(); };
         std::sort(segments_.begin(),segments_.end(),checkX);
-        std::vector<Point>::iterator it;
+        std::vector<Segment>::iterator it;
         it=segments_.begin()+(segments_.size()+1)/2; // set iterator in the middle of the vector of points of this node
-        std::vector<Point> l_points,r_points;              // now sort l\_points and r\_points based on their y-coordinates
-        l_points.assign(segments_.begin(), it);
-        r_points.assign(it, segments_.end());
+        std::vector<Segment> l_segments,r_segments;  // now sort l\_points and r\_points based on their y-coordinates
+        l_segments.assign(segments_.begin(), it);
+        r_segments.assign(it, segments_.end());
         auto checkY = [](Segment a, Segment b) -> bool { return a.getMean().y() < b.getMean().y(); };
-        std::sort(l_points.begin(),l_points.end(),checkY); // sort left and right vectors into top and bottom based on the y-coordinates
-        std::sort(r_points.begin(),r_points.end(),checkY);
+        std::sort(l_segments.begin(),l_segments.end(),checkY); // sort left and right vectors into top and bottom based on the y-coordinates
+        std::sort(r_segments.begin(),r_segments.end(),checkY);
         std::vector<Segment> tl_segments, tr_segments, bl_segments, br_segments; // creation of vectors of points of child nodes
-        it=l_points.begin()+(l_points.size()+1)/2;
-        tl_segments.assign(it,l_points.end());
-        bl_segments.assign(l_points.begin(),it);
-        it=r_points.begin()+(r_points.size()+1)/2;
-        tr_segments.assign(it,r_points.end());
-        br_segments.assign(r_points.begin(),it);
+        it=l_segments.begin()+(l_segments.size()+1)/2;
+        tl_segments.assign(it,l_segments.end());
+        bl_segments.assign(l_segments.begin(),it);
+        it=r_segments.begin()+(r_segments.size()+1)/2;
+        tr_segments.assign(it,r_segments.end());
+        br_segments.assign(r_segments.begin(),it);
 
         if (!tl_segments.empty()) tl_child_ = new Node(tl_segments, deg_); // recursive construction of the Cluster Tree levels below root
         if (!tr_segments.empty()) tr_child_ = new Node(tr_segments, deg_);
@@ -193,36 +194,36 @@ unsigned Node::setV()
     const double* gauss_wht   = getGaussWeights(order);
 
     unsigned segs = segments_.size();
-    V_node_ = Eigen::MatrixXd::Zero(segs, (deg+1)*(deg+1));
+    V_node_ = Eigen::MatrixXd::Zero(segs, (deg_+1)*(deg_+1));
     for(unsigned i=0; i<segs; ++i) {
 
-        Eigen::MatrixXd VnodeX = Eigen::MatrixXd::Ones(order, (deg+1));
-        Eigen::MatrixXd VnodeY = Eigen::MatrixXd::Ones(order, (deg+1));
+        Eigen::MatrixXd VnodeX = Eigen::MatrixXd::Ones(order, (deg_+1));
+        Eigen::MatrixXd VnodeY = Eigen::MatrixXd::Ones(order, (deg_+1));
 
         for(unsigned j=0; j<order; ++j) {
 
             /* transformation of quadrature nodes from [-1,1] to [a,b] */
-            Eigen::Vector2d tk = 0.5 * (b - a) * gauss_point[j] + 0.5 * (b + a);
-                     double wk = 0.5 * (b - a).norm() * gauss_wht[j];
+            Eigen::Vector2d tk = 0.5 * (segments_[i].getB() - segments_[i].getA()) * gauss_point[j] + 0.5 * (segments_[i].getB() + segments_[i].getA());
+                     double wk = 0.5 * (segments_[i].getB() - segments_[i].getA()).norm() * gauss_wht[j];
 
-            for(unsigned k=0; k<=deg; ++k) {
+            for(unsigned k=0; k<=deg_; ++k) {
                 for(unsigned l=0; l<k; ++l) {
                     VnodeX(j,k) *= tk.x() - tkx_[l];
                 }
                 // Skip "l == k"
-                for(unsigned l=k+1; l<=deg; ++l) {
+                for(unsigned l=k+1; l<=deg_; ++l) {
                     VnodeX(j,k) *= tk.x() - tkx_[l];
                 }
                 VnodeX(j,k) *= wkx_(k);
             }
             VnodeX.row(j) *= wk;
 
-            for(unsigned j=0; j<=deg; ++j) {
+             for(unsigned k=0; k<=deg_; ++k) {
                 for(unsigned l=0; l<k; ++l) {
                     VnodeY(j,k) *= tk.y() - tky_[l];
                 }
                 // Skip "l == k"
-                for(unsigned l=j+1; l<=deg; ++l) {
+                for(unsigned l=j+1; l<=deg_; ++l) {
                     VnodeY(j,k) *= tk.y() - tky_[l];
                 }
                 VnodeY(j,k) *= wky_(j);
@@ -230,17 +231,17 @@ unsigned Node::setV()
             VnodeY.row(j) *= wk;
         }
 
-        Eigen::MatrixXd V_node_tmp(order, (deg+1)*(deg+1));
+        Eigen::MatrixXd V_node_tmp(order, (deg_+1)*(deg_+1));
         for(unsigned j=0; j<order; ++j) {
-            for(unsigned k=0; k<=deg; ++k) {
-                V_node_tmp.block(j, k*(deg+1), 1, deg+1) = VnodeX(j,k) * VnodeY.row(j);
+            for(unsigned k=0; k<=deg_; ++k) {
+                V_node_tmp.block(j, k*(deg_+1), 1, deg_+1) = VnodeX(j,k) * VnodeY.row(j);
             }
         }
 
         V_node_.row(i) = V_node_tmp.colwise().sum();
     }
     /* SAM_LISTING_END_3 */
-    return ppts * (deg_+2)*(deg_+1)/2; // return no. of 'operations' performed
+    return segs * order * (deg_+2)*(deg_+1)/2; // return no. of 'operations' performed
 }
 
 // compute V*c restricted to node indices

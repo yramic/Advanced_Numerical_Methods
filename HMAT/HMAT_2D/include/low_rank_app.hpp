@@ -34,7 +34,7 @@ public:
      * \brief Approximate matrix-vector multiplication
      * \param c Vector c
      */
-    Eigen::VectorXd mvProd(Eigen::VectorXd& c);
+    Eigen::VectorXd mvProd(const Eigen::VectorXd& c);
     /*!
      * \brief Count number of corresponding far field points for each row of the product vector
      * \param ff_v Vector of BlockClusters

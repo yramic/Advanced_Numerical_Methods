@@ -22,7 +22,7 @@ LowRankApp::LowRankApp(Kernel* kernel, const std::vector<Point> &pp, double eta,
 { }
 
 // approximate matrix-vector multiplication
-Eigen::VectorXd LowRankApp::mvProd(Eigen::VectorXd& c)
+Eigen::VectorXd LowRankApp::mvProd(const Eigen::VectorXd& c)
 {
     nops_ = 0;
 

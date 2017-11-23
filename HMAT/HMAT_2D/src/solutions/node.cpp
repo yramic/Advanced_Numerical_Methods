@@ -193,37 +193,37 @@ unsigned Node::setV()
 
     // Alternate way of computing V matrix
 /*
-    Eigen::MatrixXd VnodeX = Eigen::MatrixXd::Ones(ppts, (deg+1));
-    Eigen::MatrixXd VnodeY = Eigen::MatrixXd::Ones(ppts, (deg+1));
+    Eigen::MatrixXd VnodeX = Eigen::MatrixXd::Ones(ppts, (deg_+1));
+    Eigen::MatrixXd VnodeY = Eigen::MatrixXd::Ones(ppts, (deg_+1));
     for(unsigned i=0; i<=ppts-1; ++i) {
-        for(unsigned j=0; j<=deg; ++j) {
+        for(unsigned j=0; j<=deg_; ++j) {
             for(unsigned k=0; k<j; ++k) {
                 VnodeX(i,j) *= PPointsTree_[i].getX() - tkx_[k];
             }
             // Skip "k == j"
-            for(unsigned k=j+1; k<=deg; ++k) {
+            for(unsigned k=j+1; k<=deg_; ++k) {
                 VnodeX(i,j) *= PPointsTree_[i].getX() - tkx_[k];
             }
             VnodeX(i,j) *= wkx_(j);
         }
     }
     for(unsigned i=0; i<=ppts-1; ++i) {
-        for(unsigned j=0; j<=deg; ++j) {
+        for(unsigned j=0; j<=deg_; ++j) {
             for(unsigned k=0; k<j; ++k) {
                 VnodeY(i,j) *= PPointsTree_[i].getY() - tky_[k];
             }
             // Skip "k == j"
-            for(unsigned k=j+1; k<=deg; ++k) {
+            for(unsigned k=j+1; k<=deg_; ++k) {
                 VnodeY(i,j) *= PPointsTree_[i].getY() - tky_[k];
             }
             VnodeY(i,j) *= wky_(j);
         }
     }
 
-    Eigen::MatrixXd V_node_new(ppts, (deg+1)*(deg+1));
+    Eigen::MatrixXd V_node_new(ppts, (deg_+1)*(deg_+1));
     for(unsigned i=0; i<=ppts-1; ++i) {
-        for(unsigned j=0; j<=deg; ++j) {
-            V_node_new.block(i, j*(deg+1), 1, deg+1) = VnodeX(i,j) * VnodeY.row(i);
+        for(unsigned j=0; j<=deg_; ++j) {
+            V_node_new.block(i, j*(deg_+1), 1, deg_+1) = VnodeX(i,j) * VnodeY.row(i);
         }
     }
     V_node_ = V_node_new;
