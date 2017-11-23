@@ -31,7 +31,7 @@ unsigned BlockNearF::setMatrix(Kernel* G)
     // Compute collocation matrix for near field points
     for(unsigned i=0; i<pair_.first->getSegments().size(); ++i)
         for(unsigned j=0; j<pair_.second->getSegments().size(); ++j)
-            C_(i,j) = (*G)(pair_.first->getSegments()[i].getX(),pair_.first->getSegments()[i].getY(),
-                           pair_.second->getSegments()[j].getX(),pair_.second->getSegments()[j].getY());
+            C_(i,j) = (*G)(pair_.first->getSegments()[i].getA(),pair_.first->getSegments()[i].getB(),
+                           pair_.second->getSegments()[j].getA(),pair_.second->getSegments()[j].getB());
     return C_.rows()*C_.cols(); // return no. of 'operations' performed
 }

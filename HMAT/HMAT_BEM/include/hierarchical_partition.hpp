@@ -15,7 +15,7 @@
 #include "block_nearf.hpp"
 #include "ctree.hpp"
 #include "kernel.hpp"
-#include "point.hpp"
+#include "segment.hpp"
 #include <iostream>
 
 /*!
@@ -26,11 +26,11 @@ class HierarchicalPartitioning
 public:
     /*!
     * \brief Constructor for the Hierarchical Partitioning Class
-    * \param PPoints Polygon Points
+    * \param segments Segments
     * \param eta eta variable of admissibility
     * \param deg Degree of itnerpolation
     */
-    HierarchicalPartitioning(const std::vector<Segment> &PPoints, double eta, unsigned deg);
+    HierarchicalPartitioning(const std::vector<Segment>& segments, double eta, unsigned deg);
     /*!
      * \brief Return the Far Field pairs vector
      */

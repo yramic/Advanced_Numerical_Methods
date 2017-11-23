@@ -17,7 +17,7 @@
 #include <iostream>
 
 // actual constructor
-cTree::cTree(const std::vector<Point> &PPoints, unsigned deg):
+cTree::cTree(const std::vector<Point>& PPoints, unsigned deg):
     root_(NULL), PPointsTree_(PPoints)
 {
     unsigned n = PPoints.size();

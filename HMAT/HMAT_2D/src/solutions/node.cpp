@@ -11,6 +11,7 @@
 #include "../../include/node.hpp"
 #include "../../include/cheby.hpp"
 #include "../../include/point.hpp"
+#include <Eigen/SVD>
 #include <iostream>
 
 #define inertia
@@ -34,6 +35,7 @@ Node::~Node()
 // calculate the rectangle defined by the points of the node
 void Node::getRect()
 {
+    /* SAM_LISTING_BEGIN_2 */
     double maxX,minX,maxY,minY;
     maxX = PPointsTree_.begin()->getX();
     minX = PPointsTree_.begin()->getX();
@@ -52,17 +54,18 @@ void Node::getRect()
         else if (it->getY()<minY) {
             minY = it->getY();
         }
-        Cheby cbx(x1_b_, x2_b_, deg_);
-        Cheby cby(y1_b_, y2_b_, deg_);
-        tkx_ = cbx.getNodes(); // Chebyshew nodes for x axis
-        wkx_ = cbx.getWghts(); // weights of Lagrange polynomial for x axis
-        tky_ = cby.getNodes(); // Chebyshew nodes for y axis
-        wky_ = cby.getWghts(); // weights of Lagrange polynomial for y axis
     }
     x1_ = minX;
     x2_ = maxX;
     y1_ = minY;
     y2_ = maxY;
+    Cheby cbx(x1_, x2_, deg_);
+    Cheby cby(y1_, y2_, deg_);
+    tkx_ = cbx.getNodes(); // Chebyshew nodes for x axis
+    wkx_ = cbx.getWghts(); // weights of Lagrange polynomial for x axis
+    tky_ = cby.getNodes(); // Chebyshew nodes for y axis
+    wky_ = cby.getWghts(); // weights of Lagrange polynomial for y axis
+    /* SAM_LISTING_END_2 */
 }
 
 // build tree recursively
@@ -108,12 +111,12 @@ void Node::setSons()
             A(0,i) = PPointsTree_[i].getX() - avgX;
             A(1,i) = PPointsTree_[i].getY() - avgY;
         }
-        Eigen::MatrixXd M = A * A.tranpose();
-        Eigen::JacobiSVD<Eigen::MatrixXd> svdOfA(A); // 'M' is square, so no options are necessary
-        Eigen::MatrixXd V = svdOfA.matrixV();
-        auto y = [](double x, double x1, double y1, double avgX, double avgY) -> double {return avgY+(x-avgX)*y1/x1; };
+        Eigen::MatrixXd M = A * A.transpose();
+        Eigen::JacobiSVD<Eigen::MatrixXd> svdOfM(M); // 'M' is square, so no options are necessary
+        Eigen::MatrixXd V = svdOfM.matrixV();
+        auto y = [](double x, double x1, double y1, double avgX, double avgY) -> double { return avgY+(x-avgX)*y1/x1; };
         std::vector<Point> top_PPoints, bottom_PPoints, left_PPoints, right_PPoints; // creation of vectors of points of child nodes
-        for(int i = 0; i < PPointsTree_.size(); i++){
+        for(unsigned i=0; i<PPointsTree_.size(); ++i){
             double y1 = y(PPointsTree_[i].getX(),V(0,0),V(1,0),avgX,avgY); // y value of the line that is defined by the point {avgX,avgY} and the vector corresponding to the biggest eigen value
             double y2 = y(PPointsTree_[i].getX(),V(0,1),V(1,1),avgX,avgY); // y value of the line that is defined by the point {avgX,avgY} and the vector corresponding to the second biggest eigen value
             if(y2<=PPointsTree_[i].getY()){
@@ -157,7 +160,7 @@ void Node::setSons()
 // compute V-matrix of node
 unsigned Node::setV()
 {
-    /* SAM_LISTING_BEGIN_2 */
+    /* SAM_LISTING_BEGIN_3 */
     int ppts = PPointsTree_.size();
     auto checkID = [](Point a, Point b) -> bool { return a.getId()<b.getId(); };
     std::sort(PPointsTree_.begin(),PPointsTree_.end(),checkID);
@@ -225,7 +228,7 @@ unsigned Node::setV()
     }
     V_node_ = V_node_new;
 */
-    /* SAM_LISTING_END_2 */
+    /* SAM_LISTING_END_3 */
     return ppts * (deg_+2)*(deg_+1)/2; // return no. of 'operations' performed
 }
 

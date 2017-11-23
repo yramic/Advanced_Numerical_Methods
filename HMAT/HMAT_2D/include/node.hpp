@@ -13,7 +13,6 @@
 
 #include "point.hpp"
 #include <Eigen/Dense>
-#include <Eigen/SVD>
 #include <vector>
 
 
@@ -188,25 +187,25 @@ public:
      * \brief Setter for X1 coordinate of the bounding box
      */
     void setX1_b(double x1) {
-        x1_b_=x1;
+        x1_=x1;
     }
     /*!
      * \brief Setter for X1 coordinate of the bounding box
      */
     void setX2_b(double x2) {
-        x2_b_=x2;
+        x2_=x2;
     }
     /*!
      * \brief Setter for X2 coordinate of the bounding box
      */
     void setY1_b(double y1) {
-        y1_b_=y1;
+        y1_=y1;
     }
     /*!
      * \brief Setter for Y2 coordinate of the bounding box
      */
     void setY2_b(double y2) {
-        y2_b_=y2;
+        y2_=y2;
     }
     /*!
      * \brief Setter for id of the node
@@ -221,8 +220,7 @@ private:
     Node* bl_child_; //!< bottom left child of node
     Node* br_child_; //!< bottom right child of node
     std::vector<Point> PPointsTree_; //!< vector of median points of the polygone's edges
-    double x1_,x2_,y1_,y2_; //!< cluster coordinates
-    double x1_b_,x2_b_,y1_b_,y2_b_; //!< bounding box coordinates
+    double x1_,x2_,y1_,y2_; //!< bounding box coordinates
     unsigned deg_; //!< degree of interpolation
     Eigen::VectorXd tkx_, tky_; //!< Chebyshev Nodes
     Eigen::VectorXd wkx_, wky_; //!< Lagrange polynomial weights

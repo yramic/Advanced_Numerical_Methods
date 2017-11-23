@@ -26,18 +26,24 @@ public:
     Segment():
         a_(Eigen::Vector2d::Zero()),
         b_(Eigen::Vector2d::Zero()),
-        id_(0), v_(0)
+        id_(0)
     {}
     /*!
-    * \brief Return x coordinate of this point
+    * \brief Return mean coordinates of this segment
     */
-    Eigen::Vector2d getX() const {
+    Eigen::Vector2d getMean() const {
+        return (a_ + b_)/2.;
+    }
+    /*!
+    * \brief Return first  extreme coordinates of this segment
+    */
+    Eigen::Vector2d getA() const {
         return a_;
     }
     /*!
-    * \brief Return y coordinate of this point
+    * \brief Return second extreme coordinates of this segment
     */
-    Eigen::Vector2d getY() const {
+    Eigen::Vector2d getB() const {
         return b_;
     }
     /*!

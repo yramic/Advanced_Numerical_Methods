@@ -11,6 +11,8 @@
 #ifndef KERNEL_HPP
 #define KERNEL_HPP
 
+#include <Eigen/Dense>
+
 /*!
 * \brief Kernel base class
 */
@@ -29,6 +31,15 @@ public:
     Kernel(double num):
         num_(num)
     { }
+
+    /*!
+    * \brief Virtual Functor
+    * \param x1 x-coordinate of first point
+    * \param y1 y-coordinate of first point
+    * \param x2 x-coordinate of second point
+    * \param y2 y-coordinate of second point
+    */
+    virtual double operator()(double x1, double y1, double x2, double y2) = 0;
 
     /*!
     * \brief Virtual Functor
@@ -59,6 +70,14 @@ public:
     * \param y1 y-coordinate of first point
     * \param x2 x-coordinate of second point
     * \param y2 y-coordinate of second point
+    */
+    double operator()(double x1, double y1, double x2, double y2);
+    /*!
+    * \brief Functor for 2D
+    * \param a coordinates of first point of first segment
+    * \param b coordinates of second point of first segment
+    * \param c coordinates of first point of second segment
+    * \param d coordinates of second point of second segment
     */
     double operator()(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
                       const Eigen::Vector2d& c, const Eigen::Vector2d& d, double eta = 1e-05);

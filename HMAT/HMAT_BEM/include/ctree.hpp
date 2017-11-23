@@ -11,7 +11,7 @@
 #ifndef CTREE_HPP
 #define CTREE_HPP
 
-#include "point.hpp"
+#include "segment.hpp"
 #include <Eigen/Dense>
 #include <vector>
 
@@ -32,10 +32,10 @@ public:
     cTree(): root_(NULL) {}
     /*!
     * \brief Actual Constructor for 2D
-    * \param PPointsTree Vector of Polygon Points
+    * \param segments Vector of segments
     * \param deg Degree of interpolation
     */
-    cTree(const std::vector<Point> &PPointsTree, unsigned deg);
+    cTree(const std::vector<Segment>& segments, unsigned deg);
     /*!
     * \brief Copy Constructor for 2D
     * \param T The cTree to copy
@@ -50,7 +50,7 @@ public:
 
 private:
     Node* root_; //!< pointer to node-root of "cTree"
-    const std::vector<Point> PPointsTree_;  //!< vector that has all the Polygon Points
+    const std::vector<Segment> segments_;  //!< vector that has all the Polygon Points
     friend class Node;
 };
 

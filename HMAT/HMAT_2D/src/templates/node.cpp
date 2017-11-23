@@ -32,35 +32,7 @@ Node::~Node()
 // calculate the rectangle defined by the points of the node
 void Node::getRect()
 {
-    double maxX,minX,maxY,minY;
-    maxX = PPointsTree_.begin()->getX();
-    minX = PPointsTree_.begin()->getX();
-    maxY = PPointsTree_.begin()->getY();
-    minY = PPointsTree_.begin()->getY();
-    for (std::vector<Point>::iterator it=PPointsTree_.begin()+1; it!=PPointsTree_.end(); it++){
-        if (it->getX()>maxX) {
-            maxX = it->getX();
-        }
-        else if (it->getX()<minX) {
-            minX = it->getX();
-        }
-        if (it->getY()>maxY) {
-            maxY = it->getY();
-        }
-        else if (it->getY()<minY) {
-            minY = it->getY();
-        }
-        Cheby cbx(x1_b_, x2_b_, deg_);
-        Cheby cby(y1_b_, y2_b_, deg_);
-        tkx_ = cbx.getNodes(); // Chebyshew nodes for x axis
-        wkx_ = cbx.getWghts(); // weights of Lagrange polynomial for x axis
-        tky_ = cby.getNodes(); // Chebyshew nodes for y axis
-        wky_ = cby.getWghts(); // weights of Lagrange polynomial for y axis
-    }
-    x1_ = minX;
-    x2_ = maxX;
-    y1_ = minY;
-    y2_ = maxY;
+    // TODO
 }
 
 // build tree recursively
@@ -74,19 +46,6 @@ void Node::setSons()
         // TODO
 #endif
         getRect(); // calculate the rectangle defined by the points of the node
-        // fix for the rectangle if it is a segment
-        if(std::abs(x1_-x2_)<10*std::numeric_limits<double>::epsilon()){
-            x2_++;
-        }
-        if(std::abs(y1_-y2_)<10*std::numeric_limits<double>::epsilon()){
-            y2_++;
-        }
-        Cheby cbx(x1_, x2_, deg_); // Chebvchev interpolation on the edges of the rectangle
-        Cheby cby(y1_, y2_, deg_);
-        tkx_ = cbx.getNodes(); // Chebyshew nodes for x axis
-        wkx_ = cbx.getWghts(); // weights of Lagrange polynomial for x axis
-        tky_ = cby.getNodes(); // Chebyshew nodes for y axis
-        wky_ = cby.getWghts(); // weights of Lagrange polynomial for y axis
     }
 }
 

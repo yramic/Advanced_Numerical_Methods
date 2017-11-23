@@ -8,19 +8,19 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../../include/hierarchical_partition.hpp"
-#include "../../include/block_nearf.hpp"
-#include "../../include/cheby.hpp"
-#include "../../include/ctree.hpp"
-#include "../../include/is_admissible.hpp"
-#include "../../include/node.hpp"
+#include "../include/hierarchical_partition.hpp"
+#include "../include/block_nearf.hpp"
+#include "../include/cheby.hpp"
+#include "../include/ctree.hpp"
+#include "../include/is_admissible.hpp"
+#include "../include/node.hpp"
 #include <Eigen/Dense>
 #include <vector>
 #include <iostream>
 
 // Constructor: creates the cluster tree and
-HierarchicalPartitioning::HierarchicalPartitioning(const std::vector<Point>& GPoints, double eta, unsigned deg):
-    Tx_(GPoints,deg), Ty_(Tx_), eta_(eta)
+HierarchicalPartitioning::HierarchicalPartitioning(const std::vector<Segment>& segments, double eta, unsigned deg):
+    Tx_(segments,deg), Ty_(Tx_), eta_(eta)
 {}
 
 // compute the Far and Near Field pairs
@@ -55,7 +55,7 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
     // admissibility for 4D Matrices
     AdmissibilityH adm;
     /* SAM_LISTING_BEGIN_0 */
-    if((*ynode).getPPoints().size()<=1 || (*xnode).getPPoints().size()<=1) {
+    if((*ynode).getSegments().size()<=1 || (*xnode).getSegments().size()<=1) {
             NearField_.push_back(new BlockNearF(xnode,ynode));
     } else {
         // if the cluster corresponding to *xnode and *ynode is admissible, we add them to the far field list of each one
@@ -93,7 +93,7 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode, do
     }
     // admissibility for 4D Matrices
     AdmissibilityH adm;
-    if((*ynode).getPPoints().size()<=1 || (*xnode).getPPoints().size()<=1){
+    if((*ynode).getSegments().size()<=1 || (*xnode).getSegments().size()<=1){
         NearField_.push_back(new BlockNearF(xnode,ynode));
         cmatrix((*ynode).getNodeID(),(*xnode).getNodeID())++;
     }
