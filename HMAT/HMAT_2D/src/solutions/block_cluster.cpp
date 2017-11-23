@@ -8,8 +8,8 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/block_cluster.hpp"
-#include "../include/cheby.hpp"
+#include "../../include/block_cluster.hpp"
+#include "../../include/cheby.hpp"
 #include <iostream>
 
 // Constructor
@@ -25,6 +25,7 @@ BlockCluster::BlockCluster(Node* ndx, Node* ndy, Kernel* G):
 // compute matrix $C_{\sigma,\mu}$
 unsigned BlockCluster::setMatrix(Kernel* G)
 {
+    /* SAM_LISTING_BEGIN_0 */
     Eigen::VectorXd tk1x = pair_.first->getTkx();
     Eigen::VectorXd tk1y = pair_.first->getTky();
     Eigen::VectorXd tk2x = pair_.second->getTkx();
@@ -39,6 +40,7 @@ unsigned BlockCluster::setMatrix(Kernel* G)
             }
         }
     }
+    /* SAM_LISTING_END_0 */
     return C_.rows()*C_.cols(); // return no. of 'operations' performed
 }
 

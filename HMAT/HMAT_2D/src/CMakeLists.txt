@@ -1,5 +1,4 @@
 set(cpp_files
-    ${CMAKE_CURRENT_LIST_DIR}/block_cluster.cpp
     ${CMAKE_CURRENT_LIST_DIR}/block_nearf.cpp
     ${CMAKE_CURRENT_LIST_DIR}/cheby.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ctree.cpp

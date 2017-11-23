@@ -23,9 +23,9 @@ int main() {
 
     // Input
 
-    std::cout << "Enter gridsize:" << std::endl;
-    unsigned n; std::cin >> n;
-//    unsigned n = 100;
+//    std::cout << "Enter gridsize:" << std::endl;
+//    unsigned n; std::cin >> n;
+    unsigned n = 100;
 
     // initialization of segments
     std::vector<Segment> segments;
@@ -47,13 +47,13 @@ int main() {
 
     Eigen::VectorXd c = Eigen::VectorXd::Random(n);
 
-    std::cout << "Enter admissibility constant:" << std::endl;
-    double eta; std::cin >> eta;
-//    double eta = 0.5;
+//    std::cout << "Enter admissibility constant:" << std::endl;
+//    double eta; std::cin >> eta;
+    double eta = 0.5;
 
-    std::cout << "Enter degree of interpolating polynomials:" << std::endl;
-    unsigned q; std::cin >> q;
-//    unsigned q = 2;
+//    std::cout << "Enter degree of interpolating polynomials:" << std::endl;
+//    unsigned q; std::cin >> q;
+    unsigned q = 2;
 
     KernelGalerkin G; // initialization of Galerkin kernel for 2d problem -1/(2*pi)*log||x-y||
 
