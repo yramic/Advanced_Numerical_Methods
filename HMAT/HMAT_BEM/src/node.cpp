@@ -226,7 +226,7 @@ unsigned Node::setV()
                 for(unsigned l=j+1; l<=deg_; ++l) {
                     VnodeY(j,k) *= tk.y() - tky_[l];
                 }
-                VnodeY(j,k) *= wky_(j);
+                VnodeY(j,k) *= wky_(k);
             }
             VnodeY.row(j) *= wk;
         }
