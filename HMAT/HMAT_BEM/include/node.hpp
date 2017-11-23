@@ -112,7 +112,7 @@ public:
     /*!
      * \brief return the V matrix of this node
      */
-    Eigen::MatrixXd getV_node() const{
+    Eigen::MatrixXd getV_node() const {
         return V_node_;
     }
     /*!
@@ -126,7 +126,7 @@ public:
     /*!
      * \brief return the id of this node
      */
-    int getNodeID(){
+    int getNodeID() {
         return nodeId_;
     }
     /*!
@@ -161,14 +161,6 @@ public:
      * \brief Build tree recursively
      */
     void setSons();
-    /*!
-     * \brief Function for splitting the square space in 4 smaller square spaces
-     * \param x1 x coordinate of left edge of cluster
-     * \param x2 x coordinate of right edge of cluster
-     * \param y1 y coordinate of bottom edge of cluster
-     * \param y2 y coordinate of top edge of cluster
-     */
-    void setSons(double x1, double x2, double y1, double y2);
     /*!
      * \brief Compute V matrix
      * \param deg Degree of interpolation
@@ -219,7 +211,7 @@ public:
     /*!
      * \brief Setter for id of the node
      */
-    void setNodeId(double n){
+    void setNodeId(double n) {
         nodeId_ = n;
     }
 

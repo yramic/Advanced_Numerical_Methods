@@ -75,7 +75,6 @@ void Node::setSons()
         std::sort(PPointsTree_.begin(),PPointsTree_.end(),checkX);
         std::vector<Point>::iterator it;
         it=PPointsTree_.begin()+(PPointsTree_.size()+1)/2; // set iterator in the middle of the vector of points of this node
-                                                           // alternative: sort points by x-coordinates and split them in half
         std::vector<Point> l_points,r_points;              // now sort l\_points and r\_points based on their y-coordinates
         l_points.assign(PPointsTree_.begin(), it);
         r_points.assign(it, PPointsTree_.end());
@@ -98,19 +97,20 @@ void Node::setSons()
 #endif
 #ifdef inertia
         /* SAM_LISTING_BEGIN_1 */
-        Eigen::MatrixXd A(PPointsTree_.size(),2);
-        for(int i = 0; i < PPointsTree_.size(); i++){
-            A(i,0) = PPointsTree_[i].getX();
-            A(i,1) = PPointsTree_[i].getY();
-        }
-        Eigen::BDCSVD<Eigen::MatrixXd> svdOfA(A,Eigen::DecompositionOptions::ComputeEigenvectors | Eigen::DecompositionOptions::ComputeFullV);
-        Eigen::MatrixXd V = svdOfA.matrixV();
         double sumX, sumY;
         for(int i = 0; i < PPointsTree_.size(); i++){
             sumX += PPointsTree_[i].getX();
             sumY += PPointsTree_[i].getY();
         }
         double avgX = sumX/(double)PPointsTree_.size(), avgY = sumY/(double)PPointsTree_.size();
+        Eigen::MatrixXd A(2, PPointsTree_.size());
+        for(unsigned i=0; i<PPointsTree_.size(); ++i){
+            A(0,i) = PPointsTree_[i].getX() - avgX;
+            A(1,i) = PPointsTree_[i].getY() - avgY;
+        }
+        Eigen::MatrixXd M = A * A.tranpose();
+        Eigen::JacobiSVD<Eigen::MatrixXd> svdOfA(A); // 'M' is square, so no options are necessary
+        Eigen::MatrixXd V = svdOfA.matrixV();
         auto y = [](double x, double x1, double y1, double avgX, double avgY) -> double {return avgY+(x-avgX)*y1/x1; };
         std::vector<Point> top_PPoints, bottom_PPoints, left_PPoints, right_PPoints; // creation of vectors of points of child nodes
         for(int i = 0; i < PPointsTree_.size(); i++){
