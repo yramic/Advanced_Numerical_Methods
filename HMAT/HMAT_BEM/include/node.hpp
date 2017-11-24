@@ -108,6 +108,8 @@ public:
     std::vector<Segment> getSegments() const {
         return segments_;
     }
+
+    double evalLagrange(unsigned j, double tk);
     /*!
      * \brief return the V matrix of this node
      */

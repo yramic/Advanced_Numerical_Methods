@@ -34,7 +34,8 @@ unsigned BlockCluster::setMatrix(Kernel* G)
         for(int j=0; j<tk1y.size(); j++){
             for(int k=0; k<tk2x.size(); k++){
                 for(int l=0; l<tk2y.size(); l++){
-                    C_(i*(tk1y.size())+j,k*(tk2y.size())+l) = (*G)(tk1x[i],tk1y[j],tk2x[k],tk2y[l]);
+                    C_(i*tk1x.size()+j,
+                       k*tk2x.size()+l) = (*G)(tk1x[i],tk1y[j],tk2x[k],tk2y[l]);
                 }
             }
         }

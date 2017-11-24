@@ -174,6 +174,20 @@ void Node::setSons()
     }
 }
 
+double Node::evalLagrange(unsigned j, double tk)
+{
+    double result = 1.;
+    for(unsigned k=0; k<j; ++k) {
+        result *= tk - tkx_[k];
+    }
+    // Skip "k == j"
+    for(unsigned k=j+1; k<=deg_; ++k) {
+        result *= tk - tkx_[k];
+    }
+    result *= wkx_(j);
+    return result;
+}
+
 // compute V-matrix of node
 unsigned Node::setV()
 {
@@ -197,45 +211,22 @@ unsigned Node::setV()
     V_node_ = Eigen::MatrixXd::Zero(segs, (deg_+1)*(deg_+1));
     for(unsigned i=0; i<segs; ++i) {
 
-        Eigen::MatrixXd VnodeX = Eigen::MatrixXd::Ones(order, (deg_+1));
-        Eigen::MatrixXd VnodeY = Eigen::MatrixXd::Ones(order, (deg_+1));
-        Eigen::MatrixXd V_node_tmp(order, (deg_+1)*(deg_+1));
+        for(unsigned k1=0; k1<=deg_; ++k1) {
+            for(unsigned k2=0; k2<=deg_; ++k2) {
+                double sum = 0.;
+                for(unsigned j=0; j<order; ++j) {
 
-        for(unsigned j=0; j<order; ++j) {
+                    /* transformation of quadrature nodes from [-1,1] to [a,b] */
+                    Eigen::Vector2d tk = 0.5 * (segments_[i].getB() - segments_[i].getA()) * gauss_point[j] + 0.5 * (segments_[i].getB() + segments_[i].getA());
+//                           double wk = 0.5 * (segments_[i].getB() - segments_[i].getA()).norm() * gauss_wht[j];
 
-            /* transformation of quadrature nodes from [-1,1] to [a,b] */
-            Eigen::Vector2d tk = 0.5 * (segments_[i].getB() - segments_[i].getA()) * gauss_point[j] + 0.5 * (segments_[i].getB() + segments_[i].getA());
-                     double wk = 0.5 * (segments_[i].getB() - segments_[i].getA()).norm() * gauss_wht[j];
-
-            for(unsigned k=0; k<=deg_; ++k) {
-                for(unsigned l=0; l<k; ++l) {
-                    VnodeX(j,k) *= tk.x() - tkx_[l];
+                    sum += gauss_wht[j] * evalLagrange(k1, tk.x()) * evalLagrange(k2, tk.y());
                 }
-                // Skip "l == k"
-                for(unsigned l=k+1; l<=deg_; ++l) {
-                    VnodeX(j,k) *= tk.x() - tkx_[l];
-                }
-                VnodeX(j,k) *= wkx_(k);
+
+                sum *= 0.5 * (segments_[i].getB() - segments_[i].getA()).norm();
+                V_node_(i, k1*(deg_+1) + k2) = sum;
             }
-
-             for(unsigned k=0; k<=deg_; ++k) {
-                for(unsigned l=0; l<k; ++l) {
-                    VnodeY(j,k) *= tk.y() - tky_[l];
-                }
-                // Skip "l == k"
-                for(unsigned l=j+1; l<=deg_; ++l) {
-                    VnodeY(j,k) *= tk.y() - tky_[l];
-                }
-                VnodeY(j,k) *= wky_(k);
-            }
-
-            for(unsigned k=0; k<=deg_; ++k) {
-                V_node_tmp.block(j, k*(deg_+1), 1, deg_+1) = VnodeX(j,k) * VnodeY.row(j);
-            }
-            V_node_tmp.row(j) *= wk;
         }
-
-        V_node_.row(i) = V_node_tmp.colwise().sum();
     }
     /* SAM_LISTING_END_3 */
     return segs * order * (deg_+2)*(deg_+1)/2; // return no. of 'operations' performed

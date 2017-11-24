@@ -159,11 +159,11 @@ int main() {
 
     Eigen::VectorXd diff = f_exact - f_approx;
 
-    Eigen::MatrixXd Mtilde(n,n);
-    for(int i=0; i<n; ++i) {
-        LowRankApp HMat_tmp(&G, segments, eta, q);
-        Mtilde.col(i) = HMat_tmp.mvProd(Eigen::VectorXd::Unit(n,i));
-    }
+//    Eigen::MatrixXd Mtilde(n,n);
+//    for(int i=0; i<n; ++i) {
+//        LowRankApp HMat_tmp(&G, segments, eta, q);
+//        Mtilde.col(i) = HMat_tmp.mvProd(Eigen::VectorXd::Unit(n,i));
+//    }
 
     // Compute approximation error
 
