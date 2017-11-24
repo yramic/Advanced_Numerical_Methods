@@ -2,7 +2,7 @@
  *                                                                     *
  * Code for Course "Advanced Numerical Methods for CSE"                *
  * (Prof. Dr. R. Hiptmair)                                             *
- * Author: Ioannis Magkanaris                                          *
+ * Author: Daniele Casati                                              *
  * Date: 11/2017                                                       *
  * (C) Seminar for Applied Mathematics, ETH Zurich                     *
  * This code can be freely used for non-commercial purposes as long    *
@@ -53,5 +53,11 @@ Eigen::MatrixXd BlockCluster::getVCV() const
 {
     Eigen::MatrixXd Vsigma = pair_.first->getV_Node();
     Eigen::MatrixXd Vmu    = pair_.second->getV_Node();
-    return Vsigma * C_ * Vmu.transpose();
+    Eigen::MatrixXd VCV = Vsigma * C_ * Vmu.transpose();
+    Eigen::MatrixXd VCVord(VCV.rows(), VCV.cols());
+    for(unsigned i=0; i<pair_.first->getSegments().size(); ++i)
+        for(unsigned j=0; j<pair_.second->getSegments().size(); ++j)
+            VCVord(pair_.first->getSegments()[i].getId(),
+                   pair_.second->getSegments()[j].getId()) = VCV(i,j);
+    return VCVord;
 }

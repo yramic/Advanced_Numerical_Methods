@@ -2,7 +2,7 @@
  *                                                                     *
  * Code for Course "Advanced Numerical Methods for CSE"                *
  * (Prof. Dr. R. Hiptmair)                                             *
- * Author: Ioannis Magkanaris                                          *
+ * Author: Daniele Casati                                              *
  * Date: 11/2017                                                       *
  * (C) Seminar for Applied Mathematics, ETH Zurich                     *
  * This code can be freely used for non-commercial purposes as long    *
@@ -11,6 +11,9 @@
 #include "include/kernel.hpp"
 #include "include/low_rank_app.hpp"
 #include "include/segment.hpp"
+extern "C" {
+#include "../BEM/CppHilbert/Library/source/gaussQuadrature.h"
+}
 
 #include <Eigen/Dense>
 #include <chrono>
@@ -21,90 +24,125 @@
 
 int main() {
 
-//    std::vector<Segment> segments;
-//    {
-//        Segment s;
-//        s.setId(0);
-//        Eigen::Vector2d a, b;
-//        a << 0, 1;
-//        b << 0, 0;
-//        s.setA(a);
-//        s.setB(b);
-//        segments.push_back(s);
-//    }
-//    {
-//        Segment s;
-//        s.setId(1);
-//        Eigen::Vector2d a, b;
-//        a << 0, 0;
-//        b << 1, 0;
-//        s.setA(a);
-//        s.setB(b);
-//        segments.push_back(s);
-//    }
-//    unsigned n = 2;
-//    Node n(segments, 1);
-//    n.getRect();
-//    n.setV();
-//    std::cout << n.getV_node() << std::endl;
+    // Test
 
-//    unsigned n = 2;
-//    std::vector<Segment> segments;
-//    segments.reserve(n);
-//    std::srand(std::time(0)); // initializing points properties randomly
-//    double progress = 0.; double shift = 1./n;
-//    for(unsigned i=0; i<n; ++i) {
-//        {
-//            Segment s;
-//            s.setId(i*4);
-//            Eigen::Vector2d a, b;
-//            a << progress, 0.;
-//            b << progress+shift, 0.;
-//            s.setA(a);
-//            s.setB(b);
-//            segments.push_back(s);
-//        }
-//        {
-//            Segment s;
-//            s.setId(i*4+1);
-//            Eigen::Vector2d a, b;
-//            a << 0., progress;
-//            b << 0., progress+shift;
-//            s.setA(a);
-//            s.setB(b);
-//            segments.push_back(s);
-//        }
-//        {
-//            Segment s;
-//            s.setId(i*4+2);
-//            Eigen::Vector2d a, b;
-//            a << progress, 1.;
-//            b << progress+shift, 1.;
-//            s.setA(a);
-//            s.setB(b);
-//            segments.push_back(s);
-//        }
-//        {
-//            Segment s;
-//            s.setId(i*4+3);
-//            Eigen::Vector2d a, b;
-//            a << 1., progress;
-//            b << 1., progress+shift;
-//            s.setA(a);
-//            s.setB(b);
-//            segments.push_back(s);
-//        }
-//        progress += 1./n;
-//    }
-//    n = segments.size();
+    std::vector<Segment> segments;
+    {
+        Segment s;
+        s.setId(0);
+        Eigen::Vector2d a, b;
+        a << 0, 1;
+        b << 0, 0;
+        s.setA(a);
+        s.setB(b);
+        segments.push_back(s);
+    }
+    {
+        Segment s;
+        s.setId(1);
+        Eigen::Vector2d a, b;
+        a << 0, 0;
+        b << 1, 0;
+        s.setA(a);
+        s.setB(b);
+        segments.push_back(s);
+    }
+    {
+        Segment s;
+        s.setId(2);
+        Eigen::Vector2d a, b;
+        a << 1, 0;
+        b << 1, 1;
+        s.setA(a);
+        s.setB(b);
+        segments.push_back(s);
+    }
+    {
+        Segment s;
+        s.setId(3);
+        Eigen::Vector2d a, b;
+        a << 1, 1;
+        b << 0, 1;
+        s.setA(a);
+        s.setB(b);
+        segments.push_back(s);
+    }
+    unsigned n = segments.size();
+    Node node(segments, 10);
+    node.getRect();
+    node.setV();
+
+    KernelGalerkin G; // initialization of Galerkin kernel for 2d problem -1/(2*pi)*log||x-y||
+
+    BlockCluster bc(&node, &node);
+    bc.setMatrix(&G);
+    std::cout << "VCVt:" << std::endl << bc.getVCV() << std::endl;
+
+    Eigen::MatrixXd M(n,n);
+    for(int i=0; i<n; ++i)
+        for(int j=0; j<n; ++j)
+            M(i,j) = G(segments[i].getA(), segments[i].getB(), segments[j].getA(), segments[j].getB());
+    std::cout << "CppHilbert:" << std::endl << M << std::endl;
 
     // Input
+/*
+    std::cout << "Enter gridsize:" << std::endl;
+    unsigned n; std::cin >> n;
+//    unsigned n = 1000;
 
-//    std::cout << "Enter gridsize:" << std::endl;
-//    unsigned n; std::cin >> n;
-    unsigned n = 50;
-
-    // initialization of segments
+    // initialization of segments on a square
+    unsigned n = 2; // segments per edge
+    std::vector<Segment> segments;
+    segments.reserve(n);
+    std::srand(std::time(0)); // initializing points properties randomly
+    double progress = 0.; double shift = 1./n;
+    for(unsigned i=0; i<n; ++i) {
+        {
+            Segment s;
+            s.setId(i*4);
+            Eigen::Vector2d a, b;
+            a << progress, 0.;
+            b << progress+shift, 0.;
+            s.setA(a);
+            s.setB(b);
+            segments.push_back(s);
+        }
+        {
+            Segment s;
+            s.setId(i*4+1);
+            Eigen::Vector2d a, b;
+            a << 0., progress;
+            b << 0., progress+shift;
+            s.setA(a);
+            s.setB(b);
+            segments.push_back(s);
+        }
+        {
+            Segment s;
+            s.setId(i*4+2);
+            Eigen::Vector2d a, b;
+            a << progress, 1.;
+            b << progress+shift, 1.;
+            s.setA(a);
+            s.setB(b);
+            segments.push_back(s);
+        }
+        {
+            Segment s;
+            s.setId(i*4+3);
+            Eigen::Vector2d a, b;
+            a << 1., progress;
+            b << 1., progress+shift;
+            s.setA(a);
+            s.setB(b);
+            segments.push_back(s);
+        }
+        progress += 1./n;
+    }
+    n = segments.size();
+*/
+/*
+    // initialization of segments on a circle
     std::vector<Segment> segments;
     segments.reserve(n);
     std::srand(std::time(0)); // initializing points properties randomly
@@ -124,13 +162,13 @@ int main() {
 
     Eigen::VectorXd c = Eigen::VectorXd::Random(n);
 
-//    std::cout << "Enter admissibility constant:" << std::endl;
-//    double eta; std::cin >> eta;
-    double eta = 0.5;
+    std::cout << "Enter admissibility constant:" << std::endl;
+    double eta; std::cin >> eta;
+//    double eta = 0.5;
 
-//    std::cout << "Enter degree of interpolating polynomials:" << std::endl;
-//    unsigned q; std::cin >> q;
-    unsigned q = 2;
+    std::cout << "Enter degree of interpolating polynomials:" << std::endl;
+    unsigned q; std::cin >> q;
+//    unsigned q = 2;
 
     KernelGalerkin G; // initialization of Galerkin kernel for 2d problem -1/(2*pi)*log||x-y||
 
@@ -159,12 +197,6 @@ int main() {
 
     Eigen::VectorXd diff = f_exact - f_approx;
 
-//    Eigen::MatrixXd Mtilde(n,n);
-//    for(int i=0; i<n; ++i) {
-//        LowRankApp HMat_tmp(&G, segments, eta, q);
-//        Mtilde.col(i) = HMat_tmp.mvProd(Eigen::VectorXd::Unit(n,i));
-//    }
-
     // Compute approximation error
 
     std::cout << "Number of matrix operations performed for exact matrix: " << n*n << std::endl;
@@ -174,4 +206,5 @@ int main() {
               << "Relative Approximation error between f_exact and f_approx (l-2 norm of diff/l-2 norm of f_exact): " << diff.lpNorm<2>()/f_exact.lpNorm<2>() << std::endl
               << "Time needed for exact multiplication: "       << time_diff1.count() << " s" << std::endl
               << "Time needed for approximate multiplication: " << time_diff2.count() << " s" << std::endl;
+*/
 }

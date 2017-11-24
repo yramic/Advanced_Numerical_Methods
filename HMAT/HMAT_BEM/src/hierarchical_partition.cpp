@@ -2,7 +2,7 @@
  *                                                                     *
  * Code for Course "Advanced Numerical Methods for CSE"                *
  * (Prof. Dr. R. Hiptmair)                                             *
- * Author: Ioannis Magkanaris                                          *
+ * Author: Daniele Casati                                              *
  * Date: 11/2017                                                       *
  * (C) Seminar for Applied Mathematics, ETH Zurich                     *
  * This code can be freely used for non-commercial purposes as long    *
