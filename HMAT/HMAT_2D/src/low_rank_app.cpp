@@ -17,7 +17,7 @@
 #include <iostream>
 
 // constructor for solving the 2D problem
-LowRankApp::LowRankApp(Kernel* kernel, const std::vector<Point> &pp, double eta, unsigned deg):
+LowRankApp::LowRankApp(Kernel* kernel, const std::vector<Point>& pp, double eta, unsigned deg):
     kernel_(kernel), HP_(pp,eta,deg), deg_(deg), nops_(0)
 { }
 

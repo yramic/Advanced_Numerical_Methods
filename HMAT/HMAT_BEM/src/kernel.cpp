@@ -10,6 +10,7 @@
  ***********************************************************************/
 #include "../include/kernel.hpp"
 #include "../BEM/CppHilbert/Library/source/singleLayerPotential.hpp"
+#include <cmath>
 
 // kernel for 2D problem of 2 vectors
 double KernelGalerkin::operator()(double x1, double y1, double x2, double y2)

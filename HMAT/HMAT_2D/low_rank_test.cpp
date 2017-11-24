@@ -123,7 +123,7 @@ int main() {
 
     auto start3 = std::chrono::system_clock::now();
 
-    GlobalInterpolationApp gip_gskernel(&G, points, n);
+    GlobalInterpolationApp gip_gskernel(&G, points);
     Eigen::VectorXd f_g_approx = gip_gskernel.mvProd(c, q);
 
     auto end3 = std::chrono::system_clock::now();

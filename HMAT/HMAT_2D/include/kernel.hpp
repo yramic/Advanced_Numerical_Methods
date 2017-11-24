@@ -65,7 +65,7 @@ public:
 /*!
 * \brief Kernel functor \f${x1}\times{x2}\times{y1}\times{y2}\f$
 */
-class PolynomialKernel: public Kernel
+class KernelPolynomial: public Kernel
 {
     using Kernel::Kernel; // C++11 inheritance of constructors
 
@@ -83,7 +83,7 @@ public:
 /*!
 * \brief Kernel functor 1
 */
-class ConstantKernel: public Kernel
+class KernelConstant: public Kernel
 {
     using Kernel::Kernel; // C++11 inheritance of constructors
 
@@ -101,7 +101,7 @@ public:
 /**
 * \brief Kernel functor \f$\cos(|\vec{x}-\vec{y}|)\f$
 */
-class GlobalSmoothKernel: public Kernel
+class KernelGlobalSmooth: public Kernel
 {
     using Kernel::Kernel; // C++11 inheritance of constructors
 
@@ -119,7 +119,7 @@ public:
 /**
 * \brief Kernel functor \f$e^{-|\vec{x}-\vec{y}|^2}\f$
 */
-class GaussKernel: public Kernel
+class KernelGauss: public Kernel
 {
     using Kernel::Kernel; // C++11 inheritance of constructors
 

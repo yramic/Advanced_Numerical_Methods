@@ -25,9 +25,8 @@ public:
      * \brief Constructor for 2D problem
      * \param kernel Kernel used for the matrix multiplication
      * \param pp Vector of points in space
-     * \param n Number of points
      */
-    GlobalInterpolationApp(Kernel* kernel, std::vector<Point> pp, int n);
+    GlobalInterpolationApp(Kernel* kernel, const std::vector<Point>& pp);
     /*!
      * \brief Approximate matrix-vector multiplication
      * \param c Vector c

@@ -11,10 +11,10 @@
 #include "../../include/global_interpolation_app.hpp"
 #include "../../include/cheby.hpp"
 #include "../../include/kernel.hpp"
-#include <iostream>
 #include <Eigen/Dense>
+#include <iostream>
 
-GlobalInterpolationApp::GlobalInterpolationApp(Kernel* kernel, std::vector<Point> pp, int n):
+GlobalInterpolationApp::GlobalInterpolationApp(Kernel* kernel, const std::vector<Point>& pp):
     K_(kernel), PPoints_(pp)
 {}
 

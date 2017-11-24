@@ -69,6 +69,13 @@ public:
     Node* getYNode() {
         return pair_.second;
     }
+
+    /*!
+     * \brief return matrix \f$V_{\sigma}C_{\sigma,\mu}V_{\mu}^\top\f$,
+     * where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
+     */
+    Eigen::MatrixXd getVCV() const;
+
 private:
     std::pair<Node*,Node*> pair_;
     Eigen::MatrixXd C_; //!< Matrix \f$C_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters

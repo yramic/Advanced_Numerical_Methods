@@ -30,7 +30,7 @@ public:
     * \param eta eta variable of admissibility
     * \param deg Degree of itnerpolation
     */
-    HierarchicalPartitioning(const std::vector<Point> &PPoints, double eta, unsigned deg);
+    HierarchicalPartitioning(const std::vector<Point>& PPoints, double eta, unsigned deg);
     /*!
      * \brief Return the Far Field pairs vector
      */

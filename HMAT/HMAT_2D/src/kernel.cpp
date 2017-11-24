@@ -9,7 +9,6 @@
  * as this header is left intact.                                      *
  ***********************************************************************/
 #include "../include/kernel.hpp"
-#include "../include/cheby.hpp"
 #include <cmath>
 #include <limits>
 
@@ -19,31 +18,31 @@ double KernelGalerkin::operator()(double x1, double y1, double x2, double y2)
     if(std::abs(x1-x2) < std::numeric_limits<double>::epsilon() &&
        std::abs(y1-y2) < std::numeric_limits<double>::epsilon()) return 0;
     double lvl;
-    lvl = std::sqrt(std::pow(x1 - x2, 2) + std::pow(y1 - y2, 2)); // should be ||x-y||
-    double lvl1 = -(1./(2*M_PI))*(std::log(lvl));
+    lvl = std::pow(x1 - x2, 2) + std::pow(y1 - y2, 2); // should be ||x-y||^2
+    double lvl1 = -1./(4*M_PI)*std::log(lvl);
     return num_ * lvl1;
 }
 
 // 2D Polynomial Kernel
-double PolynomialKernel::operator()(double x1, double y1, double x2, double y2)
+double KernelPolynomial::operator()(double x1, double y1, double x2, double y2)
 {
     return num_ * x1*x2*y1*y2;
 }
 
 // Constant Kernel
-double ConstantKernel::operator()(double x1, double y1, double x2, double y2)
+double KernelConstant::operator()(double x1, double y1, double x2, double y2)
 {
     return num_;
 }
 
 // Global Smooth Kernel
-double GlobalSmoothKernel::operator()(double x1, double y1, double x2, double y2)
+double KernelGlobalSmooth::operator()(double x1, double y1, double x2, double y2)
 {
     return num_ * std::cos(std::sqrt(std::pow(x1 - x2, 2) + std::pow(y1 - y2, 2)));
 }
 
 // Gauss Kernel
-double GaussKernel::operator()(double x1, double y1, double x2, double y2)
+double KernelGauss::operator()(double x1, double y1, double x2, double y2)
 {
     int t1 = std::pow(std::sqrt(std::pow(x1 - x2, 2) + std::pow(y1 - y2, 2)),2);
     int t  = std::exp(-(t1));
