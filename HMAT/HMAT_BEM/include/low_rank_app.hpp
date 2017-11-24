@@ -11,10 +11,15 @@
 #ifndef LOW_RANK_APP_HPP
 #define LOW_RANK_APP_HPP
 
-#include "ctree.hpp"
+#include "block_cluster.hpp"
+#include "block_nearf.hpp"
 #include "hierarchical_partition.hpp"
 #include "kernel.hpp"
+#include "node.hpp"
+#include "segment.hpp"
 #include <Eigen/Dense>
+#include <fstream>
+#include <string>
 
 /*!
 * \brief Master class for low-rank approximation (Far and Near Field distribution computation)
@@ -29,7 +34,16 @@ public:
      * \param eta eta variable of admissibility
      * \param deg Degree of interpolation
      */
-    LowRankApp(Kernel* kernel,const std::vector<Segment>& segments, double eta, unsigned deg);
+    LowRankApp(Kernel* kernel, const std::vector<Segment>& segments, double eta, unsigned deg);
+    /*!
+     * \brief Constructor for 2D Low Rank Approximation
+     * \param kernel Kernel used for the matrix multiplication
+     * \param segments Vector of segments in space
+     * \param eta eta variable of admissibility
+     * \param deg Degree of interpolation
+     * \param myfile Output file where to print errors in debug mode
+     */
+    LowRankApp(Kernel* kernel, const std::vector<Segment>& segments, double eta, unsigned deg, const std::string& filename);
     /*!
      * \brief Approximate matrix-vector multiplication
      * \param c Vector c
@@ -43,6 +57,30 @@ public:
     void calc_numb_approx_per_row(std::vector<BlockCluster*> ff_v, Eigen::VectorXd& f_approx_ff_contr);
 
 private:
+    /*!
+     * \brief Pre-processing: initialize matrix V and vector Vc for all far field nodes
+     * \param ff_v_x Vector of Far Field XNodes
+     * \param ff_v_y Vector of Far Field YNodes
+     * \param c Vector c to multiply
+     */
+    void preProcess(std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y, const Eigen::VectorXd& c);
+    /*!
+     * \brief Block-processing: compute vector CVc for all far field pairs and store it into xnode
+     * \param ff_v Vector of Far Field Pairs
+     */
+    void blockProcess(std::vector<BlockCluster*> ff_v);
+    /*!
+     * \brief Debug-processing: compute approximate matrix VCV for all far field pairs,
+     * corresponding exact block C, and the error between them
+     * \param ff_v Vector of Far Field Pairs
+     */
+    void debugProcess(std::vector<BlockCluster*> ff_v);
+    /*!
+     * \brief Post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place
+     * \param ff_v_x Vector of Far Field XNodes
+     * \param f Output product vector
+     */
+    void postProcess(std::vector<Node*> ff_v_x, Eigen::VectorXd& f);
     /*!
      * \brief Compute far field contribution
      * \param ff_v Vector of Far Field Pairs
@@ -64,29 +102,14 @@ private:
      */
     void nf_contribution(std::vector<BlockNearF*> nf_v,
                          const Eigen::VectorXd& c, Eigen::VectorXd& f, Eigen::VectorXd& f_aprox_nf_contr);
-    /*!
-     * \brief Pre-processing: initialize matrix V and vector Vc for all far field nodes
-     * \param ff_v_x Vector of Far Field XNodes
-     * \param ff_v_y Vector of Far Field YNodes
-     * \param c Vector c to multiply
-     */
-    void preProcess(std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y, const Eigen::VectorXd& c);
-    /*!
-     * \brief Block-processing: compute vector CVc for all far field pairs and store it into xnode
-     * \param ff_v Vector of Far Field Pairs
-     */
-    void blockProcess(std::vector<BlockCluster*> ff_v);
-    /*!
-     * \brief Post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place
-     * \param ff_v_x Vector of Far Field XNodes
-     * \param f Output product vector
-     */
-    void postProcess(std::vector<Node*> ff_v_x, Eigen::VectorXd& f);
 
+    unsigned   deg_; //!< degree of interpolation
     Kernel* kernel_; //!< pointer for kernel
     HierarchicalPartitioning HP_; //!< Hierarchical Partiotion class for constructing the tree and calculate near and far field nodes
-    unsigned   deg_; //!< degree of interpolation
+    std::vector<Segment> segments_; //!< Vector of segments
     unsigned  nops_; //!< number of 'operations' performed
+    bool     debug_; //!< should debugProcess be performed?
+    std::ofstream myfile_; // where to print errors in debug mode
 };
 
 #endif // LOW_RANK_APP_HPP

@@ -112,7 +112,7 @@ void LowRankApp::postProcess(std::vector<Node*> ff_v_x, Eigen::VectorXd& f)
         for(int i = 0; i < ff_v_x.size(); i++){
             Node* xnode = ff_v_x[i];
             Eigen::VectorXd CVc = xnode->getCVc_Node();
-            Eigen::MatrixXd  Vx = xnode->getV_node();
+            Eigen::MatrixXd  Vx = xnode->getV_Node();
             Eigen::VectorXd f_seg = Vx * CVc;
             lsum += Vx.rows()*Vx.cols();
             for(int i=0; i<xnode->getPPoints().size(); i++){

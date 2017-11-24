@@ -174,18 +174,21 @@ void Node::setSons()
     }
 }
 
+// evaluate Lagrange polynomial
 double Node::evalLagrange(unsigned j, double tk)
 {
-    double result = 1.;
+    double result_n = 1., result_d = 1.;
     for(unsigned k=0; k<j; ++k) {
-        result *= tk - tkx_[k];
+        result_n *= tk - tkx_[k];
+        result_d *= tkx_[j] - tkx_[k];
     }
     // Skip "k == j"
     for(unsigned k=j+1; k<=deg_; ++k) {
-        result *= tk - tkx_[k];
+        result_n *= tk - tkx_[k];
+        result_d *= tkx_[j] - tkx_[k];
     }
-    result *= wkx_(j);
-    return result;
+//  return result_n * wkx_(j);
+    return result_n / result_d;
 }
 
 // compute V-matrix of node
@@ -211,20 +214,20 @@ unsigned Node::setV()
     V_node_ = Eigen::MatrixXd::Zero(segs, (deg_+1)*(deg_+1));
     for(unsigned i=0; i<segs; ++i) {
 
-        for(unsigned k1=0; k1<=deg_; ++k1) {
-            for(unsigned k2=0; k2<=deg_; ++k2) {
+        for(unsigned j1=0; j1<=deg_; ++j1) {
+            for(unsigned j2=0; j2<=deg_; ++j2) {
                 double sum = 0.;
-                for(unsigned j=0; j<order; ++j) {
+                for(unsigned k=0; k<order; ++k) {
 
                     /* transformation of quadrature nodes from [-1,1] to [a,b] */
-                    Eigen::Vector2d tk = 0.5 * (segments_[i].getB() - segments_[i].getA()) * gauss_point[j] + 0.5 * (segments_[i].getB() + segments_[i].getA());
-//                           double wk = 0.5 * (segments_[i].getB() - segments_[i].getA()).norm() * gauss_wht[j];
+                    Eigen::Vector2d tk = 0.5 * (segments_[i].getB() - segments_[i].getA()) * gauss_point[k] + 0.5 * (segments_[i].getB() + segments_[i].getA());
+//                           double wk = 0.5 * (segments_[i].getB() - segments_[i].getA()).norm() * gauss_wht[k];
 
-                    sum += gauss_wht[j] * evalLagrange(k1, tk.x()) * evalLagrange(k2, tk.y());
+                    sum += gauss_wht[k] * evalLagrange(j1, tk.x()) * evalLagrange(j2, tk.y());
                 }
 
                 sum *= 0.5 * (segments_[i].getB() - segments_[i].getA()).norm();
-                V_node_(i, k1*(deg_+1) + k2) = sum;
+                V_node_(i, j1*(deg_+1) + j2) = sum;
             }
         }
     }

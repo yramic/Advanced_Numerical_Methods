@@ -102,7 +102,7 @@ int main() {
 
 //    std::cout << "Enter gridsize:" << std::endl;
 //    unsigned n; std::cin >> n;
-    unsigned n = 100;
+    unsigned n = 50;
 
     // initialization of segments
     std::vector<Segment> segments;

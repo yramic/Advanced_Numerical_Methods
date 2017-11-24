@@ -19,13 +19,6 @@ BlockCluster::BlockCluster(Node* xnode, Node* ynode):
     pair_(std::make_pair(xnode,ynode))
 { }
 
-//// Constructor
-//BlockCluster::BlockCluster(Node* xnode, Node* ynode, Kernel G):
-//    pair_(std::make_pair(xnode,ynode)), G_(G)
-//{
-//    setMatrix();
-//}
-
 // compute matrix $C_{\sigma,\mu}$
 unsigned BlockCluster::setMatrix(Kernel* G)
 {

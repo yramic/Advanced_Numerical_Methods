@@ -15,6 +15,7 @@
 #include "../include/kernel.hpp"
 #include "../include/node.hpp"
 #include "../include/point.hpp"
+#include <Eigen/Dense>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -110,7 +111,7 @@ void LowRankApp<BlockCluster,Node>::calc_numb_approx_per_row(std::vector<BlockCl
     }
 }
 
-// compute far field contribution
+// compute far-field contribution
 template<>
 void LowRankApp<BlockCluster,Node>::ff_contribution(std::vector<BlockCluster*> ff_v,
                                                     std::vector<Node*> ff_v_x, std::vector<Node*> ff_v_y,

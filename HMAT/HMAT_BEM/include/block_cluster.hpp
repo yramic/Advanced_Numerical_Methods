@@ -29,14 +29,6 @@ public:
     BlockCluster(Node* ndx, Node* ndy);
 
     /*!
-     * \brief Constructor
-     * \param ndx Node* x
-     * \param ndy Node* y
-     * \param G Kernel Function
-     */
-    BlockCluster(Node* ndx, Node* ndy, Kernel* G);
-
-    /*!
     * \brief return matrix \f$C_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
     */
     Eigen::MatrixXd getMatrix() const {
@@ -69,6 +61,13 @@ public:
     Node* getYNode() {
         return pair_.second;
     }
+
+    /*!
+     * \brief return matrix \f$V_{\sigma}C_{\sigma,\mu}V_{\mu}^\top\f$,
+     * where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
+     */
+    Eigen::MatrixXd getVCV() const;
+
 private:
     std::pair<Node*,Node*> pair_;
     Eigen::MatrixXd C_; //!< Matrix \f$C_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters

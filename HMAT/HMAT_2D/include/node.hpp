@@ -111,9 +111,7 @@ public:
     /*!
      * \brief return the V matrix of this node
      */
-    Eigen::MatrixXd getV_node() const {
-        return V_node_;
-    }
+    Eigen::MatrixXd getV_Node() const { return V_node_; }
     /*!
      * \brief return the Vc vector
      */
