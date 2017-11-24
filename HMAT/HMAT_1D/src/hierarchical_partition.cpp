@@ -17,8 +17,6 @@
 #include "../include/node.hpp"
 #include "../include/point.hpp"
 #include <Eigen/Dense>
-#include <algorithm>
-#include <iostream>
 #include <vector>
 
 // add pairs of pointers to Node of the Cluster Tree in the Near and Far Field Vectors of pairs

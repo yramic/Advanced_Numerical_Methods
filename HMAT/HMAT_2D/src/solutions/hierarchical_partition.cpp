@@ -16,7 +16,6 @@
 #include "../../include/node.hpp"
 #include <Eigen/Dense>
 #include <vector>
-#include <iostream>
 
 // Constructor: creates the cluster tree and
 HierarchicalPartitioning::HierarchicalPartitioning(const std::vector<Point>& GPoints, double eta, unsigned deg):

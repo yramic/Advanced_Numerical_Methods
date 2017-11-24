@@ -14,47 +14,20 @@
 #include "../include/kernel.hpp"
 #include "../include/node.hpp"
 #include <Eigen/Dense>
+#include <fstream>
+#include <iomanip>
 #include <iostream>
+#include <string>
 
 // constructor for solving the 2D problem
 LowRankApp::LowRankApp(Kernel* kernel, const std::vector<Point>& pp, double eta, unsigned deg):
-    kernel_(kernel), HP_(pp,eta,deg), deg_(deg), nops_(0)
+    kernel_(kernel), HP_(pp,eta,deg), deg_(deg), nops_(0), debug_(false)
 { }
 
-// approximate matrix-vector multiplication
-Eigen::VectorXd LowRankApp::mvProd(const Eigen::VectorXd& c)
-{
-    nops_ = 0;
-
-    // compute the Near and Far Field Pairs
-    HP_.setNearFar();
-
-    Eigen::VectorXd f_approx_ff_contr = Eigen::VectorXd::Zero(c.size());
-    Eigen::VectorXd f_approx_nf_contr = Eigen::VectorXd::Zero(c.size());
-    // compute far field contribution
-    Eigen::VectorXd f_approx = Eigen::VectorXd::Zero(c.size());
-    ff_contribution(HP_.getFF(),
-                    HP_.getFFxnds(), HP_.getFFynds(),
-                    c, f_approx, f_approx_ff_contr);
-    std::cout << "Far Field Contribution for each row" << std::endl;
-    std::cout << f_approx_ff_contr << std::endl;
-
-    // compute near-field contribution
-    nf_contribution(HP_.getNF(),
-                    c, f_approx, f_approx_nf_contr);
-    std::cout << "Near Field Contribution for each row" << std::endl;
-    std::cout << f_approx_nf_contr << std::endl;
-
-    // number of Near and Far Field Pairs
-    int near = HP_.getNF().size(), far = HP_.getFF().size();
-    std::cout << "Near Field Nodes: " << near << " Far Field Nodes: " << far << std::endl;
-    std::cout << "Near Field Nodes: " << (double)near/(near+far)*100. << "% " << "Far Field Nodes: " << (double)far/(near+far)*100. << "%" << std::endl;
-    //PPointsTree_.getRoot()->printree(0); // printing the tree for testing
-
-    std::cout << "Number of matrix operations performed for low-rank approximation: " << nops_ << std::endl;
-
-    return f_approx;
-}
+// constructor for solving the 2D problem
+LowRankApp::LowRankApp(Kernel* kernel, const std::vector<Point>& pp, double eta, unsigned deg, const std::string& filename):
+    kernel_(kernel), HP_(pp,eta,deg), deg_(deg), nops_(0), debug_(true), myfile_(filename.c_str(),std::ios::app)
+{ }
 
 // pre-processing: initialize matrix V and vector Vc for all far field nodes
 // do these steps once for each node, not every time the node appears in a pair
@@ -102,6 +75,29 @@ void LowRankApp::blockProcess(std::vector<BlockCluster*> ff_v)
     }
 }
 
+// debug-processing: compute approximate matrix VCV for all far field pairs,
+// orresponding exact block C, and the error between them
+void LowRankApp::debugProcess(std::vector<BlockCluster*> ff_v)
+{
+    double error_Frobenius = 0., error_max = 0.;
+    for(auto& pair : ff_v){ // iterate for all the pairs of far field nodes
+        Eigen::MatrixXd block_approx = pair->getVCV();
+        BlockNearF tmp(pair->getXNode(),
+                       pair->getYNode());
+        tmp.setMatrix(kernel_);
+        Eigen::MatrixXd block_exact = tmp.getMatrix();
+        Eigen::MatrixXd diff_blocks = block_exact - block_approx;
+        error_Frobenius += diff_blocks.norm() / std::sqrt(block_exact.rows()*block_exact.cols());
+        double error_tmp = diff_blocks.cwiseAbs().maxCoeff();
+        if(error_max < error_tmp) {
+           error_max = error_tmp;
+        }
+    }
+
+    myfile_ << "error_Frobenius, " << points_.size() << ", " << std::setprecision(10) << error_Frobenius/ff_v.size() << std::endl; // average error w.r.t. all blocks
+    myfile_ << "error_max, "       << points_.size() << ", " << std::setprecision(10) << error_max                   << std::endl;
+}
+
 // post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place
 void LowRankApp::postProcess(std::vector<Node*> ff_v_x, Eigen::VectorXd& f)
 {
@@ -143,6 +139,9 @@ void LowRankApp::ff_contribution(std::vector<BlockCluster*> ff_v,
 {
     preProcess(ff_v_x, ff_v_y, c);
     blockProcess(ff_v);
+    if(debug_) {
+        debugProcess(ff_v);
+    }
     postProcess(ff_v_x, f);
     calc_numb_approx_per_row(ff_v, f_approx_ff_contr);
 }
@@ -164,4 +163,39 @@ void LowRankApp::nf_contribution(std::vector<BlockNearF*> nf_v,
             }
         }
     }
+}
+
+// approximate matrix-vector multiplication
+Eigen::VectorXd LowRankApp::mvProd(const Eigen::VectorXd& c)
+{
+    nops_ = 0;
+
+    // compute the Near and Far Field Pairs
+    HP_.setNearFar();
+
+    Eigen::VectorXd f_approx_ff_contr = Eigen::VectorXd::Zero(c.size());
+    Eigen::VectorXd f_approx_nf_contr = Eigen::VectorXd::Zero(c.size());
+    // compute far field contribution
+    Eigen::VectorXd f_approx = Eigen::VectorXd::Zero(c.size());
+    ff_contribution(HP_.getFF(),
+                    HP_.getFFxnds(), HP_.getFFynds(),
+                    c, f_approx, f_approx_ff_contr);
+    std::cout << "Far Field Contribution for each row" << std::endl;
+    std::cout << f_approx_ff_contr << std::endl;
+
+    // compute near-field contribution
+    nf_contribution(HP_.getNF(),
+                    c, f_approx, f_approx_nf_contr);
+    std::cout << "Near Field Contribution for each row" << std::endl;
+    std::cout << f_approx_nf_contr << std::endl;
+
+    // number of Near and Far Field Pairs
+    int near = HP_.getNF().size(), far = HP_.getFF().size();
+    std::cout << "Near Field Nodes: " << near << " Far Field Nodes: " << far << std::endl;
+    std::cout << "Near Field Nodes: " << (double)near/(near+far)*100. << "% " << "Far Field Nodes: " << (double)far/(near+far)*100. << "%" << std::endl;
+    //PPointsTree_.getRoot()->printree(0); // printing the tree for testing
+
+    std::cout << "Number of matrix operations performed for low-rank approximation: " << nops_ << std::endl;
+
+    return f_approx;
 }

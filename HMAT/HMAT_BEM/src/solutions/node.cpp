@@ -8,11 +8,11 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/node.hpp"
-#include "../include/cheby.hpp"
-#include "../include/segment.hpp"
+#include "../../include/node.hpp"
+#include "../../include/cheby.hpp"
+#include "../../include/segment.hpp"
 extern "C" {
-#include "../BEM/CppHilbert/Library/source/gaussQuadrature.h"
+#include "../../../BEM/CppHilbert/Library/source/gaussQuadrature.h"
 }
 #include <Eigen/SVD>
 #include <iostream>
@@ -232,7 +232,7 @@ unsigned Node::setV()
         }
     }
     /* SAM_LISTING_END_3 */
-    return segs * order * (deg_+2)*(deg_+1)/2; // return no. of 'operations' performed
+    return segs * order * (deg_+1)*(deg_+1); // return no. of 'operations' performed
 }
 
 // compute V*c restricted to node indices

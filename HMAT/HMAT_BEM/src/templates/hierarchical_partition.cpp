@@ -2,7 +2,7 @@
  *                                                                     *
  * Code for Course "Advanced Numerical Methods for CSE"                *
  * (Prof. Dr. R. Hiptmair)                                             *
- * Author: Ioannis Magkanaris                                          *
+ * Author: Daniele Casati                                              *
  * Date: 11/2017                                                       *
  * (C) Seminar for Applied Mathematics, ETH Zurich                     *
  * This code can be freely used for non-commercial purposes as long    *
@@ -18,8 +18,8 @@
 #include <vector>
 
 // Constructor: creates the cluster tree and
-HierarchicalPartitioning::HierarchicalPartitioning(const std::vector<Point>& GPoints, double eta, unsigned deg):
-    Tx_(GPoints,deg), Ty_(Tx_), eta_(eta)
+HierarchicalPartitioning::HierarchicalPartitioning(const std::vector<Segment>& segments, double eta, unsigned deg):
+    Tx_(segments,deg), Ty_(Tx_), eta_(eta)
 {}
 
 // compute the Far and Near Field pairs

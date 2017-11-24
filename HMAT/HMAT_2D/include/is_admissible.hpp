@@ -23,15 +23,15 @@ public:
     /*!
      * \brief Return maximum base
      */
-    virtual double get_max() = 0;
+    virtual double get_max(Node* x, Node* y) = 0;
     /*!
      * \brief Return minimum base
      */
-    virtual double get_min() = 0;
+    virtual double get_min(Node* x, Node* y) = 0;
     /*!
      * \brief Return if the cluster is admissible
      */
-    virtual bool is_admissible() = 0;
+    virtual bool is_admissible(Node* x, Node* y, double eta) = 0;
 };
 
 

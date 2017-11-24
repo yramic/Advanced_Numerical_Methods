@@ -8,15 +8,14 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/hierarchical_partition.hpp"
-#include "../include/block_nearf.hpp"
-#include "../include/cheby.hpp"
-#include "../include/ctree.hpp"
-#include "../include/is_admissible.hpp"
-#include "../include/node.hpp"
+#include "../../include/hierarchical_partition.hpp"
+#include "../../include/block_nearf.hpp"
+#include "../../include/cheby.hpp"
+#include "../../include/ctree.hpp"
+#include "../../include/is_admissible.hpp"
+#include "../../include/node.hpp"
 #include <Eigen/Dense>
 #include <vector>
-#include <iostream>
 
 // Constructor: creates the cluster tree and
 HierarchicalPartitioning::HierarchicalPartitioning(const std::vector<Segment>& segments, double eta, unsigned deg):

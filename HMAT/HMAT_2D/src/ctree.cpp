@@ -14,7 +14,6 @@
 #include "../include/point.hpp"
 #include <Eigen/Dense>
 #include <vector>
-#include <iostream>
 
 // actual constructor
 cTree::cTree(const std::vector<Point>& PPoints, unsigned deg):

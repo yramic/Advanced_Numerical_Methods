@@ -14,7 +14,6 @@
 #include "../include/segment.hpp"
 #include <Eigen/Dense>
 #include <vector>
-#include <iostream>
 
 // actual constructor
 cTree::cTree(const std::vector<Segment>& segments, unsigned deg):

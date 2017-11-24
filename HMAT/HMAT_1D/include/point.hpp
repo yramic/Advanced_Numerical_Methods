@@ -22,7 +22,8 @@ public:
     /*!
     * \brief Default Constructor
     */
-    Point(): x_(0),id_(0){}
+    Point(): x_(0),id_(0)
+    {}
     /*!
     * \brief Return x coordinate of this point
     */

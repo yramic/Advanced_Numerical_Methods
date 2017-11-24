@@ -8,8 +8,8 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/block_cluster.hpp"
-#include "../include/cheby.hpp"
+#include "../../include/block_cluster.hpp"
+#include "../../include/cheby.hpp"
 #include <iostream>
 
 // Constructor

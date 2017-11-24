@@ -161,7 +161,7 @@ void Node::setSons()
 unsigned Node::setV()
 {
     /* SAM_LISTING_BEGIN_3 */
-    int ppts = PPointsTree_.size();
+    unsigned ppts = PPointsTree_.size();
     auto checkID = [](Point a, Point b) -> bool { return a.getId()<b.getId(); };
     std::sort(PPointsTree_.begin(),PPointsTree_.end(),checkID);
     V_node_ = Eigen::MatrixXd::Constant(ppts, (deg_+1)*(deg_+1), 1);

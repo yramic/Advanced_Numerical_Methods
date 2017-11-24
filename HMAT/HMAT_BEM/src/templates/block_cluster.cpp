@@ -8,27 +8,19 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/block_cluster.hpp"
-#include "../include/kernel.hpp"
-#include "../include/node.hpp"
-#include <Eigen/Dense>
-#include <iomanip>
+#include "../../include/block_cluster.hpp"
+#include "../../include/cheby.hpp"
+#include <iostream>
 
 // Constructor
-BlockCluster::BlockCluster(Node* xnode, Node* ynode):
-    pair_(std::make_pair(xnode,ynode))
+BlockCluster::BlockCluster(Node* ndx, Node* ndy):
+    pair_(std::make_pair(ndx,ndy))
 { }
 
 // compute matrix $C_{\sigma,\mu}$
 unsigned BlockCluster::setMatrix(Kernel* G)
 {
-    Eigen::VectorXd tkx = pair_.first->getTK();
-    Eigen::VectorXd tky = pair_.second->getTK();
-    C_.resize(tkx.size(),tky.size());
-    // Compute collocation matrix for Chebychev nodes
-    for(unsigned i=0; i<tkx.size(); ++i)
-        for(unsigned j=0; j<tky.size(); ++j)
-            C_(i,j) = (*G)(tkx(i),tky(j));
+    // TODO
     return C_.rows()*C_.cols(); // return no. of 'operations' performed
 }
 
@@ -49,9 +41,9 @@ Eigen::MatrixXd BlockCluster::getVCV() const
     Eigen::MatrixXd Vmu    = pair_.second->getV_Node();
     Eigen::MatrixXd VCV = Vsigma * C_ * Vmu.transpose();
     Eigen::MatrixXd VCVord(VCV.rows(), VCV.cols());
-    for(unsigned i=0; i<pair_.first->getPoints().size(); ++i)
-        for(unsigned j=0; j<pair_.second->getPoints().size(); ++j)
-            VCVord(pair_.first->getPoints()[i].getId(),
-                   pair_.second->getPoints()[j].getId()) = VCV(i,j);
+    for(unsigned i=0; i<pair_.first->getSegments().size(); ++i)
+        for(unsigned j=0; j<pair_.second->getSegments().size(); ++j)
+            VCVord(pair_.first->getSegments()[i].getId(),
+                   pair_.second->getSegments()[j].getId()) = VCV(i,j);
     return VCVord;
 }

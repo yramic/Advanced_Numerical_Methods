@@ -38,12 +38,12 @@ public:
     /*!
      * \brief Constructor for 2D Low Rank Approximation
      * \param kernel Kernel used for the matrix multiplication
-     * \param segments Vector of segments in space
+     * \param pp Vector of points in space
      * \param eta eta variable of admissibility
      * \param deg Degree of interpolation
      * \param myfile Output file where to print errors in debug mode
      */
-    LowRankApp(Kernel* kernel, const std::vector<Segment>& segments, double eta, unsigned deg, const std::string& filename);
+    LowRankApp(Kernel* kernel, const std::vector<Point>& pp, double eta, unsigned deg, const std::string& filename);
     /*!
      * \brief Approximate matrix-vector multiplication
      * \param c Vector c

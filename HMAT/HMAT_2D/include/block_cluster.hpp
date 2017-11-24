@@ -29,14 +29,6 @@ public:
     BlockCluster(Node* ndx, Node* ndy);
 
     /*!
-     * \brief Constructor
-     * \param ndx Node* x
-     * \param ndy Node* y
-     * \param G Kernel Function
-     */
-    BlockCluster(Node* ndx, Node* ndy, Kernel* G);
-
-    /*!
     * \brief return matrix \f$C_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
     */
     Eigen::MatrixXd getMatrix() const {
