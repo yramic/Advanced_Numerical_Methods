@@ -8,8 +8,7 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/kernel.hpp"
-#include "../BEM/CppHilbert/Library/source/singleLayerPotential.hpp"
+#include "../../include/kernel.hpp"
 #include <cmath>
 
 // kernel for 2D problem of 2 vectors
@@ -27,5 +26,5 @@ double KernelGalerkin::operator()(double x1, double y1, double x2, double y2)
 double KernelGalerkin::operator()(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
                                   const Eigen::Vector2d& c, const Eigen::Vector2d& d, double eta)
 {
-    return computeVij(a, b, c, d, eta);
+    // TODO
 }

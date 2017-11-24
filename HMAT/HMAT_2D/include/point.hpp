@@ -45,7 +45,7 @@ public:
         return id_;
     }
     /*!
-    * \brief Return value of this point
+    * \brief Return value of this point (for debugging)
     */
     double getV() const {
         return v_;
@@ -63,7 +63,7 @@ public:
     */
     void setId(unsigned id);
     /*!
-    * \brief Set value
+    * \brief Set value (for debugging)
     */
     void setV(double v);
 

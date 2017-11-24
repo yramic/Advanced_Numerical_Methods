@@ -61,7 +61,6 @@ public:
     cTree getTx(){
         return Tx_;
     }
-
     /*!
     * \brief Compute the Far and Near Field pairs
     */

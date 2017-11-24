@@ -94,7 +94,7 @@ int main() {
     unsigned n = 2; // segments per edge
     std::vector<Segment> segments;
     segments.reserve(n);
-    std::srand(std::time(0)); // initializing points properties randomly
+    std::srand(std::time(0)); // initializing segment properties randomly
     double progress = 0.; double shift = 1./n;
     for(unsigned i=0; i<n; ++i) {
         {

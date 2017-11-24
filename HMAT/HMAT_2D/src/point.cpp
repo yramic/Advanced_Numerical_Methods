@@ -28,7 +28,7 @@ void Point::setId(unsigned id)
     id_ = id;
 }
 
-// set value of the point (not used)
+// set value of the point (for debugging)
 void Point::setV(double v)
 {
     v_ = v;

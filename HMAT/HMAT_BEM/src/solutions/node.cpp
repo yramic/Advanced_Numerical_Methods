@@ -220,8 +220,8 @@ unsigned Node::setV()
                 for(unsigned k=0; k<order; ++k) {
 
                     /* transformation of quadrature nodes from [-1,1] to [a,b] */
-                    Eigen::Vector2d tk = 0.5 * (segments_[i].getB() - segments_[i].getA()) * gauss_point[k] + 0.5 * (segments_[i].getB() + segments_[i].getA());
-//                           double wk = 0.5 * (segments_[i].getB() - segments_[i].getA()).norm() * gauss_wht[k];
+                    Eigen::Vector2d tk = 0.5 * (segments_[i].getB() - segments_[i].getA()) * gauss_point[k] +
+                                         0.5 * (segments_[i].getB() + segments_[i].getA());
 
                     sum += gauss_wht[k] * evalLagrange(j1, tk.x()) * evalLagrange(j2, tk.y());
                 }
