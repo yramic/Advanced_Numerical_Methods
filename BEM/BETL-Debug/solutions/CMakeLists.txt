@@ -55,11 +55,11 @@ else()
         CMAKE_ARGS ${EXTERNAL_PROJECT_CMAKE_ARGS_PREFIX} -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/Eigen_install)
         include_directories(${CMAKE_CURRENT_BINARY_DIR}/Eigen_install/include/eigen3)
 
-      endif()
-
-      ADD_DEFINITIONS(-DEIGEN3_ACTIVATED)
+endif()
 
 add_definitions("-Wno-ignored-attributes -Wno-deprecated-declarations")
+
+ADD_DEFINITIONS(-DEIGEN3_ACTIVATED)
 
 
 # There is too much hassle handling these corner cases, so we just require the people who have
@@ -131,15 +131,20 @@ eth_interface
 ${ETH_LIBRARIES} 
 )
 
+# make main
 set(SRCS main.cpp)
 add_executable(main ${SRCS})
+
+# make demo
+set(SRCS demo.cpp)
+add_executable(demo ${SRCS})
+
+
+
 target_link_libraries(main ${BETL2_LIBRARIES})
 add_dependencies(main Eigen)
 add_dependencies(main Betl2)
 
-set(SRCS demo.cpp)
-add_executable(demo ${SRCS})
 target_link_libraries(demo ${BETL2_LIBRARIES})
 add_dependencies(demo Eigen)
 add_dependencies(demo Betl2)
-

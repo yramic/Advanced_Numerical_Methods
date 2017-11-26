@@ -57,10 +57,10 @@ else()
 
 endif()
 
-
 add_definitions("-Wno-ignored-attributes -Wno-deprecated-declarations")
 
 # make main
 set(SRCS main.cpp)
 add_executable(main ${SRCS})
+
 
