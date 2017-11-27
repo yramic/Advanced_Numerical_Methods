@@ -139,6 +139,8 @@ void LowRankApp<BlockCluster,Node>::nf_contribution(std::vector<BlockNearF*> nf_
         for(int i=0; i<xnode->getPoints().size(); i++){
             for(int j=0; j<ynode->getPoints().size(); j++){
                 f(xnode->getPoints()[i].getId()) += C(i,j) * c(ynode->getPoints()[j].getId()); // add near field contribution to ``f''
+                // The contributions of all near-field pairs involving 'xnode' can first be summed ('blockProcess')
+                // and only then positioned in the right entry of 'f' ('postProcess'), similarly to the near-field vector.
                 ++f_approx_nf_contr(xnode->getPoints()[i].getId());
                 nops_ += C.rows()*C.cols();
             }
