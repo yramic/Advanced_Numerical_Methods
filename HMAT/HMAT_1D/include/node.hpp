@@ -13,6 +13,7 @@
 
 #include "point.hpp"
 #include <Eigen/Dense>
+#include <iostream>
 #include <vector>
 
 // forward declaration to avoid cross-referencing
@@ -43,7 +44,12 @@ public:
     /*!
      * \brief Destructor
      */
-    virtual ~Node();
+    virtual ~Node() {
+        if((l_child_ == NULL) && (r_child_ == NULL))
+            std::cout << "leaves destroyed" << std::endl;
+        if(l_child_ != NULL) delete l_child_;
+        if(r_child_ != NULL) delete r_child_;
+    }
     /*!
      * \brief return vector of node´s points
      */

@@ -8,7 +8,6 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "../include/is_admissible.hpp"
 #include <cmath>
 
 // get max edge of the cluster

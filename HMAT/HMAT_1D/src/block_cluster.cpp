@@ -10,14 +10,7 @@
  ***********************************************************************/
 #include "../include/block_cluster.hpp"
 #include "../include/kernel.hpp"
-#include "../include/node.hpp"
 #include <Eigen/Dense>
-#include <iomanip>
-
-// Constructor
-BlockCluster::BlockCluster(Node* xnode, Node* ynode):
-    pair_(std::make_pair(xnode,ynode))
-{ }
 
 // compute matrix $C_{\sigma,\mu}$
 unsigned BlockCluster::setMatrix(Kernel* G)

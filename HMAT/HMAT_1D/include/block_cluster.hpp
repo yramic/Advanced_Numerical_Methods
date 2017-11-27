@@ -29,7 +29,9 @@ public:
      * \param ndy YNode
      * \param G Kernel Function
      */
-    BlockCluster(Node* xnode, Node* ynode);
+    BlockCluster(Node* xnode, Node* ynode):
+        pair_(std::make_pair(xnode,ynode))
+    { }
 
     /*!
      * \brief return matrix \f$C_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters

@@ -10,7 +10,6 @@
  ***********************************************************************/
 #include "../../include/block_cluster.hpp"
 #include "../../include/cheby.hpp"
-#include <iostream>
 
 // Constructor
 BlockCluster::BlockCluster(Node* ndx, Node* ndy):

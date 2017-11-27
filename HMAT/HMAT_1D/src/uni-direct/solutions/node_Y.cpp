@@ -23,15 +23,6 @@ Node_Y::Node_Y(std::vector<Point> points, int& id, unsigned deg)
     setSons(id);
 }
 
-// destructor
-Node_Y::~Node_Y()
-{
-    if((l_child_ == NULL) && (r_child_ == NULL))
-        std::cout << "leaves destroyed" << std::endl;
-    if(l_child_ != NULL) delete l_child_;
-    if(r_child_ != NULL) delete r_child_;
-}
-
 // build tree recursively
 void Node_Y::setSons(int& id)
 {

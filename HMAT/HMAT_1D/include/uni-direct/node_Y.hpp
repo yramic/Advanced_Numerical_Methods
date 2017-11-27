@@ -13,6 +13,7 @@
 
 #include "../node.hpp"
 #include <Eigen/Dense>
+#include <iostream>
 
 // forward declaration to avoid cross-referencing
 template<typename NODE>
@@ -36,7 +37,12 @@ public:
     /*!
      * \brief Destructor
      */
-    virtual ~Node_Y();
+    virtual ~Node_Y() {
+        if((l_child_ == NULL) && (r_child_ == NULL))
+            std::cout << "leaves destroyed" << std::endl;
+        if(l_child_ != NULL) delete l_child_;
+        if(r_child_ != NULL) delete r_child_;
+    }
     /*!
      * \brief build tree recursively
      * \param id ID of node

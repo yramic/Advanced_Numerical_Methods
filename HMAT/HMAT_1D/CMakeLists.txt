@@ -17,12 +17,14 @@ add_executable(low_rank_test_1D_solution low_rank_test.cpp)
 target_link_libraries(low_rank_test_1D_solution hmat_1d_sols)
 
 # Template target for exercise b
-add_library(hmat_1d_uni_tmps SHARED ${headers} ${headers_uni} ${cpp_files_uni} ${cpp_files_uni_tmps})
+add_library(hmat_1d_uni_tmps SHARED ${headers} ${headers_uni}
+    ${cpp_files} ${cpp_files_tmps} ${cpp_files_uni} ${cpp_files_uni_tmps})
 add_executable(low_rank_test_1D_uni_template low_rank_test_uni.cpp)
-target_link_libraries(low_rank_test_1D_uni_template hmat_1d_tmps hmat_1d_uni_tmps)
+target_link_libraries(low_rank_test_1D_uni_template hmat_1d_uni_tmps)
 
 # Solution target for exercise b
-add_library(hmat_1d_uni_sols SHARED ${headers} ${headers_uni} ${cpp_files_uni} ${cpp_files_uni_sols})
+add_library(hmat_1d_uni_sols SHARED ${headers} ${headers_uni}
+    ${cpp_files} ${cpp_files_sols} ${cpp_files_uni} ${cpp_files_uni_sols})
 add_executable(low_rank_test_1D_uni_solution low_rank_test_uni.cpp)
-target_link_libraries(low_rank_test_1D_uni_solution hmat_1d_sols hmat_1d_uni_sols)
+target_link_libraries(low_rank_test_1D_uni_solution hmat_1d_uni_sols)
 
