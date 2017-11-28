@@ -1,0 +1,3 @@
+[submodule "3rd_Party/ethGenericGrid"]
+        path = 3rd_Party/ethGenericGrid
+        url = git@gitlab.math.ethz.ch:NumPDE/EthGenericGrid.git

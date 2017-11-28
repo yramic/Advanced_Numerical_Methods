@@ -1,0 +1,17 @@
+before_script:
+  - cp .gitlab-ci/ci-gitmodules .gitmodules # patching submodule
+  - git submodule sync # apply patch
+  - git submodule update --init
+  - cp .gitlab-ci/eth-generic-grid-ci-gitmodules third_party/Betl2/.gitmodules
+  - git submodule sync --recursive
+  - git submodule update --init --recursive
+
+AdvNumCSE:
+  only:
+    - master
+  script:
+    - mkdir -p build
+    - pushd build
+    - cmake -DCMAKE_BUILD_TYPE=Release ..
+    - make -j
+    - popd
