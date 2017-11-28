@@ -2,6 +2,8 @@
 #include <Eigen/QR>
 #include <Eigen/SVD>
 #include <cmath>
+#include <iomanip>
+#include <iostream>
 
 
 /* @brief Compute the rank-q best approximation of [A1*B1 A2*B2]
@@ -85,7 +87,8 @@ std::pair<double,double> test_low_rank_merge(size_t n) {
 
 
 
-    std::pair<Eigen::MatrixXd,Eigen::MatrixXd> AB = low_rank_merge();
+    Eigen::MatrixXd A1, B1, A2, B2;
+    std::pair<Eigen::MatrixXd,Eigen::MatrixXd> AB = low_rank_merge(A1, B1, A2, B2);
     Eigen::MatrixXd Ztilde = AB.first * AB.second.transpose();
 
     Eigen::MatrixXd diff = Z - Ztilde;
@@ -179,7 +182,8 @@ std::pair<double,size_t> test_adap_rank_merge(size_t n, double rtol) {
 
 
 
-    std::pair<Eigen::MatrixXd,Eigen::MatrixXd> AB = adap_rank_merge(rtol);
+    Eigen::MatrixXd A1, B1, A2, B2;
+    std::pair<Eigen::MatrixXd,Eigen::MatrixXd> AB = adap_rank_merge(A1, B1, A2, B2, rtol);
     Eigen::MatrixXd Ztilde = AB.first * AB.second.transpose();
 
     Eigen::MatrixXd diff = Z - Ztilde;
