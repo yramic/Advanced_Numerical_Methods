@@ -40,11 +40,5 @@ Eigen::MatrixXd BlockCluster::getVCV() const
 {
     Eigen::MatrixXd Vsigma = pair_.first->getV_Node();
     Eigen::MatrixXd Vmu    = pair_.second->getV_Node();
-    Eigen::MatrixXd VCV = Vsigma * C_ * Vmu.transpose();
-    Eigen::MatrixXd VCVord(VCV.rows(), VCV.cols());
-    for(unsigned i=0; i<pair_.first->getPoints().size(); ++i)
-        for(unsigned j=0; j<pair_.second->getPoints().size(); ++j)
-            VCVord(pair_.first->getPoints()[i].getId(),
-                   pair_.second->getPoints()[j].getId()) = VCV(i,j);
-    return VCVord;
+    return Vsigma * C_ * Vmu.transpose();
 }
