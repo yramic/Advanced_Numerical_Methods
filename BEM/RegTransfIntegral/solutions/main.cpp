@@ -269,16 +269,6 @@ double integrateTSing(const TriaPanel& T, const Eigen::Vector3d& x,
     // If xp is not too close to T, we don't have a singularity and we can 
     // integrate using gauss-legendre without any particular treatment.
     if(exterior){
-      // find closest point to x which is on T.
-      Eigen::Vector3d coeff2;
-      for(int i=0; i<3; i++){
-	if(coeff(i)<=0.){ coeff2(i) = 0.;}
-	else if(coeff(i)>=1.){ coeff2(i) = 1.;}
-	else{ coeff2(i) = coeff(i);}
-      }
-      Eigen::Vector3d xpT = coeff2(0)*vT[0] + coeff2(1)*vT[1] + coeff2(2)*vT[2];
-      // take distance to that point
-      double distT_x = (x - xpT).norm();
       // Get quadrature points and weights for [0, 1] to use tensor-Gauss quadrature
       Eigen::RowVectorXd xq,wq;
       std::tie(xq,wq) =  gauleg(0, 1, n);
@@ -292,13 +282,15 @@ double integrateTSing(const TriaPanel& T, const Eigen::Vector3d& x,
       };
       // Integrate
       double Iq = 0.;
-      for(int l=0; l<n; l++){
+      for(int l1=0; l1<n; l1++){
+	for(int l2=0; l2<n; l2++){
 	// Compute quadrature point on unit square
-	Eigen::Vector2d qp; qp << xq(l), xq(l)*(1.-xq(l));
+	Eigen::Vector2d qp; qp << xq(l1), xq(l2)*(1.-xq(l1));
 	// Multiply quadrature weight by determinants coming from transformations
-	double dy = wq(l)*(1.-xq(l))*sqrt(fabs((Fk.transpose()*Fk).determinant()));
+	double dy = wq(l1)*wq(l2)*(1.-xq(l1))*sqrt(fabs((Fk.transpose()*Fk).determinant()));
 	// add contribution
 	Iq += 1./(x - phiK(qp)).norm()*dy;
+	}
       }
       res = Iq;
     } // end if not too close
