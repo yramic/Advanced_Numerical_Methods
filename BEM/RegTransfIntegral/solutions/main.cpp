@@ -1,8 +1,9 @@
-#include <iostream>
+#include <array>
+#include <cmath>
 #include <fstream>
+#include <iostream>
 #include <istream>
 #include <iomanip>
-#include <cmath>
 #include <Eigen/Dense>
 #include "gauleg.hpp"
 

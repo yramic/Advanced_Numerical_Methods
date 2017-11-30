@@ -4,11 +4,12 @@
 //// Contributors:  dcasati 
 //// This file is part of the AdvNumCSE repository.
 ////
-#include <iostream>
+#include <array>
+#include <cmath>
 #include <fstream>
+#include <iostream>
 #include <istream>
 #include <iomanip>
-#include <cmath>
 #include <Eigen/Dense>
 #include "gauleg.hpp"
 
