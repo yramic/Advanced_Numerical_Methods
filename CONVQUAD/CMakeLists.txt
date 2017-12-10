@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 3.1)
+add_all_subdirectories(${CMAKE_CURRENT_SOURCE_DIR})
 
-project(CONVQUAD)
 
