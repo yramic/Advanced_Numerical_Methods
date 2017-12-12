@@ -196,13 +196,13 @@ unsigned Node::setV()
 {
     /* SAM_LISTING_BEGIN_3 */
     unsigned order;
-    if(deg_ < 2)
+    if(2*deg_ < 2)
         order = 2;
-    else if(deg_ < 4)
+    else if(2*deg_ < 4)
         order = 4;
-    else if(deg_ < 8)
+    else if(2*deg_ < 8)
         order = 8;
-    else if(deg_ < 16)
+    else if(2*deg_ < 16)
         order = 16;
     else
         order = 32;

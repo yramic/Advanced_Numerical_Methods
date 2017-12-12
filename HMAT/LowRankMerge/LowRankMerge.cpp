@@ -63,9 +63,9 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd> low_rank_merge(
     Eigen::MatrixXd Btilde = (Q * V).leftCols(A1.cols()); // (2.4.38b)
 
     return {Atilde,Btilde};
-    #else // TEMPLATE
+#else // TEMPLATE
     // TODO: Compute {Atilde,Btilde} as in (2.4.38a)/(2.4.38b)
-    #endif // TEMPLATE
+#endif // TEMPLATE
 }
 /* SAM_LISTING_END_0 */
 
@@ -108,9 +108,9 @@ std::pair<double,double> test_low_rank_merge(size_t n)
     double err_max  = diff.cwiseAbs().maxCoeff();
 
     return {err_Frob,err_max};
-    #else // TEMPLATE
+#else // TEMPLATE
     // TODO: Compute {err_Frob,err_max}
-    #endif // TEMPLATE
+#endif // TEMPLATE
 }
 /* SAM_LISTING_END_1 */
 
@@ -170,9 +170,9 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd> adap_rank_merge(
 
     return {Atilde,Btilde};
 
-    #else // TEMPLATE
+#else // TEMPLATE
     // TODO: Compute {Atilde,Btilde} as in (2.4.38a)/(2.4.38b), given (2.4.32)
-    #endif // TEMPLATE
+#endif // TEMPLATE
 }
 /* SAM_LISTING_END_2 */
 
@@ -217,9 +217,9 @@ std::pair<double,size_t> test_adap_rank_merge(size_t n, double rtol) {
 
     return {err_Frob,AB.first.cols()};
 
-    #else // TEMPLATE
+#else // TEMPLATE
     // TODO: Compute {err_Frob,p}, with p := no. of singular values != 0
-    #endif // TEMPLATE
+#endif // TEMPLATE
 }
 /* SAM_LISTING_END_3 */
 
@@ -252,7 +252,7 @@ int main() {
                   << "Rank = "
                   << errs.second << std::endl;
     }
-    std::cout << "Problem 2.3.c" << std::endl;
+    std::cout << "Problem 2.3.e" << std::endl;
     std::cout << "Fixed n = 500" << std::endl;
     unsigned n = 500;
     for(int p=1; p<=8; ++p) {

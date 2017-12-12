@@ -19,7 +19,6 @@ extern "C" {
 template<typename FUNC>
 Eigen::VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau)
 {
-#if SOLUTION
     Eigen::MatrixXd A = Eigen::MatrixXd::Zero(p,p);
     Eigen::VectorXd b = Eigen::VectorXd::Zero(p);
 
@@ -70,16 +69,12 @@ Eigen::VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau)
     }
 
     return grid;
-#else // TEMPLATE
-    // TODO: Find the unknown function u in the Abel integral equation
-#endif // TEMPLATE
 }
 /* SAM_LISTING_END_0 */
 
 
 int main() {
     /* SAM_LISTING_BEGIN_1 */
-#if SOLUTION
     double tau = 0.01;
     size_t N = std::round(1./tau) + 1;
     Eigen::VectorXd grid = Eigen::LinSpaced(N, 0., 1.);
@@ -99,8 +94,5 @@ int main() {
                   << std::scientific << std::setprecision(3)
                   << err_max << std::endl;
     }
-#else // TEMPLATE
-    // TODO: Tabulate the max error of the Galerkin approximation scheme
-#endif // TEMPLATE
     /* SAM_LISTING_END_1 */
 }

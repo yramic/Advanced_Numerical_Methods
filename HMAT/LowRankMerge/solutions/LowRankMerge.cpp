@@ -236,7 +236,7 @@ int main() {
                   << "Rank = "
                   << errs.second << std::endl;
     }
-    std::cout << "Problem 2.3.c" << std::endl;
+    std::cout << "Problem 2.3.e" << std::endl;
     std::cout << "Fixed n = 500" << std::endl;
     unsigned n = 500;
     for(int p=1; p<=8; ++p) {
