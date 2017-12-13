@@ -104,7 +104,7 @@ Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N)
     for(int i=0; i<p; ++i) {
 
         // integrate on semi-circumference centered in (1,0) with unitary radius:
-        std::complex<double> ti = 1. + std::exp( std::complex<double>(0., 0.5*M_PI*(1. - (gauss_pts_p[i]+1.)/p)) ); // M_PI/2 - 0.5*(gauss_pts_p[i]+1.) * M_PI/p
+        std::complex<double> ti = 1. + std::exp( std::complex<double>(0., 0.5*M_PI*(1. - (gauss_pts_p[i]+1.)/p)) ); // M\_PI/2 - 0.5*(gauss\_pts\_p[i]+1.) * M\_PI/p
                      double  wi = 0.5 * gauss_wht_p[i]; // change of integration domain to semi-circumference
 
         for(int j=0; j<N+1; ++j) {
@@ -158,7 +158,7 @@ Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N)
     for(int i=0; i<p; ++i) {
 
         // integrate on semi-circumference centered in (1,0) with unitary radius:
-        std::complex<double> ti = 1. + std::exp( std::complex<double>(0., 0.5*M_PI*(1. - (gauss_pts_p[i]+1.)/p)) ); // M_PI/2 - 0.5*(gauss_pts_p[i]+1.) * M_PI/p
+        std::complex<double> ti = 1. + std::exp( std::complex<double>(0., 0.5*M_PI*(1. - (gauss_pts_p[i]+1.)/p)) ); // M\_PI/2 - 0.5*(gauss\_pts\_p[i]+1.) * M\_PI/p
                      double  wi = 0.5 * gauss_wht_p[i]; // change of integration domain to semi-circumference
 
         for(int j=0; j<N+1; ++j) {
