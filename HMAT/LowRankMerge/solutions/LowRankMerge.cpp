@@ -242,7 +242,7 @@ int main() {
     for(int p=1; p<=8; ++p) {
         double rtol = std::pow(10,-p);
         std::pair<double,size_t> errs = test_adap_rank_merge(n, rtol);
-        std::cout << "n = " << n << std::setw(15)
+        std::cout << "rtol = " << rtol << std::setw(15)
                   << "Frobenius = "
                   << std::scientific << std::setprecision(3)
                   << errs.first  << std::setw(10)
