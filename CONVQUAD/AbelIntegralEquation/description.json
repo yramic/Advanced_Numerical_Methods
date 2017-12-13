@@ -1,0 +1,8 @@
+{
+    "author" : "dcasati",
+    "email" : "daniele.casati@sam.math.ethz.ch",
+    "contributors" : "",
+
+    "name": "AbelIntegralEquation",
+    "all" : ["AbelIntegralEquation.cpp"]
+}

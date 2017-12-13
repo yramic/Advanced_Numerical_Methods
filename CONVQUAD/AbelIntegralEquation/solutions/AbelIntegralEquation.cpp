@@ -122,10 +122,18 @@ Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N)
 
     w *= std::tgamma(0.5)*tau / std::complex<double>(0.,2.*M_PI);
 
-    Eigen::MatrixXcd T = toeplitz_triangular(w);
-    Eigen::VectorXcd u = T.triangularView<Eigen::Lower>().solve(y);
+    // Solve the convolution quadrature:
 
-    return u;
+    Eigen::VectorXd  grid = Eigen::VectorXd::LinSpaced(N+1,0.,1.);
+    Eigen::VectorXcd y_N(N+1);
+    for(int i=0; i<N+1; ++i) {
+        y_N(i) = std::complex<double>(y(grid(i)),0.);
+    }
+
+    Eigen::MatrixXcd T = toeplitz_triangular(w);
+    Eigen::VectorXcd u = T.triangularView<Eigen::Lower>().solve(y_N);
+
+    return u.real();
 }
 /* SAM_LISTING_END_2 */
 
@@ -168,10 +176,18 @@ Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N)
 
     w *= std::tgamma(0.5)*tau / std::complex<double>(0.,2.*M_PI);
 
-    Eigen::MatrixXcd T = toeplitz_triangular(w);
-    Eigen::VectorXcd u = T.triangularView<Eigen::Lower>().solve(y);
+    // Solve the convolution quadrature:
 
-    return u;
+    Eigen::VectorXd  grid = Eigen::VectorXd::LinSpaced(N+1,0.,1.);
+    Eigen::VectorXcd y_N(N+1);
+    for(int i=0; i<N+1; ++i) {
+        y_N(i) = std::complex<double>(y(grid(i)),0.);
+    }
+
+    Eigen::MatrixXcd T = toeplitz_triangular(w);
+    Eigen::VectorXcd u = T.triangularView<Eigen::Lower>().solve(y_N);
+
+    return u.real();
 }
 /* SAM_LISTING_END_3 */
 
@@ -182,10 +198,10 @@ int main() {
         auto y = [](double t) { return t; };
 
         double tau = 0.01;
-        size_t N = std::round(1./tau) + 1;
-        Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N, 0., 1.);
-        Eigen::VectorXd u_ex(N);
-        for(int i=0; i<N; ++i) {
+        size_t N = std::round(1./tau);
+        Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N+1,0.,1.);
+        Eigen::VectorXd u_ex(N+1);
+        for(int i=0; i<N+1; ++i) {
             u_ex(i) = 8./M_PI*std::sqrt(grid(i));
         }
 
@@ -210,9 +226,9 @@ int main() {
         std::cout << "Implicit Euler" << std::endl;
         for(int N=10; N<=1280; N*=2) {
 
-            Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N, 0., 1.);
-            Eigen::VectorXd u_ex(N);
-            for(int i=0; i<N; ++i) {
+            Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N+1,0.,1.);
+            Eigen::VectorXd u_ex(N+1);
+            for(int i=0; i<N+1; ++i) {
                 u_ex(i) = 8./M_PI*std::sqrt(grid(i));
             }
 
@@ -228,9 +244,9 @@ int main() {
         std::cout << "BDF-2" << std::endl;
         for(int N=10; N<=1280; N*=2) {
 
-            Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N, 0., 1.);
-            Eigen::VectorXd u_ex(N);
-            for(int i=0; i<N; ++i) {
+            Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N+1,0.,1.);
+            Eigen::VectorXd u_ex(N+1);
+            for(int i=0; i<N+1; ++i) {
                 u_ex(i) = 8./M_PI*std::sqrt(grid(i));
             }
 
