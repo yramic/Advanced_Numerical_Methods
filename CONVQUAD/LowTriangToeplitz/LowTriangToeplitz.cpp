@@ -16,8 +16,8 @@ Eigen::VectorXcd myconv(const Eigen::VectorXcd& h, const Eigen::VectorXcd& x) {
   const long n = h.size();
   // Zero padding, cf. \eqref{eq:zeropad}
   Eigen::VectorXcd hp(2*n - 1), xp(2*n - 1);
-  hp << h, VectorXcd::Zero(n - 1);
-  xp << x, VectorXcd::Zero(n - 1);
+  hp << h, Eigen::VectorXcd::Zero(n - 1);
+  xp << x, Eigen::VectorXcd::Zero(n - 1);
   // Periodic discrete convolution of length \Blue{$2n-1$}, \cref{cpp:pconffft}
   return pconvfft(hp, xp);
 }
@@ -54,7 +54,7 @@ Eigen::VectorXcd toepmult(const Eigen::VectorXcd& c, const Eigen::VectorXcd& r,
 
     Eigen::VectorXcd cr_tmp = c;
     cr_tmp.conservativeResize(2*n); cr_tmp.tail(n) = Eigen::VectorXcd::Zero(n);
-    cr_tmp.tail(n-1).real() = r.tail(n-1).reverse();
+    cr_tmp.tail(n-1) = r.tail(n-1).reverse();
 
     Eigen::VectorXcd  x_tmp = x;
     x_tmp.conservativeResize(2*n);   x_tmp.tail(n) = Eigen::VectorXcd::Zero(n);
@@ -76,9 +76,9 @@ Eigen::VectorXcd ltp_solve(const Eigen::VectorXcd& f, const Eigen::VectorXcd& y)
 {
     assert(f.size() == y.size() &&
            "f and y vectors must have the same length!");
-    assert(f(0) != 0 &&
+    assert(std::abs(f(0)) > 1e-10 &&
            "Lower triangular Toeplitz matrix must be invertible!");
-    assert(std::log2(f.size) = std::floor(std::log2(f.size)) &&
+    assert(std::log2(f.size()) == std::floor(std::log2(f.size())) &&
            "Size of f must be a power of 2!");
 
 #if SOLUTION
@@ -89,7 +89,7 @@ Eigen::VectorXcd ltp_solve(const Eigen::VectorXcd& f, const Eigen::VectorXcd& y)
 
     Eigen::VectorXcd u_head = ltp_solve(f.head(n/2), y.head(n/2));
     Eigen::VectorXcd t = y.tail(n/2) - toepmult(f.tail(n/2), f.segment(1,n/2).reverse(), u_head);
-    Eigen::VectorXcd u_tail = ltp_solve(f.tail(n/2), y.tail(n/2));
+    Eigen::VectorXcd u_tail = ltp_solve(f.head(n/2), t);
 
     Eigen::VectorXcd u(n); u << u_head, u_tail;
     return u;
@@ -126,13 +126,13 @@ Eigen::MatrixXcd toeplitz(const Eigen::VectorXcd& c, const Eigen::VectorXcd& r)
 int main() {
 
     // Initialization
-    size_t n = 3;
+    size_t n = 4;
     Eigen::VectorXcd c1(n), c2(n), r1(n), r2(n), y(n);
-    c1 << 1, 2, 3;
-    r1 << 1, 0, 0;
-    c2 << 4, 5, 6;
-    r2 << 4, 0, 0;
-    y  << 7, 8, 9;
+    c1 << 1, 2, 3, 4;
+    r1 << 1, 0, 0, 0;
+    c2 << 5, 6, 7, 8;
+    r2 << 5, 0, 0, 0;
+    y  << 9,10,11,12;
     Eigen::MatrixXcd T1 = toeplitz(c1, r1);
     Eigen::MatrixXcd T2 = toeplitz(c2, r2);
 
