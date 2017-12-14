@@ -1,9 +1,3 @@
-//// 
-//// Copyright (C) 2017 SAM (D-MATH) @ ETH Zurich
-//// Author(s): curzuato < > 
-//// Contributors:  dcasati 
-//// This file is part of the AdvNumCSE repository.
-////
 #include <Eigen/Dense>
 #include <cmath>
 #include <iomanip>
@@ -11,6 +5,9 @@
 extern "C" {
 #include "../../../BEM/CppHilbert/Library/source/gaussQuadrature.h"
 }
+
+using namespace Eigen;
+using namespace std;
 
 
 /* @brief Find the unknown function u in the Abel integral equation
@@ -21,17 +18,19 @@ extern "C" {
  * \param tau Meshwidth of the grid where to compute the values of u
  * \\return Values of u on a grid in [0,1] with meshwidth tau
  */
+/* SAM_LISTING_BEGIN_0 */
 template<typename FUNC>
-Eigen::VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau)
+VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau)
 {
     // TODO: Find the unknown function u in the Abel integral equation with Galerkin discretization
 }
+/* SAM_LISTING_END_0 */
 
 
-Eigen::MatrixXcd toeplitz_triangular(const Eigen::VectorXcd& c)
+MatrixXcd toeplitz_triangular(const VectorXcd& c)
 {
     size_t n = c.size();
-    Eigen::MatrixXcd T = Eigen::MatrixXcd::Zero(n, n);
+    MatrixXcd T = MatrixXcd::Zero(n, n);
     for(int i=0; i<n; ++i) {
         T.col(i).tail(n-i) = c.head(n-i);
     }
@@ -45,11 +44,13 @@ Eigen::MatrixXcd toeplitz_triangular(const Eigen::VectorXcd& c)
  * \param N Number of discretization steps
  * \\return Values of u from convolution quadrature
  */
+/* SAM_LISTING_BEGIN_2 */
 template<typename FUNC>
-Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N)
+VectorXd cq_ieul_abel(const FUNC& y, size_t N)
 {
     // TODO: Find the unknown function u in the Abel integral equation with convolution quadrature (implicit Euler)
 }
+/* SAM_LISTING_END_2 */
 
 
 /* @brief Find the unknown function u in the Abel integral equation
@@ -58,15 +59,21 @@ Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N)
  * \param N Number of discretization steps
  * \\return Values of u from convolution quadrature
  */
+/* SAM_LISTING_BEGIN_3 */
 template<typename FUNC>
-Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N)
+VectorXd cq_bdf2_abel(const FUNC& y, size_t N)
 {
     // TODO: Find the unknown function u in the Abel integral equation with convolution quadrature (BDF-2)
 }
+/* SAM_LISTING_END_3 */
 
 
 int main() {
+    /* SAM_LISTING_BEGIN_1 */
     // TODO: Tabulate the max error of the Galerkin approximation scheme
+    /* SAM_LISTING_END_1 */
 
+    /* SAM_LISTING_BEGIN_4 */
     // TODO: Tabulate the max error of the convolution quadratures
+    /* SAM_LISTING_END_4 */
 }

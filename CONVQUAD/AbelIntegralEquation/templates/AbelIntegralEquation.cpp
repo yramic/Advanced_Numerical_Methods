@@ -6,6 +6,9 @@ extern "C" {
 #include "../../../BEM/CppHilbert/Library/source/gaussQuadrature.h"
 }
 
+using namespace Eigen;
+using namespace std;
+
 
 /* @brief Find the unknown function u in the Abel integral equation
  * using Galerkin discretization with a polynomial basis.
@@ -17,17 +20,17 @@ extern "C" {
  */
 /* SAM_LISTING_BEGIN_0 */
 template<typename FUNC>
-Eigen::VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau)
+VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau)
 {
     // TODO: Find the unknown function u in the Abel integral equation with Galerkin discretization
 }
 /* SAM_LISTING_END_0 */
 
 
-Eigen::MatrixXcd toeplitz_triangular(const Eigen::VectorXcd& c)
+MatrixXd toeplitz_triangular(const VectorXd& c)
 {
     size_t n = c.size();
-    Eigen::MatrixXcd T = Eigen::MatrixXcd::Zero(n, n);
+    MatrixXd T = MatrixXd::Zero(n, n);
     for(int i=0; i<n; ++i) {
         T.col(i).tail(n-i) = c.head(n-i);
     }
@@ -43,11 +46,26 @@ Eigen::MatrixXcd toeplitz_triangular(const Eigen::VectorXcd& c)
  */
 /* SAM_LISTING_BEGIN_2 */
 template<typename FUNC>
-Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N)
+VectorXd cq_ieul_abel(const FUNC& y, size_t N)
 {
     // TODO: Find the unknown function u in the Abel integral equation with convolution quadrature (implicit Euler)
 }
 /* SAM_LISTING_END_2 */
+
+
+VectorXd pconv(const VectorXd& u, const VectorXd& x) {
+  using idx_t = VectorXd::Index; // may be unsigned !
+  const idx_t n = x.size();
+  VectorXd z = VectorXd::Zero(n);
+  // Need signed indices when differences are formed
+  for (long k = 0; k < n; ++k) {
+      for (long j = 0; j < n; ++j) {
+          long ind = (k - j < 0 ? n + k - j : k - j);
+          z(k) += u(ind)*x(j);
+      }
+  }
+  return z;
+}
 
 
 /* @brief Find the unknown function u in the Abel integral equation
@@ -58,7 +76,7 @@ Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N)
  */
 /* SAM_LISTING_BEGIN_3 */
 template<typename FUNC>
-Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N)
+VectorXd cq_bdf2_abel(const FUNC& y, size_t N)
 {
     // TODO: Find the unknown function u in the Abel integral equation with convolution quadrature (BDF-2)
 }

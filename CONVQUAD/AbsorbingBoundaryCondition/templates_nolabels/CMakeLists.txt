@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(AbelIntegralEquation)
+project(AbsorbingBoundaryCondition)
 
 ###########################################################################
 #
@@ -59,8 +59,8 @@ endif()
 
 add_definitions("-Wno-ignored-attributes -Wno-deprecated-declarations")
 
-# make AbelIntegralEquation
-set(SRCS AbelIntegralEquation.cpp)
-add_executable(AbelIntegralEquation ${SRCS})
+# make AbsorbingBoundaryCondition
+set(SRCS AbsorbingBoundaryCondition.cpp)
+add_executable(AbsorbingBoundaryCondition ${SRCS})
 
 
