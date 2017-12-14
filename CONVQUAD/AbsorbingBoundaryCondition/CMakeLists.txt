@@ -1,10 +1,8 @@
-# Template target
-add_executable(convquad_absorbing-boundary-condition_template AbsorbingBoundaryCondition.cpp)
-target_link_libraries(convquad_absorbing-boundary-condition_template CppHilbert)
-target_compile_definitions(convquad_absorbing-boundary-condition_template PRIVATE SOLUTION=0 INTERNAL=0)
+add_executable_advnumcse(solution AbsorbingBoundaryCondition.cpp)
+get_target_name_advnumcse(solution SOLUTION)
+target_compile_definitions(${SOLUTION} PRIVATE SOLUTION=1 INTERNAL=1)
 
-# Solution target
-add_executable(convquad_absorbing-boundary-condition_solution AbsorbingBoundaryCondition.cpp)
-target_link_libraries(convquad_absorbing-boundary-condition_solution CppHilbert)
-target_compile_definitions(convquad_absorbing-boundary-condition_solution PRIVATE SOLUTION=1 INTERNAL=1)
+add_executable_advnumcse(template AbsorbingBoundaryCondition.cpp)
+get_target_name_advnumcse(template TEMPLATE)
+target_compile_definitions(${TEMPLATE} PRIVATE SOLUTION=0 INTERNAL=0)
 
