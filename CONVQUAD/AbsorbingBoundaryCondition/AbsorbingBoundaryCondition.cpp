@@ -19,6 +19,7 @@ extern "C" {
 template<typename FUNC>
 Eigen::VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau)
 {
+#if SOLUTION
     Eigen::MatrixXd A = Eigen::MatrixXd::Zero(p,p);
     Eigen::VectorXd b = Eigen::VectorXd::Zero(p);
 
@@ -29,7 +30,7 @@ Eigen::VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau)
 
         for(int j=1; j<=p; ++j) {
 
-            A(i-1,j-1) = 2.*std::sqrt(M_PI)*std::tgamma(1.+j) / ((3.+2.*i+2.*j)*std::tgamma(3./2.+j));
+            A(i-1,j-1) = 2.*std::sqrt(M_PI)*std::tgamma(1.+j) / ((3.+2.*i+2.*j)*std::tgamma(3./2.+j)); // std::tgamma(1.+j) == j! is j is integer
         }
 
         for(int k=0; k<p; ++k) {
@@ -54,6 +55,9 @@ Eigen::VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau)
     }
 
     return grid;
+#else // TEMPLATE
+    // TODO: Find the unknown function u in the Abel integral equation with Galerkin discretization
+#endif // TEMPLATE
 }
 /* SAM_LISTING_END_0 */
 
@@ -79,6 +83,7 @@ Eigen::MatrixXcd toeplitz_triangular(const Eigen::VectorXcd& c)
 template<typename FUNC>
 Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N)
 {
+#if SOLUTION
     Eigen::VectorXcd w = Eigen::VectorXd::Zero(N+1);
     double tau = 1./N;
 
@@ -119,6 +124,9 @@ Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N)
     Eigen::VectorXcd u = T.triangularView<Eigen::Lower>().solve(y_N);
 
     return u.real();
+#else // TEMPLATE
+    // TODO: Find the unknown function u in the Abel integral equation with convolution quadrature (implicit Euler)
+#endif // TEMPLATE
 }
 /* SAM_LISTING_END_2 */
 
@@ -133,6 +141,7 @@ Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N)
 template<typename FUNC>
 Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N)
 {
+#if SOLUTION
     Eigen::VectorXcd w = Eigen::VectorXd::Zero(N+1);
     double tau = 1./N;
 
@@ -173,12 +182,16 @@ Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N)
     Eigen::VectorXcd u = T.triangularView<Eigen::Lower>().solve(y_N);
 
     return u.real();
+#else // TEMPLATE
+    // TODO: Find the unknown function u in the Abel integral equation with convolution quadrature (BDF-2)
+#endif // TEMPLATE
 }
 /* SAM_LISTING_END_3 */
 
 
 int main() {
     /* SAM_LISTING_BEGIN_1 */
+#if SOLUTION
     {
         auto y = [](double t) { return t; };
 
@@ -187,7 +200,7 @@ int main() {
         Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N+1,0.,1.);
         Eigen::VectorXd u_ex(N+1);
         for(int i=0; i<N+1; ++i) {
-            u_ex(i) = 8./M_PI*std::sqrt(grid(i));
+            u_ex(i) = 2./M_PI*std::sqrt(grid(i));
         }
 
         std::cout << "Problem 3.1.g" << std::endl;
@@ -201,9 +214,13 @@ int main() {
                       << err_max << std::endl;
         }
     }
+#else // TEMPLATE
+    // TODO: Tabulate the max error of the Galerkin approximation scheme
+#endif // TEMPLATE
     /* SAM_LISTING_END_1 */
 
     /* SAM_LISTING_BEGIN_4 */
+#if SOLUTION
     {
         auto y = [](double t) { return t; };
 
@@ -214,7 +231,7 @@ int main() {
             Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N+1,0.,1.);
             Eigen::VectorXd u_ex(N+1);
             for(int i=0; i<N+1; ++i) {
-                u_ex(i) = 8./M_PI*std::sqrt(grid(i));
+                u_ex(i) = 2./M_PI*std::sqrt(grid(i));
             }
 
             Eigen::VectorXd u_app = cq_ieul_abel(y, N);
@@ -232,7 +249,7 @@ int main() {
             Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N+1,0.,1.);
             Eigen::VectorXd u_ex(N+1);
             for(int i=0; i<N+1; ++i) {
-                u_ex(i) = 8./M_PI*std::sqrt(grid(i));
+                u_ex(i) = 2./M_PI*std::sqrt(grid(i));
             }
 
             Eigen::VectorXd u_app = cq_bdf2_abel(y, N);
@@ -244,5 +261,8 @@ int main() {
                       << err_max << std::endl;
         }
     }
+#else // TEMPLATE
+    // TODO: Tabulate the max error of the convolution quadratures
+#endif // TEMPLATE
     /* SAM_LISTING_END_4 */
 }

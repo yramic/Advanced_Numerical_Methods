@@ -23,29 +23,14 @@ Eigen::VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau)
     Eigen::MatrixXd A = Eigen::MatrixXd::Zero(p,p);
     Eigen::VectorXd b = Eigen::VectorXd::Zero(p);
 
-    const double* gauss_pts_pp = getGaussPoints(p*p);
-    const double* gauss_wht_pp = getGaussWeights(p*p);
-
     const double* gauss_pts_p = getGaussPoints(p);
     const double* gauss_wht_p = getGaussWeights(p);
 
-    for(int i=0; i<p; ++i) {
+    for(int i=1; i<=p; ++i) {
 
-        for(int j=0; j<p; ++j) {
+        for(int j=1; j<=p; ++j) {
 
-            for(int k=0; k<p*p; ++k) {
-
-                double tk = 0.5 * (gauss_pts_pp[k] + 1.);
-                double wk = 0.5 *  gauss_wht_pp[k];
-
-                for(int l=0; l<p*p; ++l) {
-
-                    double xl = 0.5 * std::sqrt(tk) * (gauss_pts_pp[k] + 1.);
-                    double wl = 0.5 * std::sqrt(tk) *  gauss_wht_pp[k];
-
-                    A(i,j) += wk*wl * 2. * std::pow(tk,i) * std::pow(tk - xl*xl,j);
-                }
-            }
+            A(i-1,j-1) = 2.*std::sqrt(M_PI)*std::tgamma(1.+j) / ((3.+2.*i+2.*j)*std::tgamma(3./2.+j)); // std::tgamma(1.+j) == j! is j is integer
         }
 
         for(int k=0; k<p; ++k) {
@@ -53,7 +38,7 @@ Eigen::VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau)
             double tk = 0.5 * (gauss_pts_p[k] + 1.);
             double wk = 0.5 *  gauss_wht_p[k];
 
-            b(i) += wk * std::pow(tk,i) * y(tk);
+            b(i-1) += wk * std::pow(tk,i) * y(tk);
         }
     }
 
@@ -64,8 +49,8 @@ Eigen::VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau)
     Eigen::VectorXd u    = Eigen::VectorXd::Zero(N+1);
 
     for(int i=0; i<N+1; ++i) {
-        for(int j=0; j<p; ++j) {
-            u(i) += x(j) * std::pow(grid(i),j);
+        for(int j=1; j<=p; ++j) {
+            u(i) += x(j-1) * std::pow(grid(i),j);
         }
     }
 
@@ -98,19 +83,19 @@ Eigen::MatrixXcd toeplitz_triangular(const Eigen::VectorXcd& c)
 template<typename FUNC>
 Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N)
 {
-#if SOLUTION
+//#if SOLUTION
     Eigen::VectorXcd w = Eigen::VectorXd::Zero(N+1);
     double tau = 1./N;
 
-    int p = 10; // order of quadrature rule
+    int p = 8; // order of quadrature rule
     const double* gauss_pts_p = getGaussPoints(p);
     const double* gauss_wht_p = getGaussWeights(p);
 
     for(int i=0; i<p; ++i) {
 
         // integrate on semi-circumference centered in (1,0) with unitary radius:
-        std::complex<double> ti = 1. + std::exp( std::complex<double>(0., 0.5*M_PI*(1. - (gauss_pts_p[i]+1.)/p)) ); // M\_PI/2 - 0.5*(gauss\_pts\_p[i]+1.) * M\_PI/p
-                     double  wi = 0.5 * gauss_wht_p[i]; // change of integration domain to semi-circumference
+        std::complex<double> ti = 1. + std::exp( std::complex<double>(0.,-0.5*M_PI*gauss_pts_p[i]) ); // M\_PI/2 - 0.5*(gauss\_pts\_p[i]+1.)*M\_PI
+                     double  wi = 0.5 * M_PI * gauss_wht_p[i]; // change of integration domain to semi-circumference
 
         for(int j=0; j<N+1; ++j) {
             w(j) += wi / (std::sqrt(ti)*std::pow(1.-tau*ti,j+1));
@@ -156,19 +141,19 @@ Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N)
 template<typename FUNC>
 Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N)
 {
-#if SOLUTION
+//#if SOLUTION
     Eigen::VectorXcd w = Eigen::VectorXd::Zero(N+1);
     double tau = 1./N;
 
-    int p = 10; // order of quadrature rule
+    int p = 8; // order of quadrature rule
     const double* gauss_pts_p = getGaussPoints(p);
     const double* gauss_wht_p = getGaussWeights(p);
 
     for(int i=0; i<p; ++i) {
 
         // integrate on semi-circumference centered in (1,0) with unitary radius:
-        std::complex<double> ti = 1. + std::exp( std::complex<double>(0., 0.5*M_PI*(1. - (gauss_pts_p[i]+1.)/p)) ); // M\_PI/2 - 0.5*(gauss\_pts\_p[i]+1.) * M\_PI/p
-                     double  wi = 0.5 * gauss_wht_p[i]; // change of integration domain to semi-circumference
+        std::complex<double> ti = 1. + std::exp( std::complex<double>(0.,-0.5*M_PI*gauss_pts_p[i]) ); // M\_PI/2 - 0.5*(gauss\_pts\_p[i]+1.)*M\_PI
+                     double  wi = 0.5 * M_PI * gauss_wht_p[i]; // change of integration domain to semi-circumference
 
         for(int j=0; j<N+1; ++j) {
             w(j) += wi / (std::sqrt(ti)*std::sqrt(1.+tau*ti)) * (1./std::pow(2.-std::sqrt(1.+2.*tau*ti),j+1) - 1./std::pow(2.+std::sqrt(1.+2.*tau*ti),j+1));
@@ -215,11 +200,11 @@ int main() {
         Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N+1,0.,1.);
         Eigen::VectorXd u_ex(N+1);
         for(int i=0; i<N+1; ++i) {
-            u_ex(i) = 8./M_PI*std::sqrt(grid(i));
+            u_ex(i) = 2./M_PI*std::sqrt(grid(i));
         }
 
         std::cout << "Problem 3.1.g" << std::endl;
-        for(int p=2; p<=10; ++p) {
+        for(int p=2; p<=32; p*=2) {
             Eigen::VectorXd u_app = poly_spec_abel(y, p, tau);
             Eigen::VectorXd diff  = u_ex - u_app;
             double err_max  = diff.cwiseAbs().maxCoeff();
@@ -234,7 +219,7 @@ int main() {
 #endif // TEMPLATE
     /* SAM_LISTING_END_1 */
 
-    /* SAM_LISTING_BEGIN_3 */
+    /* SAM_LISTING_BEGIN_4 */
 #if SOLUTION
     {
         auto y = [](double t) { return t; };
@@ -246,7 +231,7 @@ int main() {
             Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N+1,0.,1.);
             Eigen::VectorXd u_ex(N+1);
             for(int i=0; i<N+1; ++i) {
-                u_ex(i) = 8./M_PI*std::sqrt(grid(i));
+                u_ex(i) = 2./M_PI*std::sqrt(grid(i));
             }
 
             Eigen::VectorXd u_app = cq_ieul_abel(y, N);
@@ -264,7 +249,7 @@ int main() {
             Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N+1,0.,1.);
             Eigen::VectorXd u_ex(N+1);
             for(int i=0; i<N+1; ++i) {
-                u_ex(i) = 8./M_PI*std::sqrt(grid(i));
+                u_ex(i) = 2./M_PI*std::sqrt(grid(i));
             }
 
             Eigen::VectorXd u_app = cq_bdf2_abel(y, N);
@@ -279,5 +264,5 @@ int main() {
 #else // TEMPLATE
     // TODO: Tabulate the max error of the convolution quadratures
 #endif // TEMPLATE
-    /* SAM_LISTING_END_3 */
+    /* SAM_LISTING_END_4 */
 }
