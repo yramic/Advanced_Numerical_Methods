@@ -33,8 +33,8 @@ VectorXd pconv(const VectorXd& u, const VectorXd& x) {
 /* @brief Find the unknown function u at final time t = 1 in the evolution problem
  * using Galerkin discretization and convolution quadrature (BDF-2)
  * \param phi Template function for the right-hand side
- * \param M Number of discretization steps in time
- * \param N Number of discretization steps in space
+ * \param M Number of discretization intervals in time
+ * \param N Number of discretization intervals in space
  * \param p Order of quadrature rule
  * \\return Values of u at final time t = 1
  */
@@ -46,75 +46,5 @@ VectorXd solveABC(const FUNC& phi, size_t M, size_t N, int p)
 
 
 int main() {
-//#if SOLUTION
-//    {
-//        auto y = [](double t) { return t; };
-
-//        double tau = 0.01;
-//        size_t N = round(1./tau);
-//        VectorXd grid = VectorXd::LinSpaced(N+1,0.,1.);
-//        VectorXd u_ex(N+1);
-//        for(int i=0; i<N+1; ++i) {
-//            u_ex(i) = 2./M_PI*sqrt(grid(i));
-//        }
-
-//        cout << "Problem 3.1.g" << endl;
-//        for(int p=2; p<=32; p*=2) {
-//            VectorXd u_app = poly_spec_abel(y, p, tau);
-//            VectorXd diff  = u_ex - u_app;
-//            double err_max  = diff.cwiseAbs().maxCoeff();
-//            cout <<   "p = " << p << setw(15)
-//                      << "Max = "
-//                      << scientific << setprecision(3)
-//                      << err_max << endl;
-//        }
-//    }
-//#else // TEMPLATE
-//    // TODO: Tabulate the max error of the Galerkin approximation scheme
-//#endif // TEMPLATE
-
-//#if SOLUTION
-//    {
-//        auto y = [](double t) { return t; };
-
-//        cout << "Problem 3.1.l"  << endl;
-//        cout << "Implicit Euler" << endl;
-//        for(int N=10; N<=1280; N*=2) {
-
-//            VectorXd grid = VectorXd::LinSpaced(N+1,0.,1.);
-//            VectorXd u_ex(N+1);
-//            for(int i=0; i<N+1; ++i) {
-//                u_ex(i) = 2./M_PI*sqrt(grid(i));
-//            }
-
-//            VectorXd u_app = cq_ieul_abel(y, N);
-//            VectorXd diff  = u_ex - u_app;
-//            double err_max  = diff.cwiseAbs().maxCoeff();
-//            cout <<   "N = " << N << setw(15)
-//                      << "Max = "
-//                      << scientific << setprecision(3)
-//                      << err_max << endl;
-//        }
-
-//        cout << "BDF-2" << endl;
-//        for(int N=10; N<=1280; N*=2) {
-
-//            VectorXd grid = VectorXd::LinSpaced(N+1,0.,1.);
-//            VectorXd u_ex(N+1);
-//            for(int i=0; i<N+1; ++i) {
-//                u_ex(i) = 2./M_PI*sqrt(grid(i));
-//            }
-
-//            VectorXd u_app = cq_bdf2_abel(y, N);
-//            VectorXd diff  = u_ex - u_app;
-//            double err_max  = diff.cwiseAbs().maxCoeff();
-//            cout <<   "N = " << N << setw(15)
-//                      << "Max = "
-//                      << scientific << setprecision(3)
-//                      << err_max << endl;
-//        }
-//    }
-//#else // TEMPLATE
-//    // TODO: Tabulate the max error of the convolution quadratures
-//#endif // TEMPLATE
+    // TODO: Tabulate the H1-error of the Galerkin discretization + convolution quadrature
 }

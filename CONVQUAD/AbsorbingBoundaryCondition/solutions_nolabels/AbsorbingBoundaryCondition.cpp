@@ -33,30 +33,27 @@ VectorXd pconv(const VectorXd& u, const VectorXd& x) {
 /* @brief Find the unknown function u at final time t = 1 in the evolution problem
  * using Galerkin discretization and convolution quadrature (BDF-2)
  * \param phi Template function for the right-hand side
- * \param M Number of discretization steps in time
- * \param N Number of discretization steps in space
+ * \param M Number of discretization intervals in time
+ * \param N Number of discretization intervals in space
  * \param p Order of quadrature rule
  * \\return Values of u at final time t = 1
  */
 template<typename FUNC>
 VectorXd solveABC(const FUNC& phi, size_t M, size_t N, int p)
 {
-    double h = 1./(N-1);
-    VectorXd grid = VectorXd::LinSpaced(N,0.,1.);
+    double h = 1./N;
+    VectorXd grid = VectorXd::LinSpaced(N+1,0.,1.);
 
-    SparseMatrix<double> A(N,N);
-    std::vector<Eigen::Triplet<double> > triplets(3*N-2);
-    triplets[0] = Eigen::Triplet<double>(0,0, 1./h - 1./(h*h*pow(M_PI,3))*(2. + (M_PI*M_PI*h*h-2.)*cos(M_PI*h) - 2.*M_PI*h*sin(M_PI*h)) );
-    triplets[1] = Eigen::Triplet<double>(1,0,-1./h + 1./(h*h*pow(M_PI,3))*(2. - 2.*cos(M_PI*h) - M_PI*h*sin(M_PI*h)) );
-    for(int i=1; i<N-1; ++i) {
-        triplets[2+3*i  ] = Eigen::Triplet<double>(i-1,i,-1./h + 1./(h*h*pow(M_PI,3))*(2.*(cos(M_PI*grid(i-1)) - cos(M_PI*grid(i))) - M_PI*h*(sin(M_PI*grid(i-1)) + sin(M_PI*grid(i)))) );
-        triplets[2+3*i+1] = Eigen::Triplet<double>(i,  i, 2./h + 1./(h*h*pow(M_PI,3))*((M_PI*M_PI*h*h-4.)*(cos(M_PI*grid(i-1)) - cos(M_PI*grid(i+1))) + 4.*M_PI*h*(sin(M_PI*grid(i-1)) + sin(M_PI*grid(i+1)))) );
-        triplets[2+3*i+2] = Eigen::Triplet<double>(i+1,i,-1./h + 1./(h*h*pow(M_PI,3))*(2.*(cos(M_PI*grid(i)) - cos(M_PI*grid(i+1))) - M_PI*h*(sin(M_PI*grid(i)) + sin(M_PI*grid(i+1)))) );
+    SparseMatrix<double> A(N+1,N+1); A.reserve(3*N+1); // 3*(N+1) - 2
+    A.insert(0,0) = 1./h - 1./(h*h*pow(M_PI,3))*(2. + (M_PI*M_PI*h*h-2.)*cos(M_PI*h) - 2.*M_PI*h*sin(M_PI*h));
+    A.insert(1,0) =-1./h + 1./(h*h*pow(M_PI,3))*(2. - 2.*cos(M_PI*h) - M_PI*h*sin(M_PI*h));
+    for(int i=1; i<N; ++i) {
+        A.insert(i-1,i) =-1./h + 1./(h*h*pow(M_PI,3))*(2.*(cos(M_PI*grid(i-1)) - cos(M_PI*grid(i))) - M_PI*h*(sin(M_PI*grid(i-1)) + sin(M_PI*grid(i))));
+        A.insert(i,  i) = 2./h + 1./(h*h*pow(M_PI,3))*((M_PI*M_PI*h*h-4.)*(cos(M_PI*grid(i-1)) - cos(M_PI*grid(i+1))) + 4.*M_PI*h*(sin(M_PI*grid(i-1)) + sin(M_PI*grid(i+1))));
+        A.insert(i+1,i) =-1./h + 1./(h*h*pow(M_PI,3))*(2.*(cos(M_PI*grid(i)) - cos(M_PI*grid(i+1))) - M_PI*h*(sin(M_PI*grid(i)) + sin(M_PI*grid(i+1))));
     }
-    triplets[3*N-4] = Eigen::Triplet<double>(N-2,N-1,-1./h + 1./(h*h*pow(M_PI,3))*(2.*cos(M_PI*(1.-h)) - 2. - M_PI*h*sin(M_PI*(1.-h))) );
-    triplets[3*N-3] = Eigen::Triplet<double>(N-1,N-1, 1./h + 1./(h*h*pow(M_PI,3))*((M_PI*M_PI*h*h-2.)*cos(M_PI*(1.-h)) - 2. + 2.*M_PI*h*sin(M_PI*(1.-h))) );
-
-    A.setFromTriplets(triplets.begin(), triplets.end());
+    A.insert(N-1,N) =-1./h + 1./(h*h*pow(M_PI,3))*(2.*cos(M_PI*(1.-h)) - 2. - M_PI*h*sin(M_PI*(1.-h)));
+    A.insert(N,  N) = 1./h + 1./(h*h*pow(M_PI,3))*((M_PI*M_PI*h*h-2.)*cos(M_PI*(1.-h)) - 2. + 2.*M_PI*h*sin(M_PI*(1.-h)));
 
     double tau = 1./M;
     VectorXcd w = VectorXd::Zero(M+1);
@@ -74,26 +71,27 @@ VectorXd solveABC(const FUNC& phi, size_t M, size_t N, int p)
     w *= tau*1e-7/complex<double>(0.,p); // coefficient of weight formula, tau/complex<double>(0.,2.*M\_PI), times quadrature weight, 2.*M\_PI*1e-7/p
 
     SparseMatrix<complex<double> > Aw = A.cast<complex<double> >();
-    Aw.coeffRef(N-1,N-1) += w(0);
+    Aw.coeffRef(N,N) += w(0);
     SimplicialLLT<SparseMatrix<complex<double> > > solver;
     solver.compute(Aw);
 
-    MatrixXcd u = VectorXcd::Zero(N,M+1); // first column is at time t = 0
+    MatrixXcd u = MatrixXcd::Zero(N+1,M+1); // first column is at time t = 0
     for(int i=1; i<M+1; ++i) {
 
         complex<double> rhs_N = 0.;
         for(int l=0; l<i; ++l) {
-            rhs_N += w(i-l) * u(N-1,l);
+            rhs_N += w(i-l) * u(N,l);
         }
 
-        VectorXcd phi_i(N);
-        for(int j=0; j<N; ++j) {
+        VectorXcd phi_i(N+1);
+        for(int j=0; j<N+1; ++j) {
             phi_i(j) = (complex<double>)phi(grid(j),i*tau);
         }
 
-        VectorXcd rhs = phi_i; rhs(N-1) -= rhs_N;
+        VectorXcd rhs = phi_i; rhs(N) -= rhs_N;
 
-        u.col(i) = solver.solve(rhs);
+        VectorXcd tmp = solver.solve(rhs);
+        u.col(i) = tmp;
     }
 
     return u.col(M).real();
@@ -101,75 +99,33 @@ VectorXd solveABC(const FUNC& phi, size_t M, size_t N, int p)
 
 
 int main() {
-//#if SOLUTION
-//    {
-//        auto y = [](double t) { return t; };
+    auto phi = [](double x, double t) { return sin(M_PI*x)*sin(M_PI*t); };
+    VectorXd u_ref = solveABC(phi, 2560, 2560, 20);
 
-//        double tau = 0.01;
-//        size_t N = round(1./tau);
-//        VectorXd grid = VectorXd::LinSpaced(N+1,0.,1.);
-//        VectorXd u_ex(N+1);
-//        for(int i=0; i<N+1; ++i) {
-//            u_ex(i) = 2./M_PI*sqrt(grid(i));
-//        }
+    cout << "Problem 3.2.d" << endl;
+    for(int N=10; N<=1280; N*=2) {
+        VectorXd u_tmp = solveABC(phi, 2560, N, 20);
+        double error = 0.;
+        double ratio = 2560/N;
+        for(int i=1; i<=2560; ++i) {
+            int j = ceil(i/ratio);
+            error += pow((u_ref(i) - u_ref(i-1))/2560. - (u_tmp(j) - u_tmp(j-1))/(double)(N-1), 2) / 2560.; // denominator is h of refined grid
+        }
+        cout << "N = " << N << setw(15)
+             << "H1-Error = "
+             << scientific << setprecision(3)
+             << error << endl;
+    }
 
-//        cout << "Problem 3.1.g" << endl;
-//        for(int p=2; p<=32; p*=2) {
-//            VectorXd u_app = poly_spec_abel(y, p, tau);
-//            VectorXd diff  = u_ex - u_app;
-//            double err_max  = diff.cwiseAbs().maxCoeff();
-//            cout <<   "p = " << p << setw(15)
-//                      << "Max = "
-//                      << scientific << setprecision(3)
-//                      << err_max << endl;
-//        }
-//    }
-//#else // TEMPLATE
-//    // TODO: Tabulate the max error of the Galerkin approximation scheme
-//#endif // TEMPLATE
-
-//#if SOLUTION
-//    {
-//        auto y = [](double t) { return t; };
-
-//        cout << "Problem 3.1.l"  << endl;
-//        cout << "Implicit Euler" << endl;
-//        for(int N=10; N<=1280; N*=2) {
-
-//            VectorXd grid = VectorXd::LinSpaced(N+1,0.,1.);
-//            VectorXd u_ex(N+1);
-//            for(int i=0; i<N+1; ++i) {
-//                u_ex(i) = 2./M_PI*sqrt(grid(i));
-//            }
-
-//            VectorXd u_app = cq_ieul_abel(y, N);
-//            VectorXd diff  = u_ex - u_app;
-//            double err_max  = diff.cwiseAbs().maxCoeff();
-//            cout <<   "N = " << N << setw(15)
-//                      << "Max = "
-//                      << scientific << setprecision(3)
-//                      << err_max << endl;
-//        }
-
-//        cout << "BDF-2" << endl;
-//        for(int N=10; N<=1280; N*=2) {
-
-//            VectorXd grid = VectorXd::LinSpaced(N+1,0.,1.);
-//            VectorXd u_ex(N+1);
-//            for(int i=0; i<N+1; ++i) {
-//                u_ex(i) = 2./M_PI*sqrt(grid(i));
-//            }
-
-//            VectorXd u_app = cq_bdf2_abel(y, N);
-//            VectorXd diff  = u_ex - u_app;
-//            double err_max  = diff.cwiseAbs().maxCoeff();
-//            cout <<   "N = " << N << setw(15)
-//                      << "Max = "
-//                      << scientific << setprecision(3)
-//                      << err_max << endl;
-//        }
-//    }
-//#else // TEMPLATE
-//    // TODO: Tabulate the max error of the convolution quadratures
-//#endif // TEMPLATE
+    for(int M=10; M<=1280; M*=2) {
+        VectorXd u_tmp = solveABC(phi, M, 2560, 20);
+        double error = 0.;
+        for(int i=1; i<=2560; ++i) {
+            error += pow((u_ref(i) - u_ref(i-1))/2560. - (u_tmp(i) - u_tmp(i-1))/2560., 2) / 2560.; // denominator is h of refined grid
+        }
+        cout << "M = " << M << setw(15)
+             << "H1-Error = "
+             << scientific << setprecision(10)
+             << error << endl;
+    }
 }
