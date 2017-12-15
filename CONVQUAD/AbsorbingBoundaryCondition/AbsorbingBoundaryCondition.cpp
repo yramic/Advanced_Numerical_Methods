@@ -1,4 +1,5 @@
 #include <Eigen/Dense>
+#include <Eigen/Sparse>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
@@ -7,59 +8,79 @@ using namespace Eigen;
 using namespace std;
 
 
-/* @brief Find the unknown function u in the Abel integral equation
- * using convolution quadrature (BDF-2)
- * \param y Template function for the right-hand side
- * \param N Number of discretization steps
- * \\return Values of u from convolution quadrature
+MatrixXd toeplitz_triangular(const VectorXd& c)
+{
+    size_t n = c.size();
+    MatrixXd T = MatrixXd::Zero(n, n);
+    for(int i=0; i<n; ++i) {
+        T.col(i).tail(n-i) = c.head(n-i);
+    }
+    return T;
+}
+
+
+/* @brief Find the unknown function u in the evolution problem
+ * using Galerkin discretization and convolution quadrature (BDF-2)
+ * \param phi Template function for the right-hand side
+ * \param M Number of discretization steps in time
+ * \param N Number of discretization steps in space
+ * \param p Order of quadrature rule
+ * \\return Values of u from the evolution problem
  */
 /* SAM_LISTING_BEGIN_0 */
 template<typename FUNC>
-VectorXd cq_bdf2_abel(const FUNC& y, size_t N)
+VectorXd solveABC(const FUNC& phi, size_t M, size_t N, int p)
 {
 //#if SOLUTION
-    VectorXcd w = VectorXd::Zero(N+1);
-    double tau = 1./N;
+    double h = 1./(N-1);
+    VectorXd grid = VectorXd::LinSpaced(N,0.,1.);
 
-    int p = 8; // order of quadrature rule
-    const double* gauss_pts_p = getGaussPoints(p);
-    const double* gauss_wht_p = getGaussWeights(p);
+    SparseMatrix<double> A(N,N);
+    std::vector<Eigen::Triplet<double> > triplets(3*N-2);
+    triplets[0] = Eigen::Triplet<double>(0,0, 1./h - 1./(h*h*pow(M_PI,3))*(2. + (M_PI*M_PI*h*h-2.)*cos(M_PI*h) - 2.*M_PI*h*sin(M_PI*h)) );
+    triplets[1] = Eigen::Triplet<double>(1,0,-1./h + 1./(h*h*pow(M_PI,3))*(2. - 2.*cos(M_PI*h) - M_PI*h*sin(M_PI*h)) );
+    for(int i=1; i<N-1; ++i) {
+        triplets[2+3*i  ] = Eigen::Triplet<double>(i-1,i,-1./h + 1./(h*h*pow(M_PI,3))*(2.*(cos(M_PI*grid(i-1)) - cos(M_PI*grid(i))) - M_PI*h*(sin(M_PI*grid(i-1)) + sin(M_PI*grid(i)))) );
+        triplets[2+3*i+1] = Eigen::Triplet<double>(i,  i, 2./h + 1./(h*h*pow(M_PI,3))*((M_PI*M_PI*h*h-4.)*(cos(M_PI*grid(i-1)) - cos(M_PI*grid(i+1))) + 4.*M_PI*h*(sin(M_PI*grid(i-1)) + sin(M_PI*grid(i+1)))) );
+        triplets[2+3*i+2] = Eigen::Triplet<double>(i+1,i,-1./h + 1./(h*h*pow(M_PI,3))*(2.*(cos(M_PI*grid(i)) - cos(M_PI*grid(i+1))) - M_PI*h*(sin(M_PI*grid(i)) + sin(M_PI*grid(i+1)))) );
+    }
+    triplets[3*N-4] = Eigen::Triplet<double>(N-2,N-1,-1./h + 1./(h*h*pow(M_PI,3))*(2.*cos(M_PI*(1.-h)) - 2. - M_PI*h*sin(M_PI*(1.-h))) );
+    triplets[3*N-3] = Eigen::Triplet<double>(N-1,N-1, 1./h + 1./(h*h*pow(M_PI,3))*((M_PI*M_PI*h*h-2.)*cos(M_PI*(1.-h)) - 2. + 2.*M_PI*h*sin(M_PI*(1.-h))) );
+
+    A.setFromTriplets(triplets.begin(), triplets.end());
+
+
+
+    double tau = 1./M;
+    VectorXcd w = VectorXd::Zero(M+1);
 
     for(int i=0; i<p; ++i) {
 
-        // integrate on semi-circumference centered in (1,0) with unitary radius:
-        complex<double> ti = 1. + exp( complex<double>(0.,-0.5*M_PI*gauss_pts_p[i]) ); // M\_PI/2 - 0.5*(gauss\_pts\_p[i]+1.)*M\_PI
-                     double  wi = 0.5 * M_PI * gauss_wht_p[i]; // change of integration domain to semi-circumference
+        // integrate on circumference centered in (0,0) with radius $~ 10^{-7}$:
+        complex<double> ti = 1e-7*complex<double>(cos(2.*M_PI*i/p),sin(2.*M_PI*i/p));
 
-        for(int j=0; j<N+1; ++j) {
-            w(j) += wi / (sqrt(ti)*sqrt(1.+tau*ti)) * (1./pow(2.-sqrt(1.+2.*tau*ti),j+1) - 1./pow(2.+sqrt(1.+2.*tau*ti),j+1));
-        }
-
-        // integrate on segment from (+1,-1) to (+1,+1):
-        ti = complex<double>(1.,gauss_pts_p[i]);
-        wi = gauss_wht_p[i];
-
-        for(int j=0; j<N+1; ++j) {
-            w(j) += wi / (sqrt(ti)*sqrt(1.+tau*ti)) * (1./pow(2.-sqrt(1.+2.*tau*ti),j+1) - 1./pow(2.+sqrt(1.+2.*tau*ti),j+1));
+        for(int l=0; l<M+1; ++l) {
+            w(l) += 1./sqrt(1.+tau*ti) * (1./pow(2.-sqrt(1.+2.*tau*ti),l+1) - 1./pow(2.+sqrt(1.+2.*tau*ti),l+1)) * log(ti)/(ti*ti+1.);
         }
     }
 
-    w *= tgamma(0.5)*tau / complex<double>(0.,2.*M_PI);
+    w *= tau*1e-7/complex<double>(0.,p); // coefficient of weight formula, tau/complex<double>(0.,2.*M_PI), times quadrature weight, 2.*M_PI*1e-7/p
+
+
 
     // Solve the convolution quadrature:
 
-    VectorXd  grid = VectorXd::LinSpaced(N+1,0.,1.);
-    VectorXcd y_N(N+1);
-    for(int i=0; i<N+1; ++i) {
-        y_N(i) = complex<double>(y(grid(i)),0.);
+    VectorXd phi_n(M+1);
+    for(int i=0; i<M+1; ++i) {
+        phi_n(i) = phi(grid(i));
     }
 
-    MatrixXcd T = toeplitz_triangular(w);
-    VectorXcd u = T.triangularView<Lower>().solve(y_N);
+    MatrixXd T = toeplitz_triangular(w);
+    VectorXd u = T.triangularView<Lower>().solve(phi_n);
 
-    return u.real();
+    return u;
 #else // TEMPLATE
-    // TODO: Find the unknown function u in the Abel integral equation with convolution quadrature (BDF-2)
+    // TODO: Find the unknown function u in the evolution problem
 #endif // TEMPLATE
 }
 /* SAM_LISTING_END_0 */
