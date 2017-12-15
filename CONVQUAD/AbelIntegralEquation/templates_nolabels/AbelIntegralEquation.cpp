@@ -5,6 +5,7 @@
 //// This file is part of the AdvNumCSE repository.
 ////
 #include <Eigen/Dense>
+#include <unsupported/Eigen/FFT>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
@@ -53,18 +54,22 @@ VectorXd cq_ieul_abel(const FUNC& y, size_t N)
 }
 
 
-VectorXd pconv(const VectorXd& u, const VectorXd& x) {
-  using idx_t = VectorXd::Index; // may be unsigned !
-  const idx_t n = x.size();
-  VectorXd z = VectorXd::Zero(n);
-  // Need signed indices when differences are formed
-  for (long k = 0; k < n; ++k) {
-      for (long j = 0; j < n; ++j) {
-          long ind = (k - j < 0 ? n + k - j : k - j);
-          z(k) += u(ind)*x(j);
-      }
-  }
-  return z;
+VectorXcd pconvfft(const VectorXcd& u, const VectorXcd& x)
+{
+    FFT<double> fft;
+    VectorXcd tmp = ( fft.fwd(u) ).cwiseProduct( fft.fwd(x) );
+    return fft.inv(tmp);
+}
+
+
+VectorXcd myconv(const VectorXcd& h, const VectorXcd& x) {
+  const long n = h.size();
+  // Zero padding, cf. \eqref{eq:zeropad}
+  VectorXcd hp(2*n - 1), xp(2*n - 1);
+  hp << h, VectorXcd::Zero(n - 1);
+  xp << x, VectorXcd::Zero(n - 1);
+  // Periodic discrete convolution of length \Blue{$2n-1$}, \cref{cpp:pconffft}
+  return pconvfft(hp, xp);
 }
 
 

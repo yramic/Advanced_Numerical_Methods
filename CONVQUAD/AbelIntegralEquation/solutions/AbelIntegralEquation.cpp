@@ -1,4 +1,5 @@
 #include <Eigen/Dense>
+#include <unsupported/Eigen/FFT>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
@@ -30,7 +31,7 @@ VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau)
 
         for(int j=1; j<=p; ++j) {
 
-            A(i-1,j-1) = 2.*sqrt(M_PI)*tgamma(1.+j) / ((3.+2.*i+2.*j)*tgamma(3./2.+j)); // tgamma(1.+j) == j! is j is integer
+            A(i-1,j-1) = 2.*sqrt(M_PI)*tgamma(1+j) / ((3.+2.*i+2.*j)*tgamma(3./2.+j)); // tgamma(1.+j) == j! is j is integer
         }
 
         for(int k=0; k<p; ++k) {
@@ -54,7 +55,7 @@ VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau)
         }
     }
 
-    return grid;
+    return u;
 }
 /* SAM_LISTING_END_0 */
 
@@ -102,18 +103,22 @@ VectorXd cq_ieul_abel(const FUNC& y, size_t N)
 /* SAM_LISTING_END_2 */
 
 
-VectorXd pconv(const VectorXd& u, const VectorXd& x) {
-  using idx_t = VectorXd::Index; // may be unsigned !
-  const idx_t n = x.size();
-  VectorXd z = VectorXd::Zero(n);
-  // Need signed indices when differences are formed
-  for (long k = 0; k < n; ++k) {
-      for (long j = 0; j < n; ++j) {
-          long ind = (k - j < 0 ? n + k - j : k - j);
-          z(k) += u(ind)*x(j);
-      }
-  }
-  return z;
+VectorXcd pconvfft(const VectorXcd& u, const VectorXcd& x)
+{
+    FFT<double> fft;
+    VectorXcd tmp = ( fft.fwd(u) ).cwiseProduct( fft.fwd(x) );
+    return fft.inv(tmp);
+}
+
+
+VectorXcd myconv(const VectorXcd& h, const VectorXcd& x) {
+  const long n = h.size();
+  // Zero padding, cf. \eqref{eq:zeropad}
+  VectorXcd hp(2*n - 1), xp(2*n - 1);
+  hp << h, VectorXcd::Zero(n - 1);
+  xp << x, VectorXcd::Zero(n - 1);
+  // Periodic discrete convolution of length \Blue{$2n-1$}, \cref{cpp:pconffft}
+  return pconvfft(hp, xp);
 }
 
 
@@ -134,10 +139,10 @@ VectorXd cq_bdf2_abel(const FUNC& y, size_t N)
 
     VectorXd w2(N+1); w2(0) = 1.;
     for(int l=1; l<N+1; ++l) {
-        w2(l) = w2(l-1) * pow(3,1-l) * (l - 0.5) / l; // denominator for factorial
+        w2(l) = w2(l-1) * 1./pow(3,l) * (l - 0.5) / l; // denominator for factorial
     }
 
-    VectorXd w = pconv(w1, w2);
+    VectorXd w = myconv(w1, w2).head(N+1).real();
     w *= sqrt(M_PI/N) * sqrt(2./3.);
 
     // Solve the convolution quadrature:
@@ -173,7 +178,7 @@ int main() {
         for(int p=2; p<=10; ++p) {
             VectorXd u_app = poly_spec_abel(y, p, tau);
             VectorXd diff  = u_ex - u_app;
-            double err_max  = diff.cwiseAbs().maxCoeff();
+            double err_max = diff.cwiseAbs().maxCoeff();
             cout <<   "p = " << p << setw(15)
                       << "Max = "
                       << scientific << setprecision(3)
@@ -198,7 +203,7 @@ int main() {
 
             VectorXd u_app = cq_ieul_abel(y, N);
             VectorXd diff  = u_ex - u_app;
-            double err_max  = diff.cwiseAbs().maxCoeff();
+            double err_max = diff.cwiseAbs().maxCoeff();
             cout <<   "N = " << N << setw(15)
                       << "Max = "
                       << scientific << setprecision(3)
@@ -216,7 +221,7 @@ int main() {
 
             VectorXd u_app = cq_bdf2_abel(y, N);
             VectorXd diff  = u_ex - u_app;
-            double err_max  = diff.cwiseAbs().maxCoeff();
+            double err_max = diff.cwiseAbs().maxCoeff();
             cout <<   "N = " << N << setw(15)
                       << "Max = "
                       << scientific << setprecision(3)

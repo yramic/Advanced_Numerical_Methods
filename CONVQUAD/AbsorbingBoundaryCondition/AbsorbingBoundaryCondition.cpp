@@ -9,21 +9,6 @@ using namespace Eigen;
 using namespace std;
 
 
-VectorXd pconv(const VectorXd& u, const VectorXd& x) {
-  using idx_t = VectorXd::Index; // may be unsigned !
-  const idx_t n = x.size();
-  VectorXd z = VectorXd::Zero(n);
-  // Need signed indices when differences are formed
-  for (long k = 0; k < n; ++k) {
-      for (long j = 0; j < n; ++j) {
-          long ind = (k - j < 0 ? n + k - j : k - j);
-          z(k) += u(ind)*x(j);
-      }
-  }
-  return z;
-}
-
-
 /* @brief Find the unknown function u at final time t = 1 in the evolution problem
  * using Galerkin discretization and convolution quadrature (BDF-2)
  * \param phi Template function for the right-hand side
