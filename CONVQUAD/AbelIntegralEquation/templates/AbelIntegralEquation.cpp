@@ -2,9 +2,7 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
-extern "C" {
-#include "../../../BEM/CppHilbert/Library/source/gaussQuadrature.h"
-}
+#include "gauleg.hpp"
 
 using namespace Eigen;
 using namespace std;

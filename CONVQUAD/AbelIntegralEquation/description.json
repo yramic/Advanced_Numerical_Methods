@@ -4,5 +4,5 @@
     "contributors" : "",
 
     "name": "AbelIntegralEquation",
-    "all" : ["AbelIntegralEquation.cpp"]
+    "all" : ["AbelIntegralEquation.cpp", "gauleg.hpp"]
 }

@@ -1,5 +1,6 @@
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
+#include <Eigen/SparseCholesky>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
@@ -8,30 +9,34 @@ using namespace Eigen;
 using namespace std;
 
 
-MatrixXd toeplitz_triangular(const VectorXd& c)
-{
-    size_t n = c.size();
-    MatrixXd T = MatrixXd::Zero(n, n);
-    for(int i=0; i<n; ++i) {
-        T.col(i).tail(n-i) = c.head(n-i);
-    }
-    return T;
+VectorXd pconv(const VectorXd& u, const VectorXd& x) {
+  using idx_t = VectorXd::Index; // may be unsigned !
+  const idx_t n = x.size();
+  VectorXd z = VectorXd::Zero(n);
+  // Need signed indices when differences are formed
+  for (long k = 0; k < n; ++k) {
+      for (long j = 0; j < n; ++j) {
+          long ind = (k - j < 0 ? n + k - j : k - j);
+          z(k) += u(ind)*x(j);
+      }
+  }
+  return z;
 }
 
 
-/* @brief Find the unknown function u in the evolution problem
+/* @brief Find the unknown function u at final time t = 1 in the evolution problem
  * using Galerkin discretization and convolution quadrature (BDF-2)
  * \param phi Template function for the right-hand side
  * \param M Number of discretization steps in time
  * \param N Number of discretization steps in space
  * \param p Order of quadrature rule
- * \\return Values of u from the evolution problem
+ * \\return Values of u at final time t = 1
  */
 /* SAM_LISTING_BEGIN_0 */
 template<typename FUNC>
 VectorXd solveABC(const FUNC& phi, size_t M, size_t N, int p)
 {
-//#if SOLUTION
+#if SOLUTION
     double h = 1./(N-1);
     VectorXd grid = VectorXd::LinSpaced(N,0.,1.);
 
@@ -49,8 +54,6 @@ VectorXd solveABC(const FUNC& phi, size_t M, size_t N, int p)
 
     A.setFromTriplets(triplets.begin(), triplets.end());
 
-
-
     double tau = 1./M;
     VectorXcd w = VectorXd::Zero(M+1);
 
@@ -64,102 +67,113 @@ VectorXd solveABC(const FUNC& phi, size_t M, size_t N, int p)
         }
     }
 
-    w *= tau*1e-7/complex<double>(0.,p); // coefficient of weight formula, tau/complex<double>(0.,2.*M_PI), times quadrature weight, 2.*M_PI*1e-7/p
+    w *= tau*1e-7/complex<double>(0.,p); // coefficient of weight formula, tau/complex<double>(0.,2.*M\_PI), times quadrature weight, 2.*M\_PI*1e-7/p
 
+    SparseMatrix<complex<double> > Aw = A.cast<complex<double> >();
+    Aw.coeffRef(N-1,N-1) += w(0);
+    SimplicialLLT<SparseMatrix<complex<double> > > solver;
+    solver.compute(Aw);
 
+    MatrixXcd u = VectorXcd::Zero(N,M+1); // first column is at time t = 0
+    for(int i=1; i<M+1; ++i) {
 
-    // Solve the convolution quadrature:
+        complex<double> rhs_N = 0.;
+        for(int l=0; l<i; ++l) {
+            rhs_N += w(i-l) * u(N-1,l);
+        }
 
-    VectorXd phi_n(M+1);
-    for(int i=0; i<M+1; ++i) {
-        phi_n(i) = phi(grid(i));
+        VectorXcd phi_i(N);
+        for(int j=0; j<N; ++j) {
+            phi_i(j) = (complex<double>)phi(grid(j),i*tau);
+        }
+
+        VectorXcd rhs = phi_i; rhs(N-1) -= rhs_N;
+
+        u.col(i) = solver.solve(rhs);
     }
 
-    MatrixXd T = toeplitz_triangular(w);
-    VectorXd u = T.triangularView<Lower>().solve(phi_n);
-
-    return u;
+    return u.col(M).real();
 #else // TEMPLATE
-    // TODO: Find the unknown function u in the evolution problem
+    // TODO: Find the unknown function u at final time t = 1 in the evolution problem
 #endif // TEMPLATE
 }
 /* SAM_LISTING_END_0 */
 
 
 int main() {
-    /* SAM_LISTING_BEGIN_1 */
-#if SOLUTION
-    {
-        auto y = [](double t) { return t; };
+//    /* SAM_LISTING_BEGIN_1 */
+//#if SOLUTION
+//    {
+//        auto y = [](double t) { return t; };
 
-        double tau = 0.01;
-        size_t N = round(1./tau);
-        VectorXd grid = VectorXd::LinSpaced(N+1,0.,1.);
-        VectorXd u_ex(N+1);
-        for(int i=0; i<N+1; ++i) {
-            u_ex(i) = 2./M_PI*sqrt(grid(i));
-        }
+//        double tau = 0.01;
+//        size_t N = round(1./tau);
+//        VectorXd grid = VectorXd::LinSpaced(N+1,0.,1.);
+//        VectorXd u_ex(N+1);
+//        for(int i=0; i<N+1; ++i) {
+//            u_ex(i) = 2./M_PI*sqrt(grid(i));
+//        }
 
-        cout << "Problem 3.1.g" << endl;
-        for(int p=2; p<=32; p*=2) {
-            VectorXd u_app = poly_spec_abel(y, p, tau);
-            VectorXd diff  = u_ex - u_app;
-            double err_max  = diff.cwiseAbs().maxCoeff();
-            cout <<   "p = " << p << setw(15)
-                      << "Max = "
-                      << scientific << setprecision(3)
-                      << err_max << endl;
-        }
-    }
-#else // TEMPLATE
-    // TODO: Tabulate the max error of the Galerkin approximation scheme
-#endif // TEMPLATE
-    /* SAM_LISTING_END_1 */
+//        cout << "Problem 3.1.g" << endl;
+//        for(int p=2; p<=32; p*=2) {
+//            VectorXd u_app = poly_spec_abel(y, p, tau);
+//            VectorXd diff  = u_ex - u_app;
+//            double err_max  = diff.cwiseAbs().maxCoeff();
+//            cout <<   "p = " << p << setw(15)
+//                      << "Max = "
+//                      << scientific << setprecision(3)
+//                      << err_max << endl;
+//        }
+//    }
+//#else // TEMPLATE
+//    // TODO: Tabulate the max error of the Galerkin approximation scheme
+//#endif // TEMPLATE
+//    /* SAM_LISTING_END_1 */
 
-    /* SAM_LISTING_BEGIN_4 */
-#if SOLUTION
-    {
-        auto y = [](double t) { return t; };
+//    /* SAM_LISTING_BEGIN_4 */
+//#if SOLUTION
+//    {
+//        auto y = [](double t) { return t; };
 
-        cout << "Problem 3.1.l"  << endl;
-        cout << "Implicit Euler" << endl;
-        for(int N=10; N<=1280; N*=2) {
+//        cout << "Problem 3.1.l"  << endl;
+//        cout << "Implicit Euler" << endl;
+//        for(int N=10; N<=1280; N*=2) {
 
-            VectorXd grid = VectorXd::LinSpaced(N+1,0.,1.);
-            VectorXd u_ex(N+1);
-            for(int i=0; i<N+1; ++i) {
-                u_ex(i) = 2./M_PI*sqrt(grid(i));
-            }
+//            VectorXd grid = VectorXd::LinSpaced(N+1,0.,1.);
+//            VectorXd u_ex(N+1);
+//            for(int i=0; i<N+1; ++i) {
+//                u_ex(i) = 2./M_PI*sqrt(grid(i));
+//            }
 
-            VectorXd u_app = cq_ieul_abel(y, N);
-            VectorXd diff  = u_ex - u_app;
-            double err_max  = diff.cwiseAbs().maxCoeff();
-            cout <<   "N = " << N << setw(15)
-                      << "Max = "
-                      << scientific << setprecision(3)
-                      << err_max << endl;
-        }
+//            VectorXd u_app = cq_ieul_abel(y, N);
+//            VectorXd diff  = u_ex - u_app;
+//            double err_max  = diff.cwiseAbs().maxCoeff();
+//            cout <<   "N = " << N << setw(15)
+//                      << "Max = "
+//                      << scientific << setprecision(3)
+//                      << err_max << endl;
+//        }
 
-        cout << "BDF-2" << endl;
-        for(int N=10; N<=1280; N*=2) {
+//        cout << "BDF-2" << endl;
+//        for(int N=10; N<=1280; N*=2) {
 
-            VectorXd grid = VectorXd::LinSpaced(N+1,0.,1.);
-            VectorXd u_ex(N+1);
-            for(int i=0; i<N+1; ++i) {
-                u_ex(i) = 2./M_PI*sqrt(grid(i));
-            }
+//            VectorXd grid = VectorXd::LinSpaced(N+1,0.,1.);
+//            VectorXd u_ex(N+1);
+//            for(int i=0; i<N+1; ++i) {
+//                u_ex(i) = 2./M_PI*sqrt(grid(i));
+//            }
 
-            VectorXd u_app = cq_bdf2_abel(y, N);
-            VectorXd diff  = u_ex - u_app;
-            double err_max  = diff.cwiseAbs().maxCoeff();
-            cout <<   "N = " << N << setw(15)
-                      << "Max = "
-                      << scientific << setprecision(3)
-                      << err_max << endl;
-        }
-    }
-#else // TEMPLATE
-    // TODO: Tabulate the max error of the convolution quadratures
-#endif // TEMPLATE
-    /* SAM_LISTING_END_4 */
+//            VectorXd u_app = cq_bdf2_abel(y, N);
+//            VectorXd diff  = u_ex - u_app;
+//            double err_max  = diff.cwiseAbs().maxCoeff();
+//            cout <<   "N = " << N << setw(15)
+//                      << "Max = "
+//                      << scientific << setprecision(3)
+//                      << err_max << endl;
+//        }
+//    }
+//#else // TEMPLATE
+//    // TODO: Tabulate the max error of the convolution quadratures
+//#endif // TEMPLATE
+//    /* SAM_LISTING_END_4 */
 }

@@ -8,9 +8,7 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
-extern "C" {
-#include "../../../BEM/CppHilbert/Library/source/gaussQuadrature.h"
-}
+#include "gauleg.hpp"
 
 using namespace Eigen;
 using namespace std;
@@ -30,8 +28,8 @@ VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau)
     MatrixXd A = MatrixXd::Zero(p,p);
     VectorXd b = VectorXd::Zero(p);
 
-    const double* gauss_pts_p = getGaussPoints(p);
-    const double* gauss_wht_p = getGaussWeights(p);
+    Eigen::RowVectorXd gauss_pts_p, gauss_wht_p;
+    std::tie(gauss_pts_p,gauss_wht_p) = gauleg(0., 1., p);
 
     for(int i=1; i<=p; ++i) {
 
@@ -42,8 +40,8 @@ VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau)
 
         for(int k=0; k<p; ++k) {
 
-            double tk = 0.5 * (gauss_pts_p[k] + 1.);
-            double wk = 0.5 *  gauss_wht_p[k];
+            double tk = gauss_pts_p(k);
+            double wk = gauss_wht_p(k);
 
             b(i-1) += wk * pow(tk,i) * y(tk);
         }
