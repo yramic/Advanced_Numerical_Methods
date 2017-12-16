@@ -94,7 +94,7 @@ int main() {
         double ratio = 2560/N;
         for(int i=1; i<=2560; ++i) {
             int j = ceil(i/ratio);
-            error += pow((u_ref(i) - u_ref(i-1))/2560. - (u_tmp(j) - u_tmp(j-1))/(double)(N-1), 2) / 2560.; // denominator is h of refined grid
+            error += pow((u_ref(i) - u_ref(i-1))*2560. - (u_tmp(j) - u_tmp(j-1))*N, 2) / 2560.; // h = 1/N
         }
         cout << "N = " << N << setw(15)
              << "H1-Error = "
@@ -106,7 +106,7 @@ int main() {
         VectorXd u_tmp = solveABC(phi, M, 2560, 20);
         double error = 0.;
         for(int i=1; i<=2560; ++i) {
-            error += pow((u_ref(i) - u_ref(i-1))/2560. - (u_tmp(i) - u_tmp(i-1))/2560., 2) / 2560.; // denominator is h of refined grid
+            error += pow((u_ref(i) - u_ref(i-1)) - (u_tmp(i) - u_tmp(i-1)), 2) * 2560.; // h = 1/N
         }
         cout << "M = " << M << setw(15)
              << "H1-Error = "
