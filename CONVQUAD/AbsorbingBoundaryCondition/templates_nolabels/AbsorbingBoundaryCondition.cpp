@@ -6,7 +6,7 @@
 ////
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
-#include <Eigen/SparseCholesky>
+#include <Eigen/SparseLU>
 #include <cmath>
 #include <iomanip>
 #include <iostream>

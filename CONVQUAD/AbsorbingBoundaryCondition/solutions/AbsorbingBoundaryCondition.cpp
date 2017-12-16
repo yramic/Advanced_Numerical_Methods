@@ -1,6 +1,6 @@
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
-#include <Eigen/SparseCholesky>
+#include <Eigen/SparseLU>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
@@ -52,7 +52,7 @@ VectorXd solveABC(const FUNC& phi, size_t M, size_t N, int p)
 
     SparseMatrix<complex<double> > Aw = A.cast<complex<double> >();
     Aw.coeffRef(N,N) += w(0);
-    SimplicialLLT<SparseMatrix<complex<double> > > solver;
+    SparseLU<SparseMatrix<complex<double> > > solver;
     solver.compute(Aw);
 
     MatrixXcd u = MatrixXcd::Zero(N+1,M+1); // first column is at time t = 0

@@ -86,7 +86,7 @@ VectorXd cq_ieul_abel(const FUNC& y, size_t N)
 {
     VectorXd w(N+1); w(0) = 1.;
     for(int l=1; l<N+1; ++l) {
-        w(l) = w(l-1) * (l - 0.5) / l; // denominator for factorial
+        w(l) = w(l-1) * (l - 0.5) / l; // denominator is factorial
     }
     w *= sqrt(M_PI/N);
 
@@ -135,12 +135,12 @@ VectorXd cq_bdf2_abel(const FUNC& y, size_t N)
 {
     VectorXd w1(N+1); w1(0) = 1.;
     for(int l=1; l<N+1; ++l) {
-        w1(l) = w1(l-1) * (l - 0.5) / l; // denominator for factorial
+        w1(l) = w1(l-1) * (l - 0.5) / l; // denominator is factorial
     }
 
-    VectorXd w2(N+1); w2(0) = 1.;
+    VectorXd w2 = w1;
     for(int l=1; l<N+1; ++l) {
-        w2(l) = w2(l-1) * 1./pow(3,l) * (l - 0.5) / l; // denominator for factorial
+        w2(l) /= pow(3,l);
     }
 
     VectorXd w = myconv(w1, w2).head(N+1).real();
@@ -179,9 +179,9 @@ int main() {
             VectorXd diff  = u_ex - u_app;
             double err_max = diff.cwiseAbs().maxCoeff();
             cout <<   "p = " << p << setw(15)
-                      << "Max = "
-                      << scientific << setprecision(3)
-                      << err_max << endl;
+                 << "Max = "
+                 << scientific << setprecision(3)
+                 << err_max << endl;
         }
     }
 
@@ -202,9 +202,9 @@ int main() {
             VectorXd diff  = u_ex - u_app;
             double err_max = diff.cwiseAbs().maxCoeff();
             cout <<   "N = " << N << setw(15)
-                      << "Max = "
-                      << scientific << setprecision(3)
-                      << err_max << endl;
+                 << "Max = "
+                 << scientific << setprecision(3)
+                 << err_max << endl;
         }
 
         cout << "BDF-2" << endl;
@@ -220,9 +220,9 @@ int main() {
             VectorXd diff  = u_ex - u_app;
             double err_max = diff.cwiseAbs().maxCoeff();
             cout <<   "N = " << N << setw(15)
-                      << "Max = "
-                      << scientific << setprecision(3)
-                      << err_max << endl;
+                 << "Max = "
+                 << scientific << setprecision(3)
+                 << err_max << endl;
         }
     }
 }
