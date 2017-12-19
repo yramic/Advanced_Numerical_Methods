@@ -88,10 +88,8 @@ VectorXd solveABC(const FUNC& g, size_t M, size_t N, int p)
             rhs_N += w(i-l) * u(N,l);
         }
 
-        VectorXcd phi_i(N+1);
-        for(int j=0; j<N+1; ++j) {
-            phi_i(j) = (complex<double>)g(grid(j), i*tau);
-        }
+        VectorXcd phi_i = VectorXcd::Zero(N+1);
+        phi_i(N) = (complex<double>)g(i*tau);
 
         VectorXcd rhs = phi_i; rhs(N) -= rhs_N;
 
@@ -110,7 +108,7 @@ VectorXd solveABC(const FUNC& g, size_t M, size_t N, int p)
 int main() {
     /* SAM_LISTING_BEGIN_2 */
 #if SOLUTION
-    auto g = [](double x, double t) { return sin(M_PI*x)*sin(M_PI*t); };
+    auto g = [](double t) { return sin(M_PI*t); };
     VectorXd u_ref = solveABC(g, 2560, 2560, 20);
 
     cout << "Problem 3.2.d" << endl;

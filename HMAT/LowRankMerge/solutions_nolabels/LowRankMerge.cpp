@@ -58,7 +58,7 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd> low_rank_merge(
     // to actual singular vectors and are not computed in thin format.
 
     Eigen::MatrixXd Q = Eigen::MatrixXd::Zero(Q1.rows()+Q2.rows(), Q1.cols()+Q2.cols());
-    Q.block(1,1,
+    Q.block(0,0,
             Q1.rows(),Q1.cols()) = Q1;
     Q.block(Q1.rows(),Q1.cols(),
             Q2.rows(),Q2.cols()) = Q2;
@@ -152,7 +152,7 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd> adap_rank_merge(
     Eigen::MatrixXd V = SVD.matrixV().leftCols(p);
 
     Eigen::MatrixXd Q = Eigen::MatrixXd::Zero(Q1.rows()+Q2.rows(), Q1.cols()+Q2.cols());
-    Q.block(1,1,
+    Q.block(0,0,
             Q1.rows(),Q1.cols()) = Q1;
     Q.block(Q1.rows(),Q1.cols(),
             Q2.rows(),Q2.cols()) = Q2;
