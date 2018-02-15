@@ -32,7 +32,7 @@ VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau)
 
         for(int j=1; j<=p; ++j) {
 
-            A(i-1,j-1) = 2.*sqrt(M_PI)*tgamma(1+j) / ((3.+2.*i+2.*j)*tgamma(3./2.+j)); // tgamma(1.+j) == j! is j is integer
+            A(i-1,j-1) = 2.*sqrt(M_PI)*tgamma(1+j) / ((3.+2.*i+2.*j)*tgamma(3./2.+j)); // tgamma(1+j) == j! if j is integer
         }
 
         for(int k=0; k<p; ++k) {
