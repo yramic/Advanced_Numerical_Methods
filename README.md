@@ -20,7 +20,7 @@ to make yourself familiar with the interface.
 
 ## Download and Compile Everything
 
-        $ git clone --recursive https://gitlab.math.ethz.ch/AdvNumCSE/Code
+        $ git clone --recurse-submodules https://gitlab.math.ethz.ch/AdvNumCSE/Code
         $ cd Code
         $ mkdir build && cd build
         $ cmake ..

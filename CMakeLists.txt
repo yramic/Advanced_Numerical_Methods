@@ -94,11 +94,11 @@ endif()
 
 # Make sure they have checked out the repository
 if (NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/Betl2/CMakeLists.txt)
-  message(FATAL_ERROR "You have not downloaded the Betl2 submodule. Please do\n    cd ${CMAKE_SOURCE_DIR}/third_party/\n    git checkout Betl2;\n    cd Betl2;\n    git submodule init;\n    git submodule update --init --recursive\n\nRemember you have to have a gitlab.math.ethz.ch account for this. Go to https://www.gitlab.math.ethz.ch and log in to get an account, then send an email to the organizers to get access.")
+  message(FATAL_ERROR "You have not downloaded the Betl2 submodule. Please do\n    git submodule update --init --recursive\n\nRemember you have to have a gitlab.math.ethz.ch account for this. Go to https://www.gitlab.math.ethz.ch and log in to get an account, then send an email to the organizers to get access.")
 endif()
 
 if (NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/Betl2/3rd_Party/ethGenericGrid/CMakeLists.txt)
-  message(FATAL_ERROR "You have not downloaded the ethGenericGrid submodule. Please do\n    cd ${CMAKE_SOURCE_DIR}/third_party/Betl2/3rd_Party\n    git checkout ethGenericGrid;\n    cd ethGenericGrid;\n    git submodule init;\n    git submodule update --init --recursive\nRemember you have to have a gitlab.math.ethz.ch account for this. Go to https://www.gitlab.math.ethz.ch and log in to get an account, then send an email to the organizers to get access.")
+  message(FATAL_ERROR "You have not downloaded the ethGenericGrid submodule. Please do\n    git submodule update --init --recursive\nRemember you have to have a gitlab.math.ethz.ch account for this. Go to https://www.gitlab.math.ethz.ch and log in to get an account, then send an email to the organizers to get access.")
 endif()
 
 set(ETH_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/ethGenericGrid_install/include)
