@@ -94,7 +94,7 @@ __Mac OS X__
 
 Dependencies can be installed with [brew](http://brew.sh/):
 
-        brew tap homebrew/science
+        brew tap brewsci/science
         brew install git cmake
 	
 __Windows__
