@@ -13,5 +13,5 @@ AdvNumCSE:
     - mkdir -p build
     - pushd build
     - cmake -D CMAKE_BUILD_TYPE=Release -D EIGEN3_INCLUDE_DIR="/usr/include/eigen3" ..
-    - make -j
+    - nice -n 10 make -j12
     - popd
