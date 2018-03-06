@@ -35,17 +35,10 @@ The path for each problem / lecture code is:
  - `<Chapter>/<ProblemName>/templates_nolabels` or `<Chapter>/<LectureCode>/templates_nolabels` for templates.
  - `<Chapter>/<ProblemName>/solutions_nolabels` or `<Chapter>/<LectureCode>/solutions_nolabels` for solutions.
 
-Each of these folders contains an independent `CMake` file.
-You should be able to compile and execute a code using:
+Each of these codes correspond to a `target`, which is a `make` command that can be used to compile only that one code and the related dependencies.
+Targets are in the format `a<assignment_number>problem<problem_number>` (e.g., `a1problem1`) or `a<assignment_number>problem<problem_number>_sol`, depending on whether the code is a template or a solution.
 
-```
-$ cmake .
-$ make
-$ cd bin
-$ ./executable_name
-```
-
-Alternatively, after running `cmake ..` in the `build` folder, you can recover the list of all possible targets of `make` by typing:
+After running `cmake ..` in the `build` folder, you can recover the list of all possible targets by typing:
 
         $ cmake --build . --target help
 
@@ -57,11 +50,9 @@ Then you can choose a target and run:
 
         $ make <target>
 
-Targets will be in the format `<chapter>_<problem_name>_<code_type>`, where `<code_type>` is either `template` or `solution`.
-
 The corresponding executable will be located in:
 
-        $ ./build/bin/<chapter>/<problem-name>/
+        $ ./build/bin/
 
 **TIP**
 
