@@ -6,6 +6,14 @@
 
 ## Coding style
 
+## Comments
+
+* Code commented using Doxygen; all doxygen related comments must be inside /* */
+  (C-style comments)
+* For comments to be typeset with LaTeX use C++-style comments // ....
+  These comments should be used inside methods/functions in order to explain 
+  details of the algorithms.
+
 ## Directory structure
 
 ## Demos and tests
