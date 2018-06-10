@@ -51,7 +51,7 @@ stages:
 
 # now run the routines on all runners
 setup_ubuntu_current:
-  <<: *setup
+  <<: *setup_ubuntu
   tags: [ubuntu, current]
 
 init_repo_ubuntu_current:
