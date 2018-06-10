@@ -1,17 +1,63 @@
-before_script:
-  - cp .gitlab-ci/ci-gitmodules .gitmodules # patching submodule
-  - git submodule sync # apply patch
-  - git submodule update --init
-  - cp .gitlab-ci/eth-generic-grid-ci-gitmodules third_party/Betl2/.gitmodules
-  - git submodule sync --recursive
-  - git submodule update --init --recursive
+---
+stages:
+  - setup
+  - init_repo
+  - compile
 
-AdvNumCSE:
-  only:
-    - master
+# First define all routines 
+.setup_ubuntu: &setup_ubuntu
+  stage: setup
+  script: 
+    - >
+      sudo apt-get install --yes --force-yes -qq --no-install-recommends
+      build-essential
+      gfortran 
+      git
+      cmake
+      libmgl-dev
+      libeigen3-dev
+      libboost-all-dev
+      libsuitesparse-dev
+      libmatio-dev
+      libblas-dev
+      liblapack-dev
+  tags: [ubuntu]
+
+.init_repo: &init_repo
+  stage: init_repo
+  tags: [all]
   script:
+    - cp .gitlab-ci/ci-gitmodules .gitmodules # patching submodule
+    - git submodule sync # apply patch
+    - git submodule update --init
+    - cp .gitlab-ci/eth-generic-grid-ci-gitmodules third_party/Betl2/.gitmodules
+    - git submodule sync --recursive
+    - git submodule update --init --recursive
+
+.compile: &compile
+  stage: compile
+  tags: [all]
+  cache:
+    paths:
+      - build/
+  script:
+    - git submodule update --init --recursive
+    - "if [[ \"$CI_RUNNER_TAGS\" == *\"clang\"* ]]; then export CC=clang; export CXX=clang++; fi"
     - mkdir -p build
     - pushd build
-    - cmake -D CMAKE_BUILD_TYPE=Release -D EIGEN3_INCLUDE_DIR="/usr/include/eigen3" ..
-    - nice -n 10 make -j12
+    - cmake ..
+    - make -j2
     - popd
+
+# now run the routines on all runners
+setup_ubuntu_current:
+  <<: *setup
+  tags: [ubuntu, current]
+
+init_repo_ubuntu_current:
+  <<: *init_repo
+  tags: [ubuntu, current]
+
+compile_ubuntu_current:
+  <<: *compile
+  tags: [ubuntu, current]
