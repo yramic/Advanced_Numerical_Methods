@@ -6,6 +6,43 @@
 
 ## Coding style
 
+* Names should be descriptive, avoiding abbreviations. Common abbreviations can be used e.g. "num"
+	* File Names
+		* Should be all lowercase. Underscores "_" can be included in the file name.
+
+	* Type Names
+		* Type names start with a capital letter and have a capital letter for each new word with no underscores.
+		* This applies for names of all types - classes, structs, type aliases, enums and type template parameters
+
+	* Variable names
+		* The names of variables and data members are all lowercase, with underscores between words.
+		* Data members of classes (but not structs) additionally have trailing underscores.
+
+	* Constant names
+		* Variables declared constexpr or const, and whose value is fixed for the duration of the program, are named with a leading "k" followed by mixed case.
+
+* header files
+ 	* All header files shoud have #define guards to prevent multiple inclusion
+	* Avoid forward declarations where possible. #include the headers required
+	* Order of includes : Related header, C library, C++ library, other libraries, project's header. A blank line between Related header files and C library header file & C++ library header files and other library's header files.
+
+* Declaration order
+	* A class definition should usually start with a public: section, followed by protected:, then private:. Omit sections that would be empty.
+
+* File Comments
+ 	* If a .h declares multiple abstractions, the file-level comment should broadly describe the contents of the file, and how the abstractions are related. A 1 or 2 sentence file-level comment may be sufficient. The detailed documentation about individual abstractions belongs with those abstractions, not at the file level.
+
+* Class Comments
+	* Every non-obvious class declaration should have an accompanying comment that describes what it is for and how it should be used.
+
+* Function Comments
+	* Declaration comments describe use of the function (when it is non-obvious); comments at the definition of a function describe operation.
+	* Function Declarations : Almost every function declaration should have comments immediately preceding it that describe what the function does and how to use it.
+	* Function Definitions : If there is anything tricky about how a function does its job, the function definition should have an explanatory comment.
+
+* Spaces vs. Tabs
+	* Use only spaces, and indent 2 spaces at a time.
+
 ## Comments
 
 * Code commented using Doxygen; all doxygen related comments must be inside /* */
