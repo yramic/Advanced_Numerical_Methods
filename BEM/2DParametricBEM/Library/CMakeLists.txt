@@ -1,8 +1,8 @@
 cmake_minimum_required( VERSION 2.8 )
 
-project(2dparametricbem)
+set(CMAKE_CXX_FLAGS "-std=c++11")
+set(DIRECTORIES src)
 
-set(DIRECTORIES Library Tests)
 foreach(directory ${DIRECTORIES})
 	add_subdirectory(${directory})
 endforeach(directory)
