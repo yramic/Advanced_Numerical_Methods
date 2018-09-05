@@ -25,11 +25,13 @@ void test_parametrized_line() {
   testpoint = parametrization(0.);
   assert(fabs(testpoint(0)-0.5)<eps);
   assert(fabs(testpoint(1)-0.5)<eps);
-  std::cout << "(" << testpoint(0) << "," << testpoint(1) <<") ; expected (0.5,0.5)" << std::endl;
+  std::cout << "Test for parametrization of a line segment joining (0,1) and (1,0)" << std::endl;
+  std::cout << "------------------------------------------------------------------" << std::endl;
+  std::cout << "Parametrization point at t = 0 : (" << testpoint(0) << "," << testpoint(1) <<") ; expected : (0.5,0.5)" << std::endl;
   // Derivative at the point corresponding to t = 0.3
   testpoint = parametrization.Derivative(0.3);
   assert(fabs(testpoint(1)/testpoint(0)+1)<eps);
-  std::cout << "slope : "<<testpoint(1)/testpoint(0) <<" ; expected : -1" << std::endl;
+  std::cout << "Parametrization slope at t = 0 : "<<testpoint(1)/testpoint(0) <<" ; expected : -1\n" << std::endl;
 }
 
 void test_parametrized_semi_circle() {
@@ -51,7 +53,9 @@ void test_parametrized_semi_circle() {
     end = parametrization(t2);
     length += (end-start).norm(); // Adding the length of current line segment
   }
-  std::cout << "Approximate value of Pi: " << length << std::endl;
+  std::cout << "Test for parametrization of a semi circle with unit radius" << std::endl;
+  std::cout << "----------------------------------------------------------" << std::endl;
+  std::cout << "Pi approximated using length of the semi circle : " << length << "\n" << std::endl;
   assert(fabs(length-M_PI)<eps);
 }
 
@@ -67,7 +71,9 @@ void test_fourier_parametrization() {
   double t = rand()/RAND_MAX;
   t = 2 * t - 1; //range -1 to 1
   Eigen::Vector2d randompoint = parametrization(t);
-  std::cout << "Norm at random point = " << randompoint.norm() << " (expected value = 1.)" << std::endl;
+  std::cout << "Test for parametrization of a fourier sum which reduces to (cos(t), sin(t))" << std::endl;
+  std::cout << "---------------------------------------------------------------------------" << std::endl;
+  std::cout << "Norm of location vector at random point = " << randompoint.norm() << " ; expected value = 1." << std::endl;
   assert(fabs(randompoint.norm()-1)<eps);
 }
 

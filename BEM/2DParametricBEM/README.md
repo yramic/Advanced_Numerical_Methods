@@ -21,7 +21,7 @@
 	* Constant names
 		* Variables declared constexpr or const, and whose value is fixed for the duration of the program, are named with a leading "k" followed by mixed case.
 
-* header files
+* Header files
  	* All header files shoud have #define guards to prevent multiple inclusion
 	* Avoid forward declarations where possible. #include the headers required
 	* Order of includes : Related header, C library, C++ library, other libraries, project's header. A blank line between Related header files and C library header file & C++ library header files and other library's header files.
@@ -53,4 +53,11 @@
 
 ## Directory structure
 
+root
+  |- Library
+  |  |- src
+  |- Tests
+
 ## Demos and tests
+
+* Directory Tests contains parametrization_tests.cpp to independently test the parametrizations.
