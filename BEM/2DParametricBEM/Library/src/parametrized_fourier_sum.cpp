@@ -31,13 +31,8 @@ ParametrizedFourierSum::ParametrizedFourierSum(CoefficientsList cos_list,
                                 cosine.cols()==sine.cols());
                        }
 
-std::pair<double,double> ParametrizedFourierSum::ParameterRange(void) const {
-  // Parameter interval : [-1,1]
-  return std::make_pair(-1.,1.);
-}
-
 Eigen::Vector2d ParametrizedFourierSum::operator() (double t) const {
-  assert(t>=-1 && t<=1);
+  assert(IsWithinParameterRange(t));
   int N = cosine.cols();
   Eigen::VectorXd cos_theta(N);
   Eigen::VectorXd sin_theta(N);
@@ -52,7 +47,7 @@ Eigen::Vector2d ParametrizedFourierSum::operator() (double t) const {
 }
 
 Eigen::Vector2d ParametrizedFourierSum::Derivative(double t) const {
-  assert(t>=-1 && t<=1);
+  assert(IsWithinParameterRange(t));
   int N = cosine.cols();
   Eigen::VectorXd cos_theta_dot(N);
   Eigen::VectorXd sin_theta_dot(N);

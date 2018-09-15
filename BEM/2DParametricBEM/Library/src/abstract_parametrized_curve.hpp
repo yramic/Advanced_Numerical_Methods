@@ -1,6 +1,6 @@
 /**
  * \file abstract_parametrized_curve.hpp
- * \brief This file declares a pure abstract class for representing
+ * \brief This file declares an abstract class for representing
  *        Parametrized curves. The interface follows the one outlined
  *        Section 1.4.3.4 in the lecture material for Advanced Numerical
  *        Methods for CSE.
@@ -17,16 +17,26 @@
 class AbstractParametrizedCurve {
   public:
 /**
- * This function is used for querying the parameter interval
+ * This function is used for querying the parameter interval.
+ * The standard parameter interval [-1,1] is used and it can't
+ * be overriden in the inherited classes as the function is non
+ * virtual. The function is declared static as it is independent
+ * of the concrete object.
  *
  * @return A std::pair<double,double> object containing
  *          the valid parameter range for parametrization
+ *          that is [-1,1]
  */
-  virtual std::pair<double,double> ParameterRange(void) const = 0;
+ static std::pair<double,double> ParameterRange(void) {
+   // Parameter range : [-1,1]
+   return std::make_pair(-1.,1.);
+ }
 
 /**
  * This function is used for accessing a point on the parametrized
- * curve with parameter "t" for the parametrization $\gamma$(t)
+ * curve with parameter "t" for the parametrization $\gamma$(t).
+ * This is a pure virtual function which has to be implemented
+ * in the inherited classes.
  *
  * @param t Double type argument for the parameter value/
  * @return A 2-D vector of type Eigen::Vector2d
@@ -37,7 +47,9 @@ class AbstractParametrizedCurve {
 
 /**
  * This function is used for retrieving the derivative \dot{$\gamma$(t)}
- * at a point on the parametrized curve
+ * at a point on the parametrized curve.
+ * This is a pure virtual function which has to be implemented
+ * in the inherited classes.
  *
  * @param t Parameter value of Double type
  *          at which the derivative for
@@ -47,6 +59,22 @@ class AbstractParametrizedCurve {
  *         derivative at point 't'
  */
   virtual Eigen::Vector2d Derivative(double t) const = 0;
+
+/**
+ * This function is used for checking whether a value t is within the
+ * valid parameter range. This function is non virtual to prevent it
+ * from being overriden as the parameter interval is fixed. It is
+ * declared static because the check is independent of the concrete
+ * implementation.
+ *
+ * @param t The value to be checked
+ * @return boolean indicating result of the performed check
+ */
+   static bool IsWithinParameterRange(double t) {
+     double a,b;
+     std::tie(a,b) = ParameterRange();
+     return ( t>=a && t<=b );
+   }
 };
 
 #endif //PARAMETRIZEDCURVEHPP

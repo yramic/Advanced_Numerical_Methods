@@ -24,15 +24,10 @@ class ParametrizedLine : public AbstractParametrizedCurve {
     /**
      * Constructor with start and end points of the 2D line
      *
-     * @param start Starting point for the line segment
-     * @param end Ending point for the line segment
+     * @param first Starting point for the line segment
+     * @param second Ending point for the line segment
      */
-    ParametrizedLine(Point, Point);
-
-    /**
-     * @see AbstractParametrizedCurve::ParameterRange()
-     */
-    std::pair<double,double> ParameterRange(void) const;
+    ParametrizedLine(Point first, Point second);
 
     /**
      * @see AbstractParametrizedCurve::operator() (double)

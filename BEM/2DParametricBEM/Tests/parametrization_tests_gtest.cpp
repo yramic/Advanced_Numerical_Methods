@@ -27,8 +27,6 @@ TEST(LineParametrizationTest,Parametrization) {
   testpoint = parametrization(0.);
   EXPECT_NEAR(0.5,testpoint(0),eps);
   EXPECT_NEAR(0.5,testpoint(1),eps);
-  //assert(fabs(testpoint(0)-0.5)<eps);
-  //assert(fabs(testpoint(1)-0.5)<eps);
 }
 
 TEST(LineParametrizationTest,Derivative) {
@@ -42,7 +40,6 @@ TEST(LineParametrizationTest,Derivative) {
   // Derivative at the point corresponding to t = 0.3
   testpoint = parametrization.Derivative(0.3);
   EXPECT_NEAR(-1,testpoint(1)/testpoint(0),eps);
-  //assert(fabs(testpoint(1)/testpoint(0)+1)<eps);
 }
 
 TEST(SemiCircleParametrizationTest,Parametrization) {
@@ -65,7 +62,6 @@ TEST(SemiCircleParametrizationTest,Parametrization) {
     length += (end-start).norm(); // Adding the length of current line segment
   }
   EXPECT_NEAR(M_PI,length,eps);
-  //assert(fabs(length-M_PI)<eps);
 }
 
 TEST(FourierSumParametrizationTest,Parametrization) {
@@ -81,7 +77,25 @@ TEST(FourierSumParametrizationTest,Parametrization) {
   t = 2 * t - 1; //range -1 to 1
   Eigen::Vector2d randompoint = parametrization(t);
   EXPECT_NEAR(1,randompoint.norm(),eps);
-  //assert(fabs(randompoint.norm()-1)<eps);
+}
+
+TEST(InterfaceTest,ParameterRange) {
+  double a,b;
+  std::tie(a,b) = ParametrizedLine::ParameterRange();
+  EXPECT_EQ(a,-1);
+  EXPECT_EQ(b,1);
+  std::tie(a,b) = ParametrizedFourierSum::ParameterRange();
+  EXPECT_EQ(a,-1);
+  EXPECT_EQ(b,1);
+  std::tie(a,b) = ParametrizedSemiCircle::ParameterRange();
+  EXPECT_EQ(a,-1);
+  EXPECT_EQ(b,1);
+}
+
+TEST(InterfaceTest,IsWithinParameterRange) {
+  EXPECT_EQ(true,ParametrizedLine::IsWithinParameterRange(0.99));
+  EXPECT_EQ(false,ParametrizedFourierSum::IsWithinParameterRange(1.01));
+  EXPECT_EQ(true,ParametrizedSemiCircle::IsWithinParameterRange(-0.99));
 }
 
 int main(int argc, char **argv) {

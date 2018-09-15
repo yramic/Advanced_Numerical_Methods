@@ -22,13 +22,10 @@ class ParametrizedSemiCircle : public AbstractParametrizedCurve {
   public:
     /**
      * Constructor with specified radius; default value = 1.
+     *
+     * @param r radius of the semi circle
      */
-    ParametrizedSemiCircle(double = 1.);
-
-    /**
-     * @see AbstractParametrizedCurve::ParameterRange()
-     */
-    std::pair<double,double> ParameterRange(void) const;
+    ParametrizedSemiCircle(double r = 1.);
 
     /**
      * @see AbstractParametrizedCurve::operator() (double)

@@ -26,12 +26,7 @@ class ParametrizedFourierSum : public AbstractParametrizedCurve {
      * @param sin_list Coefficient list for sine terms
      */
     ParametrizedFourierSum(CoefficientsList cos_list,
-                           CoefficientsList sine_list);
-
-    /**
-     * @see AbstractParametrizedCurve::ParameterRange()
-     */
-    std::pair<double,double> ParameterRange(void) const;
+                           CoefficientsList sin_list);
 
     /**
      * @see AbstractParametrizedCurve::operator() (double)

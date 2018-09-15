@@ -22,20 +22,15 @@
 
 ParametrizedSemiCircle::ParametrizedSemiCircle(double r) : radius(r) {}
 
-std::pair<double,double> ParametrizedSemiCircle::ParameterRange(void) const {
-  // Parameter range : [-1,1]
-  return std::make_pair(-1.,1.);
-}
-
 Eigen::Vector2d ParametrizedSemiCircle::operator() (double t) const {
-  assert(t>=-1 && t<=1);
+  assert(IsWithinParameterRange(t));
   // Parametrization using polar coordinates based on parameter t
   Eigen::Vector2d point(radius*cos(M_PI*t/2.),radius*sin(M_PI*t/2.));
   return point;
 }
 
 Eigen::Vector2d ParametrizedSemiCircle::Derivative(double t) const {
-  assert(t>=-1 && t<=1);
+  assert(IsWithinParameterRange(t));
   // Derivative of the polar coordinaties used in the function operator()
   Eigen::Vector2d derivative(-radius*M_PI*sin(M_PI*t/2.)/2.,M_PI*radius*cos(M_PI*t/2.)/2.);
   return derivative;
