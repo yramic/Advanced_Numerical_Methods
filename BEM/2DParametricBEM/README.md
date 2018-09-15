@@ -22,6 +22,7 @@
 		* Variables declared constexpr or const, and whose value is fixed for the duration of the program, are named with a leading "k" followed by mixed case.
 
 * Header files
+	* All of a project's header files should be listed as descendants of the project's source directory without use of UNIX directory shortcuts . (the current directory) or .. (the parent directory).
  	* All header files shoud have #define guards to prevent multiple inclusion
 	* Avoid forward declarations where possible. #include the headers required
 	* Order of includes : Related header, C library, C++ library, other libraries, project's header. A blank line between Related header files and C library header file & C++ library header files and other library's header files.

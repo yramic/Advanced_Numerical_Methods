@@ -1,8 +1,12 @@
-/*
- * This cpp file defines the class representing Fourier
- * Sum based parametrization
- * (See parametrized_fourier_sum.hpp)
+/**
+ * \file parametrized_fourier_sum.cpp
+ * \brief This file defines the class representing Fourier
+ *        Sum based parametrization
+ * @see parametrized_fourier_sum.hpp
+ *
+ *  This File is a part of the 2D-Parametric BEM package
  */
+
 #include "abstract_parametrized_curve.hpp"
 #include "parametrized_fourier_sum.hpp"
 
@@ -38,7 +42,7 @@ Eigen::Vector2d ParametrizedFourierSum::operator() (double t) const {
   Eigen::VectorXd cos_theta(N);
   Eigen::VectorXd sin_theta(N);
   for (int i = 0 ; i<N ; ++i) {
-    // Computing cosine and sine values at the parameter value
+    // Computing cosine and sine values at the parameter value t
     cos_theta(i) = cos((i+1)*t);
     sin_theta(i) = sin((i+1)*t);
   }

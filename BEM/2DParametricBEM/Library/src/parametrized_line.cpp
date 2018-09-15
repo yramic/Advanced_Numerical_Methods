@@ -1,7 +1,10 @@
-/*
- * This cpp file defines the class representing
- * parametrization of a line in 2-D
- * (See parametrized_line.hpp)
+/**
+ * \file parametrized_line.cpp
+ * \brief This file defines the class representing parametrization of
+ *        a line segment in 2D.
+ * @see parametrized_line.hpp
+ *
+ *  This File is a part of the 2D-Parametric BEM package
  */
 
 #include "abstract_parametrized_curve.hpp"

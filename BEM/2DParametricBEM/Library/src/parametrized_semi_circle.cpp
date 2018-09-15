@@ -1,8 +1,10 @@
-/*
- * This cpp file defines the class representing
- * parametrization of a semi-circle centered at
- * (0,0) and lying in the positive x-halt
- * (See parametrized_semi_circle.hpp)
+/**
+ * \file parametrized_semi_circle.cpp
+ * \brief This file defines the class representing parametrization
+ *        of a semi circle.
+ * @see parametrized_semi_circle.hpp
+ *
+ *  This File is a part of the 2D-Parametric BEM package
  */
 
 #include "abstract_parametrized_curve.hpp"
