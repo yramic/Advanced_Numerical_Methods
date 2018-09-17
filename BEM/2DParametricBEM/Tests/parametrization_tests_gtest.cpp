@@ -21,7 +21,7 @@ TEST(LineParametrizationTest,Parametrization) {
   using Point = std::pair<double,double>;
   Eigen::Vector2d x1; x1 << 0,1; // Point (0,1)
   Eigen::Vector2d x2; x2 << 1,0; // Point (1,0)
-  ParametrizedLine parametrization(x1,x2);
+  parametricbem2d::ParametrizedLine parametrization(x1,x2);
   // Test point (0.5,0.5) corresponding to t = 0.0
   Eigen::Vector2d testpoint;
   testpoint = parametrization(0.);
@@ -33,7 +33,7 @@ TEST(LineParametrizationTest,Derivative) {
   using Point = std::pair<double,double>;
   Eigen::Vector2d x1; x1 << 0,1; // Point (0,1)
   Eigen::Vector2d x2; x2 << 1,0; // Point (1,0)
-  ParametrizedLine parametrization(x1,x2);
+  parametricbem2d::ParametrizedLine parametrization(x1,x2);
   // Test point (0.5,0.5) corresponding to t = 0.0
   Eigen::Vector2d testpoint;
   testpoint = parametrization(0.);
@@ -44,7 +44,7 @@ TEST(LineParametrizationTest,Derivative) {
 
 TEST(SemiCircleParametrizationTest,Parametrization) {
   // Parametrized semi-circle with unit radius
-  ParametrizedSemiCircle parametrization;
+  parametricbem2d::ParametrizedSemiCircle parametrization;
   double tmin,tmax;
   std::tie(tmin,tmax) = parametrization.ParameterRange();
   double length = 0.;
@@ -72,7 +72,7 @@ TEST(FourierSumParametrizationTest,Parametrization) {
   b << 0.,
        1.;
   // The fourier sum parametrization using these coefficients reduces to (cos(t),sin(t))
-  ParametrizedFourierSum parametrization(a,b);
+  parametricbem2d::ParametrizedFourierSum parametrization(a,b);
   double t = rand()/RAND_MAX;
   t = 2 * t - 1; //range -1 to 1
   Eigen::Vector2d randompoint = parametrization(t);
@@ -81,21 +81,21 @@ TEST(FourierSumParametrizationTest,Parametrization) {
 
 TEST(InterfaceTest,ParameterRange) {
   double a,b;
-  std::tie(a,b) = ParametrizedLine::ParameterRange();
+  std::tie(a,b) = parametricbem2d::ParametrizedLine::ParameterRange();
   EXPECT_EQ(a,-1);
   EXPECT_EQ(b,1);
-  std::tie(a,b) = ParametrizedFourierSum::ParameterRange();
+  std::tie(a,b) = parametricbem2d::ParametrizedFourierSum::ParameterRange();
   EXPECT_EQ(a,-1);
   EXPECT_EQ(b,1);
-  std::tie(a,b) = ParametrizedSemiCircle::ParameterRange();
+  std::tie(a,b) = parametricbem2d::ParametrizedSemiCircle::ParameterRange();
   EXPECT_EQ(a,-1);
   EXPECT_EQ(b,1);
 }
 
 TEST(InterfaceTest,IsWithinParameterRange) {
-  EXPECT_EQ(true,ParametrizedLine::IsWithinParameterRange(0.99));
-  EXPECT_EQ(false,ParametrizedFourierSum::IsWithinParameterRange(1.01));
-  EXPECT_EQ(true,ParametrizedSemiCircle::IsWithinParameterRange(-0.99));
+  EXPECT_EQ(true,parametricbem2d::ParametrizedLine::IsWithinParameterRange(0.99));
+  EXPECT_EQ(false,parametricbem2d::ParametrizedFourierSum::IsWithinParameterRange(1.01));
+  EXPECT_EQ(true,parametricbem2d::ParametrizedSemiCircle::IsWithinParameterRange(-0.99));
 }
 
 int main(int argc, char **argv) {

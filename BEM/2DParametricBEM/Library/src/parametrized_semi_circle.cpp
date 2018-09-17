@@ -7,7 +7,6 @@
  *  This File is a part of the 2D-Parametric BEM package
  */
 
-#include "abstract_parametrized_curve.hpp"
 #include "parametrized_semi_circle.hpp"
 
 #include <math.h>
@@ -17,21 +16,22 @@
 
 #include <Eigen/Dense>
 
-
 #define _USE_MATH_DEFINES //for Pi
 
-ParametrizedSemiCircle::ParametrizedSemiCircle(double r) : radius(r) {}
+namespace parametricbem2d {
+  ParametrizedSemiCircle::ParametrizedSemiCircle(double r) : radius(r) {}
 
-Eigen::Vector2d ParametrizedSemiCircle::operator() (double t) const {
-  assert(IsWithinParameterRange(t));
-  // Parametrization using polar coordinates based on parameter t
-  Eigen::Vector2d point(radius*cos(M_PI*t/2.),radius*sin(M_PI*t/2.));
-  return point;
-}
+  Eigen::Vector2d ParametrizedSemiCircle::operator() (double t) const {
+    assert(IsWithinParameterRange(t));
+    // Parametrization using polar coordinates based on parameter t
+    Eigen::Vector2d point(radius*cos(M_PI*t/2.),radius*sin(M_PI*t/2.));
+    return point;
+  }
 
-Eigen::Vector2d ParametrizedSemiCircle::Derivative(double t) const {
-  assert(IsWithinParameterRange(t));
-  // Derivative of the polar coordinaties used in the function operator()
-  Eigen::Vector2d derivative(-radius*M_PI*sin(M_PI*t/2.)/2.,M_PI*radius*cos(M_PI*t/2.)/2.);
-  return derivative;
-}
+  Eigen::Vector2d ParametrizedSemiCircle::Derivative(double t) const {
+    assert(IsWithinParameterRange(t));
+    // Derivative of the polar coordinaties used in the function operator()
+    Eigen::Vector2d derivative(-radius*M_PI*sin(M_PI*t/2.)/2.,M_PI*radius*cos(M_PI*t/2.)/2.);
+    return derivative;
+  }
+} // namespace parametricbem2d

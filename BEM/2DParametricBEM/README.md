@@ -21,6 +21,15 @@
 	* Constant names
 		* Variables declared constexpr or const, and whose value is fixed for the duration of the program, are named with a leading "k" followed by mixed case.
 
+	* Namespace name
+		* Namespace names are all lower-case. Top-level namespace names are based on the project name . Avoid collisions between nested namespaces and well-known top-level namespaces. Abbreviations not allowed for namespace names.
+
+* Namespace usage
+	* Follow the rules on Namespace Names.
+	* Terminate namespaces with comments '// namespace name_of_namespace'.
+	* Namespaces wrap the entire source file after includes, gflags definitions/declarations and forward declarations of classes from other namespaces.
+	* You may not use a using-directive to make all names from a namespace available.
+
 * Header files
 	* All of a project's header files should be listed as descendants of the project's source directory without use of UNIX directory shortcuts . (the current directory) or .. (the parent directory).
  	* All header files shoud have #define guards to prevent multiple inclusion
@@ -55,8 +64,11 @@
 ## Directory structure
 
 root
+
   |- Library
+
   |  |- src
+
   |- Tests
 
 ## Demos and tests
