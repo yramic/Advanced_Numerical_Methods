@@ -1,5 +1,7 @@
 include_directories(./../Library/src)
 
+include_directories(./../Library/src/BEM\ Space)
+
 include_directories(./googletest/include)
 
 set(CMAKE_CXX_FLAGS "-std=c++11")

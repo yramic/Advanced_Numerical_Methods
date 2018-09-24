@@ -13,6 +13,9 @@
 #include "parametrized_line.hpp"
 #include "parametrized_semi_circle.hpp"
 #include "parametrized_fourier_sum.hpp"
+#include "abstract_bem_space.hpp"
+#include "discontinuous_space.hpp"
+#include "continuous_space.hpp"
 
 double eps = 1e-2; // A global threshold for error
 
@@ -96,6 +99,66 @@ TEST(InterfaceTest,IsWithinParameterRange) {
   EXPECT_EQ(true,parametricbem2d::ParametrizedLine::IsWithinParameterRange(0.99));
   EXPECT_EQ(false,parametricbem2d::ParametrizedFourierSum::IsWithinParameterRange(1.01));
   EXPECT_EQ(true,parametricbem2d::ParametrizedSemiCircle::IsWithinParameterRange(-0.99));
+}
+
+TEST(BemSpace,DiscontinuousSpace0) {
+  parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<0>();
+  using BasisFunctionPointer = parametricbem2d::AbstractBEMSpace::BasisFunctionPointer;
+  int Q = space->getQ();
+  EXPECT_EQ(Q,1);
+  std::vector<BasisFunctionPointer> bases = space->getShapeFunctions();
+  double t = rand()/RAND_MAX;
+  t = 2 * t - 1; //range -1 to 1
+  EXPECT_EQ(bases[0](t),1);
+}
+
+TEST(BemSpace,DiscontinuousSpace1) {
+  parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<1>();
+  using BasisFunctionPointer = parametricbem2d::AbstractBEMSpace::BasisFunctionPointer;
+  int Q = space->getQ();
+  EXPECT_EQ(Q,2);
+  std::vector<BasisFunctionPointer> bases = space->getShapeFunctions();
+  double t = rand()/RAND_MAX;
+  t = 2 * t - 1; //range -1 to 1
+  EXPECT_EQ(bases[0](t),0.5);
+  EXPECT_EQ(bases[1](t),0.5*t);
+}
+
+TEST(BemSpace,ContinuousSpace0) {
+  parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::ContinuousSpace<0>();
+  using BasisFunctionPointer = parametricbem2d::AbstractBEMSpace::BasisFunctionPointer;
+  int Q = space->getQ();
+  EXPECT_EQ(Q,1);
+  std::vector<BasisFunctionPointer> bases = space->getShapeFunctions();
+  double t = rand()/RAND_MAX;
+  t = 2 * t - 1; //range -1 to 1
+  EXPECT_EQ(bases[0](t),1);
+}
+
+TEST(BemSpace,ContinuousSpace1) {
+  parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::ContinuousSpace<1>();
+  using BasisFunctionPointer = parametricbem2d::AbstractBEMSpace::BasisFunctionPointer;
+  int Q = space->getQ();
+  EXPECT_EQ(Q,2);
+  std::vector<BasisFunctionPointer> bases = space->getShapeFunctions();
+  double t = rand()/RAND_MAX;
+  t = 2 * t - 1; //range -1 to 1
+  EXPECT_EQ(bases[0](t),0.5*(1+t));
+  EXPECT_EQ(bases[1](t),0.5*(1-t));
+}
+
+TEST(BemSpace,ContinuousSpace2) {
+  const int p = 2;
+  parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::ContinuousSpace<p>();
+  using BasisFunctionPointer = parametricbem2d::AbstractBEMSpace::BasisFunctionPointer;
+  int Q = space->getQ();
+  EXPECT_EQ(Q,3);
+  std::vector<BasisFunctionPointer> bases = space->getShapeFunctions();
+  double t = rand()/RAND_MAX;
+  t = 2 * t - 1; //range -1 to 1
+  EXPECT_EQ(bases[0](t),0.5*(1+t));
+  EXPECT_EQ(bases[1](t),0.5*(1-t));
+  EXPECT_EQ(bases[2](t),(1-t*t));
 }
 
 int main(int argc, char **argv) {

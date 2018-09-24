@@ -10,6 +10,7 @@
 #define PARAMETRIZEDCURVEHPP
 
 #include <utility>
+
 #include <Eigen/Dense>
 
 /**
