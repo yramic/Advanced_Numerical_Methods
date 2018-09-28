@@ -16,8 +16,10 @@
 #include "abstract_bem_space.hpp"
 #include "discontinuous_space.hpp"
 #include "continuous_space.hpp"
+#include "single_layer.hpp"
+#include "singleLayerPotential.hpp"
 
-double eps = 1e-2; // A global threshold for error
+double eps = 1e-5; // A global threshold for error
 
 //LineParametrizationTest is hieararcy name, Parametrization is a test in this hierarchy
 TEST(LineParametrizationTest,Parametrization) {
@@ -112,6 +114,16 @@ TEST(BemSpace,DiscontinuousSpace0) {
   EXPECT_EQ(bases[0](t),1);
 }
 
+TEST(LocGlobMap,DiscontinuousSpace0) {
+  parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<0>();
+  using LocGlobMapPointer = parametricbem2d::AbstractBEMSpace::LocGlobMapPointer;
+  int N = rand()%100+1;
+  int n = rand()%N+1;
+  int q = 1;
+  LocGlobMapPointer map = space->getLocGlobMap();
+  EXPECT_EQ(n,map(q,n,N));
+}
+
 TEST(BemSpace,DiscontinuousSpace1) {
   parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<1>();
   using BasisFunctionPointer = parametricbem2d::AbstractBEMSpace::BasisFunctionPointer;
@@ -122,6 +134,16 @@ TEST(BemSpace,DiscontinuousSpace1) {
   t = 2 * t - 1; //range -1 to 1
   EXPECT_EQ(bases[0](t),0.5);
   EXPECT_EQ(bases[1](t),0.5*t);
+}
+
+TEST(LocGlobMap,DiscontinuousSpace1) {
+  parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<1>();
+  using LocGlobMapPointer = parametricbem2d::AbstractBEMSpace::LocGlobMapPointer;
+  int N = rand()%100+1;
+  int n = rand()%N+1;
+  LocGlobMapPointer map = space->getLocGlobMap();
+  EXPECT_EQ(n,map(1,n,N));
+  EXPECT_EQ(n+N,map(2,n,N));
 }
 
 TEST(BemSpace,ContinuousSpace0) {
@@ -159,6 +181,56 @@ TEST(BemSpace,ContinuousSpace2) {
   EXPECT_EQ(bases[0](t),0.5*(1+t));
   EXPECT_EQ(bases[1](t),0.5*(1-t));
   EXPECT_EQ(bases[2](t),(1-t*t));
+}
+
+TEST(SingleLayer_0,CoincidingPanels) {
+  // Test for the single layer
+  Eigen::Vector2d x1; x1 << 10,9; // Point (0,1)
+  Eigen::Vector2d x2; x2 << 7,11; // Point (1,0)
+  parametricbem2d::ParametrizedLine parametrization(x1,x2);
+  //parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<0>();
+  parametricbem2d::DiscontinuousSpace<0> space;
+  Eigen::MatrixXd interaction_matrix = SingleLayer(parametrization,
+                                        parametrization,
+                                        space);
+
+  double old_lib_soln = computeVij(x1,x2,x1,x2,0.);
+  EXPECT_NEAR(interaction_matrix(0,0),old_lib_soln,eps);
+}
+
+TEST(SingleLayer_0,AdjacentPanels) {
+  // Test for the single layer
+  Eigen::Vector2d x1; x1 << 3,4; // Point (0,1)
+  Eigen::Vector2d x2; x2 << 7,8; // Point (1,0)
+  Eigen::Vector2d x3; x3 << 11,15; // Point (0,-1)
+  parametricbem2d::ParametrizedLine panel1(x1,x2);
+  parametricbem2d::ParametrizedLine panel2(x2,x3);
+  //parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<0>();
+  parametricbem2d::DiscontinuousSpace<0> space;
+  Eigen::MatrixXd interaction_matrix = SingleLayer(panel1,
+                                        panel2,
+                                        space);
+
+  double old_lib_soln = computeVij(x1,x2,x2,x3,0.);
+  EXPECT_NEAR(interaction_matrix(0,0),old_lib_soln,eps);
+}
+
+TEST(SingleLayer_0,General) {
+  // Test for the single layer
+  Eigen::Vector2d x1; x1 << 0,1; // Point (0,1)
+  Eigen::Vector2d x2; x2 << 1,0; // Point (1,0)
+  Eigen::Vector2d x3; x3 << 0,-1; // Point (0,-1)
+  Eigen::Vector2d x4; x4 << -1,0; // Point (-1,0)
+  parametricbem2d::ParametrizedLine panel1(x1,x2);
+  parametricbem2d::ParametrizedLine panel2(x3,x4);
+  //parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<0>();
+  parametricbem2d::DiscontinuousSpace<0> space;
+  Eigen::MatrixXd interaction_matrix = SingleLayer(panel1,
+                                        panel2,
+                                        space);
+
+  double old_lib_soln = computeVij(x1,x2,x3,x4,0.);
+  EXPECT_NEAR(interaction_matrix(0,0),old_lib_soln,eps);
 }
 
 int main(int argc, char **argv) {

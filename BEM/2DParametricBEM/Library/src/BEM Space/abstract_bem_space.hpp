@@ -20,9 +20,22 @@ namespace parametricbem2d {
   public:
     /**
      * This typedef aids in making a std::vector of function pointers.
-     * The basis functions are of type: double basis (double);
+     * The basis functions have the signature: double basis_function(double);
      */
     typedef double(*BasisFunctionPointer)(double t);
+
+    /**
+     * This typedef aids in returning a function pointer for local to global map
+     * defined in 1.4.75. The maps have the following signature:
+     * unsigned int map (unsigned int q, unsigned int n, unsigned int N);
+     *
+     * @param q Index of the local/reference shape function
+     * @param n Index of the panel for which this map is applied
+     * @param N Total number of panels in the system
+     * @return Integer denoting the global shape function number corresponding
+     *         to the local shape function referenced by q for the panel no. n
+     */
+    typedef unsigned int(*LocGlobMapPointer) (unsigned int q, unsigned int n, unsigned int N);
 
     /**
       * This function is used for querying the parameter interval.
@@ -46,7 +59,7 @@ namespace parametricbem2d {
      *
      * @return Integer Q which is the number of local shape functions
      */
-    virtual int getQ() const {
+    int getQ() const {
       return q;
     }
 
@@ -55,7 +68,7 @@ namespace parametricbem2d {
      * Shape Functions for the given BEM Space.
      *
      * @return An std::vector object of size Q containing all the Reference
-     *         Shape Functions
+     *         Shape Functions in the form of function pointers
      */
      std::vector<BasisFunctionPointer> getShapeFunctions() const {
        return referenceshapefunctions;
@@ -77,15 +90,20 @@ namespace parametricbem2d {
         return ( t>=a && t<=b );
     }
 
+    LocGlobMapPointer getLocGlobMap() {
+      return locglobmap;
+    }
+
    protected:
      /**
-      * protected constructor ensures this base class is non instantiable/
+      * protected constructor ensures this base class is non instantiable.
       */
      AbstractBEMSpace():q(0) {};
      /**
-      * A protected vector containing the Reference Shape Functionsx
+      * A protected vector containing the Reference Shape Functions.
       */
      std::vector<BasisFunctionPointer> referenceshapefunctions;
+     LocGlobMapPointer locglobmap;
      int q;
   }; // class AbstractBEMSpace
 } // namespace parametricbem2d
