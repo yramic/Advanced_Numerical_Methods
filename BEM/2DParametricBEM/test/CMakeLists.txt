@@ -1,16 +1,12 @@
 set(CMAKE_CXX_FLAGS "-std=c++11")
 
-include_directories(./../Library/src)
-
-include_directories(./../Library/src/BEM\ Space)
-
+include_directories(${CMAKE_SOURCE_DIR}/include)
+include_directories(../../CppHilbert/Library/source/)
 include_directories(./googletest/include)
 
-add_subdirectory(../../CppHilbert/Library ${CMAKE_SOURCE_DIR}/build/bin)
+add_subdirectory(../../CppHilbert/Library ${CMAKE_SOURCE_DIR}/lib)
 
-link_directories(${CMAKE_SOURCE_DIR}/build/bin)
-
-include_directories(../../CppHilbert/Library/source/)
+link_directories(${CMAKE_SOURCE_DIR}/lib)
 
 # For using the g-test framework
 add_subdirectory(googletest)

@@ -2,7 +2,7 @@ cmake_minimum_required( VERSION 2.8 )
 
 project(2dparametricbem)
 
-set(DIRECTORIES Library Tests)
+set(DIRECTORIES src test)
 foreach(directory ${DIRECTORIES})
 	add_subdirectory(${directory})
 endforeach(directory)
