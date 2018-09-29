@@ -1,37 +1,38 @@
 /**
- * \file parametrized_semi_circle.hpp
+ * \file parametrized_circular_arc.hpp
  * \brief This file declares the class for representing parametrization
- *        of a semi circle.
+ *        of a circular arc.
  *
  *  This File is a part of the 2D-Parametric BEM package
  */
 
-#ifndef PARAMETRIZEDSEMICIRCLEHPP
-#define PARAMETRIZEDSEMICIRCLEHPP
+#ifndef PARAMETRIZEDCIRCULARARCHPP
+#define PARAMETRIZEDCIRCULARARCHPP
 
 #include <utility>
 
 #include <Eigen/Dense>
-
 #include "abstract_parametrized_curve.hpp"
 
 namespace parametricbem2d {
   /**
-   * \class ParametrizedSemiCircle
+   * \class ParametrizedCircularArc
    * \brief This class represents the parametrization
-   *        of a semi circle. It is centered at (0,0) and lies in
-   *        positive x half plane. This class inherits from the
+   *        of a circular arc. This class inherits from the
    *        Abstract base class representing parametrized curves
    * @see abstract_parametrized_curve.hpp
    */
-  class ParametrizedSemiCircle : public AbstractParametrizedCurve {
+  class ParametrizedCircularArc : public AbstractParametrizedCurve {
     public:
       /**
        * Constructor with specified radius; default value = 1.
        *
        * @param r radius of the semi circle
        */
-      ParametrizedSemiCircle(double r = 1.);
+      ParametrizedCircularArc(Eigen::Vector2d center,
+                              double r,
+                              double phi_start,
+                              double phi_end);
 
       /**
        * See documentation in AbstractParametrizedCurve
@@ -52,8 +53,11 @@ namespace parametricbem2d {
       /**
        * Private const field for storing the radius
        */
+      const Eigen::Vector2d center_;
       const double radius_;
-  }; // class ParametrizedSemiCircle
+      const double phi_start_;
+      const double phi_end_;
+  }; // class ParametrizedCircularArc
 } // namespace parametricbem2d
 
-#endif //PARAMETRIZEDSEMICIRCLEHPP
+#endif //PARAMETRIZEDCIRCULARARCHPP

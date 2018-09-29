@@ -34,4 +34,17 @@ namespace parametricbem2d {
     Eigen::Vector2d derivative(-radius*M_PI*sin(M_PI*t/2.)/2.,M_PI*radius*cos(M_PI*t/2.)/2.);
     return derivative;
   }
+
+  PanelVector ParametrizedSemiCircle::split(unsigned int N) const {
+    PanelVector parametrization_parts;
+    for (int i = 0 ; i < N ; ++i) {
+      double phi_min = 0.;
+      double phi_max = M_PI/2.;
+      Eigen::Vector2d center(2); center << 0,0;
+      double phi_start = phi_min + i*(phi_max-phi_min)/N;
+      double phi_end = phi_min + (i+1)*(phi_max-phi_min)/N;
+      parametrization_parts.push_back(ParametrizedCircularArc(center,radius_,phi_start,phi_end));
+    }
+    return parametrization_parts;
+  }
 } // namespace parametricbem2d

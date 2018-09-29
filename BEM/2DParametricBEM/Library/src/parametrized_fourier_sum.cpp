@@ -22,17 +22,22 @@ namespace parametricbem2d {
   using CoefficientsList = typename ParametrizedFourierSum::CoefficientsList;
 
   ParametrizedFourierSum::ParametrizedFourierSum(CoefficientsList cos_list,
-                                                 CoefficientsList sin_list)
-                                                :cosine(cos_list),sine(sin_list)
+                                                 CoefficientsList sin_list,
+                                                 double tmin,
+                                                 double tmax)
+                                                :cosine_(cos_list),
+                                                 sine_(sin_list),
+                                                 tmin_(tmin),
+                                                 tmax_(tmax)
                          {
                            // Checking consistency
-                           assert(cosine.rows()==sine.rows() &&
-                                  cosine.cols()==sine.cols());
+                           assert(cosine_.cols()==sine_.cols());
                          }
 
   Eigen::Vector2d ParametrizedFourierSum::operator() (double t) const {
     assert(IsWithinParameterRange(t));
-    int N = cosine.cols();
+    t = t*(tmax_-tmin_)/2+(tmax_+tmin_)/2;
+    int N = cosine_.cols();
     Eigen::VectorXd cos_theta(N);
     Eigen::VectorXd sin_theta(N);
     for (int i = 0 ; i<N ; ++i) {
@@ -41,13 +46,14 @@ namespace parametricbem2d {
       sin_theta(i) = sin((i+1)*t);
     }
     // Matrix multiplication to create the Fourier Sum (in vector form)
-    Eigen::Vector2d point = cosine*cos_theta + sine*sin_theta;
+    Eigen::Vector2d point = cosine_*cos_theta + sine_*sin_theta;
     return point;
   }
 
   Eigen::Vector2d ParametrizedFourierSum::Derivative(double t) const {
     assert(IsWithinParameterRange(t));
-    int N = cosine.cols();
+    t = t*(tmax_-tmin_)/2+(tmax_+tmin_)/2;
+    int N = cosine_.cols();
     Eigen::VectorXd cos_theta_dot(N);
     Eigen::VectorXd sin_theta_dot(N);
     for (int i = 0 ; i<N ; ++i) {
@@ -56,7 +62,17 @@ namespace parametricbem2d {
       sin_theta_dot(i) = (i+1)*cos((i+1)*t);
     }
     // Matrix multiplication to create the derivative of Fourier Sum (in vector form)
-    Eigen::Vector2d derivative = cosine*cos_theta_dot + sine*sin_theta_dot;
+    Eigen::Vector2d derivative = cosine_*cos_theta_dot + sine_*sin_theta_dot;
     return derivative;
+  }
+
+  PanelVector ParametrizedFourierSum::split(unsigned int N) const {
+    PanelVector parametrization_parts;
+    for (int i = 0 ; i < N ; ++i) {
+      double tmin = tmin_+ i*(tmax_-tmin_)/N;
+      double tmax = tmin_+ (i+1)*(tmax_-tmin_)/N;
+      parametrization_parts.push_back(ParametrizedFourierSum(cosine_,sine_,tmin,tmax));
+    }
+    return parametrization_parts;
   }
 } // namespace parametricbem2d

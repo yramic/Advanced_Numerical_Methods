@@ -45,13 +45,18 @@ namespace parametricbem2d {
        */
       Eigen::Vector2d Derivative(double) const;
 
+      /**
+       * See documentation in AbstractParametrizedCurve
+       */
+      PanelVector split(unsigned int) const;
+
     private:
       /**
        * private const fields for storing the starting and
        * ending point of the line.
        */
-      const Point start;
-      const Point end;
+      const Point start_;
+      const Point end_;
   }; // class ParametrizedLine
 } // namespace parametricbem2d
 

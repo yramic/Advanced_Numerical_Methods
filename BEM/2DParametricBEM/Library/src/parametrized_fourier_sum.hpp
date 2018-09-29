@@ -22,7 +22,7 @@ namespace parametricbem2d {
    */
   class ParametrizedFourierSum : public AbstractParametrizedCurve {
     public:
-      using CoefficientsList = typename Eigen::MatrixXd;
+      using CoefficientsList = typename Eigen::Matrix<double, 2, Eigen::Dynamic>;
 
       /**
        * Constructor with two coefficient list type parameters
@@ -33,7 +33,9 @@ namespace parametricbem2d {
        * @param sin_list Coefficient list for sine terms
        */
       ParametrizedFourierSum(CoefficientsList cos_list,
-                             CoefficientsList sin_list);
+                             CoefficientsList sin_list,
+                             double tmin=-1.,
+                             double tmax=1.);
 
       /**
        * See documentation in AbstractParametrizedCurve
@@ -45,16 +47,22 @@ namespace parametricbem2d {
        */
       Eigen::Vector2d Derivative(double) const;
 
+      /**
+       * See documentation in AbstractParametrizedCurve
+       */
+      PanelVector split(unsigned int) const;
+
     private:
       /**
        * List of coefficients for the cosine terms in Fourier Sum based parametrization
        */
-      const CoefficientsList cosine;
+      const CoefficientsList cosine_;
 
       /**
        * List of coefficients for the sine terms in Fourier Sum based parametrization
        */
-      const CoefficientsList sine;
+      const CoefficientsList sine_;
+      const double tmin_,tmax_;
   }; // class ParametrizedFourierSum
 } // namespace parametricbem2d
 
