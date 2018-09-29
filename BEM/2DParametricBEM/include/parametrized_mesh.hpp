@@ -23,11 +23,13 @@ namespace parametricbem2d {
    *        Section 1.4.3.4 in the lecture material for
    *        Advanced Numerical Methods for CSE.
    */
+
+  //using PanelVector = std::vector<AbstractParametrizedCurve>;
+
   class ParametrizedMesh {
     public:
       using PanelIterator = std::vector<AbstractParametrizedCurve>::iterator;
-      using PanelVector = std::vector<AbstractParametrizedCurve>;
-
+      using PanelVector = AbstractParametrizedCurve::PanelVector;
      /**
       * This function is used for querying the parameter interval.
       * The standard parameter interval [-1,1] is used and it can't

@@ -48,7 +48,8 @@ namespace parametricbem2d {
     for (int i = 0 ; i < N ; ++i) {
       double phi_start = phi_start_ + i*(phi_end_-phi_start_)/N;
       double phi_end = phi_start_ + (i+1)*(phi_end_-phi_start_)/N;
-      parametrization_parts.push_back(ParametrizedCircularArc(center_,radius_,phi_start,phi_end));
+      ParametrizedCircularArc part(center_,radius_,phi_start,phi_end);
+      parametrization_parts.push_back(&part);
     }
     return parametrization_parts;
   }

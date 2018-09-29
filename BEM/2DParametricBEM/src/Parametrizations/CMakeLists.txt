@@ -6,5 +6,5 @@ FILE(GLOB ParamSources ./*.cpp)
 
 add_library(parametrizations STATIC ${ParamSources})
 
-install(TARGETS parametrizations DESTINATION ${CMAKE_SOURCE_DIR}/lib)
+#install(TARGETS parametrizations DESTINATION ${CMAKE_SOURCE_DIR}/lib)
 

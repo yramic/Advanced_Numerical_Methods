@@ -2,7 +2,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11")
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
-include_directories(../../../CppHilbert/Library/source/)
+include_directories(../../CppHilbert/Library/source/)
 
 add_subdirectory(Parametrizations)
 
@@ -10,10 +10,8 @@ add_subdirectory(Parametrizations)
 #include_directories(/home/piyush/Downloads/cpp/src)
 #FILE(GLOB ExtSources /home/piyush/Downloads/cpp/src/*.cpp)
 
-#add_library(parametrizations STATIC parametrized_fourier_sum.cpp parametrized_line.cpp parametrized_semi_circle.cpp)
-
 FILE(GLOB QuadratureSources ./Quadrature/*.cpp)
 
-add_library(single_layer STATIC single_layer.cpp ${QuadratureSources} ../../../CppHilbert/Library/source/gaussQuadrature.c)
+add_library(single_layer STATIC single_layer.cpp ${QuadratureSources} ../../CppHilbert/Library/source/gaussQuadrature.c)
 
-install(TARGETS single_layer DESTINATION ${CMAKE_SOURCE_DIR}/lib)
+#install(TARGETS single_layer DESTINATION ${CMAKE_SOURCE_DIR}/lib)

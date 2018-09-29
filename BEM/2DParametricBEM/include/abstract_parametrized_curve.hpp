@@ -13,7 +13,7 @@
 #include <vector>
 
 #include <Eigen/Dense>
-#include "parametrized_mesh.hpp"
+//#include "parametrized_mesh.hpp"
 /**
  * \namespace parametricbem2d
  * \brief This namespace contains all the classes and functions for
@@ -27,9 +27,10 @@ namespace parametricbem2d {
    *        Section 1.4.3.4 in the lecture material for
    *        Advanced Numerical Methods for CSE.
    */
+   class AbstractParametrizedCurve;
+  using PanelVector = std::vector<AbstractParametrizedCurve*>;
   class AbstractParametrizedCurve {
     public:
-      using PanelVector = std::vector<AbstractParametrizedCurve>;
      /**
       * This function is used for querying the parameter interval.
       * The standard parameter interval [-1,1] is used and it can't
@@ -101,7 +102,7 @@ namespace parametricbem2d {
       * @return boolean indicating result of the performed check
       */
      virtual PanelVector split(unsigned int N) const = 0;
-     
+
   }; // class AbstractParametrizedCurve
 } // namespace parametricbem2d
 

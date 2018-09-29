@@ -15,23 +15,24 @@
 #include <utility>
 
 #include <Eigen/Dense>
+#include "parametrized_circular_arc.hpp"
 
 #define _USE_MATH_DEFINES //for Pi
 
 namespace parametricbem2d {
-  ParametrizedSemiCircle::ParametrizedSemiCircle(double r) : radius(r) {}
+  ParametrizedSemiCircle::ParametrizedSemiCircle(double r) : radius_(r) {}
 
   Eigen::Vector2d ParametrizedSemiCircle::operator() (double t) const {
     assert(IsWithinParameterRange(t));
     // Parametrization using polar coordinates based on parameter t
-    Eigen::Vector2d point(radius*cos(M_PI*t/2.),radius*sin(M_PI*t/2.));
+    Eigen::Vector2d point(radius_*cos(M_PI*t/2.),radius_*sin(M_PI*t/2.));
     return point;
   }
 
   Eigen::Vector2d ParametrizedSemiCircle::Derivative(double t) const {
     assert(IsWithinParameterRange(t));
     // Derivative of the polar coordinaties used in the function operator()
-    Eigen::Vector2d derivative(-radius*M_PI*sin(M_PI*t/2.)/2.,M_PI*radius*cos(M_PI*t/2.)/2.);
+    Eigen::Vector2d derivative(-radius_*M_PI*sin(M_PI*t/2.)/2.,M_PI*radius_*cos(M_PI*t/2.)/2.);
     return derivative;
   }
 
@@ -43,7 +44,8 @@ namespace parametricbem2d {
       Eigen::Vector2d center(2); center << 0,0;
       double phi_start = phi_min + i*(phi_max-phi_min)/N;
       double phi_end = phi_min + (i+1)*(phi_max-phi_min)/N;
-      parametrization_parts.push_back(ParametrizedCircularArc(center,radius_,phi_start,phi_end));
+      ParametrizedCircularArc part(center,radius_,phi_start,phi_end);
+      parametrization_parts.push_back(&part);
     }
     return parametrization_parts;
   }

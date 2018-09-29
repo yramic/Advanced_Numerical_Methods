@@ -71,7 +71,8 @@ namespace parametricbem2d {
     for (int i = 0 ; i < N ; ++i) {
       double tmin = tmin_+ i*(tmax_-tmin_)/N;
       double tmax = tmin_+ (i+1)*(tmax_-tmin_)/N;
-      parametrization_parts.push_back(ParametrizedFourierSum(cosine_,sine_,tmin,tmax));
+      ParametrizedFourierSum part(cosine_,sine_,tmin,tmax);
+      parametrization_parts.push_back(&part);
     }
     return parametrization_parts;
   }
