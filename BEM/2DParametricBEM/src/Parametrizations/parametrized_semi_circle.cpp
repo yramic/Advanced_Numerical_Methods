@@ -13,6 +13,7 @@
 #include <assert.h>
 #include <iostream>
 #include <utility>
+#include <memory>
 
 #include <Eigen/Dense>
 #include "parametrized_circular_arc.hpp"
@@ -44,8 +45,8 @@ namespace parametricbem2d {
       Eigen::Vector2d center(2); center << 0,0;
       double phi_start = phi_min + i*(phi_max-phi_min)/N;
       double phi_end = phi_min + (i+1)*(phi_max-phi_min)/N;
-      ParametrizedCircularArc part(center,radius_,phi_start,phi_end);
-      parametrization_parts.push_back(&part);
+      ParametrizedCircularArc *part = new ParametrizedCircularArc(center,radius_,phi_start,phi_end);
+      parametrization_parts.push_back(part);
     }
     return parametrization_parts;
   }

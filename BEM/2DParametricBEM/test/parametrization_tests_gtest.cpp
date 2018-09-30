@@ -13,6 +13,7 @@
 #include "parametrized_line.hpp"
 #include "parametrized_semi_circle.hpp"
 #include "parametrized_fourier_sum.hpp"
+#include "parametrized_circular_arc.hpp"
 #include "abstract_bem_space.hpp"
 #include "discontinuous_space.hpp"
 #include "continuous_space.hpp"
@@ -69,6 +70,30 @@ TEST(SemiCircleParametrizationTest,Parametrization) {
   EXPECT_NEAR(M_PI,length,eps);
 }
 
+TEST(ParametrizedCircularArcTest,Parametrization) {
+  // Parametrized with unit radius, centered at (1,-1)
+  Eigen::Vector2d center(2); center << 1,-1;
+  double r = 1.2;
+  parametricbem2d::ParametrizedCircularArc parametrization(center,r,0,M_PI/2);
+  double tmin,tmax;
+  std::tie(tmin,tmax) = parametrization.ParameterRange();
+  double length = 0.;
+  double t1,t2;
+  // Representing the circular arc parametrized curve by Nbins number of
+  // Points or Nbins -1 number of line segments and summing up the lengths
+  // to get an approximation of Pi
+  int Nbins = 1000;
+  for (int i = 0 ; i<Nbins-1 ; ++i) {
+    t1 = tmin + i * (tmax-tmin)/(Nbins-1); // Current Point
+    t2 = tmin + (i+1) * (tmax-tmin)/(Nbins-1); // Next Point
+    Eigen::Vector2d start,end;
+    start = parametrization(t1);
+    end = parametrization(t2);
+    length += (end-start).norm(); // Adding the length of current line segment
+  }
+  EXPECT_NEAR(M_PI,length*2/r,eps);
+}
+
 TEST(FourierSumParametrizationTest,Parametrization) {
   Eigen::MatrixXd a(2,1); //cosine coefficients ; N = 1
   Eigen::MatrixXd b(2,1); //sine coefficients ; N = 1
@@ -112,9 +137,10 @@ TEST(BemSpace,DiscontinuousSpace0) {
   double t = rand()/RAND_MAX;
   t = 2 * t - 1; //range -1 to 1
   EXPECT_EQ(bases[0](t),1);
+  delete space;
 }
 
-TEST(LocGlobMap,DiscontinuousSpace0) {
+/*TEST(LocGlobMap,DiscontinuousSpace0) {
   parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<0>();
   using LocGlobMapPointer = parametricbem2d::AbstractBEMSpace::LocGlobMapPointer;
   int N = rand()%100+1;
@@ -122,7 +148,7 @@ TEST(LocGlobMap,DiscontinuousSpace0) {
   int q = 1;
   LocGlobMapPointer map = space->getLocGlobMap();
   EXPECT_EQ(n,map(q,n,N));
-}
+}*/
 
 TEST(BemSpace,DiscontinuousSpace1) {
   parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<1>();
@@ -134,9 +160,10 @@ TEST(BemSpace,DiscontinuousSpace1) {
   t = 2 * t - 1; //range -1 to 1
   EXPECT_EQ(bases[0](t),0.5);
   EXPECT_EQ(bases[1](t),0.5*t);
+  delete space;
 }
 
-TEST(LocGlobMap,DiscontinuousSpace1) {
+/*TEST(LocGlobMap,DiscontinuousSpace1) {
   parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<1>();
   using LocGlobMapPointer = parametricbem2d::AbstractBEMSpace::LocGlobMapPointer;
   int N = rand()%100+1;
@@ -144,7 +171,7 @@ TEST(LocGlobMap,DiscontinuousSpace1) {
   LocGlobMapPointer map = space->getLocGlobMap();
   EXPECT_EQ(n,map(1,n,N));
   EXPECT_EQ(n+N,map(2,n,N));
-}
+}*/
 
 TEST(BemSpace,ContinuousSpace0) {
   parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::ContinuousSpace<0>();
@@ -155,6 +182,7 @@ TEST(BemSpace,ContinuousSpace0) {
   double t = rand()/RAND_MAX;
   t = 2 * t - 1; //range -1 to 1
   EXPECT_EQ(bases[0](t),1);
+  delete space;
 }
 
 TEST(BemSpace,ContinuousSpace1) {
@@ -167,6 +195,7 @@ TEST(BemSpace,ContinuousSpace1) {
   t = 2 * t - 1; //range -1 to 1
   EXPECT_EQ(bases[0](t),0.5*(1+t));
   EXPECT_EQ(bases[1](t),0.5*(1-t));
+  delete space;
 }
 
 TEST(BemSpace,ContinuousSpace2) {
@@ -181,6 +210,7 @@ TEST(BemSpace,ContinuousSpace2) {
   EXPECT_EQ(bases[0](t),0.5*(1+t));
   EXPECT_EQ(bases[1](t),0.5*(1-t));
   EXPECT_EQ(bases[2](t),(1-t*t));
+  delete space;
 }
 
 TEST(SingleLayer_0,CoincidingPanels) {
@@ -223,7 +253,6 @@ TEST(SingleLayer_0,General) {
   Eigen::Vector2d x4; x4 << -1,0; // Point (-1,0)
   parametricbem2d::ParametrizedLine panel1(x1,x2);
   parametricbem2d::ParametrizedLine panel2(x3,x4);
-  //parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<0>();
   parametricbem2d::DiscontinuousSpace<0> space;
   Eigen::MatrixXd interaction_matrix = SingleLayer(panel1,
                                         panel2,
@@ -231,6 +260,91 @@ TEST(SingleLayer_0,General) {
 
   double old_lib_soln = computeVij(x1,x2,x3,x4,0.);
   EXPECT_NEAR(interaction_matrix(0,0),old_lib_soln,eps);
+}
+
+TEST(LocGlobMap,ContinuousSpace0) {
+  parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::ContinuousSpace<0>();
+  using LocGlobMapPointer = parametricbem2d::AbstractBEMSpace::LocGlobMapPointer;
+  LocGlobMapPointer map = space->getLocGlobMap();
+  EXPECT_EQ(map(1,5,10),1);
+  delete space;
+}
+
+TEST(LocGlobMap,ContinuousSpace1) {
+  parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::ContinuousSpace<1>();
+  using LocGlobMapPointer = parametricbem2d::AbstractBEMSpace::LocGlobMapPointer;
+  LocGlobMapPointer map = space->getLocGlobMap();
+  EXPECT_EQ(map(1,1,4),1);
+  EXPECT_EQ(map(1,2,4),2);
+  EXPECT_EQ(map(1,1,4),1);
+  EXPECT_EQ(map(2,1,4),4);
+  delete space;
+}
+
+TEST(LocGlobMap,DiscontinuousSpace0) {
+  parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<0>();
+  using LocGlobMapPointer = parametricbem2d::AbstractBEMSpace::LocGlobMapPointer;
+  LocGlobMapPointer map = space->getLocGlobMap();
+  EXPECT_EQ(map(1,1,4),1);
+  EXPECT_EQ(map(1,2,4),2);
+  delete space;
+}
+
+TEST(LocGlobMap,DiscontinuousSpace1) {
+  parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<1>();
+  using LocGlobMapPointer = parametricbem2d::AbstractBEMSpace::LocGlobMapPointer;
+  LocGlobMapPointer map = space->getLocGlobMap();
+  EXPECT_EQ(map(2,1,4),5);
+  EXPECT_EQ(map(2,2,4),6);
+  EXPECT_EQ(map(1,4,4),4);
+  EXPECT_EQ(map(2,4,4),8);
+  delete space;
+}
+
+TEST(Split,ParametrizedLine) {
+  using Point = std::pair<double,double>;
+  using PanelVector = parametricbem2d::PanelVector;
+  Eigen::Vector2d x1; x1 << 0,1; // Point (0,1)
+  Eigen::Vector2d x2; x2 << 1,0; // Point (1,0)
+  parametricbem2d::ParametrizedLine parametrization(x1,x2);
+  unsigned int N = 10;
+  PanelVector components = parametrization.split(N);
+  for (unsigned int i = 0 ; i < N-1 ; ++i) {
+    EXPECT_NEAR((components[i]->operator()(1) -
+                 components[i+1]->operator()(-1)).norm(),0,eps);
+  }
+}
+
+TEST(Split,ParametrizedCircularArc) {
+  using Point = std::pair<double,double>;
+  using PanelVector = parametricbem2d::PanelVector;
+  Eigen::Vector2d center; center << 2.5,3.6;
+  double radius = 33;
+  parametricbem2d::ParametrizedCircularArc parametrization(center,radius,.33*M_PI,.99*M_PI);
+  unsigned int N = 10;
+  PanelVector components = parametrization.split(N);
+  for (unsigned int i = 0 ; i < N-1 ; ++i) {
+    //std::cout << "i: " << i << std::endl;
+    EXPECT_NEAR((components[i]->operator()(1) -
+                 components[i+1]->operator()(-1)).norm(),0,eps);
+  }
+}
+
+TEST(Split,ParametrizedFourierSum) {
+  Eigen::MatrixXd a(2,1); //cosine coefficients ; N = 1
+  Eigen::MatrixXd b(2,1); //sine coefficients ; N = 1
+  a << 1.,
+       0.;
+  b << 0.,
+       1.;
+  parametricbem2d::ParametrizedFourierSum parametrization(a,b);
+  unsigned int N = 10;
+  using PanelVector = parametricbem2d::PanelVector;
+  PanelVector components = parametrization.split(N);
+  for (unsigned int i = 0 ; i < N-1 ; ++i)
+    EXPECT_NEAR((components[i]->operator()(1) -
+                 components[i+1]->operator()(-1)).norm(),0,eps);
+
 }
 
 int main(int argc, char **argv) {

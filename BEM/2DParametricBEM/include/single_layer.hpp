@@ -15,6 +15,7 @@
 
 #include "abstract_parametrized_curve.hpp"
 #include "abstract_bem_space.hpp"
+#include "parametrized_mesh.hpp"
 
 namespace parametricbem2d {
   using BasisFunctionPointer = AbstractBEMSpace::BasisFunctionPointer;
@@ -96,6 +97,29 @@ namespace parametricbem2d {
   Eigen::MatrixXd SingleLayer(const AbstractParametrizedCurve& pi,
                               const AbstractParametrizedCurve& pi_p,
                               const AbstractBEMSpace& space);
+
+  /**
+   * This function is used to evaluate the Interaction Matrix for
+   * the pair of panels \f$\Pi\f$ and \f$\Pi\f$' for the bilinear
+   * form induced by the Single Layer BIO given by the formula :
+   * \f$I_{ij}\f$ = \f$-\frac{1}{2\pi} \int_{\Pi} \int_{\Pi '} \log{ \vert x-y \vert } b^{j}_{\Pi '}(y) b^{i}_{\Pi}(x) ds(y) ds(x) \f$
+   * where \f$b^{j}_{\Pi '}\f$ & \f$b^{i}_{\Pi}\f$ are local shape functions
+   * associated with panels \f$\Pi\f$ ' and \f$\Pi\f$ respectively. \f$I\f$, the
+   * interaction matrix is of size QXQ where Q is the number of local shape
+   * functions for the used BEM space. The computation of the entries
+   * are based on cases and delegated to these functions accordingly:
+   * ComputeIntegralGeneral
+   * ComputeIntegralAdjacent
+   * ComputeIntegralCoinciding
+   *
+   * @param pi Parametrization for the first panel \f$\Pi\f$.
+   * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
+   * @param space The BEM space to be used for calculations
+   * @return An Eigen::MatrixXd type Interaction Matrix (QXQ)
+   *         where Q depends on the BEM space employed.
+   */
+  Eigen::MatrixXd SingleLayerMatrix(const ParametrizedMesh mesh,
+                                    const AbstractBEMSpace& space);
 } // namespace parametricbem2d
 
 #endif //SINGLELAYERHPP

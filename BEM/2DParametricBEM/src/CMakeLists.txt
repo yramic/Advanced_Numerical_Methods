@@ -6,12 +6,12 @@ include_directories(../../CppHilbert/Library/source/)
 
 add_subdirectory(Parametrizations)
 
+add_subdirectory(Quadrature)
+
 #External library for Gauss Quadrature
 #include_directories(/home/piyush/Downloads/cpp/src)
 #FILE(GLOB ExtSources /home/piyush/Downloads/cpp/src/*.cpp)
 
-FILE(GLOB QuadratureSources ./Quadrature/*.cpp)
-
-add_library(single_layer STATIC single_layer.cpp ${QuadratureSources} ../../CppHilbert/Library/source/gaussQuadrature.c)
+add_library(single_layer STATIC single_layer.cpp parametrized_mesh.cpp)
 
 #install(TARGETS single_layer DESTINATION ${CMAKE_SOURCE_DIR}/lib)

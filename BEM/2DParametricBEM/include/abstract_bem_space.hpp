@@ -90,7 +90,7 @@ namespace parametricbem2d {
         return ( t>=a && t<=b );
     }
 
-    LocGlobMapPointer getLocGlobMap() {
+    LocGlobMapPointer getLocGlobMap() const{
       return locglobmap;
     }
 

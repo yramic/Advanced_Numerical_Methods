@@ -18,7 +18,8 @@ namespace parametricbem2d {
    unsigned int N = getNumPanels();
    // Checking consistency of the mesh
    for (unsigned int i = 0 ; i < N ; ++i)
-     assert(fabs(panels_[i%N]->(1)-panels_[(i+1)%N]->(-1)) < 1e-5);
+     assert(fabs((panels_[i%N]->operator()(1)-
+                  panels_[(i+1)%N]->operator()(-1)).norm()) < 1e-5);
   }
 
   PanelVector ParametrizedMesh::getPanels() const{
@@ -31,7 +32,7 @@ namespace parametricbem2d {
 
   Eigen::Vector2d ParametrizedMesh::getVertex(unsigned int i) const {
    assert(i<getNumPanels());
-   return panels_[i]->(-1);
+   return panels_[i]->operator()(-1);
   }
 
 } // namespace parametricbem2d

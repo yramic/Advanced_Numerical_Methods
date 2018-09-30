@@ -21,6 +21,7 @@ extern "C" {
 #include "gaussQuadrature.h"
 }
 #include "logweight_quadrature.hpp"
+#include "parametrized_mesh.hpp"
 //#include "integration.h"
 
 namespace parametricbem2d {
@@ -33,6 +34,7 @@ namespace parametricbem2d {
     // Vector containing the Reference Shape Functions
     std::vector<BasisFunctionPointer> bases = space.getShapeFunctions();
     unsigned int N = 32; // No. of points for Gauss Quadrature
+    double tol = 1e-5;
 
     for (int i=0 ; i<Q ; ++i) {
       for (int j=0; j<Q ; ++j) {
@@ -41,7 +43,8 @@ namespace parametricbem2d {
                                                               pi_p,
                                                               bases[i],
                                                               bases[j]);
-        else if ( pi(1)==pi_p(-1) || pi(-1)==pi_p(1)) // Adjacent Panels
+        else if ( fabs((pi(1)-pi_p(-1)).norm())<tol ||
+                  fabs((pi(-1)-pi_p(1)).norm())<tol) // Adjacent Panels
           interaction_matrix(i,j) = ComputeIntegralAdjacent(pi,
                                                             pi_p,
                                                             bases[i],
@@ -238,6 +241,38 @@ namespace parametricbem2d {
     }
     return -1/(2*M_PI)*integral;
   }
+
+  Eigen::MatrixXd SingleLayerMatrix(const ParametrizedMesh mesh,
+                                    const AbstractBEMSpace& space) {
+  //anc
+    using LocGlobMapPointer = AbstractBEMSpace::LocGlobMapPointer;
+
+    unsigned int numpanels = mesh.getNumPanels();
+    PanelVector panels = mesh.getPanels();
+    LocGlobMapPointer map = space.getLocGlobMap();
+    unsigned int Q = space.getQ();
+
+    Eigen::MatrixXd output = Eigen::MatrixXd::Zero(numpanels,numpanels);
+
+    for (unsigned int i = 0 ; i < numpanels ; ++i) {
+      for (unsigned int j = 0 ; j < numpanels ; ++j) {
+        Eigen::MatrixXd interaction_matrix = SingleLayer(*panels[i],
+                                                         *panels[j],
+                                                         space);
+        // Local to global mapping
+        for (unsigned int I = 0 ; I < Q ; ++I) {
+          for (unsigned int J = 0 ; J < Q ; ++J) {
+            int II = map(I+1,i+1,numpanels)-1;
+            int JJ = map(J+1,j+1,numpanels)-1;
+            output(II,JJ) += interaction_matrix(I,J);
+          }
+        }
+      }
+    }
+    return output;
+  }
+
+
 
 
 } // namespace parametricbem2d

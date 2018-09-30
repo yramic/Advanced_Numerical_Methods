@@ -11,6 +11,7 @@
 
 #include <utility>
 #include <vector>
+#include <iterator>
 
 #include <Eigen/Dense>
 //#include "parametrized_mesh.hpp"
@@ -27,7 +28,7 @@ namespace parametricbem2d {
    *        Section 1.4.3.4 in the lecture material for
    *        Advanced Numerical Methods for CSE.
    */
-   class AbstractParametrizedCurve;
+  class AbstractParametrizedCurve;
   using PanelVector = std::vector<AbstractParametrizedCurve*>;
   class AbstractParametrizedCurve {
     public:
@@ -102,6 +103,9 @@ namespace parametricbem2d {
       * @return boolean indicating result of the performed check
       */
      virtual PanelVector split(unsigned int N) const = 0;
+
+   protected:
+     PanelVector parametrization_parts_;
 
   }; // class AbstractParametrizedCurve
 } // namespace parametricbem2d

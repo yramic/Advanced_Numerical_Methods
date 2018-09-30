@@ -8,9 +8,11 @@
 
 #include "parametrized_circular_arc.hpp"
 
+#include <math.h>
 #include <utility>
 
 #include <Eigen/Dense>
+#define _USE_MATH_DEFINES //for Pi
 
 namespace parametricbem2d {
 
@@ -21,7 +23,9 @@ namespace parametricbem2d {
                                                    center_(center),
                                                    radius_(r),
                                                    phi_start_(phi_start),
-                                                   phi_end_(phi_end) {}
+                                                   phi_end_(phi_end) {
+     assert(fabs(phi_end-phi_start)<=2*M_PI);
+   }
 
   Eigen::Vector2d ParametrizedCircularArc::operator() (double t) const {
     assert(IsWithinParameterRange(t));
@@ -48,8 +52,8 @@ namespace parametricbem2d {
     for (int i = 0 ; i < N ; ++i) {
       double phi_start = phi_start_ + i*(phi_end_-phi_start_)/N;
       double phi_end = phi_start_ + (i+1)*(phi_end_-phi_start_)/N;
-      ParametrizedCircularArc part(center_,radius_,phi_start,phi_end);
-      parametrization_parts.push_back(&part);
+      ParametrizedCircularArc *part = new ParametrizedCircularArc(center_,radius_,phi_start,phi_end);
+      parametrization_parts.push_back(part);
     }
     return parametrization_parts;
   }

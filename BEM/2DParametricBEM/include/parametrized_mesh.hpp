@@ -29,7 +29,7 @@ namespace parametricbem2d {
   class ParametrizedMesh {
     public:
       using PanelIterator = std::vector<AbstractParametrizedCurve>::iterator;
-      using PanelVector = AbstractParametrizedCurve::PanelVector;
+      
      /**
       * This function is used for querying the parameter interval.
       * The standard parameter interval [-1,1] is used and it can't
