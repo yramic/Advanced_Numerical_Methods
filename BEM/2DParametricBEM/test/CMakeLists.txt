@@ -13,9 +13,9 @@ link_directories(${CMAKE_BINARY_DIR}/CppHilbert)
 # For using the g-test framework
 add_subdirectory(googletest)
 
-add_executable(param_tests_gtest parametrization_tests_gtest.cpp)
+add_executable(tests tests.cpp)
 
-target_link_libraries(param_tests_gtest parametrizations gtest single_layer quadrature CppHilbert)
+target_link_libraries(tests parametrizations gtest single_layer quadrature CppHilbert)
 
 #install(TARGETS param_tests_gtest DESTINATION ${CMAKE_SOURCE_DIR}/bin)
 

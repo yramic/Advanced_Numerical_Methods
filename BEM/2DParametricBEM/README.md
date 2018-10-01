@@ -65,12 +65,18 @@
 
 root
 
-  |- Library
+    |-doxygen
 
-  |  |- src
+    |-include
 
-  |- Tests
+    |-src
+
+    | |-Parametrizations
+
+    | |-Quadrature
+
+    |-test
 
 ## Demos and tests
 
-* Directory Tests contains parametrization_tests.cpp to independently test the parametrizations.
+* Directory Tests contains tests.cpp which contains unit tests for different parts of this project.
