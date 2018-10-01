@@ -19,6 +19,7 @@
 #include "continuous_space.hpp"
 #include "single_layer.hpp"
 #include "singleLayerPotential.hpp"
+#include "parametrized_mesh.hpp"
 
 double eps = 1e-5; // A global threshold for error
 
@@ -348,6 +349,60 @@ TEST(Split,ParametrizedFourierSum) {
     EXPECT_NEAR((components[i]->operator()(1) -
                  components[i+1]->operator()(-1)).norm(),0,eps);
 
+}
+
+TEST(ParametrizedMeshTest,MemberFunctions) {
+  using PanelVector = parametricbem2d::PanelVector;
+  Eigen::Vector2d x1; x1 << 0,0; // Point (0,0)
+  Eigen::Vector2d x2; x2 << 1,0; // Point (1,0)
+  Eigen::Vector2d x3; x3 << 1,1; // Point (1,1)
+  Eigen::Vector2d x4; x4 << 0,1; // Point (0,1)
+  parametricbem2d::ParametrizedLine line1(x1,x2);
+  parametricbem2d::ParametrizedLine line2(x2,x3);
+  parametricbem2d::ParametrizedLine line3(x3,x4);
+  parametricbem2d::ParametrizedLine line4(x4,x1);
+  PanelVector line1panels = line1.split(2);
+  PanelVector line2panels = line2.split(2);
+  PanelVector line3panels = line3.split(2);
+  PanelVector line4panels = line4.split(2);
+  PanelVector panels;
+  panels.insert(panels.end(),line1panels.begin(),line1panels.end());
+  panels.insert(panels.end(),line2panels.begin(),line2panels.end());
+  panels.insert(panels.end(),line3panels.begin(),line3panels.end());
+  panels.insert(panels.end(),line4panels.begin(),line4panels.end());
+  parametricbem2d::ParametrizedMesh mesh(panels);
+  Eigen::Vector2d vertex2 = mesh.getVertex(1);
+  EXPECT_EQ(mesh.getNumPanels(),8);
+  EXPECT_NEAR(vertex2(0),0.5,eps);
+  EXPECT_NEAR(vertex2(1),0,eps);
+}
+
+TEST(SingleLayer,PanelOrientedAssembly) {
+  using PanelVector = parametricbem2d::PanelVector;
+  Eigen::Vector2d x1; x1 << 0,0; // Point (0,0)
+  Eigen::Vector2d x2; x2 << 1,0; // Point (1,0)
+  Eigen::Vector2d x3; x3 << 1,1; // Point (1,1)
+  Eigen::Vector2d x4; x4 << 0,1; // Point (0,1)
+  parametricbem2d::ParametrizedLine line1(x1,x2);
+  parametricbem2d::ParametrizedLine line2(x2,x3);
+  parametricbem2d::ParametrizedLine line3(x3,x4);
+  parametricbem2d::ParametrizedLine line4(x4,x1);
+  PanelVector line1panels = line1.split(1);
+  PanelVector line2panels = line2.split(2);
+  PanelVector line3panels = line3.split(3);
+  PanelVector line4panels = line4.split(4);
+  PanelVector panels;
+  panels.insert(panels.end(),line1panels.begin(),line1panels.end());
+  panels.insert(panels.end(),line2panels.begin(),line2panels.end());
+  panels.insert(panels.end(),line3panels.begin(),line3panels.end());
+  panels.insert(panels.end(),line4panels.begin(),line4panels.end());
+  parametricbem2d::ParametrizedMesh mesh(panels);
+  parametricbem2d::DiscontinuousSpace<0> space;
+  Eigen::MatrixXd galerkin = SingleLayerMatrix(mesh,space,32);
+  unsigned int numpanels = mesh.getNumPanels();
+  EXPECT_EQ(numpanels,galerkin.cols());
+  EXPECT_EQ(numpanels,galerkin.rows());
+  //std::cout << galerkin << std::endl;
 }
 
 int main(int argc, char **argv) {

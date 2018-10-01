@@ -47,8 +47,8 @@ namespace parametricbem2d {
       double t2 = tmin + (i+1)*(tmax-tmin)/N;
       Point first = this->operator()(t1);
       Point second = this->operator()(t2);
-      ParametrizedLine* part = new ParametrizedLine(first,second);
-      parametrization_parts.push_back(part);
+      parametrization_parts.push_back(std::make_shared<ParametrizedLine>
+                                      (first,second));
     }
     return parametrization_parts;
   }
