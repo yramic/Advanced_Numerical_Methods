@@ -32,12 +32,14 @@ namespace parametricbem2d {
    * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
    * @param bi The basis function associated with panel \f$\Pi\f$.
    * @param bj The basis function associated with panel \f$\Pi\f$'.
+   * @param N The order for gauss/log-weighted quadrature
    * @return The (i,j)^{th} entry of the interaction matrix
    */
   double ComputeIntegralAdjacent(const AbstractParametrizedCurve& pi,
                                  const AbstractParametrizedCurve& pi_p,
                                  BasisFunctionPointer bi,
-                                 BasisFunctionPointer bj);
+                                 BasisFunctionPointer bj,
+                                 const unsigned int& N);
 
   /**
    * This function is used to evaluate a single entry of the
@@ -50,12 +52,14 @@ namespace parametricbem2d {
    * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
    * @param bi The basis function associated with panel \f$\Pi\f$.
    * @param bj The basis function associated with panel \f$\Pi\f$'.
+   * @param N The order for gauss/log-weighted quadrature
    * @return The (i,j)^{th} entry of the interaction matrix
    */
   double ComputeIntegralCoinciding(const AbstractParametrizedCurve& pi,
                                    const AbstractParametrizedCurve& pi_p,
                                    BasisFunctionPointer bi,
-                                   BasisFunctionPointer bj);
+                                   BasisFunctionPointer bj,
+                                   const unsigned int& N);
 
  /**
   * This function is used to evaluate a single entry of the
@@ -68,12 +72,14 @@ namespace parametricbem2d {
   * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
   * @param bi The basis function associated with panel \f$\Pi\f$.
   * @param bj The basis function associated with panel \f$\Pi\f$'.
+  * @param N The order for gauss/log-weighted quadrature
   * @return The (i,j)^{th} entry of the interaction matrix
   */
   double ComputeIntegralGeneral(const AbstractParametrizedCurve& pi,
                                 const AbstractParametrizedCurve& pi_p,
                                 BasisFunctionPointer bi,
-                                BasisFunctionPointer bj);
+                                BasisFunctionPointer bj,
+                                const unsigned int& N);
   /**
    * This function is used to evaluate the Interaction Matrix for
    * the pair of panels \f$\Pi\f$ and \f$\Pi\f$' for the bilinear
@@ -91,12 +97,14 @@ namespace parametricbem2d {
    * @param pi Parametrization for the first panel \f$\Pi\f$.
    * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
    * @param space The BEM space to be used for calculations
+   * @param N The order for gauss/log-weighted quadrature
    * @return An Eigen::MatrixXd type Interaction Matrix (QXQ)
    *         where Q depends on the BEM space employed.
    */
   Eigen::MatrixXd SingleLayer(const AbstractParametrizedCurve& pi,
                               const AbstractParametrizedCurve& pi_p,
-                              const AbstractBEMSpace& space);
+                              const AbstractBEMSpace& space,
+                              const unsigned int& N);
 
   /**
    * This function is used to evaluate the Interaction Matrix for
@@ -119,7 +127,8 @@ namespace parametricbem2d {
    *         where Q depends on the BEM space employed.
    */
   Eigen::MatrixXd SingleLayerMatrix(const ParametrizedMesh mesh,
-                                    const AbstractBEMSpace& space);
+                                    const AbstractBEMSpace& space,
+                                    const unsigned int& N);
 } // namespace parametricbem2d
 
 #endif //SINGLELAYERHPP

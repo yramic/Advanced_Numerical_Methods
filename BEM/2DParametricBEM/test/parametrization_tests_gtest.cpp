@@ -221,8 +221,9 @@ TEST(SingleLayer_0,CoincidingPanels) {
   //parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<0>();
   parametricbem2d::DiscontinuousSpace<0> space;
   Eigen::MatrixXd interaction_matrix = SingleLayer(parametrization,
-                                        parametrization,
-                                        space);
+                                                   parametrization,
+                                                   space,
+                                                   32);
 
   double old_lib_soln = computeVij(x1,x2,x1,x2,0.);
   EXPECT_NEAR(interaction_matrix(0,0),old_lib_soln,eps);
@@ -238,8 +239,9 @@ TEST(SingleLayer_0,AdjacentPanels) {
   //parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<0>();
   parametricbem2d::DiscontinuousSpace<0> space;
   Eigen::MatrixXd interaction_matrix = SingleLayer(panel1,
-                                        panel2,
-                                        space);
+                                                   panel2,
+                                                   space,
+                                                   32);
 
   double old_lib_soln = computeVij(x1,x2,x2,x3,0.);
   EXPECT_NEAR(interaction_matrix(0,0),old_lib_soln,eps);
@@ -255,8 +257,9 @@ TEST(SingleLayer_0,General) {
   parametricbem2d::ParametrizedLine panel2(x3,x4);
   parametricbem2d::DiscontinuousSpace<0> space;
   Eigen::MatrixXd interaction_matrix = SingleLayer(panel1,
-                                        panel2,
-                                        space);
+                                                   panel2,
+                                                   space,
+                                                   33);
 
   double old_lib_soln = computeVij(x1,x2,x3,x4,0.);
   EXPECT_NEAR(interaction_matrix(0,0),old_lib_soln,eps);
