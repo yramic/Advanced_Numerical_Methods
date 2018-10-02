@@ -60,7 +60,7 @@ namespace parametricbem2d {
      * @return Integer Q which is the number of local shape functions
      */
     int getQ() const {
-      return q;
+      return q_;
     }
 
     /**
@@ -71,7 +71,7 @@ namespace parametricbem2d {
      *         Shape Functions in the form of function pointers
      */
      std::vector<BasisFunctionPointer> getShapeFunctions() const {
-       return referenceshapefunctions;
+       return referenceshapefunctions_;
      }
 
      /**
@@ -90,21 +90,45 @@ namespace parametricbem2d {
         return ( t>=a && t<=b );
     }
 
+    /**
+    * This function returns a function pointer to the
+    * locap to global map function
+    *
+    * @return function pointer to local to global map
+    */
     LocGlobMapPointer getLocGlobMap() const{
-      return locglobmap;
+      return locglobmap_;
     }
+
+    /**
+    * This function returns the dimension of the given BEM space on the given
+    * number of panels. It is a pure virtual function and has to be implemented
+    * by the inherited class.
+    *
+    * @param numpanels Number of panels in the mesh
+    * @return Dimension of the BEM space
+    */
+    virtual unsigned int getSpaceDim(unsigned int numpanels) const=0;
 
    protected:
      /**
       * protected constructor ensures this base class is non instantiable.
       */
-     AbstractBEMSpace():q(0) {};
+     AbstractBEMSpace():q_(0) {};
      /**
       * A protected vector containing the Reference Shape Functions.
       */
-     std::vector<BasisFunctionPointer> referenceshapefunctions;
-     LocGlobMapPointer locglobmap;
-     int q;
+     std::vector<BasisFunctionPointer> referenceshapefunctions_;
+     /**
+      * A protected pointer of the type LocGlobMapPointer which is returned by
+      * the function getLocGlobMap
+      */
+     LocGlobMapPointer locglobmap_;
+     /**
+      * A protected integer q which stores the number of reference shape
+      * functions in derived concrete classes
+      */
+     int q_;
   }; // class AbstractBEMSpace
 } // namespace parametricbem2d
 

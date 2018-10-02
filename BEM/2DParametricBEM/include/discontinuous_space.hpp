@@ -45,15 +45,19 @@ namespace parametricbem2d {
       return 1.;
     }
     // Local to Global Map
-    static unsigned int map(unsigned int q_, unsigned int n, unsigned int N) {
-      assert(q_<=1 && n<=N);
+    static unsigned int map(unsigned int q, unsigned int n, unsigned int N) {
+      assert(q<=1 && n<=N);
       return n;
+    }
+    // Space Dimensions
+    unsigned int getSpaceDim(unsigned int numpanels) const{
+      return numpanels*q_;
     }
     // Constructor
     DiscontinuousSpace() {
-      q = 1;
-      referenceshapefunctions.push_back(b1);
-      locglobmap = map;
+      q_ = 1;
+      referenceshapefunctions_.push_back(b1);
+      locglobmap_ = map;
     }
   };
 
@@ -75,19 +79,23 @@ namespace parametricbem2d {
       return 0.5*t;
     }
     // Local to Global Map
-    static unsigned int map(unsigned int q_, unsigned int n, unsigned int N) {
-      assert(q_<=2 && n<=N);
-      if (q_==1)
+    static unsigned int map(unsigned int q, unsigned int n, unsigned int N) {
+      assert(q<=2 && n<=N);
+      if (q==1)
         return n;
       else
         return N+n;
     }
+    // Space Dimensions
+    unsigned int getSpaceDim(unsigned int numpanels) const{
+      return numpanels*q_;
+    }
     // Constructor
     DiscontinuousSpace() {
-      q = 2;
-      referenceshapefunctions.push_back(b1);
-      referenceshapefunctions.push_back(b2);
-      locglobmap = map;
+      q_ = 2;
+      referenceshapefunctions_.push_back(b1);
+      referenceshapefunctions_.push_back(b2);
+      locglobmap_ = map;
     }
   };
 } // namespace parametricbem2d

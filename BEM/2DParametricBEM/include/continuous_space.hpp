@@ -43,15 +43,19 @@ namespace parametricbem2d {
       return 1.;
     }
     // Local to Global Map
-    static unsigned int map(unsigned int q_, unsigned int n, unsigned int N) {
-      assert(q_<=1 && n<=N);
+    static unsigned int map(unsigned int q, unsigned int n, unsigned int N) {
+      assert(q<=1 && n<=N);
       return 1;
+    }
+    // Space Dimensions
+    unsigned int getSpaceDim(unsigned int numpanels) const{
+      return numpanels*(q_-1);
     }
     // Constructor
     ContinuousSpace() {
-      q = 1;
-      referenceshapefunctions.push_back(b1);
-      locglobmap = map;
+      q_ = 1;
+      referenceshapefunctions_.push_back(b1);
+      locglobmap_ = map;
     }
   };
 
@@ -73,19 +77,23 @@ namespace parametricbem2d {
       return 0.5*(1-t);
     }
     // Local to Global Map
-    static unsigned int map(unsigned int q_, unsigned int n, unsigned int N) {
-      assert(q_<=2 && n<=N);
-      if (q_==1)
+    static unsigned int map(unsigned int q, unsigned int n, unsigned int N) {
+      assert(q<=2 && n<=N);
+      if (q==1)
         return n;
       else
         return ((n-1)%N==0) ? N : (n-1)%N==0;
     }
+    // Space Dimensions
+    unsigned int getSpaceDim(unsigned int numpanels) const{
+      return numpanels*(q_-1);
+    }
     // Constructor
     ContinuousSpace() {
-      q = 2;
-      referenceshapefunctions.push_back(b1);
-      referenceshapefunctions.push_back(b2);
-      locglobmap = map;
+      q_ = 2;
+      referenceshapefunctions_.push_back(b1);
+      referenceshapefunctions_.push_back(b2);
+      locglobmap_ = map;
     }
   };
 
@@ -111,22 +119,26 @@ namespace parametricbem2d {
       assert(IsWithinParameterRange(t));
       return 1-t*t;
     }
-    static unsigned int map(unsigned int q_, unsigned int n, unsigned int N) {
-      assert(q_<=3 && n<=N);
-      if (q_==1)
+    static unsigned int map(unsigned int q, unsigned int n, unsigned int N) {
+      assert(q<=3 && n<=N);
+      if (q==1)
         return n;
-      else if (q_==2)
+      else if (q==2)
         return ((n-1)%N==0) ? N : (n-1)%N==0;
       else
         return N+n;
     }
+    // Space Dimensions
+    unsigned int getSpaceDim(unsigned int numpanels) const{
+      return numpanels*(q_-1);
+    }
     // Constructor
     ContinuousSpace() {
-      q = 3;
-      referenceshapefunctions.push_back(b1);
-      referenceshapefunctions.push_back(b2);
-      referenceshapefunctions.push_back(b3);
-      locglobmap = map;
+      q_ = 3;
+      referenceshapefunctions_.push_back(b1);
+      referenceshapefunctions_.push_back(b2);
+      referenceshapefunctions_.push_back(b3);
+      locglobmap_ = map;
     }
   };
 } // namespace parametricbem2d

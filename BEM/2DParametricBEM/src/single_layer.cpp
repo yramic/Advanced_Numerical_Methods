@@ -227,7 +227,7 @@ namespace parametricbem2d {
     };
 
     double integral = 0.;
-    
+
     // Getting quadrature weights and points
     Eigen::RowVectorXd weights,points;
     std::tie(points,weights) = gauleg(-1,1,N);
@@ -246,15 +246,16 @@ namespace parametricbem2d {
   Eigen::MatrixXd SingleLayerMatrix(const ParametrizedMesh mesh,
                                     const AbstractBEMSpace& space,
                                     const unsigned int& N) {
-  //anc
     using LocGlobMapPointer = AbstractBEMSpace::LocGlobMapPointer;
 
     unsigned int numpanels = mesh.getNumPanels();
+    //std::cout << "numpanels: " << numpanels << std::endl;
+    unsigned int dims = space.getSpaceDim(numpanels);
     PanelVector panels = mesh.getPanels();
     LocGlobMapPointer map = space.getLocGlobMap();
     unsigned int Q = space.getQ();
 
-    Eigen::MatrixXd output = Eigen::MatrixXd::Zero(numpanels,numpanels);
+    Eigen::MatrixXd output = Eigen::MatrixXd::Zero(dims,dims);
 
     for (unsigned int i = 0 ; i < numpanels ; ++i) {
       for (unsigned int j = 0 ; j < numpanels ; ++j) {
@@ -267,6 +268,7 @@ namespace parametricbem2d {
           for (unsigned int J = 0 ; J < Q ; ++J) {
             int II = map(I+1,i+1,numpanels)-1;
             int JJ = map(J+1,j+1,numpanels)-1;
+            //std::cout << "Local to global map of: (" <<I<<","<<J<<") to: ("<<II<<","<<JJ<<")" << std::endl;
             output(II,JJ) += interaction_matrix(I,J);
           }
         }

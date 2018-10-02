@@ -33,7 +33,7 @@ namespace parametricbem2d {
    * @param bi The basis function associated with panel \f$\Pi\f$.
    * @param bj The basis function associated with panel \f$\Pi\f$'.
    * @param N The order for gauss/log-weighted quadrature
-   * @return The (i,j)^{th} entry of the interaction matrix
+   * @return The /f$(i,j)^{th}/f$ entry of the interaction matrix
    */
   double ComputeIntegralAdjacent(const AbstractParametrizedCurve& pi,
                                  const AbstractParametrizedCurve& pi_p,
@@ -53,7 +53,7 @@ namespace parametricbem2d {
    * @param bi The basis function associated with panel \f$\Pi\f$.
    * @param bj The basis function associated with panel \f$\Pi\f$'.
    * @param N The order for gauss/log-weighted quadrature
-   * @return The (i,j)^{th} entry of the interaction matrix
+   * @return The /f$(i,j)^{th}/f$ entry of the interaction matrix
    */
   double ComputeIntegralCoinciding(const AbstractParametrizedCurve& pi,
                                    const AbstractParametrizedCurve& pi_p,
@@ -73,7 +73,7 @@ namespace parametricbem2d {
   * @param bi The basis function associated with panel \f$\Pi\f$.
   * @param bj The basis function associated with panel \f$\Pi\f$'.
   * @param N The order for gauss/log-weighted quadrature
-  * @return The (i,j)^{th} entry of the interaction matrix
+  * @return The /f$(i,j)^{th}/f$ entry of the interaction matrix
   */
   double ComputeIntegralGeneral(const AbstractParametrizedCurve& pi,
                                 const AbstractParametrizedCurve& pi_p,
@@ -99,7 +99,7 @@ namespace parametricbem2d {
    * @param space The BEM space to be used for calculations
    * @param N The order for gauss/log-weighted quadrature
    * @return An Eigen::MatrixXd type Interaction Matrix (QXQ)
-   *         where Q depends on the BEM space employed.
+   *         where Q is number of local shape functions in BEM space
    */
   Eigen::MatrixXd SingleLayer(const AbstractParametrizedCurve& pi,
                               const AbstractParametrizedCurve& pi_p,
@@ -107,24 +107,18 @@ namespace parametricbem2d {
                               const unsigned int& N);
 
   /**
-   * This function is used to evaluate the Interaction Matrix for
-   * the pair of panels \f$\Pi\f$ and \f$\Pi\f$' for the bilinear
-   * form induced by the Single Layer BIO given by the formula :
-   * \f$I_{ij}\f$ = \f$-\frac{1}{2\pi} \int_{\Pi} \int_{\Pi '} \log{ \vert x-y \vert } b^{j}_{\Pi '}(y) b^{i}_{\Pi}(x) ds(y) ds(x) \f$
-   * where \f$b^{j}_{\Pi '}\f$ & \f$b^{i}_{\Pi}\f$ are local shape functions
-   * associated with panels \f$\Pi\f$ ' and \f$\Pi\f$ respectively. \f$I\f$, the
-   * interaction matrix is of size QXQ where Q is the number of local shape
-   * functions for the used BEM space. The computation of the entries
-   * are based on cases and delegated to these functions accordingly:
-   * ComputeIntegralGeneral
-   * ComputeIntegralAdjacent
-   * ComputeIntegralCoinciding
+   * This function is used to evaluate the full Galerkin matrix based on the
+   * Bilinear form for Single Layer BIO. It uses the BEM space specified by
+   * space and the Parametrized mesh specified by mesh. It evaluates the matrix
+   * by using the function SingleLayer and panel oriented assembly based on
+   * a local to global map defined in the BEM space itself.
    *
-   * @param pi Parametrization for the first panel \f$\Pi\f$.
-   * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
+   * @param mesh ParametrizedMesh object containing all the parametrized
+   *             panels in the mesh
+   * @param space The BEM space to be used for evaluating the Galerkin matrix
    * @param space The BEM space to be used for calculations
-   * @return An Eigen::MatrixXd type Interaction Matrix (QXQ)
-   *         where Q depends on the BEM space employed.
+   * @param N Order for Gauss Quadrature
+   * @return An Eigen::MatrixXd type Galerkin Matrix for the given mesh and space
    */
   Eigen::MatrixXd SingleLayerMatrix(const ParametrizedMesh mesh,
                                     const AbstractBEMSpace& space,

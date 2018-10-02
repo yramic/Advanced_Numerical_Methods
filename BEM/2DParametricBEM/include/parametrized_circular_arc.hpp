@@ -25,9 +25,13 @@ namespace parametricbem2d {
   class ParametrizedCircularArc : public AbstractParametrizedCurve {
     public:
       /**
-       * Constructor with specified radius; default value = 1.
+       * Constructor with specified center,radius and the starting and ending
+       * polar angles
        *
-       * @param r radius of the semi circle
+       * @param center A 2-D vector containing the center for the arc
+       * @param r radius of the circular arc
+       * @param phi_start starting polar angle for the arc
+       * @param phi_end ending polar angle for the arc
        */
       ParametrizedCircularArc(Eigen::Vector2d center,
                               double r,
@@ -51,11 +55,20 @@ namespace parametricbem2d {
 
     private:
       /**
-       * Private const field for storing the radius
+       * Private const field for storing the center
        */
       const Eigen::Vector2d center_;
+      /**
+       * Private const field for storing the radius
+       */
       const double radius_;
+      /**
+       * Private const field for storing the phi_start
+       */
       const double phi_start_;
+      /**
+       * Private const field for storing the phi_end
+       */
       const double phi_end_;
   }; // class ParametrizedCircularArc
 } // namespace parametricbem2d

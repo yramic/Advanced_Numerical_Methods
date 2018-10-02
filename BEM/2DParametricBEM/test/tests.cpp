@@ -1,15 +1,12 @@
 #include <cassert>
 #include <cmath>
 #include <stdlib.h>
-
 #include <iostream>
 #include <stdexcept>
 #include <utility>
 
 #include <Eigen/Dense>
 #include "gtest/gtest.h"
-
-#define _USE_MATH_DEFINES //for pi
 #include "parametrized_line.hpp"
 #include "parametrized_semi_circle.hpp"
 #include "parametrized_fourier_sum.hpp"
@@ -20,6 +17,11 @@
 #include "single_layer.hpp"
 #include "singleLayerPotential.hpp"
 #include "parametrized_mesh.hpp"
+#include "BoundaryMesh.hpp"
+#include "buildV.hpp"
+
+
+#define _USE_MATH_DEFINES //for pi
 
 double eps = 1e-5; // A global threshold for error
 
@@ -141,16 +143,6 @@ TEST(BemSpace,DiscontinuousSpace0) {
   delete space;
 }
 
-/*TEST(LocGlobMap,DiscontinuousSpace0) {
-  parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<0>();
-  using LocGlobMapPointer = parametricbem2d::AbstractBEMSpace::LocGlobMapPointer;
-  int N = rand()%100+1;
-  int n = rand()%N+1;
-  int q = 1;
-  LocGlobMapPointer map = space->getLocGlobMap();
-  EXPECT_EQ(n,map(q,n,N));
-}*/
-
 TEST(BemSpace,DiscontinuousSpace1) {
   parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<1>();
   using BasisFunctionPointer = parametricbem2d::AbstractBEMSpace::BasisFunctionPointer;
@@ -163,16 +155,6 @@ TEST(BemSpace,DiscontinuousSpace1) {
   EXPECT_EQ(bases[1](t),0.5*t);
   delete space;
 }
-
-/*TEST(LocGlobMap,DiscontinuousSpace1) {
-  parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<1>();
-  using LocGlobMapPointer = parametricbem2d::AbstractBEMSpace::LocGlobMapPointer;
-  int N = rand()%100+1;
-  int n = rand()%N+1;
-  LocGlobMapPointer map = space->getLocGlobMap();
-  EXPECT_EQ(n,map(1,n,N));
-  EXPECT_EQ(n+N,map(2,n,N));
-}*/
 
 TEST(BemSpace,ContinuousSpace0) {
   parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::ContinuousSpace<0>();
@@ -377,7 +359,7 @@ TEST(ParametrizedMeshTest,MemberFunctions) {
   EXPECT_NEAR(vertex2(1),0,eps);
 }
 
-TEST(SingleLayer,PanelOrientedAssembly) {
+TEST(SingleLayer,PanelOrientedAssembly0) {
   using PanelVector = parametricbem2d::PanelVector;
   Eigen::Vector2d x1; x1 << 0,0; // Point (0,0)
   Eigen::Vector2d x2; x2 << 1,0; // Point (1,0)
@@ -402,7 +384,67 @@ TEST(SingleLayer,PanelOrientedAssembly) {
   unsigned int numpanels = mesh.getNumPanels();
   EXPECT_EQ(numpanels,galerkin.cols());
   EXPECT_EQ(numpanels,galerkin.rows());
-  //std::cout << galerkin << std::endl;
+}
+
+TEST(SingleLayer,PanelOrientedAssembly1) {
+  using PanelVector = parametricbem2d::PanelVector;
+  Eigen::Vector2d x1; x1 << 0,0; // Point (0,0)
+  Eigen::Vector2d x2; x2 << 1,0; // Point (1,0)
+  Eigen::Vector2d x3; x3 << 1,1; // Point (1,1)
+  Eigen::Vector2d x4; x4 << 0,1; // Point (0,1)
+  parametricbem2d::ParametrizedLine line1(x1,x2);
+  parametricbem2d::ParametrizedLine line2(x2,x3);
+  parametricbem2d::ParametrizedLine line3(x3,x4);
+  parametricbem2d::ParametrizedLine line4(x4,x1);
+  PanelVector line1panels = line1.split(1);
+  PanelVector line2panels = line2.split(1);
+  PanelVector line3panels = line3.split(1);
+  PanelVector line4panels = line4.split(1);
+  PanelVector panels;
+  panels.insert(panels.end(),line1panels.begin(),line1panels.end());
+  panels.insert(panels.end(),line2panels.begin(),line2panels.end());
+  panels.insert(panels.end(),line3panels.begin(),line3panels.end());
+  panels.insert(panels.end(),line4panels.begin(),line4panels.end());
+  parametricbem2d::ParametrizedMesh mesh(panels);
+  parametricbem2d::DiscontinuousSpace<1> space;
+  Eigen::MatrixXd galerkin = SingleLayerMatrix(mesh,space,32);
+  unsigned int numpanels = mesh.getNumPanels();
+  EXPECT_EQ(8,galerkin.cols());
+  EXPECT_EQ(8,galerkin.rows());
+}
+
+TEST(SingleLayer,CppHilbertComparison) {
+  using PanelVector = parametricbem2d::PanelVector;
+  Eigen::Vector2d x1; x1 << 0,0; // Point (0,0)
+  Eigen::Vector2d x2; x2 << 1,0; // Point (1,0)
+  Eigen::Vector2d x3; x3 << 1,1; // Point (1,1)
+  Eigen::Vector2d x4; x4 << 0,1; // Point (0,1)
+  parametricbem2d::ParametrizedLine line1(x1,x2);
+  parametricbem2d::ParametrizedLine line2(x2,x3);
+  parametricbem2d::ParametrizedLine line3(x3,x4);
+  parametricbem2d::ParametrizedLine line4(x4,x1);
+  PanelVector line1panels = line1.split(1);
+  PanelVector line2panels = line2.split(1);
+  PanelVector line3panels = line3.split(1);
+  PanelVector line4panels = line4.split(1);
+  PanelVector panels;
+  panels.insert(panels.end(),line1panels.begin(),line1panels.end());
+  panels.insert(panels.end(),line2panels.begin(),line2panels.end());
+  panels.insert(panels.end(),line3panels.begin(),line3panels.end());
+  panels.insert(panels.end(),line4panels.begin(),line4panels.end());
+  parametricbem2d::ParametrizedMesh parametrizedmesh(panels);
+  parametricbem2d::DiscontinuousSpace<0> space;
+  Eigen::MatrixXd galerkinnew = SingleLayerMatrix(parametrizedmesh,space,32);
+  Eigen::MatrixXd coords(4,2); coords << x1,x2,x3,x4;
+  Eigen::Matrix<int,4,2> elems;
+  elems << 0,1,
+           1,2,
+           2,3,
+           3,0;
+  BoundaryMesh boundarymesh(coords,elems);
+  Eigen::MatrixXd galerkinold;
+  computeV(galerkinold,boundarymesh,0);
+  EXPECT_NEAR((galerkinold-galerkinnew).norm(),0,eps);
 }
 
 int main(int argc, char **argv) {

@@ -18,61 +18,46 @@
 namespace parametricbem2d {
   /**
    * \class ParametrizedMesh
-   * \brief This abstract class provides the interface for a parametric
-   *        curve. The interface follows the one outlined in
-   *        Section 1.4.3.4 in the lecture material for
-   *        Advanced Numerical Methods for CSE.
+   * \brief This class is useful for combining parametrized panels into a
+   *        parametrized mesh which is further used in assembly of Galerkin
+   *        matrices using the parametric BEM approach.
    */
-
-  //using PanelVector = std::vector<AbstractParametrizedCurve>;
 
   class ParametrizedMesh {
     public:
-      using PanelIterator = PanelVector::iterator;
-
      /**
-      * This function is used for querying the parameter interval.
-      * The standard parameter interval [-1,1] is used and it can't
-      * be overriden in the inherited classes as the function is non
-      * virtual. The function is declared static as it is independent
-      * of the concrete object.
-      *
-      * @return A std::pair<double,double> object containing
-      *          the valid parameter range for parametrization
-      *          that is [-1,1]
+      * Constructor using a PanelVector object which contains the component
+      * panels in parametrized form for the parametrized mesh object.
       */
      ParametrizedMesh(PanelVector panels);
 
      /**
-      * This function is used for retrieving the derivative \f$\dot{\gamma}\f$(t)
-      * at a point on the parametrized curve \f$\gamma\f$(t).
-      * This is a pure virtual function which has to be implemented
-      * in the inherited classes.
+      * This function is used for retrieving a PanelVector containing all the
+      * parametrized panels in the parametrized mesh.
       *
-      * @param t Parameter value of Double type
-      *          at which the derivative for
-      *          parametrization is evaluated
-      * @return A 2-D vector of type Eigen::Vector2d
-      *         containing the parametrized
-      *         derivative at point 't'
+      * @return A PanelVector containing all the parametrized panels in the mesh
       */
      PanelVector getPanels() const;
 
      /**
-      * This function is used for checking whether a value t is within the
-      * valid parameter range. This function is non virtual to prevent it
-      * from being overriden as the parameter interval is fixed. It is
-      * declared static because the check is independent of the concrete
-      * implementation.
+      * This function is used for getting the number of panels in the
+      * parametrized mesh
       *
-      * @param t The value to be checked
-      * @return boolean indicating result of the performed check
+      * @return number of panels in the mesh
       */
      unsigned int getNumPanels() const;
 
+     /**
+      * This function is used for getting the ith vertex in the parametrized mesh
+      *
+      * @return ith vertex in the mesh as Eigen::Vector2d
+      */
      Eigen::Vector2d getVertex(unsigned int i) const;
 
    private:
+     /**
+      * Private const field for the PanelVector of the mesh
+      */
      const PanelVector panels_;
   }; // class ParametrizedMesh
 } // namespace parametricbem2d

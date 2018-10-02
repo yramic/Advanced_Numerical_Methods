@@ -22,6 +22,15 @@
  *        the 2D-Parametric BEM package.
  */
 namespace parametricbem2d {
+  // Forward declaration for using in the typedef for PanelVector
+  class AbstractParametrizedCurve;
+  /**
+   * This typedef is used for defining a vector of AbstractParametrizedCurve
+   * pointers which can store any type of parametrization derived from the
+   * abstract base class AbstractParametrizedCurve. Smart pointers are used
+   * to free up memory whenever the pointer is destroyed.
+   */
+  using PanelVector = std::vector<std::shared_ptr<AbstractParametrizedCurve>>;
   /**
    * \class AbstractParametrizedCurve
    * \brief This abstract class provides the interface for a parametric
@@ -29,9 +38,6 @@ namespace parametricbem2d {
    *        Section 1.4.3.4 in the lecture material for
    *        Advanced Numerical Methods for CSE.
    */
-  class AbstractParametrizedCurve;
-  using PanelVector = std::vector<std::shared_ptr<AbstractParametrizedCurve>>;
-  
   class AbstractParametrizedCurve {
     public:
      /**
@@ -95,20 +101,14 @@ namespace parametricbem2d {
      }
 
      /**
-      * This function is used for checking whether a value t is within the
-      * valid parameter range. This function is non virtual to prevent it
-      * from being overriden as the parameter interval is fixed. It is
-      * declared static because the check is independent of the concrete
-      * implementation.
+      * This function is used for splitting the parametrized curve into several
+      * self similar parts. It is useful to make a parametrized mesh as it
+      * returns all the part-parametrizations in the form of a PanelVector
       *
-      * @param t The value to be checked
-      * @return boolean indicating result of the performed check
+      * @param N Integer indicating the number of parts for split
+      * @return PanelVector containing all the part parametrizations
       */
      virtual PanelVector split(unsigned int N) const = 0;
-
-   protected:
-     PanelVector parametrization_parts_;
-
   }; // class AbstractParametrizedCurve
 } // namespace parametricbem2d
 

@@ -1,10 +1,4 @@
 /**
- * \file integral_gauss.hpp
- * \brief This file declares the functions to evaluate the entries of
- *        Galerkin matrices using the transformations given in section
- *        1.4.3.4 in the Lecture Notes for Advanced Numerical Methods
- *        for CSE.
- *
  * This File is a part of the 2D-Parametric BEM package
  */
 
