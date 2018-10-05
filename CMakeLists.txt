@@ -9,10 +9,10 @@ project(AdvNumCSE)
 ###########################################################################
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake/modules")
-include(${CMAKE_SOURCE_DIR}/CMake/functions/add_all_subdirectories.cmake)
-include(${CMAKE_SOURCE_DIR}/CMake/functions/add_executable_advnumcse.cmake)
-include(${CMAKE_SOURCE_DIR}/CMake/functions/add_executable_advnumcse_betl2.cmake)
-include(${CMAKE_SOURCE_DIR}/CMake/functions/get_target_name_advnumcse.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/functions/add_all_subdirectories.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/functions/add_executable_advnumcse.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/functions/add_executable_advnumcse_betl2.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/functions/get_target_name_advnumcse.cmake)
 
 ###########################################################################
 #
@@ -62,7 +62,7 @@ endif()
 # FIND EIGEN
 ###########################################################################
 
-include(${CMAKE_SOURCE_DIR}/CMake/functions/GetEIGEN3.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/functions/GetEIGEN3.cmake)
 add_definitions(-DEIGEN3_ACTIVATED)
 
 ###########################################################################

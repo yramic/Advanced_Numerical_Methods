@@ -1,4 +1,4 @@
-include(CMake/functions/get_target_name_advnumcse.cmake)
+include(cmake/functions/get_target_name_advnumcse.cmake)
 
 macro(LIST_REPLACE LIST INDEX NEWVALUE)
     list(INSERT ${LIST} ${INDEX} ${NEWVALUE})
@@ -8,7 +8,7 @@ endmacro(LIST_REPLACE)
 
 # note: install rpath is disabled for now since this is only required for relocatable binaries
 
-macro(add_executable_advnumcse _name)
+macro(add_executable_advnumcse_betl2 _name)
     # cmake targets need to be unique
     # as such we prepend a prefix from the source path
     # all of this is done by get_executable_name_advnumcse
@@ -35,8 +35,10 @@ macro(add_executable_advnumcse _name)
         RUNTIME_OUTPUT_DIRECTORY "${TARGET_RUNTIME_OUTPUT_DIRECTORY}"
         OUTPUT_NAME "${_name}"
 #        INSTALL_RPATH "@executable_path/${RELATIVE_PATH_TO_BINARY_DIR}/mathgl_install/lib"
-        )
-#    	add_dependencies(${target_name} Eigen)
+)
+	target_link_libraries(${target_name} ${BETL2_LIBRARIES})
+       	add_dependencies(${target_name} Eigen)
+        add_dependencies(${target_name} Betl2)
     endif()
 endmacro()
 
