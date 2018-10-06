@@ -3,6 +3,7 @@
 #include <istream>
 #include <cmath>
 #include <Eigen/Dense>
+#include <iomanip>
 
 using namespace Eigen;
 
@@ -21,7 +22,7 @@ MatrixXd computeAminusM(int N){
   DiagonalMatrix<double, Dynamic> AminusM(2*N+1);
 
 #if SOLUTION
-  // Diagonal for A-M stored constructed as a vector
+  // Diagonal for A-M constructed as a vector
   VectorXd AminusM_diagonal(2*N+1);
   // Just the diagonal values from \eqref{arm:dm}
   AminusM_diagonal << 0,
@@ -62,10 +63,10 @@ MatrixXd computeGammaCoefficients(const PARAM& gamma, int N){
     for(int qp=0; qp<2*N; qp++){
       double z = TR_points(qp);
       Vector2d gammaz = gamma(z);
-      // compute coeficcients ak for cosine terms
+      // compute coefficients ak for cosine terms
       cos_coefficients(k-1,0) += 1/M_PI*TR_w*gammaz(0)*cos(k*z);
       cos_coefficients(k-1,1) += 1/M_PI*TR_w*gammaz(1)*cos(k*z);
-      // compute coeficcients bk for sine terms
+      // compute coefficients bk for sine terms
       sin_coefficients(k-1,0) += 1/M_PI*TR_w*gammaz(0)*sin(k*z);
       sin_coefficients(k-1,1) += 1/M_PI*TR_w*gammaz(1)*sin(k*z);
     }// end for qp
@@ -119,6 +120,7 @@ Vector2d evaluateGammaDiff(const MatrixXd& gammaCoeffs,
 
 //----------------------------------------------------------------------------
 /* @brief Compute matrix M using periodic trapezoidal rule (2N+2 points).
+ * \tparam PARAM Type for gamma which supports evaluation operator: gamma(double)
  * \param[in] gamma Function that takes a double and returns a 2d vector
  *                  corresponding to the parametrized curve.
  * \param[in] N Discretization parameter indicating number of basis functions.
@@ -185,6 +187,8 @@ MatrixXd computeM(const PARAM& gamma, int N){
 
 //----------------------------------------------------------------------------
 /* @brief Compute right hand side using periodic trapezoidal rule (2N points).
+ * \tparam PARAM Type for gamma which supports evaluation operator: gamma(double)
+ * \tparam FUNC Type for function g which supports evaluation operator: g(double)
  * \param[in] gamma Function that takes a double and returns a 2d vector
  *                  corresponding to the parametrized curve.
  * \param[in] g Right hand side function (takes 2d points and returns a double).
@@ -221,6 +225,8 @@ VectorXd computeG(const PARAM& gamma, const FUNC& g, int N){
 
 //----------------------------------------------------------------------------
 /* @brief Build and solve boundary integral equation V rho = g
+ * \tparam PARAM Type for gamma which supports evaluation operator: gamma(double)
+ * \tparam FUNC Type for function g which supports evaluation operator: g(double)
  * \param[in] gamma Function that takes a double and returns a 2d vector
  *                  corresponding to the parametrized curve.
  * \param[in] g Right hand side function (takes 2d points and returns a double).
@@ -256,6 +262,8 @@ VectorXd solveBIE(const PARAM& gamma, const FUNC& g, int N){
   #if SOLUTION
 /* @brief Build and solve boundary integral equation V rho = g ignoring first
  *        row of the system (A has empty row for on the Disk).
+ * \tparam PARAM Type for gamma which supports evaluation operator: gamma(double)
+ * \tparam FUNC Type for function g which supports evaluation operator: g(double)
  * \param[in] gamma Function that takes a double and returns a 2d vector
  *                  corresponding to the parametrized curve.
  * \param[in] g Right hand side function (takes 2d points and returns a double).
@@ -280,6 +288,8 @@ VectorXd solveBIEonDisk(const PARAM& gamma, const FUNC& g, int N){
 
 //----------------------------------------------------------------------------
 /* @brief Reconstruct function UN from its coefficients and evaluate it at t.
+ * \tparam PARAMDER Type for gammaprime which supports evaluation operator:
+ *                  gammaprime(double)
  * \param[in] coeffs coefficients of UN
  * \param[in] t point in [0,2Pi]
  * \param[in] gammaprime Function that takes a double and returns a 2d vector
@@ -305,6 +315,8 @@ double reconstructRho(const VectorXd& coeffs, double t,
 //----------------------------------------------------------------------------
 /* @brief Compute L2 norm of UN from its coefficients using periodic trapezoidal
  *        rule (2N points).
+ * \tparam PARAMDER Type for gammaprime which supports evaluation operator:
+ *                  gammaprime(double)
  * \param[in] gammaprime Function that takes a double and returns a 2d vector
  *                       corresponding to the derivative of the curve's
  *                       parametrization.
@@ -340,6 +352,9 @@ double L2norm(const PARAMDER& gammaprime, const VectorXd& coeffs){
  *                 vector mu on the point X and using the parametrization gamma.
  *                 The integration is done using periodic trapezoidal rule
  *                 (2N+2 points).
+ * \tparam PARAM Type for gamma which supports evaluation operator: gamma(double)
+ * \tparam PARAMDER Type for gammaprime which supports evaluation operator:
+ *                  gammaprime(double)
  * \param[in] coeffs coefficients of UN.
  * \param[in] X 2d vector containing evaluation point.
  * \param[in] gamma Function that takes a double and returns a 2d vector
@@ -377,7 +392,7 @@ int main() {
 
   int N = 10;
   //----------------------------------------------------------------------------
-  std::cout << "===========  Test integration  ===========" << std::endl;
+  std::cout << "===========  Test integration errors ===========" << std::endl;
   double Qint1 = 0., Qintcos = 0., Qintlogcos2 = 0.;
 #if SOLUTION
   // Getting quadrature weights and nodes for periodic trapezoidal rule
@@ -399,7 +414,7 @@ int main() {
 	    << "\n int cosx             : " << fabs(Qintcos)
 	    << "\n int log(cosx*cosx+1) : " << fabs(Qintlogcos2 - intlogcos2ex)
 	    << std::endl;
-  std::cout << "==========================================" << std::endl
+  std::cout << "================================================" << std::endl
 	    << std::endl;
 
 
@@ -431,9 +446,11 @@ int main() {
 #endif // TEMPLATE
   // Calculating gamma(s)-gamma(t) exactly
   Vector2d exDiffS; exDiffS<< cos(0.1) - cos(0), sin(0.1);
-  std::cout << "(S(0.1)-S(0))/||S(0.1)-S(0)|| = " << diffS.transpose() << " vs "
+  std::cout << "(S(0.1)-S(0))/||S(0.1)-S(0)|| = " << std::endl;
+  std::cout << "Calculated" << std::setw(20) << "Exact" <<  std::endl;
+  std::cout << diffS.transpose()(0) << ", " << diffS.transpose()(1) << std::setw(16)
       // Calculating (gamma(s)-gamma(t))/||S_hat(s)-S_hat(t)|| ; gamma = S = S_hat
-	    << exDiffS(0)/exDiffS.norm() << " , " << exDiffS(1)/exDiffS.norm()
+	    << exDiffS(0)/exDiffS.norm() << ", " << exDiffS(1)/exDiffS.norm()
 	    << std::endl;
   std::cout << "=============================================================="
 	    << "============" << std::endl << std::endl;
@@ -458,9 +475,11 @@ int main() {
   #endif // TEMPLATE
   // Calculating gamma(s)-gamma(t) exactly
   Vector2d exDiffgamma = gamma(0.1) - gamma(0);
-  std::cout << "(gamma (0.1) - gamma(0))//S(0.1)-S(0) = " << diffGamma.transpose()
+  std::cout << "(gamma (0.1) - gamma(0))/||S(0.1)-S(0)|| = " << std::endl;
+  std::cout << "Calculated" << std::setw(20) << "Exact" <<  std::endl;
+  std::cout << diffGamma.transpose() << std::setw(8)
       // Calculating (gamma(s)-gamma(t))/||S_hat(s)-S_hat(t)||
-	    << " vs " << exDiffgamma.transpose()/exDiffS.norm() << std::endl;
+	    << exDiffgamma.transpose()/exDiffS.norm() << std::endl;
   std::cout << "============================================================="
 	    << "=============" << std::endl << std::endl;
 
@@ -468,12 +487,16 @@ int main() {
   //----------------------------------------------------------------------------
   std::cout << "=====  Test system for S(t) = (cos(t), sin(t))  ====="
 	    << std::endl;
+  // Assigning Lambda expression to the function gC
   std::function<double(const Vector2d&)> gC = [](const Vector2d& X){
     return X(0);
   };
 
+  // Getting coefficients
   VectorXd solC = solveBIEonDisk(S, gC, 10);
+  // Adding 0 to the solution as solveBIEonDisk ignores the empty first row
   VectorXd solE(21); solE << 0, solC;
+  // Reconstructing rho from the coefficients
   double solCEval = reconstructRho(solE, M_PI, Sprime);
   std::cout << "ERROR for evaluating at PI: " << fabs(solCEval- gC(S(M_PI))*2 )
 	    << std::endl;
