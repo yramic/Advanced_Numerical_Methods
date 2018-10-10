@@ -82,7 +82,7 @@ namespace parametricbem2d {
       if (q==1)
         return n;
       else
-        return ((n-1)%N==0) ? N : (n-1)%N==0;
+        return ((n-1)%N==0) ? N : (n-1);
     }
     // Space Dimensions
     unsigned int getSpaceDim(unsigned int numpanels) const{
@@ -124,7 +124,7 @@ namespace parametricbem2d {
       if (q==1)
         return n;
       else if (q==2)
-        return ((n-1)%N==0) ? N : (n-1)%N==0;
+        return ((n-1)%N==0) ? N : (n-1);
       else
         return N+n;
     }

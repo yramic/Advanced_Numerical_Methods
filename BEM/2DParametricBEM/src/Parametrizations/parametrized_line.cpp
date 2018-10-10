@@ -38,6 +38,13 @@ namespace parametricbem2d {
     return derivative;
   }
 
+  Eigen::Vector2d ParametrizedLine::DoubleDerivative(double t) const {
+    assert(IsWithinParameterRange(t));
+    // Double Derivative of the linear interpolation used in function operator()
+    Eigen::Vector2d double_derivative(0,0);
+    return double_derivative;
+  }
+
   PanelVector ParametrizedLine::split(unsigned int N) const {
     PanelVector parametrization_parts;
     for (int i = 0 ; i < N ; ++i) {

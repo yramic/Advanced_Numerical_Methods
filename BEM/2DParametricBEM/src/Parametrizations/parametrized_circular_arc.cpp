@@ -47,6 +47,16 @@ namespace parametricbem2d {
     return derivative;
   }
 
+  Eigen::Vector2d ParametrizedCircularArc::DoubleDerivative(double t) const {
+    assert(IsWithinParameterRange(t));
+    // Derivative of the polar coordinaties used in the function operator()
+    double mean = (phi_start_ + phi_end_)/2.;
+    double diff = (phi_end_ - phi_start_)/2.;
+    Eigen::Vector2d double_derivative(-radius_*diff*diff*cos(t*diff + mean),
+                                      -radius_*diff*diff*sin(t*diff + mean));
+    return double_derivative;
+  }
+
   PanelVector ParametrizedCircularArc::split(unsigned int N) const {
     PanelVector parametrization_parts;
     for (int i = 0 ; i < N ; ++i) {

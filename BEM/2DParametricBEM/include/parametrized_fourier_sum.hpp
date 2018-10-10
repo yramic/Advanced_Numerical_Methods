@@ -50,6 +50,11 @@ namespace parametricbem2d {
       /**
        * See documentation in AbstractParametrizedCurve
        */
+      Eigen::Vector2d DoubleDerivative(double) const;
+
+      /**
+       * See documentation in AbstractParametrizedCurve
+       */
       PanelVector split(unsigned int) const;
 
     private:

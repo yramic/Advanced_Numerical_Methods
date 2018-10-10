@@ -85,6 +85,22 @@ namespace parametricbem2d {
      virtual Eigen::Vector2d Derivative(double t) const = 0;
 
      /**
+      * This function is used for retrieving the double derivative
+      * \f$\ddot{\gamma}\f$(t)
+      * at a point on the parametrized curve \f$\gamma\f$(t).
+      * This is a pure virtual function which has to be implemented
+      * in the inherited classes.
+      *
+      * @param t Parameter value of Double type
+      *          at which the double derivative for
+      *          the parametrization is evaluated
+      * @return A 2-D vector of type Eigen::Vector2d
+      *         containing the parametrized double
+      *         derivative at point 't'
+      */
+     virtual Eigen::Vector2d DoubleDerivative(double t) const = 0;
+
+     /**
       * This function is used for checking whether a value t is within the
       * valid parameter range. This function is non virtual to prevent it
       * from being overriden as the parameter interval is fixed. It is

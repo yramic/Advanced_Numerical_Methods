@@ -33,8 +33,15 @@ namespace parametricbem2d {
   Eigen::Vector2d ParametrizedSemiCircle::Derivative(double t) const {
     assert(IsWithinParameterRange(t));
     // Derivative of the polar coordinaties used in the function operator()
-    Eigen::Vector2d derivative(-radius_*M_PI*sin(M_PI*t/2.)/2.,M_PI*radius_*cos(M_PI*t/2.)/2.);
+    Eigen::Vector2d derivative(-radius_*M_PI*sin(M_PI*t/2.)/2.,
+                                M_PI*radius_*cos(M_PI*t/2.)/2.);
     return derivative;
+  }
+
+  Eigen::Vector2d ParametrizedSemiCircle::DoubleDerivative(double t) const {
+    assert(IsWithinParameterRange(t));
+    // Double Derivative of the polar coordinaties in the function operator()
+    return -M_PI*M_PI/4.*operator() (t);
   }
 
   PanelVector ParametrizedSemiCircle::split(unsigned int N) const {
