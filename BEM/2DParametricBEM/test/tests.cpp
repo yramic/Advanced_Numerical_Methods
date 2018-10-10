@@ -15,10 +15,14 @@
 #include "discontinuous_space.hpp"
 #include "continuous_space.hpp"
 #include "single_layer.hpp"
+#include "double_layer.hpp"
 #include "singleLayerPotential.hpp"
+#include "doubleLayerPotential.hpp"
 #include "parametrized_mesh.hpp"
 #include "BoundaryMesh.hpp"
 #include "buildV.hpp"
+#include "buildK.hpp"
+#include "integral_gauss.hpp"
 
 
 #define _USE_MATH_DEFINES //for pi
@@ -131,6 +135,15 @@ TEST(InterfaceTest,IsWithinParameterRange) {
   EXPECT_EQ(true,parametricbem2d::ParametrizedSemiCircle::IsWithinParameterRange(-0.99));
 }
 
+double integrand(double x) {
+  return x*x;
+}
+
+TEST(IntegralGauss,ComputeIntegral) {
+  double integral = parametricbem2d::ComputeIntegral(integrand,0,1,10);
+  EXPECT_NEAR(integral,1./3.,eps);
+}
+
 TEST(BemSpace,DiscontinuousSpace0) {
   parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<0>();
   using BasisFunctionPointer = parametricbem2d::AbstractBEMSpace::BasisFunctionPointer;
@@ -203,10 +216,10 @@ TEST(SingleLayer_0,CoincidingPanels) {
   parametricbem2d::ParametrizedLine parametrization(x1,x2);
   //parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<0>();
   parametricbem2d::DiscontinuousSpace<0> space;
-  Eigen::MatrixXd interaction_matrix = SingleLayer(parametrization,
-                                                   parametrization,
-                                                   space,
-                                                   32);
+  Eigen::MatrixXd interaction_matrix = parametricbem2d::single_layer::SingleLayer(parametrization,
+                                                                                  parametrization,
+                                                                                  space,
+                                                                                  32);
 
   double old_lib_soln = computeVij(x1,x2,x1,x2,0.);
   EXPECT_NEAR(interaction_matrix(0,0),old_lib_soln,eps);
@@ -221,10 +234,10 @@ TEST(SingleLayer_0,AdjacentPanels) {
   parametricbem2d::ParametrizedLine panel2(x2,x3);
   //parametricbem2d::AbstractBEMSpace *space = new parametricbem2d::DiscontinuousSpace<0>();
   parametricbem2d::DiscontinuousSpace<0> space;
-  Eigen::MatrixXd interaction_matrix = SingleLayer(panel1,
-                                                   panel2,
-                                                   space,
-                                                   32);
+  Eigen::MatrixXd interaction_matrix = parametricbem2d::single_layer::SingleLayer(panel1,
+                                                                                  panel2,
+                                                                                  space,
+                                                                                  32);
 
   double old_lib_soln = computeVij(x1,x2,x2,x3,0.);
   EXPECT_NEAR(interaction_matrix(0,0),old_lib_soln,eps);
@@ -239,10 +252,10 @@ TEST(SingleLayer_0,General) {
   parametricbem2d::ParametrizedLine panel1(x1,x2);
   parametricbem2d::ParametrizedLine panel2(x3,x4);
   parametricbem2d::DiscontinuousSpace<0> space;
-  Eigen::MatrixXd interaction_matrix = SingleLayer(panel1,
-                                                   panel2,
-                                                   space,
-                                                   33);
+  Eigen::MatrixXd interaction_matrix = parametricbem2d::single_layer::SingleLayer(panel1,
+                                                                                  panel2,
+                                                                                  space,
+                                                                                  33);
 
   double old_lib_soln = computeVij(x1,x2,x3,x4,0.);
   EXPECT_NEAR(interaction_matrix(0,0),old_lib_soln,eps);
@@ -359,7 +372,7 @@ TEST(ParametrizedMeshTest,MemberFunctions) {
   EXPECT_NEAR(vertex2(1),0,eps);
 }
 
-TEST(SingleLayer,PanelOrientedAssembly0) {
+TEST(SingleLayer_0,PanelOrientedAssembly) {
   using PanelVector = parametricbem2d::PanelVector;
   Eigen::Vector2d x1; x1 << 0,0; // Point (0,0)
   Eigen::Vector2d x2; x2 << 1,0; // Point (1,0)
@@ -380,13 +393,13 @@ TEST(SingleLayer,PanelOrientedAssembly0) {
   panels.insert(panels.end(),line4panels.begin(),line4panels.end());
   parametricbem2d::ParametrizedMesh mesh(panels);
   parametricbem2d::DiscontinuousSpace<0> space;
-  Eigen::MatrixXd galerkin = SingleLayerMatrix(mesh,space,32);
+  Eigen::MatrixXd galerkin = parametricbem2d::single_layer::SingleLayerMatrix(mesh,space,32);
   unsigned int numpanels = mesh.getNumPanels();
   EXPECT_EQ(numpanels,galerkin.cols());
   EXPECT_EQ(numpanels,galerkin.rows());
 }
 
-TEST(SingleLayer,PanelOrientedAssembly1) {
+TEST(SingleLayer_1,PanelOrientedAssembly) {
   using PanelVector = parametricbem2d::PanelVector;
   Eigen::Vector2d x1; x1 << 0,0; // Point (0,0)
   Eigen::Vector2d x2; x2 << 1,0; // Point (1,0)
@@ -407,13 +420,13 @@ TEST(SingleLayer,PanelOrientedAssembly1) {
   panels.insert(panels.end(),line4panels.begin(),line4panels.end());
   parametricbem2d::ParametrizedMesh mesh(panels);
   parametricbem2d::DiscontinuousSpace<1> space;
-  Eigen::MatrixXd galerkin = SingleLayerMatrix(mesh,space,32);
+  Eigen::MatrixXd galerkin = parametricbem2d::single_layer::SingleLayerMatrix(mesh,space,32);
   unsigned int numpanels = mesh.getNumPanels();
   EXPECT_EQ(8,galerkin.cols());
   EXPECT_EQ(8,galerkin.rows());
 }
 
-TEST(SingleLayer,CppHilbertComparison) {
+TEST(SingleLayer_0,CppHilbertComparison) {
   using PanelVector = parametricbem2d::PanelVector;
   Eigen::Vector2d x1; x1 << 0,0; // Point (0,0)
   Eigen::Vector2d x2; x2 << 1,0; // Point (1,0)
@@ -434,7 +447,7 @@ TEST(SingleLayer,CppHilbertComparison) {
   panels.insert(panels.end(),line4panels.begin(),line4panels.end());
   parametricbem2d::ParametrizedMesh parametrizedmesh(panels);
   parametricbem2d::DiscontinuousSpace<0> space;
-  Eigen::MatrixXd galerkinnew = SingleLayerMatrix(parametrizedmesh,space,32);
+  Eigen::MatrixXd galerkinnew = parametricbem2d::single_layer::SingleLayerMatrix(parametrizedmesh,space,32);
   Eigen::MatrixXd coords(4,2); coords << x1,x2,x3,x4;
   Eigen::Matrix<int,4,2> elems;
   elems << 0,1,
@@ -445,6 +458,246 @@ TEST(SingleLayer,CppHilbertComparison) {
   Eigen::MatrixXd galerkinold;
   computeV(galerkinold,boundarymesh,0);
   EXPECT_NEAR((galerkinold-galerkinnew).norm(),0,eps);
+}
+
+TEST(DoubleLayer_1_0,CoincidingPanels) {
+  // Test for the single layer
+  Eigen::Vector2d x1; x1 << 0,1; // Point (0,1)
+  Eigen::Vector2d x2; x2 << 1,0; // Point (1,0)
+  parametricbem2d::ParametrizedLine parametrization(x1,x2);
+  parametricbem2d::DiscontinuousSpace<0> test_space;
+  parametricbem2d::ContinuousSpace<1> trial_space;
+  Eigen::MatrixXd interaction_matrix = parametricbem2d::double_layer::DoubleLayer(parametrization,
+                                                                                  parametrization,
+                                                                                  trial_space,
+                                                                                  test_space,
+                                                                                  32);
+
+  //double old_lib_soln = computeVij(x1,x2,x1,x2,0.);
+  double I0,I1;
+  computeKij(&I0,&I1,0.,x1,x2,x1,x2);
+  //std::cout << "CoincidingPanels; Old lib won't work directly; case handled outside the function" << std::endl;
+  //std::cout << "I0-I1: " << I0-I1 << "; I0+I1: " << I0+I1 << std::endl;
+  //std::cout <<interaction_matrix << std::endl;
+  //EXPECT_NEAR(interaction_matrix(0,0),old_lib_soln,eps);
+}
+
+TEST(DoubleLayer_1_0,AdjacentPanels) {
+  // Test for the single layer
+  Eigen::Vector2d x1; x1 << 3,4; // Point (0,1)
+  Eigen::Vector2d x2; x2 << 7,8; // Point (1,0)
+  Eigen::Vector2d x3; x3 << 11,15; // Point (0,-1)
+  parametricbem2d::ParametrizedLine panel1(x1,x2);
+  parametricbem2d::ParametrizedLine panel2(x2,x3);
+  parametricbem2d::DiscontinuousSpace<0> test_space;
+  parametricbem2d::ContinuousSpace<1> trial_space;
+  Eigen::MatrixXd interaction_matrix = parametricbem2d::double_layer::DoubleLayer(panel1,
+                                                                                  panel2,
+                                                                                  trial_space,
+                                                                                  test_space,
+                                                                                  32);
+  double I0,I1;
+  computeKij(&I0,&I1,0.,x1,x2,x2,x3);
+  //std::cout << "AdjacentPanels" << std::endl;
+  //std::cout << "I0-I1: " << I0-I1 << "; I0+I1: " << I0+I1 << std::endl;
+  //std::cout <<interaction_matrix << std::endl;
+  //EXPECT_NEAR(interaction_matrix(0,0),old_lib_soln,eps);
+}
+
+TEST(DoubleLayer_1_0,General) {
+  // Test for the single layer
+  Eigen::Vector2d x1; x1 << 0,1; // Point (0,1)
+  Eigen::Vector2d x2; x2 << 1,0; // Point (1,0)
+  Eigen::Vector2d x3; x3 << 0,-1; // Point (0,-1)
+  Eigen::Vector2d x4; x4 << -1,0; // Point (-1,0)
+  parametricbem2d::ParametrizedLine panel1(x1,x2);
+  parametricbem2d::ParametrizedLine panel2(x3,x4);
+  parametricbem2d::DiscontinuousSpace<0> test_space;
+  parametricbem2d::ContinuousSpace<1> trial_space;
+  Eigen::MatrixXd interaction_matrix = parametricbem2d::double_layer::DoubleLayer(panel1,
+                                                                                  panel2,
+                                                                                  trial_space,
+                                                                                  test_space,
+                                                                                  32);
+
+  //double old_lib_soln = computeVij(x1,x2,x3,x4,0.);
+  double I0,I1;
+  computeKij(&I0,&I1,0.,x1,x2,x3,x4);
+  //std::cout << "General" << std::endl;
+  //std::cout << "I0-I1: " << I0-I1 << "; I0+I1: " << I0+I1 << std::endl;
+  //std::cout <<interaction_matrix << std::endl;
+  //EXPECT_NEAR(interaction_matrix(0,0),old_lib_soln,eps);
+}
+
+TEST(DoubleLayer_0_0,CoincidingPanels) {
+  // Test for the single layer
+  Eigen::Vector2d x1; x1 << 0,1; // Point (0,1)
+  Eigen::Vector2d x2; x2 << 1,0; // Point (1,0)
+  parametricbem2d::ParametrizedLine parametrization(x1,x2);
+  parametricbem2d::DiscontinuousSpace<0> test_space;
+  parametricbem2d::DiscontinuousSpace<0> trial_space;
+  Eigen::MatrixXd interaction_matrix = parametricbem2d::double_layer::DoubleLayer(parametrization,
+                                                                                  parametrization,
+                                                                                  trial_space,
+                                                                                  test_space,
+                                                                                  32);
+
+  //double old_lib_soln = computeVij(x1,x2,x1,x2,0.);
+  double I0,I1;
+  computeKij(&I0,&I1,0.,x1,x2,x1,x2);
+  //std::cout << "CoincidingPanels; Old lib won't work directly; case handled outside the function" << std::endl;
+  //std::cout << "2*I0 " << 2*I0 << std::endl;
+  //std::cout <<interaction_matrix << std::endl;
+  //EXPECT_NEAR(interaction_matrix(0,0),old_lib_soln,eps);
+}
+
+TEST(DoubleLayer_0_0,AdjacentPanels) {
+  // Test for the single layer
+  Eigen::Vector2d x1; x1 << 3,4; // Point (0,1)
+  Eigen::Vector2d x2; x2 << 7,8; // Point (1,0)
+  Eigen::Vector2d x3; x3 << 11,15; // Point (0,-1)
+  parametricbem2d::ParametrizedLine panel1(x1,x2);
+  parametricbem2d::ParametrizedLine panel2(x2,x3);
+  parametricbem2d::DiscontinuousSpace<0> test_space;
+  parametricbem2d::DiscontinuousSpace<0> trial_space;
+  Eigen::MatrixXd interaction_matrix = parametricbem2d::double_layer::DoubleLayer(panel1,
+                                                                                  panel2,
+                                                                                  trial_space,
+                                                                                  test_space,
+                                                                                  32);
+  double I0,I1;
+  computeKij(&I0,&I1,0.,x1,x2,x2,x3);
+  //std::cout << "AdjacentPanels" << std::endl;
+  //std::cout << "2*I0 " << 2*I0 << std::endl;
+  //std::cout <<interaction_matrix << std::endl;
+  //EXPECT_NEAR(interaction_matrix(0,0),old_lib_soln,eps);
+}
+
+TEST(DoubleLayer_0_0,General) {
+  // Test for the single layer
+  Eigen::Vector2d x1; x1 << 0,1; // Point (0,1)
+  Eigen::Vector2d x2; x2 << 1,0; // Point (1,0)
+  Eigen::Vector2d x3; x3 << 0,-1; // Point (0,-1)
+  Eigen::Vector2d x4; x4 << -1,0; // Point (-1,0)
+  parametricbem2d::ParametrizedLine panel1(x1,x2);
+  parametricbem2d::ParametrizedLine panel2(x3,x4);
+  parametricbem2d::DiscontinuousSpace<0> test_space;
+  parametricbem2d::DiscontinuousSpace<0> trial_space;
+  Eigen::MatrixXd interaction_matrix = parametricbem2d::double_layer::DoubleLayer(panel1,
+                                                                                  panel2,
+                                                                                  trial_space,
+                                                                                  test_space,
+                                                                                  32);
+
+  //double old_lib_soln = computeVij(x1,x2,x3,x4,0.);
+  double I0,I1;
+  computeKij(&I0,&I1,0.,x1,x2,x3,x4);
+  //std::cout << "General" << std::endl;
+  //std::cout << "2*I0 " << 2*I0 << std::endl;
+  //std::cout <<interaction_matrix << std::endl;
+  //EXPECT_NEAR(interaction_matrix(0,0),old_lib_soln,eps);
+}
+
+TEST(DoubleLayer_1_0,PanelOrientedAssembly) {
+  using PanelVector = parametricbem2d::PanelVector;
+  Eigen::Vector2d x1; x1 << 0,0; // Point (0,0)
+  Eigen::Vector2d x2; x2 << 1,0; // Point (1,0)
+  Eigen::Vector2d x3; x3 << 1,1; // Point (1,1)
+  Eigen::Vector2d x4; x4 << 0,1; // Point (0,1)
+  parametricbem2d::ParametrizedLine line1(x1,x2);
+  parametricbem2d::ParametrizedLine line2(x2,x3);
+  parametricbem2d::ParametrizedLine line3(x3,x4);
+  parametricbem2d::ParametrizedLine line4(x4,x1);
+  PanelVector line1panels = line1.split(1);
+  PanelVector line2panels = line2.split(2);
+  PanelVector line3panels = line3.split(3);
+  PanelVector line4panels = line4.split(4);
+  PanelVector panels;
+  panels.insert(panels.end(),line1panels.begin(),line1panels.end());
+  panels.insert(panels.end(),line2panels.begin(),line2panels.end());
+  panels.insert(panels.end(),line3panels.begin(),line3panels.end());
+  panels.insert(panels.end(),line4panels.begin(),line4panels.end());
+  parametricbem2d::ParametrizedMesh mesh(panels);
+  parametricbem2d::DiscontinuousSpace<0> test_space;
+  parametricbem2d::ContinuousSpace<1> trial_space;
+  Eigen::MatrixXd galerkin = parametricbem2d::double_layer::DoubleLayerMatrix(mesh,
+                                                                              trial_space,
+                                                                              test_space,
+                                                                              32);
+  unsigned int numpanels = mesh.getNumPanels();
+  EXPECT_EQ(numpanels,galerkin.cols());
+  EXPECT_EQ(numpanels,galerkin.rows());
+}
+
+TEST(DoubleLayer_0_0,PanelOrientedAssembly) {
+  using PanelVector = parametricbem2d::PanelVector;
+  Eigen::Vector2d x1; x1 << 0,0; // Point (0,0)
+  Eigen::Vector2d x2; x2 << 1,0; // Point (1,0)
+  Eigen::Vector2d x3; x3 << 1,1; // Point (1,1)
+  Eigen::Vector2d x4; x4 << 0,1; // Point (0,1)
+  parametricbem2d::ParametrizedLine line1(x1,x2);
+  parametricbem2d::ParametrizedLine line2(x2,x3);
+  parametricbem2d::ParametrizedLine line3(x3,x4);
+  parametricbem2d::ParametrizedLine line4(x4,x1);
+  PanelVector line1panels = line1.split(1);
+  PanelVector line2panels = line2.split(2);
+  PanelVector line3panels = line3.split(3);
+  PanelVector line4panels = line4.split(4);
+  PanelVector panels;
+  panels.insert(panels.end(),line1panels.begin(),line1panels.end());
+  panels.insert(panels.end(),line2panels.begin(),line2panels.end());
+  panels.insert(panels.end(),line3panels.begin(),line3panels.end());
+  panels.insert(panels.end(),line4panels.begin(),line4panels.end());
+  parametricbem2d::ParametrizedMesh mesh(panels);
+  parametricbem2d::DiscontinuousSpace<0> test_space;
+  parametricbem2d::DiscontinuousSpace<0> trial_space;
+  Eigen::MatrixXd galerkin = parametricbem2d::double_layer::DoubleLayerMatrix(mesh,
+                                                                              trial_space,
+                                                                              test_space,
+                                                                              32);
+  unsigned int numpanels = mesh.getNumPanels();
+  EXPECT_EQ(numpanels,galerkin.cols());
+  EXPECT_EQ(numpanels,galerkin.rows());
+}
+
+TEST(DoubleLayer_1_0,CppHilbertComparison) {
+  using PanelVector = parametricbem2d::PanelVector;
+  Eigen::Vector2d x1; x1 << 0,0; // Point (0,0)
+  Eigen::Vector2d x2; x2 << 1,0; // Point (1,0)
+  Eigen::Vector2d x3; x3 << 1,.5; // Point (1,1)
+  Eigen::Vector2d x4; x4 << 0,1; // Point (0,1)
+  parametricbem2d::ParametrizedLine line1(x1,x2);
+  parametricbem2d::ParametrizedLine line2(x2,x3);
+  parametricbem2d::ParametrizedLine line3(x3,x4);
+  parametricbem2d::ParametrizedLine line4(x4,x1);
+  PanelVector line1panels = line1.split(1);
+  PanelVector line2panels = line2.split(1);
+  PanelVector line3panels = line3.split(1);
+  PanelVector line4panels = line4.split(1);
+  PanelVector panels;
+  panels.insert(panels.end(),line1panels.begin(),line1panels.end());
+  panels.insert(panels.end(),line2panels.begin(),line2panels.end());
+  panels.insert(panels.end(),line3panels.begin(),line3panels.end());
+  panels.insert(panels.end(),line4panels.begin(),line4panels.end());
+  parametricbem2d::ParametrizedMesh parametrizedmesh(panels);
+  parametricbem2d::DiscontinuousSpace<0> test_space;
+  parametricbem2d::ContinuousSpace<1> trial_space;
+  Eigen::MatrixXd galerkin = parametricbem2d::double_layer::DoubleLayerMatrix(parametrizedmesh,
+                                                                              trial_space,
+                                                                              test_space,
+                                                                              32);
+  Eigen::MatrixXd coords(4,2); coords << x1,x2,x3,x4;
+  Eigen::Matrix<int,4,2> elems;
+  elems << 0,1,
+           1,2,
+           2,3,
+           3,0;
+  BoundaryMesh boundarymesh(coords,elems);
+  Eigen::MatrixXd galerkinold;
+  computeK(galerkinold,boundarymesh,0);
+  //EXPECT_NEAR((galerkinold-galerkinnew).norm(),0,eps);
+  std::cout << "Old lib \n" << galerkinold << std::endl;
+  std::cout << "New lib \n" << galerkin << std::endl;
 }
 
 int main(int argc, char **argv) {
