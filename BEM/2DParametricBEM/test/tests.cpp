@@ -664,7 +664,7 @@ TEST(DoubleLayer_1_0,CppHilbertComparison) {
   using PanelVector = parametricbem2d::PanelVector;
   Eigen::Vector2d x1; x1 << 0,0; // Point (0,0)
   Eigen::Vector2d x2; x2 << 1,0; // Point (1,0)
-  Eigen::Vector2d x3; x3 << 1,.5; // Point (1,1)
+  Eigen::Vector2d x3; x3 << 1,.5 ; // Point (1,1)
   Eigen::Vector2d x4; x4 << 0,1; // Point (0,1)
   parametricbem2d::ParametrizedLine line1(x1,x2);
   parametricbem2d::ParametrizedLine line2(x2,x3);
@@ -695,6 +695,46 @@ TEST(DoubleLayer_1_0,CppHilbertComparison) {
   BoundaryMesh boundarymesh(coords,elems);
   Eigen::MatrixXd galerkinold;
   computeK(galerkinold,boundarymesh,0);
+  //EXPECT_NEAR((galerkinold-galerkinnew).norm(),0,eps);
+  std::cout << "Old lib \n" << galerkinold << std::endl;
+  std::cout << "New lib \n" << galerkin << std::endl;
+}
+
+TEST(DoubleLayer_0_0,CppHilbertComparison) {
+  using PanelVector = parametricbem2d::PanelVector;
+  Eigen::Vector2d x1; x1 << 0,0; // Point (0,0)
+  Eigen::Vector2d x2; x2 << 1,0; // Point (1,0)
+  Eigen::Vector2d x3; x3 << 1,.5 ; // Point (1,1)
+  Eigen::Vector2d x4; x4 << 0,1; // Point (0,1)
+  parametricbem2d::ParametrizedLine line1(x1,x2);
+  parametricbem2d::ParametrizedLine line2(x2,x3);
+  parametricbem2d::ParametrizedLine line3(x3,x4);
+  parametricbem2d::ParametrizedLine line4(x4,x1);
+  PanelVector line1panels = line1.split(1);
+  PanelVector line2panels = line2.split(1);
+  PanelVector line3panels = line3.split(1);
+  PanelVector line4panels = line4.split(1);
+  PanelVector panels;
+  panels.insert(panels.end(),line1panels.begin(),line1panels.end());
+  panels.insert(panels.end(),line2panels.begin(),line2panels.end());
+  panels.insert(panels.end(),line3panels.begin(),line3panels.end());
+  panels.insert(panels.end(),line4panels.begin(),line4panels.end());
+  parametricbem2d::ParametrizedMesh parametrizedmesh(panels);
+  parametricbem2d::DiscontinuousSpace<0> test_space;
+  parametricbem2d::DiscontinuousSpace<0> trial_space;
+  Eigen::MatrixXd galerkin = parametricbem2d::double_layer::DoubleLayerMatrix(parametrizedmesh,
+                                                                              trial_space,
+                                                                              test_space,
+                                                                              32);
+  Eigen::MatrixXd coords(4,2); coords << x1,x2,x3,x4;
+  Eigen::Matrix<int,4,2> elems;
+  elems << 0,1,
+           1,2,
+           2,3,
+           3,0;
+  BoundaryMesh boundarymesh(coords,elems);
+  Eigen::MatrixXd galerkinold;
+  computeK00(galerkinold,boundarymesh,0);
   //EXPECT_NEAR((galerkinold-galerkinnew).norm(),0,eps);
   std::cout << "Old lib \n" << galerkinold << std::endl;
   std::cout << "New lib \n" << galerkin << std::endl;
