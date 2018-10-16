@@ -24,7 +24,7 @@ MatrixXd computeAminusM(int N){
 #if SOLUTION
   // Diagonal for A-M constructed as a vector
   VectorXd AminusM_diagonal(2*N+1);
-  // Just the diagonal values from \eqref{arm:dm}
+  // Just the diagonal values
   AminusM_diagonal << 0,
                       VectorXd::LinSpaced(N,1,N).cwiseInverse()*(M_PI/2.),
                       VectorXd::LinSpaced(N,1,N).cwiseInverse()*(M_PI/2.);
@@ -98,7 +98,7 @@ Vector2d evaluateGammaDiff(const MatrixXd& gammaCoeffs,
   for(int k=1; k<=N; k++){
     double Un; // this is actually $U_{n-1}$
     if(fabs(s-t) < 1e-5)
-      Un = k; // Using limit for s-t -> 0
+      Un = k; // Using limit for $s-t \to 0$
     else
       Un = sin(k*(s-t)/2.)/(sin((s-t)/2.));
 
@@ -139,7 +139,7 @@ MatrixXd computeM(const PARAM& gamma, int N){
   Mcc.setZero(); Mss.setZero(); Msc.setZero();
 
   // In order to have a smooth integrand, we use the formula derived on 1.8.b
-  // Get coefficients for Gamma in (1.0.42)
+  // Get coefficients for Gamma
   MatrixXd gammaCoeffs = computeGammaCoefficients(gamma,N);
   // Create variable multiplying quadrature weights and integral scaling
   double coeff = -TR_w*TR_w/(4.*M_PI);

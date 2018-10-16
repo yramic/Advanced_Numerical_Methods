@@ -1,0 +1,9 @@
+{
+    "author" : "scapina",
+    "email" : "andrea.scapin@sam.math.ethz.ch",
+    "contributors" : "",
+
+    "name": "FastSpectralGal",
+    "solutions" : ["FSGmain.cpp"],
+    "templates" : ["FSGmain.cpp"]
+}

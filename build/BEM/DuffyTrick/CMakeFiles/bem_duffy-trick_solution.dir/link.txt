@@ -1,0 +1,1 @@
+/usr/lib64/ccache/c++  -g  -rdynamic CMakeFiles/bem_duffy-trick_solution.dir/main.cpp.o  -o ../../bin/BEM/DuffyTrick/solution  -L/home/excalibur/AdvNum/Code/build/ethGenericGrid_install/lib  -L/home/excalibur/AdvNum/Code/build/betl2_install/lib 
