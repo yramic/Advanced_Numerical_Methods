@@ -1,0 +1,2 @@
+/usr/bin/ar qc libquadrature.a  
+/usr/bin/ranlib libquadrature.a

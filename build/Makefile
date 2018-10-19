@@ -378,6 +378,32 @@ bem_duffy-trick_solution/fast:
 .PHONY : bem_duffy-trick_solution/fast
 
 #=============================================================================
+# Target rules for targets named bem_fast-spectral-gal_template
+
+# Build rule for target.
+bem_fast-spectral-gal_template: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 bem_fast-spectral-gal_template
+.PHONY : bem_fast-spectral-gal_template
+
+# fast build rule for target.
+bem_fast-spectral-gal_template/fast:
+	$(MAKE) -f BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir/build.make BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir/build
+.PHONY : bem_fast-spectral-gal_template/fast
+
+#=============================================================================
+# Target rules for targets named bem_fast-spectral-gal_solution
+
+# Build rule for target.
+bem_fast-spectral-gal_solution: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 bem_fast-spectral-gal_solution
+.PHONY : bem_fast-spectral-gal_solution
+
+# fast build rule for target.
+bem_fast-spectral-gal_solution/fast:
+	$(MAKE) -f BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir/build.make BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir/build
+.PHONY : bem_fast-spectral-gal_solution/fast
+
+#=============================================================================
 # Target rules for targets named bem_log-weighted-gauss-rule_template
 
 # Build rule for target.
@@ -874,6 +900,8 @@ help:
 	@echo "... bem_dir-gal-bem_solution"
 	@echo "... bem_duffy-trick_template"
 	@echo "... bem_duffy-trick_solution"
+	@echo "... bem_fast-spectral-gal_template"
+	@echo "... bem_fast-spectral-gal_solution"
 	@echo "... bem_log-weighted-gauss-rule_template"
 	@echo "... bem_log-weighted-gauss-rule_solution"
 	@echo "... bem_reg-transf-integral_template"

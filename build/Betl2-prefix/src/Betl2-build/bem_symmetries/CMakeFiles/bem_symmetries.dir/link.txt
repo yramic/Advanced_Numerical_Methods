@@ -1,0 +1,2 @@
+/usr/bin/ar qc libbem_symmetries.a  
+/usr/bin/ranlib libbem_symmetries.a

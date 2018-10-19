@@ -1,0 +1,2 @@
+/usr/bin/ar qc libfunctional.a  CMakeFiles/functional.dir/trace_enumerators.cpp.o
+/usr/bin/ranlib libfunctional.a

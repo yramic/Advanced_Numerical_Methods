@@ -1,0 +1,2 @@
+/usr/bin/ar qc libgeometry.a  
+/usr/bin/ranlib libgeometry.a

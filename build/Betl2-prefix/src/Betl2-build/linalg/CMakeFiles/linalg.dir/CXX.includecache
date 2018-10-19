@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/excalibur/AdvNum/Code/third_party/Betl2/Library/linalg/sparse_enumerators.cpp
+sparse_enumerators.hpp
+/home/excalibur/AdvNum/Code/third_party/Betl2/Library/linalg/sparse_enumerators.hpp
+
+/home/excalibur/AdvNum/Code/third_party/Betl2/Library/linalg/sparse_enumerators.hpp
+iostream
+-
+

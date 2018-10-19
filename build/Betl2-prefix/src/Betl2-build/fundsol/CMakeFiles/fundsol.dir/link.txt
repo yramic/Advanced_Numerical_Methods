@@ -1,0 +1,2 @@
+/usr/bin/ar qc libfundsol.a  CMakeFiles/fundsol.dir/fundsol_enumerators.cpp.o
+/usr/bin/ranlib libfundsol.a

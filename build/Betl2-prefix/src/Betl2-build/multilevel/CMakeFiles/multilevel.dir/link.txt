@@ -1,0 +1,2 @@
+/usr/bin/ar qc libmultilevel.a  
+/usr/bin/ranlib libmultilevel.a

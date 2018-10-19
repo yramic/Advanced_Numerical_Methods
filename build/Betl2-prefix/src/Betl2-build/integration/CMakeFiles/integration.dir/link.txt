@@ -1,0 +1,2 @@
+/usr/bin/ar qc libintegration.a  
+/usr/bin/ranlib libintegration.a

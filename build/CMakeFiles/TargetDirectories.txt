@@ -75,6 +75,14 @@
 /home/excalibur/AdvNum/Code/build/BEM/DuffyTrick/CMakeFiles/rebuild_cache.dir
 /home/excalibur/AdvNum/Code/build/BEM/DuffyTrick/CMakeFiles/bem_duffy-trick_solution.dir
 /home/excalibur/AdvNum/Code/build/BEM/DuffyTrick/CMakeFiles/install.dir
+/home/excalibur/AdvNum/Code/build/BEM/FastSpectralGal/CMakeFiles/install/strip.dir
+/home/excalibur/AdvNum/Code/build/BEM/FastSpectralGal/CMakeFiles/install/local.dir
+/home/excalibur/AdvNum/Code/build/BEM/FastSpectralGal/CMakeFiles/install.dir
+/home/excalibur/AdvNum/Code/build/BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir
+/home/excalibur/AdvNum/Code/build/BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir
+/home/excalibur/AdvNum/Code/build/BEM/FastSpectralGal/CMakeFiles/edit_cache.dir
+/home/excalibur/AdvNum/Code/build/BEM/FastSpectralGal/CMakeFiles/rebuild_cache.dir
+/home/excalibur/AdvNum/Code/build/BEM/FastSpectralGal/CMakeFiles/list_install_components.dir
 /home/excalibur/AdvNum/Code/build/BEM/LogWeightedGaussRule/CMakeFiles/install/strip.dir
 /home/excalibur/AdvNum/Code/build/BEM/LogWeightedGaussRule/CMakeFiles/install/local.dir
 /home/excalibur/AdvNum/Code/build/BEM/LogWeightedGaussRule/CMakeFiles/bem_log-weighted-gauss-rule_template.dir

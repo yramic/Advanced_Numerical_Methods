@@ -1,0 +1,2 @@
+/usr/bin/ar qc libsparse_operators.a  
+/usr/bin/ranlib libsparse_operators.a

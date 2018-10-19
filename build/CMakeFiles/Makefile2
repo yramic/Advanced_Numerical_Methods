@@ -66,7 +66,7 @@ CMAKE_BINARY_DIR = /home/excalibur/AdvNum/Code/build
 CMakeFiles/ethGenericGrid.dir/all: CMakeFiles/Eigen.dir/all
 	$(MAKE) -f CMakeFiles/ethGenericGrid.dir/build.make CMakeFiles/ethGenericGrid.dir/depend
 	$(MAKE) -f CMakeFiles/ethGenericGrid.dir/build.make CMakeFiles/ethGenericGrid.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=35,36,37,38 "Built target ethGenericGrid"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=36,37,38,39 "Built target ethGenericGrid"
 .PHONY : CMakeFiles/ethGenericGrid.dir/all
 
 # Include target in all.
@@ -208,6 +208,7 @@ BEM/all: BEM/BETL-Transmission/all
 BEM/all: BEM/CppHilbert/all
 BEM/all: BEM/DirGalBEM/all
 BEM/all: BEM/DuffyTrick/all
+BEM/all: BEM/FastSpectralGal/all
 BEM/all: BEM/LogWeightedGaussRule/all
 BEM/all: BEM/RegTransfIntegral/all
 BEM/all: BEM/SampleProblem/all
@@ -221,6 +222,7 @@ BEM/clean: BEM/BETL-Transmission/clean
 BEM/clean: BEM/CppHilbert/clean
 BEM/clean: BEM/DirGalBEM/clean
 BEM/clean: BEM/DuffyTrick/clean
+BEM/clean: BEM/FastSpectralGal/clean
 BEM/clean: BEM/LogWeightedGaussRule/clean
 BEM/clean: BEM/RegTransfIntegral/clean
 BEM/clean: BEM/SampleProblem/clean
@@ -234,6 +236,7 @@ BEM/preinstall: BEM/BETL-Transmission/preinstall
 BEM/preinstall: BEM/CppHilbert/preinstall
 BEM/preinstall: BEM/DirGalBEM/preinstall
 BEM/preinstall: BEM/DuffyTrick/preinstall
+BEM/preinstall: BEM/FastSpectralGal/preinstall
 BEM/preinstall: BEM/LogWeightedGaussRule/preinstall
 BEM/preinstall: BEM/RegTransfIntegral/preinstall
 BEM/preinstall: BEM/SampleProblem/preinstall
@@ -612,7 +615,7 @@ BEM/CppHilbert/Examples/preinstall:
 BEM/CppHilbert/Examples/CMakeFiles/cmtest.dir/all: BEM/CppHilbert/Library/CMakeFiles/CppHilbert.dir/all
 	$(MAKE) -f BEM/CppHilbert/Examples/CMakeFiles/cmtest.dir/build.make BEM/CppHilbert/Examples/CMakeFiles/cmtest.dir/depend
 	$(MAKE) -f BEM/CppHilbert/Examples/CMakeFiles/cmtest.dir/build.make BEM/CppHilbert/Examples/CMakeFiles/cmtest.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=28 "Built target cmtest"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num= "Built target cmtest"
 .PHONY : BEM/CppHilbert/Examples/CMakeFiles/cmtest.dir/all
 
 # Include target in all.
@@ -622,7 +625,7 @@ all: BEM/CppHilbert/Examples/CMakeFiles/cmtest.dir/all
 
 # Build rule for subdir invocation for target.
 BEM/CppHilbert/Examples/CMakeFiles/cmtest.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 8
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 7
 	$(MAKE) -f CMakeFiles/Makefile2 BEM/CppHilbert/Examples/CMakeFiles/cmtest.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 0
 .PHONY : BEM/CppHilbert/Examples/CMakeFiles/cmtest.dir/rule
@@ -724,7 +727,7 @@ BEM/DirGalBEM/preinstall:
 BEM/DirGalBEM/CMakeFiles/bem_dir-gal-bem_template.dir/all: BEM/CppHilbert/Library/CMakeFiles/CppHilbert.dir/all
 	$(MAKE) -f BEM/DirGalBEM/CMakeFiles/bem_dir-gal-bem_template.dir/build.make BEM/DirGalBEM/CMakeFiles/bem_dir-gal-bem_template.dir/depend
 	$(MAKE) -f BEM/DirGalBEM/CMakeFiles/bem_dir-gal-bem_template.dir/build.make BEM/DirGalBEM/CMakeFiles/bem_dir-gal-bem_template.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=19 "Built target bem_dir-gal-bem_template"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=18 "Built target bem_dir-gal-bem_template"
 .PHONY : BEM/DirGalBEM/CMakeFiles/bem_dir-gal-bem_template.dir/all
 
 # Include target in all.
@@ -761,7 +764,7 @@ clean: BEM/DirGalBEM/CMakeFiles/bem_dir-gal-bem_template.dir/clean
 BEM/DirGalBEM/CMakeFiles/bem_dir-gal-bem_solution.dir/all: BEM/CppHilbert/Library/CMakeFiles/CppHilbert.dir/all
 	$(MAKE) -f BEM/DirGalBEM/CMakeFiles/bem_dir-gal-bem_solution.dir/build.make BEM/DirGalBEM/CMakeFiles/bem_dir-gal-bem_solution.dir/depend
 	$(MAKE) -f BEM/DirGalBEM/CMakeFiles/bem_dir-gal-bem_solution.dir/build.make BEM/DirGalBEM/CMakeFiles/bem_dir-gal-bem_solution.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=18 "Built target bem_dir-gal-bem_solution"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num= "Built target bem_dir-gal-bem_solution"
 .PHONY : BEM/DirGalBEM/CMakeFiles/bem_dir-gal-bem_solution.dir/all
 
 # Include target in all.
@@ -771,7 +774,7 @@ all: BEM/DirGalBEM/CMakeFiles/bem_dir-gal-bem_solution.dir/all
 
 # Build rule for subdir invocation for target.
 BEM/DirGalBEM/CMakeFiles/bem_dir-gal-bem_solution.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 8
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 7
 	$(MAKE) -f CMakeFiles/Makefile2 BEM/DirGalBEM/CMakeFiles/bem_dir-gal-bem_solution.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 0
 .PHONY : BEM/DirGalBEM/CMakeFiles/bem_dir-gal-bem_solution.dir/rule
@@ -818,7 +821,7 @@ BEM/DuffyTrick/preinstall:
 BEM/DuffyTrick/CMakeFiles/bem_duffy-trick_template.dir/all:
 	$(MAKE) -f BEM/DuffyTrick/CMakeFiles/bem_duffy-trick_template.dir/build.make BEM/DuffyTrick/CMakeFiles/bem_duffy-trick_template.dir/depend
 	$(MAKE) -f BEM/DuffyTrick/CMakeFiles/bem_duffy-trick_template.dir/build.make BEM/DuffyTrick/CMakeFiles/bem_duffy-trick_template.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=21 "Built target bem_duffy-trick_template"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=20 "Built target bem_duffy-trick_template"
 .PHONY : BEM/DuffyTrick/CMakeFiles/bem_duffy-trick_template.dir/all
 
 # Include target in all.
@@ -855,7 +858,7 @@ clean: BEM/DuffyTrick/CMakeFiles/bem_duffy-trick_template.dir/clean
 BEM/DuffyTrick/CMakeFiles/bem_duffy-trick_solution.dir/all:
 	$(MAKE) -f BEM/DuffyTrick/CMakeFiles/bem_duffy-trick_solution.dir/build.make BEM/DuffyTrick/CMakeFiles/bem_duffy-trick_solution.dir/depend
 	$(MAKE) -f BEM/DuffyTrick/CMakeFiles/bem_duffy-trick_solution.dir/build.make BEM/DuffyTrick/CMakeFiles/bem_duffy-trick_solution.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=20 "Built target bem_duffy-trick_solution"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=19 "Built target bem_duffy-trick_solution"
 .PHONY : BEM/DuffyTrick/CMakeFiles/bem_duffy-trick_solution.dir/all
 
 # Include target in all.
@@ -886,6 +889,100 @@ clean: BEM/DuffyTrick/CMakeFiles/bem_duffy-trick_solution.dir/clean
 .PHONY : clean
 
 #=============================================================================
+# Directory level rules for directory BEM/FastSpectralGal
+
+# Convenience name for "all" pass in the directory.
+BEM/FastSpectralGal/all: BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir/all
+BEM/FastSpectralGal/all: BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir/all
+
+.PHONY : BEM/FastSpectralGal/all
+
+# Convenience name for "clean" pass in the directory.
+BEM/FastSpectralGal/clean: BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir/clean
+BEM/FastSpectralGal/clean: BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir/clean
+
+.PHONY : BEM/FastSpectralGal/clean
+
+# Convenience name for "preinstall" pass in the directory.
+BEM/FastSpectralGal/preinstall:
+
+.PHONY : BEM/FastSpectralGal/preinstall
+
+#=============================================================================
+# Target rules for target BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir
+
+# All Build rule for target.
+BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir/all:
+	$(MAKE) -f BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir/build.make BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir/depend
+	$(MAKE) -f BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir/build.make BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=22 "Built target bem_fast-spectral-gal_template"
+.PHONY : BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir/all
+
+# Include target in all.
+all: BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 1
+	$(MAKE) -f CMakeFiles/Makefile2 BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 0
+.PHONY : BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir/rule
+
+# Convenience name for target.
+bem_fast-spectral-gal_template: BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir/rule
+
+.PHONY : bem_fast-spectral-gal_template
+
+# clean rule for target.
+BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir/clean:
+	$(MAKE) -f BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir/build.make BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir/clean
+.PHONY : BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir/clean
+
+# clean rule for target.
+clean: BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_template.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
+# Target rules for target BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir
+
+# All Build rule for target.
+BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir/all:
+	$(MAKE) -f BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir/build.make BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir/depend
+	$(MAKE) -f BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir/build.make BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=21 "Built target bem_fast-spectral-gal_solution"
+.PHONY : BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir/all
+
+# Include target in all.
+all: BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 1
+	$(MAKE) -f CMakeFiles/Makefile2 BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 0
+.PHONY : BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir/rule
+
+# Convenience name for target.
+bem_fast-spectral-gal_solution: BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir/rule
+
+.PHONY : bem_fast-spectral-gal_solution
+
+# clean rule for target.
+BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir/clean:
+	$(MAKE) -f BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir/build.make BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir/clean
+.PHONY : BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir/clean
+
+# clean rule for target.
+clean: BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
 # Directory level rules for directory BEM/LogWeightedGaussRule
 
 # Convenience name for "all" pass in the directory.
@@ -912,7 +1009,7 @@ BEM/LogWeightedGaussRule/preinstall:
 BEM/LogWeightedGaussRule/CMakeFiles/bem_log-weighted-gauss-rule_template.dir/all:
 	$(MAKE) -f BEM/LogWeightedGaussRule/CMakeFiles/bem_log-weighted-gauss-rule_template.dir/build.make BEM/LogWeightedGaussRule/CMakeFiles/bem_log-weighted-gauss-rule_template.dir/depend
 	$(MAKE) -f BEM/LogWeightedGaussRule/CMakeFiles/bem_log-weighted-gauss-rule_template.dir/build.make BEM/LogWeightedGaussRule/CMakeFiles/bem_log-weighted-gauss-rule_template.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=23 "Built target bem_log-weighted-gauss-rule_template"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=24,25 "Built target bem_log-weighted-gauss-rule_template"
 .PHONY : BEM/LogWeightedGaussRule/CMakeFiles/bem_log-weighted-gauss-rule_template.dir/all
 
 # Include target in all.
@@ -922,7 +1019,7 @@ all: BEM/LogWeightedGaussRule/CMakeFiles/bem_log-weighted-gauss-rule_template.di
 
 # Build rule for subdir invocation for target.
 BEM/LogWeightedGaussRule/CMakeFiles/bem_log-weighted-gauss-rule_template.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 1
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 2
 	$(MAKE) -f CMakeFiles/Makefile2 BEM/LogWeightedGaussRule/CMakeFiles/bem_log-weighted-gauss-rule_template.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 0
 .PHONY : BEM/LogWeightedGaussRule/CMakeFiles/bem_log-weighted-gauss-rule_template.dir/rule
@@ -949,7 +1046,7 @@ clean: BEM/LogWeightedGaussRule/CMakeFiles/bem_log-weighted-gauss-rule_template.
 BEM/LogWeightedGaussRule/CMakeFiles/bem_log-weighted-gauss-rule_solution.dir/all:
 	$(MAKE) -f BEM/LogWeightedGaussRule/CMakeFiles/bem_log-weighted-gauss-rule_solution.dir/build.make BEM/LogWeightedGaussRule/CMakeFiles/bem_log-weighted-gauss-rule_solution.dir/depend
 	$(MAKE) -f BEM/LogWeightedGaussRule/CMakeFiles/bem_log-weighted-gauss-rule_solution.dir/build.make BEM/LogWeightedGaussRule/CMakeFiles/bem_log-weighted-gauss-rule_solution.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=22 "Built target bem_log-weighted-gauss-rule_solution"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=23 "Built target bem_log-weighted-gauss-rule_solution"
 .PHONY : BEM/LogWeightedGaussRule/CMakeFiles/bem_log-weighted-gauss-rule_solution.dir/all
 
 # Include target in all.
@@ -1006,7 +1103,7 @@ BEM/RegTransfIntegral/preinstall:
 BEM/RegTransfIntegral/CMakeFiles/bem_reg-transf-integral_template.dir/all:
 	$(MAKE) -f BEM/RegTransfIntegral/CMakeFiles/bem_reg-transf-integral_template.dir/build.make BEM/RegTransfIntegral/CMakeFiles/bem_reg-transf-integral_template.dir/depend
 	$(MAKE) -f BEM/RegTransfIntegral/CMakeFiles/bem_reg-transf-integral_template.dir/build.make BEM/RegTransfIntegral/CMakeFiles/bem_reg-transf-integral_template.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=25 "Built target bem_reg-transf-integral_template"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=27 "Built target bem_reg-transf-integral_template"
 .PHONY : BEM/RegTransfIntegral/CMakeFiles/bem_reg-transf-integral_template.dir/all
 
 # Include target in all.
@@ -1043,7 +1140,7 @@ clean: BEM/RegTransfIntegral/CMakeFiles/bem_reg-transf-integral_template.dir/cle
 BEM/RegTransfIntegral/CMakeFiles/bem_reg-transf-integral_solution.dir/all:
 	$(MAKE) -f BEM/RegTransfIntegral/CMakeFiles/bem_reg-transf-integral_solution.dir/build.make BEM/RegTransfIntegral/CMakeFiles/bem_reg-transf-integral_solution.dir/depend
 	$(MAKE) -f BEM/RegTransfIntegral/CMakeFiles/bem_reg-transf-integral_solution.dir/build.make BEM/RegTransfIntegral/CMakeFiles/bem_reg-transf-integral_solution.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=24 "Built target bem_reg-transf-integral_solution"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=26 "Built target bem_reg-transf-integral_solution"
 .PHONY : BEM/RegTransfIntegral/CMakeFiles/bem_reg-transf-integral_solution.dir/all
 
 # Include target in all.
@@ -1100,7 +1197,7 @@ BEM/SampleProblem/preinstall:
 BEM/SampleProblem/CMakeFiles/bem_sample-problem_template.dir/all:
 	$(MAKE) -f BEM/SampleProblem/CMakeFiles/bem_sample-problem_template.dir/build.make BEM/SampleProblem/CMakeFiles/bem_sample-problem_template.dir/depend
 	$(MAKE) -f BEM/SampleProblem/CMakeFiles/bem_sample-problem_template.dir/build.make BEM/SampleProblem/CMakeFiles/bem_sample-problem_template.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=27 "Built target bem_sample-problem_template"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=29 "Built target bem_sample-problem_template"
 .PHONY : BEM/SampleProblem/CMakeFiles/bem_sample-problem_template.dir/all
 
 # Include target in all.
@@ -1137,7 +1234,7 @@ clean: BEM/SampleProblem/CMakeFiles/bem_sample-problem_template.dir/clean
 BEM/SampleProblem/CMakeFiles/bem_sample-problem_solution.dir/all:
 	$(MAKE) -f BEM/SampleProblem/CMakeFiles/bem_sample-problem_solution.dir/build.make BEM/SampleProblem/CMakeFiles/bem_sample-problem_solution.dir/depend
 	$(MAKE) -f BEM/SampleProblem/CMakeFiles/bem_sample-problem_solution.dir/build.make BEM/SampleProblem/CMakeFiles/bem_sample-problem_solution.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=26 "Built target bem_sample-problem_solution"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=28 "Built target bem_sample-problem_solution"
 .PHONY : BEM/SampleProblem/CMakeFiles/bem_sample-problem_solution.dir/all
 
 # Include target in all.
@@ -1225,7 +1322,7 @@ HMAT/CLUSTERING/preinstall:
 HMAT/CLUSTERING/CMakeFiles/hmat_clustering_solution.dir/all:
 	$(MAKE) -f HMAT/CLUSTERING/CMakeFiles/hmat_clustering_solution.dir/build.make HMAT/CLUSTERING/CMakeFiles/hmat_clustering_solution.dir/depend
 	$(MAKE) -f HMAT/CLUSTERING/CMakeFiles/hmat_clustering_solution.dir/build.make HMAT/CLUSTERING/CMakeFiles/hmat_clustering_solution.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=85 "Built target hmat_clustering_solution"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=86 "Built target hmat_clustering_solution"
 .PHONY : HMAT/CLUSTERING/CMakeFiles/hmat_clustering_solution.dir/all
 
 # Include target in all.
@@ -1373,7 +1470,7 @@ clean: HMAT/HMAT_1D/CMakeFiles/low_rank_test_1D_solution.dir/clean
 HMAT/HMAT_1D/CMakeFiles/hmat_1d_tmps.dir/all:
 	$(MAKE) -f HMAT/HMAT_1D/CMakeFiles/hmat_1d_tmps.dir/build.make HMAT/HMAT_1D/CMakeFiles/hmat_1d_tmps.dir/depend
 	$(MAKE) -f HMAT/HMAT_1D/CMakeFiles/hmat_1d_tmps.dir/build.make HMAT/HMAT_1D/CMakeFiles/hmat_1d_tmps.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=44,45,46,47,48 "Built target hmat_1d_tmps"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=45,46,47,48,49 "Built target hmat_1d_tmps"
 .PHONY : HMAT/HMAT_1D/CMakeFiles/hmat_1d_tmps.dir/all
 
 # Include target in all.
@@ -1447,7 +1544,7 @@ clean: HMAT/HMAT_1D/CMakeFiles/low_rank_test_1D_uni_solution.dir/clean
 HMAT/HMAT_1D/CMakeFiles/hmat_1d_sols.dir/all:
 	$(MAKE) -f HMAT/HMAT_1D/CMakeFiles/hmat_1d_sols.dir/build.make HMAT/HMAT_1D/CMakeFiles/hmat_1d_sols.dir/depend
 	$(MAKE) -f HMAT/HMAT_1D/CMakeFiles/hmat_1d_sols.dir/build.make HMAT/HMAT_1D/CMakeFiles/hmat_1d_sols.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=39,40,41,42,43 "Built target hmat_1d_sols"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=40,41,42,43,44 "Built target hmat_1d_sols"
 .PHONY : HMAT/HMAT_1D/CMakeFiles/hmat_1d_sols.dir/all
 
 # Include target in all.
@@ -1484,7 +1581,7 @@ clean: HMAT/HMAT_1D/CMakeFiles/hmat_1d_sols.dir/clean
 HMAT/HMAT_1D/CMakeFiles/hmat_1d_uni_sols.dir/all:
 	$(MAKE) -f HMAT/HMAT_1D/CMakeFiles/hmat_1d_uni_sols.dir/build.make HMAT/HMAT_1D/CMakeFiles/hmat_1d_uni_sols.dir/depend
 	$(MAKE) -f HMAT/HMAT_1D/CMakeFiles/hmat_1d_uni_sols.dir/build.make HMAT/HMAT_1D/CMakeFiles/hmat_1d_uni_sols.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=49,50,51,52,53,54,55 "Built target hmat_1d_uni_sols"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=50,51,52,53,54,55,56 "Built target hmat_1d_uni_sols"
 .PHONY : HMAT/HMAT_1D/CMakeFiles/hmat_1d_uni_sols.dir/all
 
 # Include target in all.
@@ -1521,7 +1618,7 @@ clean: HMAT/HMAT_1D/CMakeFiles/hmat_1d_uni_sols.dir/clean
 HMAT/HMAT_1D/CMakeFiles/hmat_1d_uni_tmps.dir/all:
 	$(MAKE) -f HMAT/HMAT_1D/CMakeFiles/hmat_1d_uni_tmps.dir/build.make HMAT/HMAT_1D/CMakeFiles/hmat_1d_uni_tmps.dir/depend
 	$(MAKE) -f HMAT/HMAT_1D/CMakeFiles/hmat_1d_uni_tmps.dir/build.make HMAT/HMAT_1D/CMakeFiles/hmat_1d_uni_tmps.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=56,57,58,59,60,61,62,63 "Built target hmat_1d_uni_tmps"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=57,58,59,60,61,62,63,64 "Built target hmat_1d_uni_tmps"
 .PHONY : HMAT/HMAT_1D/CMakeFiles/hmat_1d_uni_tmps.dir/all
 
 # Include target in all.
@@ -1756,7 +1853,7 @@ all: HMAT/HMAT_2D/CMakeFiles/nearfar_test_template.dir/all
 
 # Build rule for subdir invocation for target.
 HMAT/HMAT_2D/CMakeFiles/nearfar_test_template.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 6
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 7
 	$(MAKE) -f CMakeFiles/Makefile2 HMAT/HMAT_2D/CMakeFiles/nearfar_test_template.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 0
 .PHONY : HMAT/HMAT_2D/CMakeFiles/nearfar_test_template.dir/rule
@@ -1793,7 +1890,7 @@ all: HMAT/HMAT_2D/CMakeFiles/low_rank_test_2D_template.dir/all
 
 # Build rule for subdir invocation for target.
 HMAT/HMAT_2D/CMakeFiles/low_rank_test_2D_template.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 6
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 7
 	$(MAKE) -f CMakeFiles/Makefile2 HMAT/HMAT_2D/CMakeFiles/low_rank_test_2D_template.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 0
 .PHONY : HMAT/HMAT_2D/CMakeFiles/low_rank_test_2D_template.dir/rule
@@ -1830,7 +1927,7 @@ all: HMAT/HMAT_2D/CMakeFiles/nearfar_test_solution.dir/all
 
 # Build rule for subdir invocation for target.
 HMAT/HMAT_2D/CMakeFiles/nearfar_test_solution.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 7
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 6
 	$(MAKE) -f CMakeFiles/Makefile2 HMAT/HMAT_2D/CMakeFiles/nearfar_test_solution.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 0
 .PHONY : HMAT/HMAT_2D/CMakeFiles/nearfar_test_solution.dir/rule
@@ -1867,7 +1964,7 @@ all: HMAT/HMAT_2D/CMakeFiles/is_admissible_test_template.dir/all
 
 # Build rule for subdir invocation for target.
 HMAT/HMAT_2D/CMakeFiles/is_admissible_test_template.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 6
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 7
 	$(MAKE) -f CMakeFiles/Makefile2 HMAT/HMAT_2D/CMakeFiles/is_admissible_test_template.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 0
 .PHONY : HMAT/HMAT_2D/CMakeFiles/is_admissible_test_template.dir/rule
@@ -1894,7 +1991,7 @@ clean: HMAT/HMAT_2D/CMakeFiles/is_admissible_test_template.dir/clean
 HMAT/HMAT_2D/CMakeFiles/hmat_2d_tmps.dir/all:
 	$(MAKE) -f HMAT/HMAT_2D/CMakeFiles/hmat_2d_tmps.dir/build.make HMAT/HMAT_2D/CMakeFiles/hmat_2d_tmps.dir/depend
 	$(MAKE) -f HMAT/HMAT_2D/CMakeFiles/hmat_2d_tmps.dir/build.make HMAT/HMAT_2D/CMakeFiles/hmat_2d_tmps.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=70,71,72,73,74 "Built target hmat_2d_tmps"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=70,71,72,73,74,75 "Built target hmat_2d_tmps"
 .PHONY : HMAT/HMAT_2D/CMakeFiles/hmat_2d_tmps.dir/all
 
 # Include target in all.
@@ -1904,7 +2001,7 @@ all: HMAT/HMAT_2D/CMakeFiles/hmat_2d_tmps.dir/all
 
 # Build rule for subdir invocation for target.
 HMAT/HMAT_2D/CMakeFiles/hmat_2d_tmps.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 5
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 6
 	$(MAKE) -f CMakeFiles/Makefile2 HMAT/HMAT_2D/CMakeFiles/hmat_2d_tmps.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 0
 .PHONY : HMAT/HMAT_2D/CMakeFiles/hmat_2d_tmps.dir/rule
@@ -1931,7 +2028,7 @@ clean: HMAT/HMAT_2D/CMakeFiles/hmat_2d_tmps.dir/clean
 HMAT/HMAT_2D/CMakeFiles/hmat_2d_sols.dir/all:
 	$(MAKE) -f HMAT/HMAT_2D/CMakeFiles/hmat_2d_sols.dir/build.make HMAT/HMAT_2D/CMakeFiles/hmat_2d_sols.dir/depend
 	$(MAKE) -f HMAT/HMAT_2D/CMakeFiles/hmat_2d_sols.dir/build.make HMAT/HMAT_2D/CMakeFiles/hmat_2d_sols.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=64,65,66,67,68,69 "Built target hmat_2d_sols"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=65,66,67,68,69 "Built target hmat_2d_sols"
 .PHONY : HMAT/HMAT_2D/CMakeFiles/hmat_2d_sols.dir/all
 
 # Include target in all.
@@ -1941,7 +2038,7 @@ all: HMAT/HMAT_2D/CMakeFiles/hmat_2d_sols.dir/all
 
 # Build rule for subdir invocation for target.
 HMAT/HMAT_2D/CMakeFiles/hmat_2d_sols.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 6
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 5
 	$(MAKE) -f CMakeFiles/Makefile2 HMAT/HMAT_2D/CMakeFiles/hmat_2d_sols.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 0
 .PHONY : HMAT/HMAT_2D/CMakeFiles/hmat_2d_sols.dir/rule
@@ -1978,7 +2075,7 @@ all: HMAT/HMAT_2D/CMakeFiles/low_rank_test_2D_solution.dir/all
 
 # Build rule for subdir invocation for target.
 HMAT/HMAT_2D/CMakeFiles/low_rank_test_2D_solution.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 7
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 6
 	$(MAKE) -f CMakeFiles/Makefile2 HMAT/HMAT_2D/CMakeFiles/low_rank_test_2D_solution.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 0
 .PHONY : HMAT/HMAT_2D/CMakeFiles/low_rank_test_2D_solution.dir/rule
@@ -2015,7 +2112,7 @@ all: HMAT/HMAT_2D/CMakeFiles/is_admissible_test_solution.dir/all
 
 # Build rule for subdir invocation for target.
 HMAT/HMAT_2D/CMakeFiles/is_admissible_test_solution.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 7
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 6
 	$(MAKE) -f CMakeFiles/Makefile2 HMAT/HMAT_2D/CMakeFiles/is_admissible_test_solution.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 0
 .PHONY : HMAT/HMAT_2D/CMakeFiles/is_admissible_test_solution.dir/rule
@@ -2184,7 +2281,7 @@ clean: HMAT/HMAT_BEM/CMakeFiles/low_rank_test_BEM_template.dir/clean
 HMAT/HMAT_BEM/CMakeFiles/hmat_bem_tmps.dir/all: BEM/CppHilbert/Library/CMakeFiles/CppHilbert.dir/all
 	$(MAKE) -f HMAT/HMAT_BEM/CMakeFiles/hmat_bem_tmps.dir/build.make HMAT/HMAT_BEM/CMakeFiles/hmat_bem_tmps.dir/depend
 	$(MAKE) -f HMAT/HMAT_BEM/CMakeFiles/hmat_bem_tmps.dir/build.make HMAT/HMAT_BEM/CMakeFiles/hmat_bem_tmps.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=80,81,82,83,84 "Built target hmat_bem_tmps"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=81,82,83,84,85 "Built target hmat_bem_tmps"
 .PHONY : HMAT/HMAT_BEM/CMakeFiles/hmat_bem_tmps.dir/all
 
 # Include target in all.
@@ -2221,7 +2318,7 @@ clean: HMAT/HMAT_BEM/CMakeFiles/hmat_bem_tmps.dir/clean
 HMAT/HMAT_BEM/CMakeFiles/hmat_bem_sols.dir/all: BEM/CppHilbert/Library/CMakeFiles/CppHilbert.dir/all
 	$(MAKE) -f HMAT/HMAT_BEM/CMakeFiles/hmat_bem_sols.dir/build.make HMAT/HMAT_BEM/CMakeFiles/hmat_bem_sols.dir/depend
 	$(MAKE) -f HMAT/HMAT_BEM/CMakeFiles/hmat_bem_sols.dir/build.make HMAT/HMAT_BEM/CMakeFiles/hmat_bem_sols.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=75,76,77,78,79 "Built target hmat_bem_sols"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=76,77,78,79,80 "Built target hmat_bem_sols"
 .PHONY : HMAT/HMAT_BEM/CMakeFiles/hmat_bem_sols.dir/all
 
 # Include target in all.
@@ -2391,7 +2488,7 @@ HMAT/LowRankMerge/preinstall:
 HMAT/LowRankMerge/CMakeFiles/hmat_low-rank-merge_template.dir/all:
 	$(MAKE) -f HMAT/LowRankMerge/CMakeFiles/hmat_low-rank-merge_template.dir/build.make HMAT/LowRankMerge/CMakeFiles/hmat_low-rank-merge_template.dir/depend
 	$(MAKE) -f HMAT/LowRankMerge/CMakeFiles/hmat_low-rank-merge_template.dir/build.make HMAT/LowRankMerge/CMakeFiles/hmat_low-rank-merge_template.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=87 "Built target hmat_low-rank-merge_template"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=88 "Built target hmat_low-rank-merge_template"
 .PHONY : HMAT/LowRankMerge/CMakeFiles/hmat_low-rank-merge_template.dir/all
 
 # Include target in all.
@@ -2428,7 +2525,7 @@ clean: HMAT/LowRankMerge/CMakeFiles/hmat_low-rank-merge_template.dir/clean
 HMAT/LowRankMerge/CMakeFiles/hmat_low-rank-merge_solution.dir/all:
 	$(MAKE) -f HMAT/LowRankMerge/CMakeFiles/hmat_low-rank-merge_solution.dir/build.make HMAT/LowRankMerge/CMakeFiles/hmat_low-rank-merge_solution.dir/depend
 	$(MAKE) -f HMAT/LowRankMerge/CMakeFiles/hmat_low-rank-merge_solution.dir/build.make HMAT/LowRankMerge/CMakeFiles/hmat_low-rank-merge_solution.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=86 "Built target hmat_low-rank-merge_solution"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=87 "Built target hmat_low-rank-merge_solution"
 .PHONY : HMAT/LowRankMerge/CMakeFiles/hmat_low-rank-merge_solution.dir/all
 
 # Include target in all.
@@ -2483,7 +2580,7 @@ HMAT/PARTMAT/preinstall:
 HMAT/PARTMAT/CMakeFiles/hmat_partmat_solution.dir/all:
 	$(MAKE) -f HMAT/PARTMAT/CMakeFiles/hmat_partmat_solution.dir/build.make HMAT/PARTMAT/CMakeFiles/hmat_partmat_solution.dir/depend
 	$(MAKE) -f HMAT/PARTMAT/CMakeFiles/hmat_partmat_solution.dir/build.make HMAT/PARTMAT/CMakeFiles/hmat_partmat_solution.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=88 "Built target hmat_partmat_solution"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num= "Built target hmat_partmat_solution"
 .PHONY : HMAT/PARTMAT/CMakeFiles/hmat_partmat_solution.dir/all
 
 # Include target in all.
@@ -2493,7 +2590,7 @@ all: HMAT/PARTMAT/CMakeFiles/hmat_partmat_solution.dir/all
 
 # Build rule for subdir invocation for target.
 HMAT/PARTMAT/CMakeFiles/hmat_partmat_solution.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 1
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 0
 	$(MAKE) -f CMakeFiles/Makefile2 HMAT/PARTMAT/CMakeFiles/hmat_partmat_solution.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/excalibur/AdvNum/Code/build/CMakeFiles 0
 .PHONY : HMAT/PARTMAT/CMakeFiles/hmat_partmat_solution.dir/rule
@@ -2564,7 +2661,7 @@ CONVQUAD/AbelIntegralEquation/preinstall:
 CONVQUAD/AbelIntegralEquation/CMakeFiles/convquad_abel-integral-equation_template.dir/all:
 	$(MAKE) -f CONVQUAD/AbelIntegralEquation/CMakeFiles/convquad_abel-integral-equation_template.dir/build.make CONVQUAD/AbelIntegralEquation/CMakeFiles/convquad_abel-integral-equation_template.dir/depend
 	$(MAKE) -f CONVQUAD/AbelIntegralEquation/CMakeFiles/convquad_abel-integral-equation_template.dir/build.make CONVQUAD/AbelIntegralEquation/CMakeFiles/convquad_abel-integral-equation_template.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=30 "Built target convquad_abel-integral-equation_template"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=31 "Built target convquad_abel-integral-equation_template"
 .PHONY : CONVQUAD/AbelIntegralEquation/CMakeFiles/convquad_abel-integral-equation_template.dir/all
 
 # Include target in all.
@@ -2601,7 +2698,7 @@ clean: CONVQUAD/AbelIntegralEquation/CMakeFiles/convquad_abel-integral-equation_
 CONVQUAD/AbelIntegralEquation/CMakeFiles/convquad_abel-integral-equation_solution.dir/all:
 	$(MAKE) -f CONVQUAD/AbelIntegralEquation/CMakeFiles/convquad_abel-integral-equation_solution.dir/build.make CONVQUAD/AbelIntegralEquation/CMakeFiles/convquad_abel-integral-equation_solution.dir/depend
 	$(MAKE) -f CONVQUAD/AbelIntegralEquation/CMakeFiles/convquad_abel-integral-equation_solution.dir/build.make CONVQUAD/AbelIntegralEquation/CMakeFiles/convquad_abel-integral-equation_solution.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=29 "Built target convquad_abel-integral-equation_solution"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=30 "Built target convquad_abel-integral-equation_solution"
 .PHONY : CONVQUAD/AbelIntegralEquation/CMakeFiles/convquad_abel-integral-equation_solution.dir/all
 
 # Include target in all.
@@ -2658,7 +2755,7 @@ CONVQUAD/AbsorbingBoundaryCondition/preinstall:
 CONVQUAD/AbsorbingBoundaryCondition/CMakeFiles/convquad_absorbing-boundary-condition_template.dir/all:
 	$(MAKE) -f CONVQUAD/AbsorbingBoundaryCondition/CMakeFiles/convquad_absorbing-boundary-condition_template.dir/build.make CONVQUAD/AbsorbingBoundaryCondition/CMakeFiles/convquad_absorbing-boundary-condition_template.dir/depend
 	$(MAKE) -f CONVQUAD/AbsorbingBoundaryCondition/CMakeFiles/convquad_absorbing-boundary-condition_template.dir/build.make CONVQUAD/AbsorbingBoundaryCondition/CMakeFiles/convquad_absorbing-boundary-condition_template.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=32 "Built target convquad_absorbing-boundary-condition_template"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=33 "Built target convquad_absorbing-boundary-condition_template"
 .PHONY : CONVQUAD/AbsorbingBoundaryCondition/CMakeFiles/convquad_absorbing-boundary-condition_template.dir/all
 
 # Include target in all.
@@ -2695,7 +2792,7 @@ clean: CONVQUAD/AbsorbingBoundaryCondition/CMakeFiles/convquad_absorbing-boundar
 CONVQUAD/AbsorbingBoundaryCondition/CMakeFiles/convquad_absorbing-boundary-condition_solution.dir/all:
 	$(MAKE) -f CONVQUAD/AbsorbingBoundaryCondition/CMakeFiles/convquad_absorbing-boundary-condition_solution.dir/build.make CONVQUAD/AbsorbingBoundaryCondition/CMakeFiles/convquad_absorbing-boundary-condition_solution.dir/depend
 	$(MAKE) -f CONVQUAD/AbsorbingBoundaryCondition/CMakeFiles/convquad_absorbing-boundary-condition_solution.dir/build.make CONVQUAD/AbsorbingBoundaryCondition/CMakeFiles/convquad_absorbing-boundary-condition_solution.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=31 "Built target convquad_absorbing-boundary-condition_solution"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=32 "Built target convquad_absorbing-boundary-condition_solution"
 .PHONY : CONVQUAD/AbsorbingBoundaryCondition/CMakeFiles/convquad_absorbing-boundary-condition_solution.dir/all
 
 # Include target in all.
@@ -2752,7 +2849,7 @@ CONVQUAD/LowTriangToeplitz/preinstall:
 CONVQUAD/LowTriangToeplitz/CMakeFiles/convquad_low-triang-toeplitz_template.dir/all:
 	$(MAKE) -f CONVQUAD/LowTriangToeplitz/CMakeFiles/convquad_low-triang-toeplitz_template.dir/build.make CONVQUAD/LowTriangToeplitz/CMakeFiles/convquad_low-triang-toeplitz_template.dir/depend
 	$(MAKE) -f CONVQUAD/LowTriangToeplitz/CMakeFiles/convquad_low-triang-toeplitz_template.dir/build.make CONVQUAD/LowTriangToeplitz/CMakeFiles/convquad_low-triang-toeplitz_template.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=34 "Built target convquad_low-triang-toeplitz_template"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=35 "Built target convquad_low-triang-toeplitz_template"
 .PHONY : CONVQUAD/LowTriangToeplitz/CMakeFiles/convquad_low-triang-toeplitz_template.dir/all
 
 # Include target in all.
@@ -2789,7 +2886,7 @@ clean: CONVQUAD/LowTriangToeplitz/CMakeFiles/convquad_low-triang-toeplitz_templa
 CONVQUAD/LowTriangToeplitz/CMakeFiles/convquad_low-triang-toeplitz_solution.dir/all:
 	$(MAKE) -f CONVQUAD/LowTriangToeplitz/CMakeFiles/convquad_low-triang-toeplitz_solution.dir/build.make CONVQUAD/LowTriangToeplitz/CMakeFiles/convquad_low-triang-toeplitz_solution.dir/depend
 	$(MAKE) -f CONVQUAD/LowTriangToeplitz/CMakeFiles/convquad_low-triang-toeplitz_solution.dir/build.make CONVQUAD/LowTriangToeplitz/CMakeFiles/convquad_low-triang-toeplitz_solution.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=33 "Built target convquad_low-triang-toeplitz_solution"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/excalibur/AdvNum/Code/build/CMakeFiles --progress-num=34 "Built target convquad_low-triang-toeplitz_solution"
 .PHONY : CONVQUAD/LowTriangToeplitz/CMakeFiles/convquad_low-triang-toeplitz_solution.dir/all
 
 # Include target in all.

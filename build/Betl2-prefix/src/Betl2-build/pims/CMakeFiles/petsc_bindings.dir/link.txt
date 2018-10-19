@@ -1,0 +1,2 @@
+/usr/bin/ar qc libpetsc_bindings.a  CMakeFiles/petsc_bindings.dir/petsc/error.cpp.o CMakeFiles/petsc_bindings.dir/petsc/monitoring_functions.cpp.o CMakeFiles/petsc_bindings.dir/petsc/world.cpp.o
+/usr/bin/ranlib libpetsc_bindings.a

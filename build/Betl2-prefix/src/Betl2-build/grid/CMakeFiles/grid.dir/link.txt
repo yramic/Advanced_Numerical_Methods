@@ -1,0 +1,2 @@
+/usr/bin/ar qc libgrid.a  CMakeFiles/grid.dir/element_types.cpp.o CMakeFiles/grid.dir/surface_grid.cpp.o CMakeFiles/grid.dir/volume2d_grid.cpp.o CMakeFiles/grid.dir/grid.cpp.o CMakeFiles/grid.dir/bary_grid.cpp.o CMakeFiles/grid.dir/edges_on_face.cpp.o
+/usr/bin/ranlib libgrid.a

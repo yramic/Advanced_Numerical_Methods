@@ -1,0 +1,2 @@
+/usr/bin/ar qc libvtu_exporter.a  CMakeFiles/vtu_exporter.dir/vtu_enumerators.cpp.o
+/usr/bin/ranlib libvtu_exporter.a

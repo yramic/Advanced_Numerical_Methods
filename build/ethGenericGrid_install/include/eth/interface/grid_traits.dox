@@ -1,0 +1,41 @@
+
+
+/*! \page GridTraitsDoc Grid Traits concept
+  
+  \section types Required types:
+  
+  Type                           | Explanation
+  -------------------------------|--------------------------------
+  gridImpl_t                     | A model of the eth::grid::Grid class. Represents the basic class through which the user obtains a handle on mesh objects.
+  gridFactory_t                  | A model of the eth::grid::GridFactory class; is used to create an arbitrary unstructured mesh.
+  viewTraits_t<GridViewType>     | A model of the eth::grid::GridView class. Template parameter specifies leaf oder level View (see \ref ViewTraitsDoc).
+  entity_t<codim>                | A model of the eth::grid::Entity class which represents an entity of given codim.
+  entitySeed_t<codim>            | A model of the eth::grid::EntitySeed class of the respective codimension.
+  entityPointer_t<codim>         | A model of the eth::grid::EntityPointer class which points to an entity of codimension codim.
+  boundaryIndexSet_t             | A model of the eth::grid::BoundaryIndexSet class which provides a zero-based, consecutive index for all boundary intersections.
+  idSet_t                        | A model of the eth::grid::IdSet class, represents a default IdSet which is typically used by mappers.
+  idType_t                       | The type to which Entities are mapped by the idSet implementation. (See eth::grid::idSet for more details)
+  geometry_t<codim>              | A model of the eth::grid::Geometry class, is used to map from reference elements of entities to global coordinates. Maps from dimMesh-codim to dimWorld.
+  localGeometry_t<dimFrom,dimTo> | A model of the eth::grid::Geometry class, is used to map from one "local coordinate system" to another "local coordinate system". Maps from dimFrom to dimTo. Is e.g. used by eth::grid::Entity< GRID_TRAITS, 0 >::geometryInFather() and eth::grid::Intersection::geometryInInside, eth::grid::Intersection::geometryInOutside().
+  hierarchicIterator_t           | A model of the eth::grid::EntityIterator class, is used to iterate through refinement children of an entity (see eth::grid::Entity::children)
+  fixedSizeMatrix_t<#rows,#cols> | A model of a fixed Size matrix (is usually a fixed size matrix of eigen)
+  intersection_t                 | A model of the eth::grid::Interface class, represents an intersection between elements or an element and a boundary.
+  ctype_t                        | The type to use for coordinates of points (typically double or float)
+  size_type                      | Type which is used to count something, should be unsigned. (e.g. entities, is typically unsigned int)
+  listenerHandle_t               | An arbitrary type which is used to identify a callback. (see eth::grid::Grid::addPreUpdateListener() or eth::grid::Grid::addPostUpdateListener() for more information)
+
+
+  \note The template argument codim always refers to the codimension of the
+      object with respect to the dimMesh!!! (see below for definition 
+      of dimMesh)
+
+  \section constants Required constants:
+
+  Name                | Type      | Explanation
+  --------------------|-----------|-------------------------------------------
+  dimMesh             | int       | Dimension of manifold which is represented by the grid.
+  dimWorld            | int       | Dimension of the space in which the grid is embedded.
+
+
+
+*/
