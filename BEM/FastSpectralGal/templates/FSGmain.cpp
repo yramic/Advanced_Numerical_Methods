@@ -1,20 +1,20 @@
-#include <iostream>
-#include <fstream>
-#include <istream>
-#include <cmath>
 #include <Eigen/Dense>
+#include <cassert>
+#include <cmath>
+#include <fstream>
+#include <iostream>
+#include <istream>
 
 using namespace Eigen;
 
 
-
-
-/* @brief Compute matrix A-M using analytic expression.
+/* @brief Compute matrix M using analytic expression.
+ *
  * \param[in] N Discretization parameter indicating number of basis functions.
  */
 /* SAM_LISTING_BEGIN_0 */
-MatrixXd computeM(int N){
-  Eigen::MatrixXd M(N,N);
+MatrixXd computeM(unsigned int N) {
+  Eigen::MatrixXd M(N, N);
   M.setZero();
 
   // TODO: Compute M
@@ -22,68 +22,91 @@ MatrixXd computeM(int N){
 }
 /* SAM_LISTING_END_0 */
 
-//----------------------------------------------------------------------------
-/* @brief Compute right hand side using periodic trapezoidal rule (2N points).
- * \param[in] gamma Function that takes a double and returns a 2d vector
- *                  corresponding to the parametrized curve.
- * \param[in] g Right hand side function (takes 2d points and returns a double).
+/* @brief Compute right hand side using Chebyshev Gauss Quadrature
+ *
+ * \tparam FUNC Type for the Dirichlet B.C. supporting : g(const double&)
+ * \param[in] g Dirichlet boundary condition; Signature : double(const double&)
+ * \param[in] N Discretization parameter indicating number of basis functions.
+ */
+/* SAM_LISTING_BEGIN_1 */
+template <typename FUNC>
+VectorXd computeG(const FUNC &g, int N) {
+  // Initialize right hand side vector
+  VectorXd RHS(N);
+  RHS.setZero();
+  // TODO: Compute RHS
+  return RHS;
+}
+/* SAM_LISTING_END_1 */
+
+/* @brief Build and solve boundary integral equation V rho = g
+ *
+ * \tparam FUNC Type for the Dirichlet B.C. supporting : g(const double&)
+ * \param[in] g Dirichlet boundary condition; Signature : double(const double&)
  * \param[in] N Discretization parameter indicating number of basis functions.
  */
 /* SAM_LISTING_BEGIN_2 */
-template <typename PARAM, typename FUNC>
-VectorXd computeG(const FUNC& g, int N){
-  // Initialize right hand side vector
-  VectorXd RHS(N);  RHS.setZero();
-    // TODO: Compute RHS
-  return RHS;
+template <typename FUNC>
+VectorXd solveBIE(const FUNC &g, int N) {
+  // TODO: Build BIE system and solve it
 }
 /* SAM_LISTING_END_2 */
 
-
-//----------------------------------------------------------------------------
-/* @brief Build and solve boundary integral equation V rho = g
- * \param[in] gamma Function that takes a double and returns a 2d vector
- *                  corresponding to the parametrized curve.
- * \param[in] g Right hand side function (takes 2d points and returns a double).
- * \param[in] N Discretization parameter indicating number of basis functions.
+/* @brief Reconstruct function UN from its coefficients and evaluate it at t.
+ *
+ * \param[in] coeffs coefficients of UN
+ * \param[in] t evaluation point [-1,1]
  */
-/* SAM_LISTING_BEGIN_3 */
-template <typename PARAM, typename FUNC>
-VectorXd solveBIE(const FUNC& g, int N){
-    // TODO: Build BIE system and solve it
-
-  return sol;
+/* SAM_LISTING_BEGIN_3a */
+double reconstructRho(const VectorXd &coeffs, double t) {
+  assert(t >= -1 && t <= 1); // Asserting evaluation is within the domain
+  int N = coeffs.rows();
+  double rho_N = 0.;
+  for (unsigned int i = 0; i < N; ++i)
+    // Coefficients start from $T_1(x)$
+    rho_N += coeffs(i) * boost::math::chebyshev_t(i + 1, t);
+  return rho_N / std::sqrt(1 - t * t);
 }
-/* SAM_LISTING_END_3 */
+/* SAM_LISTING_END_3a */
 
-
-//----------------------------------------------------------------------------
-/* SAM_LISTING_END_4a */
-
-
-//----------------------------------------------------------------------------
-/* @brief Compute L2 norm of UN from its coefficients using periodic trapezoidal
- *        rule (2N points).
- * \param[in] gammaprime Function that takes a double and returns a 2d vector
- *                       corresponding to the derivative of the curve's
- *                       parametrization.
+/* @brief Compute L2 norm of UN from its coefficients using Gauss Legendre
+ *        Quadrature rule
+ *
  * \param[in] coeffs coefficients of UN
  */
-/* SAM_LISTING_BEGIN_4b */
-template <typename PARAMDER>
-double L2norm(const VectorXd& coeffs){
+/* SAM_LISTING_BEGIN_3b */
+double L2norm(const VectorXd &coeffs) {
   double norm = 0.;
-    // TODO: reconstruct the function and compute its L2norm
-
-  return std::sqrt(res);
+  int N = coeffs.rows();
+  // Get quadrature points and weight for Gauss Legendre Quadrature
+  unsigned int order = 2 * N; // Quadrature order
+  Eigen::RowVectorXd weights, points;
+  std::tie(points, weights) = gauleg(-1, 1, order);
+  // Iterating over quadrature points
+  for (int qp = 0; qp < order; qp++) {
+    auto z = points(qp);
+    // evaluating the function
+    double rho = reconstructRho(coeffs, z);
+    norm += weights(qp) * rho * rho;
+  }
+  return std::sqrt(norm);
 }
-/* SAM_LISTING_END_4b */
+/* SAM_LISTING_END_3b */
 
-
+/* SAM_LISTING_BEGIN_4 */
 int main() {
-  unsigned int N = 10;
-  Eigen::MatrixXd M = computeM(N);
-  std::cout << "M is \n" << M << std::endl;
-  return 0;
+  std::cout << "Test for source term g1(x) = sin(2*Pi*x)" << std::endl;
+  std::cout << "N" << std::setw(15) << "L2error" << std::endl;
+  std::cout << "############################" << std::endl;
 
+  // std::function object for source term g1 using a lambda expression
+  std::function<double(const double &)> g1 = [](const double &x) {
+    return sin(2 * M_PI * x);
+  };
+	// TODO: implement the convergence test
+    std::cout << N << std::setw(15) << l2error << std::endl;
+
+  }
+  return 0;
 }
+/* SAM_LISTING_END_4 */

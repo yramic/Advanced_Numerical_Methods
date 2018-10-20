@@ -7,31 +7,25 @@
 #IncludeRegexTransform: 
 
 /home/excalibur/AdvNum/Code/BEM/FastSpectralGal/FSGmain.cpp
-iostream
+Eigen/Dense
+-
+cassert
+-
+cmath
 -
 fstream
 -
+iostream
+-
 istream
--
-cmath
--
-Eigen/Dense
--
-boost/math/special_functions/bessel.hpp
 -
 chebyshev_gauss_quadrature.hpp
 /home/excalibur/AdvNum/Code/BEM/FastSpectralGal/chebyshev_gauss_quadrature.hpp
+gauleg.hpp
+/home/excalibur/AdvNum/Code/BEM/FastSpectralGal/gauleg.hpp
+boost/math/special_functions/bessel.hpp
+-
 boost/math/special_functions/chebyshev.hpp
--
-PeriodicTrapezoidalQR.hpp
-/home/excalibur/AdvNum/Code/BEM/FastSpectralGal/PeriodicTrapezoidalQR.hpp
-
-/home/excalibur/AdvNum/Code/BEM/FastSpectralGal/PeriodicTrapezoidalQR.hpp
-iostream
--
-cmath
--
-Eigen/Dense
 -
 
 /home/excalibur/AdvNum/Code/BEM/FastSpectralGal/chebyshev_gauss_quadrature.hpp
@@ -40,6 +34,14 @@ cmath
 Eigen/Dense
 -
 utility
+-
+
+/home/excalibur/AdvNum/Code/BEM/FastSpectralGal/gauleg.hpp
+iostream
+-
+cmath
+-
+Eigen/Dense
 -
 
 /usr/include/eigen3/Eigen/Cholesky

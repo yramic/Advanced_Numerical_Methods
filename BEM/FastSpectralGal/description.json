@@ -4,6 +4,6 @@
     "contributors" : "",
 
     "name": "FastSpectralGal",
-    "solutions" : ["FSGmain.cpp", "PeriodicTrapezoidalQR.hpp", "plot_convergence.py"],
-    "templates" : ["FSGmain.cpp"]
+    "solutions" : ["FSGmain.cpp", "chebyshev_gauss_quadrature.hpp", "gauleg.hpp", "plot_convergence.py"],
+    "templates" : ["FSGmain.cpp", "chebyshev_gauss_quadrature.hpp", "gauleg.hpp", "plot_convergence.py"]
 }

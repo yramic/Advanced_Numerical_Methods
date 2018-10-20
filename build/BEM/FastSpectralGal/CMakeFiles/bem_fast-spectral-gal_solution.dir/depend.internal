@@ -3,8 +3,8 @@
 
 BEM/FastSpectralGal/CMakeFiles/bem_fast-spectral-gal_solution.dir/FSGmain.cpp.o
  /home/excalibur/AdvNum/Code/BEM/FastSpectralGal/FSGmain.cpp
- /home/excalibur/AdvNum/Code/BEM/FastSpectralGal/PeriodicTrapezoidalQR.hpp
  /home/excalibur/AdvNum/Code/BEM/FastSpectralGal/chebyshev_gauss_quadrature.hpp
+ /home/excalibur/AdvNum/Code/BEM/FastSpectralGal/gauleg.hpp
  /usr/include/eigen3/Eigen/Cholesky
  /usr/include/eigen3/Eigen/Core
  /usr/include/eigen3/Eigen/Dense
