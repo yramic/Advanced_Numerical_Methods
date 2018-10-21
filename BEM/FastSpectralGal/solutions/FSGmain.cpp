@@ -77,6 +77,7 @@ VectorXd solveBIE(const FUNC &g, int N) {
   VectorXd sol = LHS.lu().solve(RHS);
   return sol;
 }
+
 /* SAM_LISTING_END_2 */
 
 /* @brief Reconstruct function UN from its coefficients and evaluate it at t.
@@ -93,7 +94,9 @@ double reconstructRho(const VectorXd &coeffs, double t) {
     // Coefficients start from $T_1(x)$
     rho_N += coeffs(i) * boost::math::chebyshev_t(i + 1, t);
   return rho_N / std::sqrt(1 - t * t);
+
 }
+ 
 /* SAM_LISTING_END_3a */
 
 /* @brief Compute L2 norm of UN from its coefficients using Gauss Legendre

@@ -1,7 +1,7 @@
 //// 
 //// Copyright (C) 2017 SAM (D-MATH) @ ETH Zurich
-//// Author(s): curzuato < > 
-//// Contributors:  dcasati 
+//// Author(s): ascapin < > 
+//// Contributors:  ppanchal 
 //// This file is part of the AdvNumCSE repository.
 ////
 #include <Eigen/Dense>
@@ -79,6 +79,7 @@ VectorXd solveBIE(const FUNC &g, int N) {
   return sol;
 }
 
+
 /* @brief Reconstruct function UN from its coefficients and evaluate it at t.
  *
  * \param[in] coeffs coefficients of UN
@@ -92,7 +93,9 @@ double reconstructRho(const VectorXd &coeffs, double t) {
     // Coefficients start from $T_1(x)$
     rho_N += coeffs(i) * boost::math::chebyshev_t(i + 1, t);
   return rho_N / std::sqrt(1 - t * t);
+
 }
+ 
 
 /* @brief Compute L2 norm of UN from its coefficients using Gauss Legendre
  *        Quadrature rule

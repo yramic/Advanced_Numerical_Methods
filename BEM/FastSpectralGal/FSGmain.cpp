@@ -91,6 +91,8 @@ VectorXd solveBIE(const FUNC &g, int N) {
   // TODO: Build BIE system and solve it
 #endif // TEMPLATE
 }
+
+#if SOLUTION
 /* SAM_LISTING_END_2 */
 
 /* @brief Reconstruct function UN from its coefficients and evaluate it at t.
@@ -107,7 +109,10 @@ double reconstructRho(const VectorXd &coeffs, double t) {
     // Coefficients start from $T_1(x)$
     rho_N += coeffs(i) * boost::math::chebyshev_t(i + 1, t);
   return rho_N / std::sqrt(1 - t * t);
+
 }
+#endif
+ 
 /* SAM_LISTING_END_3a */
 
 /* @brief Compute L2 norm of UN from its coefficients using Gauss Legendre
@@ -117,6 +122,7 @@ double reconstructRho(const VectorXd &coeffs, double t) {
  */
 /* SAM_LISTING_BEGIN_3b */
 double L2norm(const VectorXd &coeffs) {
+  #if SOLUTION
   double norm = 0.;
   int N = coeffs.rows();
   // Get quadrature points and weight for Gauss Legendre Quadrature
@@ -130,6 +136,9 @@ double L2norm(const VectorXd &coeffs) {
     double rho = reconstructRho(coeffs, z);
     norm += weights(qp) * rho * rho;
   }
+     #else  // TEMPLATE
+  // TODO: implement the computation of the L2norm
+     #endif // TEMPLATE
   return std::sqrt(norm);
 }
 /* SAM_LISTING_END_3b */
@@ -170,12 +179,12 @@ int main() {
     // Evaluating error
     double l2error = L2norm(error_coeffs);
 
-     #else  // TEMPLATE
-	// TODO: implement the convergence test
-     #endif // TEMPLATE
     std::cout << N << std::setw(15) << l2error << std::endl;
 
   }
+     #else  // TEMPLATE
+  // TODO: implement the convergence test
+     #endif // TEMPLATE
   return 0;
 }
 /* SAM_LISTING_END_4 */

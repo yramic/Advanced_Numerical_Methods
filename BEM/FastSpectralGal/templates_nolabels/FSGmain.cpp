@@ -1,7 +1,7 @@
 //// 
 //// Copyright (C) 2017 SAM (D-MATH) @ ETH Zurich
-//// Author(s): curzuato < > 
-//// Contributors:  dcasati 
+//// Author(s): ascapin < > 
+//// Contributors:  ppanchal 
 //// This file is part of the AdvNumCSE repository.
 ////
 #include <Eigen/Dense>
@@ -52,20 +52,7 @@ VectorXd solveBIE(const FUNC &g, int N) {
   // TODO: Build BIE system and solve it
 }
 
-/* @brief Reconstruct function UN from its coefficients and evaluate it at t.
- *
- * \param[in] coeffs coefficients of UN
- * \param[in] t evaluation point [-1,1]
- */
-double reconstructRho(const VectorXd &coeffs, double t) {
-  assert(t >= -1 && t <= 1); // Asserting evaluation is within the domain
-  int N = coeffs.rows();
-  double rho_N = 0.;
-  for (unsigned int i = 0; i < N; ++i)
-    // Coefficients start from $T_1(x)$
-    rho_N += coeffs(i) * boost::math::chebyshev_t(i + 1, t);
-  return rho_N / std::sqrt(1 - t * t);
-}
+ 
 
 /* @brief Compute L2 norm of UN from its coefficients using Gauss Legendre
  *        Quadrature rule
@@ -73,19 +60,7 @@ double reconstructRho(const VectorXd &coeffs, double t) {
  * \param[in] coeffs coefficients of UN
  */
 double L2norm(const VectorXd &coeffs) {
-  double norm = 0.;
-  int N = coeffs.rows();
-  // Get quadrature points and weight for Gauss Legendre Quadrature
-  unsigned int order = 2 * N; // Quadrature order
-  Eigen::RowVectorXd weights, points;
-  std::tie(points, weights) = gauleg(-1, 1, order);
-  // Iterating over quadrature points
-  for (int qp = 0; qp < order; qp++) {
-    auto z = points(qp);
-    // evaluating the function
-    double rho = reconstructRho(coeffs, z);
-    norm += weights(qp) * rho * rho;
-  }
+  // TODO: implement the computation of the L2norm
   return std::sqrt(norm);
 }
 
@@ -98,9 +73,6 @@ int main() {
   std::function<double(const double &)> g1 = [](const double &x) {
     return sin(2 * M_PI * x);
   };
-	// TODO: implement the convergence test
-    std::cout << N << std::setw(15) << l2error << std::endl;
-
-  }
+  // TODO: implement the convergence test
   return 0;
 }
