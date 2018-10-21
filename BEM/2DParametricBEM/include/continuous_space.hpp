@@ -32,34 +32,6 @@ namespace parametricbem2d {
   };
 
   /**
-   * \brief This is a specialization of the templated class for p = 0.
-   *        This class represents the space \f$S^{0}_{0}\f$
-   */
-  template <>
-  class ContinuousSpace<0> : public AbstractBEMSpace{
-  public:
-    static double b1(double t) {
-      assert(IsWithinParameterRange(t));
-      return 1.;
-    }
-    // Local to Global Map
-    static unsigned int map(unsigned int q, unsigned int n, unsigned int N) {
-      assert(q<=1 && n<=N);
-      return 1;
-    }
-    // Space Dimensions
-    unsigned int getSpaceDim(unsigned int numpanels) const{
-      return numpanels*(q_-1);
-    }
-    // Constructor
-    ContinuousSpace() {
-      q_ = 1;
-      referenceshapefunctions_.push_back(b1);
-      locglobmap_ = map;
-    }
-  };
-
-  /**
    * \brief This is a specialization of the templated class for p = 1.
    *        This class represents the space \f$S^{0}_{1}\f$
    */
@@ -79,10 +51,10 @@ namespace parametricbem2d {
     // Local to Global Map
     static unsigned int map(unsigned int q, unsigned int n, unsigned int N) {
       assert(q<=2 && n<=N);
-      if (q==1)
+      if (q==2)
         return n;
       else
-        return ((n-1)%N==0) ? N : (n-1);
+        return (n%N==0) ? 1 : (n+1);
     }
     // Space Dimensions
     unsigned int getSpaceDim(unsigned int numpanels) const{
@@ -121,10 +93,10 @@ namespace parametricbem2d {
     }
     static unsigned int map(unsigned int q, unsigned int n, unsigned int N) {
       assert(q<=3 && n<=N);
-      if (q==1)
+      if (q==2)
         return n;
-      else if (q==2)
-        return ((n-1)%N==0) ? N : (n-1);
+      else if (q==1)
+        return (n%N==0) ? 1 : (n+1);
       else
         return N+n;
     }
