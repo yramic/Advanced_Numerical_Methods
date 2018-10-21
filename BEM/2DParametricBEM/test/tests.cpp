@@ -155,44 +155,35 @@ TEST(IntegralGauss, ComputeIntegral) {
 TEST(BemSpace, DiscontinuousSpace0) {
   parametricbem2d::AbstractBEMSpace *space =
       new parametricbem2d::DiscontinuousSpace<0>();
-  using BasisFunctionPointer =
-      parametricbem2d::AbstractBEMSpace::BasisFunctionPointer;
   int Q = space->getQ();
   EXPECT_EQ(Q, 1);
-  std::vector<BasisFunctionPointer> bases = space->getShapeFunctions();
   double t = rand() / RAND_MAX;
   t = 2 * t - 1; // range -1 to 1
-  EXPECT_EQ(bases[0](t), 1);
+  EXPECT_EQ(space->evaluateShapeFunction(0,t), 1);
   delete space;
 }
 
 TEST(BemSpace, DiscontinuousSpace1) {
   parametricbem2d::AbstractBEMSpace *space =
       new parametricbem2d::DiscontinuousSpace<1>();
-  using BasisFunctionPointer =
-      parametricbem2d::AbstractBEMSpace::BasisFunctionPointer;
   int Q = space->getQ();
   EXPECT_EQ(Q, 2);
-  std::vector<BasisFunctionPointer> bases = space->getShapeFunctions();
   double t = rand() / RAND_MAX;
   t = 2 * t - 1; // range -1 to 1
-  EXPECT_EQ(bases[0](t), 0.5);
-  EXPECT_EQ(bases[1](t), 0.5 * t);
+  EXPECT_EQ(space->evaluateShapeFunction(0,t), 0.5);
+  EXPECT_EQ(space->evaluateShapeFunction(1,t), 0.5 * t);
   delete space;
 }
 
 TEST(BemSpace, ContinuousSpace1) {
   parametricbem2d::AbstractBEMSpace *space =
       new parametricbem2d::ContinuousSpace<1>();
-  using BasisFunctionPointer =
-      parametricbem2d::AbstractBEMSpace::BasisFunctionPointer;
   int Q = space->getQ();
   EXPECT_EQ(Q, 2);
-  std::vector<BasisFunctionPointer> bases = space->getShapeFunctions();
   double t = rand() / RAND_MAX;
   t = 2 * t - 1; // range -1 to 1
-  EXPECT_EQ(bases[0](t), 0.5 * (1 + t));
-  EXPECT_EQ(bases[1](t), 0.5 * (1 - t));
+  EXPECT_EQ(space->evaluateShapeFunction(0,t), 0.5 * (1 + t));
+  EXPECT_EQ(space->evaluateShapeFunction(1,t), 0.5 * (1 - t));
   delete space;
 }
 
@@ -200,53 +191,41 @@ TEST(BemSpace, ContinuousSpace2) {
   const int p = 2;
   parametricbem2d::AbstractBEMSpace *space =
       new parametricbem2d::ContinuousSpace<p>();
-  using BasisFunctionPointer =
-      parametricbem2d::AbstractBEMSpace::BasisFunctionPointer;
   int Q = space->getQ();
   EXPECT_EQ(Q, 3);
-  std::vector<BasisFunctionPointer> bases = space->getShapeFunctions();
   double t = rand() / RAND_MAX;
   t = 2 * t - 1; // range -1 to 1
-  EXPECT_EQ(bases[0](t), 0.5 * (1 + t));
-  EXPECT_EQ(bases[1](t), 0.5 * (1 - t));
-  EXPECT_EQ(bases[2](t), (1 - t * t));
+  EXPECT_EQ(space->evaluateShapeFunction(0,t), 0.5 * (1 + t));
+  EXPECT_EQ(space->evaluateShapeFunction(1,t), 0.5 * (1 - t));
+  EXPECT_EQ(space->evaluateShapeFunction(2,t), (1 - t * t));
   delete space;
 }
 
 TEST(LocGlobMap, ContinuousSpace1) {
   parametricbem2d::AbstractBEMSpace *space =
       new parametricbem2d::ContinuousSpace<1>();
-  using LocGlobMapPointer =
-      parametricbem2d::AbstractBEMSpace::LocGlobMapPointer;
-  LocGlobMapPointer map = space->getLocGlobMap();
-  EXPECT_EQ(map(1, 1, 4), 2);
-  EXPECT_EQ(map(1, 2, 4), 3);
-  EXPECT_EQ(map(1, 3, 4), 4);
-  EXPECT_EQ(map(2, 3, 4), 3);
+  EXPECT_EQ(space->LocGlobMap(1, 1, 4), 2);
+  EXPECT_EQ(space->LocGlobMap(1, 2, 4), 3);
+  EXPECT_EQ(space->LocGlobMap(1, 3, 4), 4);
+  EXPECT_EQ(space->LocGlobMap(2, 3, 4), 3);
   delete space;
 }
 
 TEST(LocGlobMap, DiscontinuousSpace0) {
   parametricbem2d::AbstractBEMSpace *space =
       new parametricbem2d::DiscontinuousSpace<0>();
-  using LocGlobMapPointer =
-      parametricbem2d::AbstractBEMSpace::LocGlobMapPointer;
-  LocGlobMapPointer map = space->getLocGlobMap();
-  EXPECT_EQ(map(1, 1, 4), 1);
-  EXPECT_EQ(map(1, 2, 4), 2);
+  EXPECT_EQ(space->LocGlobMap(1, 1, 4), 1);
+  EXPECT_EQ(space->LocGlobMap(1, 2, 4), 2);
   delete space;
 }
 
 TEST(LocGlobMap, DiscontinuousSpace1) {
   parametricbem2d::AbstractBEMSpace *space =
       new parametricbem2d::DiscontinuousSpace<1>();
-  using LocGlobMapPointer =
-      parametricbem2d::AbstractBEMSpace::LocGlobMapPointer;
-  LocGlobMapPointer map = space->getLocGlobMap();
-  EXPECT_EQ(map(2, 1, 4), 5);
-  EXPECT_EQ(map(2, 2, 4), 6);
-  EXPECT_EQ(map(1, 4, 4), 4);
-  EXPECT_EQ(map(2, 4, 4), 8);
+  EXPECT_EQ(space->LocGlobMap(2, 1, 4), 5);
+  EXPECT_EQ(space->LocGlobMap(2, 2, 4), 6);
+  EXPECT_EQ(space->LocGlobMap(1, 4, 4), 4);
+  EXPECT_EQ(space->LocGlobMap(2, 4, 4), 8);
   delete space;
 }
 

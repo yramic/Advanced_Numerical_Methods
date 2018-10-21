@@ -38,19 +38,9 @@ namespace parametricbem2d {
   template <>
   class ContinuousSpace<1> : public AbstractBEMSpace{
   public:
-    // Basis function 1
-    static double b1(double t) {
-      assert(IsWithinParameterRange(t));
-      return 0.5*(t+1);
-    }
-    // Basis function 2
-    static double b2(double t) {
-      assert(IsWithinParameterRange(t));
-      return 0.5*(1-t);
-    }
     // Local to Global Map
-    static unsigned int map(unsigned int q, unsigned int n, unsigned int N) {
-      assert(q<=2 && n<=N);
+    unsigned int LocGlobMap(unsigned int q, unsigned int n, unsigned int N) const{
+      assert(q<=q_ && n<=N);
       if (q==2)
         return n;
       else
@@ -63,9 +53,16 @@ namespace parametricbem2d {
     // Constructor
     ContinuousSpace() {
       q_ = 2;
+      // Basis function 1
+      BasisFunctionType b1 = [&](double t) {
+        return 0.5*(t+1);
+      };
+      // Basis function 2
+      BasisFunctionType b2 = [&](double t) {
+        return 0.5*(1-t);
+      };
       referenceshapefunctions_.push_back(b1);
       referenceshapefunctions_.push_back(b2);
-      locglobmap_ = map;
     }
   };
 
@@ -76,23 +73,8 @@ namespace parametricbem2d {
   template <>
   class ContinuousSpace<2> : public AbstractBEMSpace{
   public:
-    // Basis function 1
-    static double b1(double t) {
-      assert(IsWithinParameterRange(t));
-      return 0.5*(t+1);
-    }
-    // Basis function 2
-    static double b2(double t) {
-      assert(IsWithinParameterRange(t));
-      return 0.5*(1-t);
-    }
-    // Basis function 3
-    static double b3(double t) {
-      assert(IsWithinParameterRange(t));
-      return 1-t*t;
-    }
-    static unsigned int map(unsigned int q, unsigned int n, unsigned int N) {
-      assert(q<=3 && n<=N);
+    unsigned int LocGlobMap(unsigned int q, unsigned int n, unsigned int N) const{
+      assert(q<=q_ && n<=N);
       if (q==2)
         return n;
       else if (q==1)
@@ -107,10 +89,21 @@ namespace parametricbem2d {
     // Constructor
     ContinuousSpace() {
       q_ = 3;
+      // Basis function 1
+      BasisFunctionType b1 = [&](double t) {
+        return 0.5*(t+1);
+      };
+      // Basis function 2
+      BasisFunctionType b2 = [&](double t) {
+        return 0.5*(1-t);
+      };
+      // Basis function 3
+      BasisFunctionType b3 = [&](double t) {
+        return 1-t*t;
+      };
       referenceshapefunctions_.push_back(b1);
       referenceshapefunctions_.push_back(b2);
       referenceshapefunctions_.push_back(b3);
-      locglobmap_ = map;
     }
   };
 } // namespace parametricbem2d
