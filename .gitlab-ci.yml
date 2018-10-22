@@ -46,7 +46,7 @@ stages:
     - mkdir -p build
     - pushd build
     - cmake ..
-    - make -j2
+    - make -j4
     - popd
 
 # now run the routines on all runners
