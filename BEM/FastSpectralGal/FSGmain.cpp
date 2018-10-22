@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <istream>
+#include <iomanip>
 
 using namespace Eigen;
 
