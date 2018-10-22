@@ -122,8 +122,8 @@ double reconstructRho(const VectorXd &coeffs, double t) {
  */
 /* SAM_LISTING_BEGIN_3b */
 double L2norm(const VectorXd &coeffs) {
-  #if SOLUTION
   double norm = 0.;
+  #if SOLUTION
   int N = coeffs.rows();
   // Get quadrature points and weight for Gauss Legendre Quadrature
   unsigned int order = 2 * N; // Quadrature order
