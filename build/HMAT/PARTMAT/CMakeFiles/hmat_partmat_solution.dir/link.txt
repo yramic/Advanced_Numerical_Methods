@@ -1,1 +1,0 @@
-/usr/lib64/ccache/c++  -g  -rdynamic CMakeFiles/hmat_partmat_solution.dir/PatMatMain.cpp.o  -o ../../bin/HMAT/PARTMAT/solution  -L/home/excalibur/AdvNum/Code/build/ethGenericGrid_install/lib  -L/home/excalibur/AdvNum/Code/build/betl2_install/lib 

@@ -1,2 +1,0 @@
-/usr/bin/ar qc libfe.a  CMakeFiles/fe.dir/dof_constraint.cpp.o CMakeFiles/fe.dir/fe_enumerators.cpp.o
-/usr/bin/ranlib libfe.a

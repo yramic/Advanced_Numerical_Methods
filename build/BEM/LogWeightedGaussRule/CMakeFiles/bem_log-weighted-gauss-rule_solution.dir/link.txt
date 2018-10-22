@@ -1,1 +1,0 @@
-/usr/lib64/ccache/c++  -g  -rdynamic CMakeFiles/bem_log-weighted-gauss-rule_solution.dir/main.cpp.o CMakeFiles/bem_log-weighted-gauss-rule_solution.dir/genLaguerreRule.cpp.o  -o ../../bin/BEM/LogWeightedGaussRule/solution  -L/home/excalibur/AdvNum/Code/build/ethGenericGrid_install/lib  -L/home/excalibur/AdvNum/Code/build/betl2_install/lib 

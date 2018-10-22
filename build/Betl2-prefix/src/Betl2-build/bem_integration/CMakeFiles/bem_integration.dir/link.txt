@@ -1,2 +1,0 @@
-/usr/bin/ar qc libbem_integration.a  CMakeFiles/bem_integration.dir/enum_singularity.cpp.o
-/usr/bin/ranlib libbem_integration.a

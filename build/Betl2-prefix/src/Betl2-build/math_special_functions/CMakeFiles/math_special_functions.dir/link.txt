@@ -1,2 +1,0 @@
-/usr/bin/ar qc libmath_special_functions.a  
-/usr/bin/ranlib libmath_special_functions.a

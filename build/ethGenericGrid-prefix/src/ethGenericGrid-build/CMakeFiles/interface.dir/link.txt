@@ -1,2 +1,0 @@
-/usr/bin/ar qc libeth_interface.a  CMakeFiles/interface.dir/Libs/interface/ref_el_types.cpp.o
-/usr/bin/ranlib libeth_interface.a

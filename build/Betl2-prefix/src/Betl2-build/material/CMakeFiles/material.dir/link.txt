@@ -1,2 +1,0 @@
-/usr/bin/ar qc libmaterial.a  CMakeFiles/material.dir/physical_constants.cpp.o CMakeFiles/material.dir/material_enumerators.cpp.o CMakeFiles/material.dir/material_data.cpp.o
-/usr/bin/ranlib libmaterial.a

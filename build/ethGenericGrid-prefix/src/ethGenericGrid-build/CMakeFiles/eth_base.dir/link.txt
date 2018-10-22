@@ -1,2 +1,0 @@
-/usr/bin/ar qc libeth_eth_base.a  CMakeFiles/eth_base.dir/Libs/eth_base/geometry_types.cpp.o CMakeFiles/eth_base.dir/Libs/eth_base/enum_ref_el_types.cpp.o CMakeFiles/eth_base.dir/Libs/eth_base/timer.cpp.o
-/usr/bin/ranlib libeth_eth_base.a

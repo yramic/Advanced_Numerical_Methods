@@ -1,1 +1,0 @@
-/usr/lib64/ccache/c++  -g  -rdynamic CMakeFiles/bem_analytic-reg_solution.dir/ARmain.cpp.o  -o ../../bin/BEM/AnalyticReg/solution  -L/home/excalibur/AdvNum/Code/build/ethGenericGrid_install/lib  -L/home/excalibur/AdvNum/Code/build/betl2_install/lib 

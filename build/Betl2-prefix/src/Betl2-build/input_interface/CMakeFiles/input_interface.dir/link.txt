@@ -1,2 +1,0 @@
-/usr/bin/ar qc libinput_interface.a  
-/usr/bin/ranlib libinput_interface.a

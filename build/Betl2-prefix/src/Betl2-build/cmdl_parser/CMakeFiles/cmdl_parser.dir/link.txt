@@ -1,2 +1,0 @@
-/usr/bin/ar qc libcmdl_parser.a  CMakeFiles/cmdl_parser.dir/cmdl_parser.cpp.o
-/usr/bin/ranlib libcmdl_parser.a

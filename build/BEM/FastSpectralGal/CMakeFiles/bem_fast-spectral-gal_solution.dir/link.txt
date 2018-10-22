@@ -1,1 +1,0 @@
-/usr/lib64/ccache/c++  -g  -rdynamic CMakeFiles/bem_fast-spectral-gal_solution.dir/FSGmain.cpp.o  -o ../../bin/BEM/FastSpectralGal/solution  -L/home/excalibur/AdvNum/Code/build/ethGenericGrid_install/lib  -L/home/excalibur/AdvNum/Code/build/betl2_install/lib 

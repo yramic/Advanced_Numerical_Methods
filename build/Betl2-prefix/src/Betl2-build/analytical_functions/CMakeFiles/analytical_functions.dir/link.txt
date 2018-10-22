@@ -1,2 +1,0 @@
-/usr/bin/ar qc libanalytical_functions.a  
-/usr/bin/ranlib libanalytical_functions.a

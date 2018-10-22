@@ -1,2 +1,0 @@
-/usr/bin/ar qc libbem_operator.a  
-/usr/bin/ranlib libbem_operator.a
