@@ -147,7 +147,14 @@ if (${Boost_MAJOR_VERSION} VERSION_LESS 1 OR ${Boost_MINOR_VERSION} VERSION_LESS
 else()
   add_custom_target(ODEINT) # dependency dummy
 endif()
+# Ugly fix errors with boost versions lower then 1.66
+if(${Boost_MAJOR_VERSION} VERSION_LESS 1 OR ${Boost_MINOR_VERSION} VERSION_LESS 66)
+  message("Boost version to old to contain chebyshev interpolation. Downloading manually")
+  file(DOWNLOAD "https://raw.githubusercontent.com/boostorg/math/develop/include/boost/math/special_functions/chebyshev.hpp" "boost_missing/boost/math/special_functions/chebyshev.hpp")
+  include_directories("${CMAKE_CURRENT_BINARY_DIR}/boost_missing")
+endif()
 include_directories (${Boost_INCLUDE_DIRS})
+message(${Boost_INCLUDE_DIRS})
 
 set(BETL2_LIBRARIES bem_integration
 cmdl_parser
