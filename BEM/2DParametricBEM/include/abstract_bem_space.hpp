@@ -10,6 +10,8 @@
 
 #include <utility>
 #include <vector>
+#include <functional>
+#include <cassert>
 
 namespace parametricbem2d {
 /**
@@ -19,24 +21,24 @@ namespace parametricbem2d {
 class AbstractBEMSpace {
 public:
   /**
-   * This typedef aids in returning a function pointer for local to global map
-   * defined in 1.4.75. The maps have the following signature:
-   * unsigned int map (unsigned int q, unsigned int n, unsigned int N);
+   * This function maps a local shape function to the corresponding global shape
+   * function for a BEM space on the given number of panels. This is a pure
+   * virtual function and has to be implemented in the derived classes.
    *
    * @param q Index of the local/reference shape function
    * @param n Index of the panel for which this map is applied
-   * @param N Total number of panels in the system
+   * @param N Total number of panels in the mesh
    * @return Integer denoting the global shape function number corresponding
-   *         to the local shape function referenced by q for the panel no. n
+   *         to the local shape function indexed by q for the panel no. n
    */
   virtual unsigned int LocGlobMap(unsigned int q, unsigned int n,
                                   unsigned int N) const = 0;
 
   /**
    * This function is used for querying the parameter interval.
-   * The standard parameter interval [-1,1] is used and it can't
-   * be overriden in the inherited classes as the function is non
-   * virtual. The function is declared static as it is independent
+   * The interval is fixed to be [-1,1] by declaring it as a non
+   * virtual function, preventing overriding of this function.
+   * The function is declared static as it is independent
    * of the concrete object.
    *
    * @return A std::pair<double,double> object containing
@@ -49,22 +51,26 @@ public:
   }
 
   /**
-   * This function is used to get the value of Q for a BEM Space.
-   * Q stands for the number of local shape functions for the Space.
+   * This function is used to get the number of local shape functions for
+   * the BEM space.
    *
-   * @return Integer Q which is the number of local shape functions
+   * @return Integer q_, which is the number of local shape functions
    */
   int getQ() const { return q_; }
 
   /**
-   * This function is used to get a vector containing all the Reference
-   * Shape Functions for the given BEM Space.
+   * This function is used to evaluate a particular reference shape function of
+   * the BEM space at a given point.
    *
-   * @return An std::vector object of size Q containing all the Reference
-   *         Shape Functions in the form of function pointers
+   * @return Value of the local shape function at the given point
    */
   double evaluateShapeFunction(unsigned int q, double t) const {
+    // Asserting that the requested shape function index is valid
     assert(q < q_);
+    // Asserting that the evaluation point is within parameter domain
+    assert(IsWithinParameterRange(t));
+    // Evaluating the requested reference shape function which is stored in a
+    // vector with others
     return referenceshapefunctions_[q](t);
   }
 
@@ -80,7 +86,9 @@ public:
    */
   static bool IsWithinParameterRange(double t) {
     double a, b;
+    // Getting the parameter range
     std::tie(a, b) = ParameterRange();
+    // Checking if the value is within parameter range
     return (t >= a && t <= b);
   }
 
@@ -95,18 +103,22 @@ public:
   virtual unsigned int getSpaceDim(unsigned int numpanels) const = 0;
 
 protected:
-  typedef std::function<double(double)> BasisFunctionType ;
   /**
-   * protected constructor ensures this base class is non instantiable.
+   * This typedef defines the basis function type. This is helpful in
+   * storing the reference shape functions for a BEM space in a vector.
+   */
+  typedef std::function<double(double)> BasisFunctionType;
+  /**
+   * Protected constructor ensures this base class is non instantiable.
    */
   AbstractBEMSpace() : q_(0){};
   /**
-   * A protected vector containing the Reference Shape Functions.
+   * A protected vector containing all the reference shape functions.
    */
   std::vector<BasisFunctionType> referenceshapefunctions_;
   /**
-   * A protected integer q which stores the number of reference shape
-   * functions in derived concrete classes
+   * A protected integer which stores the number of reference shape
+   * functions in the derived concrete classes
    */
   int q_;
 }; // class AbstractBEMSpace

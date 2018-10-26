@@ -16,49 +16,49 @@
 #include "abstract_parametrized_curve.hpp"
 
 namespace parametricbem2d {
+/**
+ * \class ParametrizedSemiCircle
+ * \brief This class represents the parametrization
+ *        of a semi circle. It is centered at (0,0) and lies in
+ *        positive x half plane. This class inherits from the
+ *        Abstract base class representing parametrized curves
+ * @see abstract_parametrized_curve.hpp
+ */
+class ParametrizedSemiCircle : public AbstractParametrizedCurve {
+public:
   /**
-   * \class ParametrizedSemiCircle
-   * \brief This class represents the parametrization
-   *        of a semi circle. It is centered at (0,0) and lies in
-   *        positive x half plane. This class inherits from the
-   *        Abstract base class representing parametrized curves
-   * @see abstract_parametrized_curve.hpp
+   * Constructor with specified radius; default value = 1.
+   *
+   * @param r radius of the semi circle
    */
-  class ParametrizedSemiCircle : public AbstractParametrizedCurve {
-    public:
-      /**
-       * Constructor with specified radius; default value = 1.
-       *
-       * @param r radius of the semi circle
-       */
-      ParametrizedSemiCircle(double r = 1.);
+  ParametrizedSemiCircle(double r = 1.);
 
-      /**
-       * See documentation in AbstractParametrizedCurve
-       */
-      Eigen::Vector2d operator() (double) const;
+  /**
+   * See documentation in AbstractParametrizedCurve
+   */
+  Eigen::Vector2d operator()(double) const;
 
-      /**
-       * See documentation in AbstractParametrizedCurve
-       */
-      Eigen::Vector2d Derivative(double) const;
+  /**
+   * See documentation in AbstractParametrizedCurve
+   */
+  Eigen::Vector2d Derivative(double) const;
 
-      /**
-       * See documentation in AbstractParametrizedCurve
-       */
-      Eigen::Vector2d DoubleDerivative(double) const;
+  /**
+   * See documentation in AbstractParametrizedCurve
+   */
+  Eigen::Vector2d DoubleDerivative(double) const;
 
-      /**
-       * See documentation in AbstractParametrizedCurve
-       */
-      PanelVector split(unsigned int) const;
+  /**
+   * See documentation in AbstractParametrizedCurve
+   */
+  PanelVector split(unsigned int) const;
 
-    private:
-      /**
-       * Private const field for storing the radius
-       */
-      const double radius_;
-  }; // class ParametrizedSemiCircle
+private:
+  /**
+   * Private const field for storing the radius
+   */
+  const double radius_;
+}; // class ParametrizedSemiCircle
 } // namespace parametricbem2d
 
-#endif //PARAMETRIZEDSEMICIRCLEHPP
+#endif // PARAMETRIZEDSEMICIRCLEHPP

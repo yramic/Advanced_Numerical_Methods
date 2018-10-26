@@ -22,19 +22,18 @@ namespace parametricbem2d {
 namespace single_layer {
 
 /**
- * This function is used to evaluate a single entry of the
- * Interaction Matrix for the pair of panels \f$\Pi\f$ and \f$\Pi\f$'
- * for the bilinear form induced by the Single Layer BIO. It implements
- * the case where the panels are adjacent. This function calculates the
- * matrix entry by using a local arclength parametrization and the
- * transformations mentioned in eq. 1.4.165 to eq. 1.4.172
+ * This function is used to evaluate the Interaction Matrix for the pair
+ * of panels \f$\Pi\f$ and \f$\Pi\f$', for the bilinear form induced by
+ * the Single Layer BIO. It implements the case where the panels are adjacent.
+ * The matrix entries are calculated by using a local arclength parametrization
+ * and the transformations mentioned in eq. 1.4.165 to eq. 1.4.172
  *
  * @param pi Parametrization for the first panel \f$\Pi\f$.
  * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
- * @param bi The basis function associated with panel \f$\Pi\f$.
- * @param bj The basis function associated with panel \f$\Pi\f$'.
+ * @param space The BEM space to be used for calculations
  * @param N The order for gauss/log-weighted quadrature
- * @return The /f$(i,j)^{th}/f$ entry of the interaction matrix
+ * @return An Eigen::MatrixXd type Interaction Matrix (QXQ)
+ *         where Q is number of local shape functions in BEM space
  */
 Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
                                         const AbstractParametrizedCurve &pi_p,
@@ -42,18 +41,18 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
                                         const unsigned int &N);
 
 /**
- * This function is used to evaluate a single entry of the
- * Interaction Matrix for the pair of panels \f$\Pi\f$ and \f$\Pi\f$'
- * for the bilinear form induced by the Single Layer BIO. It implements
- * the case where the panels are coinciding. The value is calculated
- * using the transformations mentioned in eq. 1.4.153 to eq. 1.4.163
+ * This function is used to evaluate the Interaction Matrix for the pair
+ * of panels \f$\Pi\f$ and \f$\Pi\f$', for the bilinear form induced by
+ * the Single Layer BIO. It implements the case where the panels are coinciding.
+ * The matrix entries are calculated by using transformations mentioned in
+ * eq. 1.4.153 to eq. 1.4.163
  *
  * @param pi Parametrization for the first panel \f$\Pi\f$.
  * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
- * @param bi The basis function associated with panel \f$\Pi\f$.
- * @param bj The basis function associated with panel \f$\Pi\f$'.
+ * @param space The BEM space to be used for calculations
  * @param N The order for gauss/log-weighted quadrature
- * @return The /f$(i,j)^{th}/f$ entry of the interaction matrix
+ * @return An Eigen::MatrixXd type Interaction Matrix (QXQ)
+ *         where Q is number of local shape functions in BEM space
  */
 Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
                                           const AbstractParametrizedCurve &pi_p,
@@ -61,18 +60,17 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
                                           const unsigned int &N);
 
 /**
- * This function is used to evaluate a single entry of the
- * Interaction Matrix for the pair of panels \f$\Pi\f$ and \f$\Pi\f$'
- * for the bilinear form induced by the Single Layer BIO. It implements
- * the general case where panels are neither coinciding nor adjacent.
- * The value is calculated using standard Gaussian Quadrature.
+ * This function is used to evaluate the Interaction Matrix for the pair
+ * of panels \f$\Pi\f$ and \f$\Pi\f$', for the bilinear form induced by
+ * the Single Layer BIO. It implements the case where the panels are completely
+ * disjoint. The matrix entries are calculated by Gauss Legendre quadrature.
  *
  * @param pi Parametrization for the first panel \f$\Pi\f$.
  * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
- * @param bi The basis function associated with panel \f$\Pi\f$.
- * @param bj The basis function associated with panel \f$\Pi\f$'.
+ * @param space The BEM space to be used for calculations
  * @param N The order for gauss/log-weighted quadrature
- * @return The /f$(i,j)^{th}/f$ entry of the interaction matrix
+ * @return An Eigen::MatrixXd type Interaction Matrix (QXQ)
+ *         where Q is number of local shape functions in BEM space
  */
 Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
                                        const AbstractParametrizedCurve &pi_p,
@@ -82,14 +80,20 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
  * This function is used to evaluate the Interaction Matrix for
  * the pair of panels \f$\Pi\f$ and \f$\Pi\f$' for the bilinear
  * form induced by the Single Layer BIO given by the formula :
- * \f$I_{ij}\f$ = \f$-\frac{1}{2\pi} \int_{\Pi} \int_{\Pi '} \log{ \vert x-y
- * \vert } b^{j}_{\Pi '}(y) b^{i}_{\Pi}(x) ds(y) ds(x) \f$ where \f$b^{j}_{\Pi
- * '}\f$ & \f$b^{i}_{\Pi}\f$ are local shape functions associated with panels
- * \f$\Pi\f$ ' and \f$\Pi\f$ respectively. \f$I\f$, the interaction matrix is of
- * size QXQ where Q is the number of local shape functions for the used BEM
+ * \f$I_{ij}\f$ = \f$-\frac{1}{2\pi} \int_{-1}^{1} \int_{-1}^{1}
+ * \log{(\|\gamma_{\Pi}(s)-\gamma_{\Pi'}(t)\|)} \hat{b}^{j}(t) \hat{b}^{i}(s)
+ * \|\dot{\gamma}_{\Pi}(s)\| \|\dot{\gamma}_{\Pi'}(t)\| dt ds \f$ where
+ * \f$\hat{b}^{j}\f$ & \f$\hat{b}^{i}\f$ are local shape functions associated
+ * the trial and test BEM space \f$S_{p}^{-1}\f$. The interaction matrix \f$I\f$
+ * , is of size QXQ where Q is the number of local shape functions in the BEM
  * space. The computation of the entries are based on cases and delegated to
- * these functions accordingly: ComputeIntegralGeneral ComputeIntegralAdjacent
- * ComputeIntegralCoinciding
+ * these functions accordingly:
+ *
+ * ComputeIntegralGeneral()
+ *
+ * ComputeIntegralAdjacent()
+ *
+ * ComputeIntegralCoinciding()
  *
  * @param pi Parametrization for the first panel \f$\Pi\f$.
  * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
@@ -105,15 +109,16 @@ Eigen::MatrixXd InteractionMatrix(const AbstractParametrizedCurve &pi,
 
 /**
  * This function is used to evaluate the full Galerkin matrix based on the
- * Bilinear form for Single Layer BIO. It uses the BEM space specified by
- * space and the Parametrized mesh specified by mesh. It evaluates the matrix
- * by using the function SingleLayer and panel oriented assembly based on
- * a local to global map defined in the BEM space itself.
+ * Bilinear form for Single Layer BIO. It uses the trial and test spaces and
+ * Parametrized mesh specified as inputs. It evaluates the matrix by panel
+ * oriented assembly by first evaluating the interaction matrix for all possible
+ * pairs of panels and then using the local to global map of BEM spaces to fill
+ * the matrix entries.
  *
  * @param mesh ParametrizedMesh object containing all the parametrized
  *             panels in the mesh
- * @param space The BEM space to be used for evaluating the Galerkin matrix
- * @param space The BEM space to be used for calculations
+ * @param space The trial and test BEM space to be used for evaluating
+ *              the Galerkin matrix
  * @param N Order for Gauss Quadrature
  * @return An Eigen::MatrixXd type Galerkin Matrix for the given mesh and space
  */

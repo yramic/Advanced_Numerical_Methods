@@ -1,9 +1,19 @@
+/**
+ * \file logweight_quadrature.cpp
+ * \brief This file defines the function to evaluate the quadrature rule
+ *        for a log-weighted integral of the form :
+ *        \f$ \int_{0}^{a} \log(t) f(t) dt \f$
+ *        using the Gauss Laguerre Rule and a simple integral transformation.
+ *
+ * This File is a part of the 2D-Parametric BEM package
+ */
+
 #include "logweight_quadrature.hpp"
 
 #include <Eigen/Dense>
 #include "genLaguerreRule.hpp"
 
-static const int KIND = 5;
+static const int KIND = 5; // To get Gauss-Laguerre quadrature rule
 
 QuadRule getLogWeightQR(double a, int n){
   // get Gauss-Laguerre quadrature points and weights

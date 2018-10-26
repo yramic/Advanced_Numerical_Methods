@@ -45,6 +45,7 @@ namespace parametricbem2d {
   }
 
   PanelVector ParametrizedSemiCircle::split(unsigned int N) const {
+    // PanelVector for storing the part parametrizations
     PanelVector parametrization_parts;
     for (int i = 0 ; i < N ; ++i) {
       double phi_min = 0.;
