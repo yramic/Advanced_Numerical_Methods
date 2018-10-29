@@ -556,6 +556,22 @@ TEST(DoubleLayer_0_0, CppHilbertComparison) {
   EXPECT_NEAR((galerkinold - galerkin).norm(), 0, eps);
 }
 
+TEST(AbstractParametrizedCurve,DistanceTo) {
+  Eigen::Vector2d center; center << 0,0;
+  parametricbem2d::ParametrizedCircularArc curve1(center,1.,0,M_PI/2);
+  Eigen::Vector2d point1(1+0.1,0); Eigen::Vector2d point2(1+0.1,1);
+  parametricbem2d::ParametrizedLine curve2(point1,point2);
+  double distance; Eigen::Vector2d solution;
+  std::tie(solution,distance) = curve1.distanceTo(curve2);
+  EXPECT_NEAR(distance,0.1,eps);
+  /*Eigen::Vector2d point3(1,0); Eigen::Vector2d point4(0,1);
+  parametricbem2d::ParametrizedLine curve3(point3,point4);
+  std::tie(solution,distance) = curve3.distanceTo(curve2);
+  EXPECT_NEAR(distance,0.1,eps);*/
+  std::cout << "Distance = " << distance << std::endl;
+  std::cout << "Solution = " << solution << std::endl;
+}
+
 int main(int argc, char **argv) {
   srand(time(NULL));
   // run tests

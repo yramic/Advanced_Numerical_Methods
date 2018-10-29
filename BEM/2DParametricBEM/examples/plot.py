@@ -1,24 +1,56 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-fname = "log_out.txt"
-data = np.loadtxt(fname)
+fname1 = "./../build/log_functions.txt"
+fname2 = "./../build/log_integrals.txt"
+data = np.loadtxt(fname1)
 
-x = data[:,0]
-y = data[:,1]
-order = data[:,3]
+x1 = data[:,0]
+y1 = data[:,1]
+x2 = data[:,2]
+y2 = data[:,3]
 
-fig,ax1 = plt.subplots()
-ax1.plot(x,y,'b')
+plt.figure()
+plt.plot(x1,y1)
 
-ax1.set_xlabel('y')
-ax1.set_ylabel('$\int_{-1}^{1} \log{(x-y)} dx$')
-#ax1.legend(['f(y)'])
-ax1.tick_params('y',colors='b')
-ax2 = ax1.twinx()
-ax2.plot(x,order,'r')
-ax2.set_ylabel('Gauss quadrature order')
-#ax2.legend(['Order'])
-ax2.tick_params('y',colors='r')
-plt.title("Plot of $\int_{-1}^{1} \log{(x-y)} dx$ vs y")
+plt.xlabel('y')
+plt.ylabel('$\int_{-1}^{1} \log{|x-y|} dx$')
+
+plt.title("Plot of $\int_{-1}^{1} \log{|x-y|} dx$ for y $\in$ [-1,1]")
+plt.savefig("y_-1_1.eps")
+
+plt.figure()
+plt.plot(x2,y2)
+
+plt.xlabel('y')
+plt.ylabel('$\int_{-1}^{1} \log{|x-y|} dx$')
+
+plt.title("Plot of $\int_{-1}^{1} \log{|x-y|} dx$ for y $\in$ [1,2]")
+plt.savefig("y_1_2.eps")
+
+plt.figure()
+x3 = np.append(x1,x2)
+y3 = np.append(y1,y2)
+plt.plot(x3,y3)
+
+plt.xlabel('y')
+plt.ylabel('$\int_{-1}^{1} \log{|x-y|} dx$')
+
+plt.title("Plot of $\int_{-1}^{1} \log{|x-y|} dx$ for y $\in$ [-1,2]")
+plt.savefig("y_-1_2.eps")
+
+data = np.loadtxt(fname2)
+order = data[:,0]
+error1 = data[:,1]
+error2 = data[:,2]
+
+plt.figure()
+plt.loglog(order,error1,'b')
+plt.loglog(order,error2,'r')
+plt.xlabel('Quadrature Order')
+plt.ylabel('Quadrature Error')
+plt.legend(["y $\in$ [-1,1]","y $\in$ [1,2]"])
+plt.title("Plot of Quadrature Error")
+plt.savefig("quadrature_error.eps")
+
 plt.show()

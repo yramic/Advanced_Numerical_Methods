@@ -13,8 +13,10 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include <iostream>
 
 #include <Eigen/Dense>
+#include "gradient_descent.hpp"
 /**
  * \namespace parametricbem2d
  * \brief This namespace contains all the classes and functions for
@@ -130,6 +132,107 @@ public:
    * @return PanelVector containing all the part parametrizations
    */
   virtual PanelVector split(unsigned int N) const = 0;
+
+  /**
+   * This function is used for splitting a parametrized curve into several
+   * self-similar part curves. It is useful to make a parametrized mesh as it
+   * returns all the part-parametrizations stored in a sequence in a PanelVector
+   * such that the end point of a part is the starting point of the next part.
+   *
+   * @param N Integer indicating the number of parts for split
+   * @return PanelVector containing all the part parametrizations
+   */
+  std::pair<Eigen::Vector2d, double>
+  distanceTo(const AbstractParametrizedCurve &curve) const {
+    // The vector to store the solution for minimum distance between two curves
+    Eigen::Vector2d initial(2);
+    initial << 0,0;
+    Eigen::Vector2d interior_solution(2);
+    // Finding an interior solution
+    std::function<Eigen::Vector2d(Eigen::Vector2d)> gradient = [&] (Eigen::Vector2d x) {
+      double s, t;
+      s = x(0);
+      t = x(1);
+      return Eigen::Vector2d(
+                (this->operator()(s) - curve(t)).dot(this->Derivative(s)),
+                -(this->operator()(s) - curve(t)).dot(curve.Derivative(t)));
+    };
+    bool interior_soln_exists;
+    std::tie(interior_solution,interior_soln_exists) = GradientDescent(gradient,initial);
+    std::cout << "Interior solution " << interior_solution << std::endl;
+    if (interior_soln_exists)
+      std::cout << "interior solution exists " << std::endl;
+    // Find minima on the boundary
+    double guess = 0.;
+    bool boundary;
+    double solution;
+    double min_dist;
+    Eigen::Vector2d final_solution;
+    // this curve(-1)
+    /*std::function<double(double)> gradient1 = [&] (double t) {
+      return -(this->operator()(-1) - curve(t)).dot(curve.Derivative(t));
+    };
+    std::tie(solution,boundary) = GradientDescent(gradient1,guess);
+    if (boundary)
+      solution = std::signbit(solution);
+    double dist1 = (this->operator()(-1) - curve(solution)).norm();
+    min_dist = dist1;
+    final_solution = Eigen::Vector2d(-1,solution);
+
+    // this curve(1)
+    std::function<double(double)> gradient2 = [&] (double t) {
+      return -(this->operator()(1) - curve(t)).dot(curve.Derivative(t));
+    };
+    std::tie(solution,boundary) = GradientDescent(gradient2,guess);
+    if (boundary)
+      solution = std::signbit(solution);
+    double dist2 = (this->operator()(1) - curve(solution)).norm();
+    if (dist2 < min_dist) {
+      min_dist = dist2;
+      final_solution = Eigen::Vector2d(1,solution);
+    }
+
+    // curve(-1)
+    std::function<double(double)> gradient3 = [&] (double s) {
+      return (this->operator()(s) - curve(-1)).dot(this->Derivative(s));
+    };
+    std::tie(solution,boundary) = GradientDescent(gradient3,guess);
+    if (boundary)
+      solution = std::signbit(solution);
+    double dist3 = (this->operator()(solution) - curve(-1)).norm();
+    if (dist3 < min_dist) {
+      min_dist = dist3;
+      final_solution = Eigen::Vector2d(solution,-1);
+    }
+
+    // curve(1)
+    std::function<double(double)> gradient4 = [&] (double s) {
+      return (this->operator()(s) - curve(1)).dot(this->Derivative(s));
+    };
+    std::tie(solution,boundary) = GradientDescent(gradient4,guess);
+    if (boundary)
+      solution = std::signbit(solution);
+    double dist4 = (this->operator()(solution) - curve(1)).norm();
+    if (dist4 < min_dist) {
+      min_dist = dist4;
+      final_solution = Eigen::Vector2d(solution,1);
+    }
+
+    */
+    // gradient descent stopped on the boundary
+    if (interior_soln_exists || true) {
+      double s, t;
+      s = interior_solution(0);
+      t = interior_solution(1);
+      double interior_distance = (this->operator()(s) - curve(t)).norm();
+      if (interior_distance < min_dist || true) {
+        min_dist = interior_distance;
+        final_solution = interior_solution;
+      }
+    }
+
+    return std::make_pair(final_solution,min_dist);
+  }
 }; // class AbstractParametrizedCurve
 } // namespace parametricbem2d
 
