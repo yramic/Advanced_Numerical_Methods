@@ -46,18 +46,18 @@ stages:
     - mkdir -p build
     - pushd build
     - cmake ..
-    - make -j2
+    - make -j4
     - popd
 
 # now run the routines on all runners
 setup_ubuntu_current:
   <<: *setup_ubuntu
-  tags: [ubuntu, current]
+  tags: [ubuntu-bionic-1]
 
 init_repo_ubuntu_current:
   <<: *init_repo
-  tags: [ubuntu, current]
+  tags: [ubuntu-bionic-1]
 
 compile_ubuntu_current:
   <<: *compile
-  tags: [ubuntu, current]
+  tags: [ubuntu-bionic-1]

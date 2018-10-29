@@ -8,11 +8,11 @@ project(AdvNumCSE)
 #
 ###########################################################################
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake/modules")
-include(${CMAKE_SOURCE_DIR}/CMake/functions/add_all_subdirectories.cmake)
-include(${CMAKE_SOURCE_DIR}/CMake/functions/add_executable_advnumcse.cmake)
-include(${CMAKE_SOURCE_DIR}/CMake/functions/add_executable_advnumcse_betl2.cmake)
-include(${CMAKE_SOURCE_DIR}/CMake/functions/get_target_name_advnumcse.cmake)
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
+include(${CMAKE_SOURCE_DIR}/cmake/functions/add_all_subdirectories.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/functions/add_executable_advnumcse.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/functions/add_executable_advnumcse_betl2.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/functions/get_target_name_advnumcse.cmake)
 
 ###########################################################################
 #
@@ -62,7 +62,7 @@ endif()
 # FIND EIGEN
 ###########################################################################
 
-include(${CMAKE_SOURCE_DIR}/CMake/functions/GetEIGEN3.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/functions/GetEIGEN3.cmake)
 add_definitions(-DEIGEN3_ACTIVATED)
 
 ###########################################################################
@@ -147,7 +147,14 @@ if (${Boost_MAJOR_VERSION} VERSION_LESS 1 OR ${Boost_MINOR_VERSION} VERSION_LESS
 else()
   add_custom_target(ODEINT) # dependency dummy
 endif()
+# Ugly fix errors with boost versions lower then 1.66
+if(${Boost_MAJOR_VERSION} VERSION_LESS 1 OR ${Boost_MINOR_VERSION} VERSION_LESS 66)
+  message("Boost version to old to contain chebyshev interpolation. Downloading manually")
+  file(DOWNLOAD "https://raw.githubusercontent.com/boostorg/math/develop/include/boost/math/special_functions/chebyshev.hpp" "boost_missing/boost/math/special_functions/chebyshev.hpp")
+  include_directories("${CMAKE_CURRENT_BINARY_DIR}/boost_missing")
+endif()
 include_directories (${Boost_INCLUDE_DIRS})
+message(${Boost_INCLUDE_DIRS})
 
 set(BETL2_LIBRARIES bem_integration
 cmdl_parser

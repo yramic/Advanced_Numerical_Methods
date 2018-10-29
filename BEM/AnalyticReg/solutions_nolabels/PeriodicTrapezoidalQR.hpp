@@ -1,7 +1,7 @@
 //// 
 //// Copyright (C) 2017 SAM (D-MATH) @ ETH Zurich
-//// Author(s): curzuato < > 
-//// Contributors:  dcasati 
+//// Author(s): ascapin < > 
+//// Contributors:  ppanchal 
 //// This file is part of the AdvNumCSE repository.
 ////
 #ifndef PTRAPEZOIDALQR_HPP
