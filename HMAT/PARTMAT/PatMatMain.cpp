@@ -47,8 +47,8 @@ public:
   VectorXd operator * (const VectorXd &v) const; 
 private:
   size_t m,n; // dimensions of matrix
-  vector<FarFieldBlock<q>> farField;
-  vector<NearFieldBlock> nearField;
+  std::vector<FarFieldBlock<q>> farField;
+  std::vector<NearFieldBlock> nearField;
 };
 /* SAM_LISTING_END_1 */
 
