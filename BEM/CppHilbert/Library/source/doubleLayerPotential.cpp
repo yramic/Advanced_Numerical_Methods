@@ -111,57 +111,43 @@ void computeKij(double* I0, double* I1, double eta,
 
 
 //-----------------------------------------------------------------------------
+/* SAM_LISTING_BEGIN_2 */
 void computeKijAnalytic(double* I0, double* I1, 
 			const Eigen::Vector2d& a, const Eigen::Vector2d& b,
 			const Eigen::Vector2d& c, const Eigen::Vector2d& d)
 {
-  
   double hi = (b-a).squaredNorm(); // hi = norm(b-a) squared 
   double hj = (d-c).squaredNorm(); // hj = norm(d-c) squared
   Eigen::Vector2d n = unitNormal(c,d); // normal vector
   
-  Eigen::Vector2d u = a-b; 
-  Eigen::Vector2d v = d-c;
-  Eigen::Vector2d w = c+d-a-b;
-  Eigen::Vector2d wpu = w+u;
-  Eigen::Vector2d wmu = w-u;
-  Eigen::Vector2d wpv = w+v;
-  Eigen::Vector2d wmv = w-v;
+  Eigen::Vector2d u = a-b, v = d-c, w = c+d-a-b;
+  Eigen::Vector2d wpu = w+u, wmu = w-u;
+  Eigen::Vector2d wpv = w+v, wmv = w-v;
 
-  double dot_u_n = u.dot(n);
-  double dot_w_n = w.dot(n);
-  double dot_wpu_n = wpu.dot(n);
-  double dot_wmu_n = wmu.dot(n);
-
+  double dot_u_n = u.dot(n), dot_w_n = w.dot(n);
+  double dot_wpu_n = wpu.dot(n), dot_wmu_n = wmu.dot(n);
   double det = CrossProd2d(u,v);
   
   double lambda=0.0, mu=0.0;
-  if (fabs(det) <= EPS*sqrt(hi*hj))  // u,v linearly dependent
-  {
-    if (fabs(u[0]) > fabs(u[1]))
-      mu = v[0]/u[0]; 
-    else
-      mu = v[1]/u[1];
+  if (fabs(det) <= EPS*sqrt(hi*hj)) { // u,v linearly dependent
+    if (fabs(u[0]) > fabs(u[1]))  mu = v[0]/u[0]; 
+    else mu = v[1]/u[1];
 
     *I0 = dot_w_n*( dlp(0,u,wpv)+dlp(0,u,wmv)+ mu*(dlp(1,v,wmu)-dlp(1,v,wpu)) );
     *I1 = dot_w_n*( dlp(0,u,wpv)-dlp(0,u,wmv)+ mu*(dlp(2,v,wmu)-dlp(2,v,wpu)) )*0.5;
   }
-  else  // u,v linearly independent 
-  {
-    if (a[0] == d[0] && a[1] == d[1])
-    {
+  else { // u,v linearly independent 
+    if (a[0] == d[0] && a[1] == d[1]) {
       *I0 = 2*( dot_wpu_n*dlp(0,v,wpu)+dot_u_n*dlp(1,u,wmv)+dot_w_n*dlp(0,u,wmv) );
       *I1 =     dot_wpu_n*dlp(1,v,wpu)-dot_u_n*dlp(1,u,wmv)-dot_w_n*dlp(0,u,wmv)
 	    + 0.5*(*I0);
     }
-    else if (b[0] == c[0] && b[1] == c[1])
-    {
+    else if (b[0] == c[0] && b[1] == c[1]) {
       *I0 = 2*( dot_wmu_n*dlp(0,v,wmu)+dot_u_n*dlp(1,u,wpv)+dot_w_n*dlp(0,u,wpv) );
       *I1 =     dot_wmu_n*dlp(1,v,wmu)+dot_u_n*dlp(1,u,wpv)+dot_w_n*dlp(0,u,wpv)
 	    - 0.5*(*I0);
     }
-    else
-    {
+    else {
       mu     = CrossProd2d(w,v)/det;
       lambda = CrossProd2d(u,w)/det;
      
@@ -177,7 +163,7 @@ void computeKijAnalytic(double* I0, double* I1,
   *I0 *= -0.125*sqrt(hi*hj)/M_PI;
   *I1 *= -0.125*sqrt(hi*hj)/M_PI;
 }
-
+/* SAM_LISTING_END_2 */
 
 //-----------------------------------------------------------------------------
 void computeKijSwappedAnalytic(double* I0, double* I1, 
