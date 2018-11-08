@@ -77,6 +77,12 @@ unsigned Node::setVc(const Eigen::VectorXd& c)
 // update C*V*c restricted to node indices
 unsigned Node::setCVc(const Eigen::VectorXd& CVc)
 {
+    //CVc_node_.setZero();
     CVc_node_ += CVc;
     return CVc_node_.size(); // return no. of 'operations' performed
+}
+
+void Node::resetCVc()
+{
+    CVc_node_.setZero();
 }

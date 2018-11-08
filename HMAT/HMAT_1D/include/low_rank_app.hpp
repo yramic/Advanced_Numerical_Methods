@@ -62,6 +62,28 @@ public:
      */
     void calc_numb_approx_per_row(std::vector<BlockCluster*> ff_v, Eigen::VectorXd& f_approx_ff_contr);
 
+    void print_ff_nf() {
+      //std::cout << "NF blocks: " << HP_.getFF().size() << " FF Blocks: " << HP_.getNF().size() << std::endl;
+
+      if (HP_.getNF().size()>0) {
+        std::cout << "NF Blocks: " << std::endl;
+        for (auto block:HP_.getNF())
+          std::cout << block->getXNode()->getPoints().front().getId() << ","
+                    << block->getXNode()->getPoints().back().getId() << " X "
+                    << block->getYNode()->getPoints().front().getId() << ","
+                    << block->getYNode()->getPoints().back().getId() << std::endl;
+      }
+
+      if (HP_.getFF().size()>0) {
+        std::cout << "FF Blocks: " << std::endl;
+        for (auto block:HP_.getFF())
+        std::cout << block->getXNode()->getPoints().front().getId() << ","
+                  << block->getXNode()->getPoints().back().getId() << " X "
+                  << block->getYNode()->getPoints().front().getId() << ","
+                  << block->getYNode()->getPoints().back().getId() << std::endl;
+      }
+    }
+
 protected:
     /*!
      * \brief Pre-processing: initialize matrix V and vector Vc for all far field nodes
@@ -76,6 +98,12 @@ protected:
      * \param ff_v Vector of Far Field Pairs
      */
     void blockProcess(std::vector<BlockCluster*> ff_v);
+
+    /*!
+     * \brief Block-processing: Set CVc for all far field pairs to zero
+     * \param ff_v Vector of Far Field Pairs
+     */
+    void blockProcessClear(std::vector<BlockCluster*> ff_v);
 
     /*!
      * \brief Debug-processing: compute approximate matrix VCV for all far field pairs,

@@ -108,7 +108,11 @@ public:
      * \return no. of 'operations' performed
      */
     unsigned setCVc(const Eigen::VectorXd& CVc);
-  
+    /*!
+     * \brief reset CVc vector to zero
+     */
+    void resetCVc();
+
 protected:
     Node* l_child_;  //!< left  child of node
     Node* r_child_;  //!< right child of node
