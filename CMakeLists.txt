@@ -183,5 +183,5 @@ ${Boost_LIBRARIES}
 add_subdirectory(BEM)
 add_subdirectory(HMAT)
 add_subdirectory(CONVQUAD)
-add_subdirectory(AMG)
+#add_subdirectory(AMG)
 

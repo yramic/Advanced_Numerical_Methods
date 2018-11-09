@@ -29,7 +29,7 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd> low_rank_merge(
     // If $m > n$, however, the extra columns of $\VQ_1$ and extra rows of $\VR_1$ are not needed.
     // Matlab returns this ''economy-size´´ format calling ''qr(A,0)´´,
     // which does not compute these extra entries.
-    // With the code above, Eigen is smart enough to not compute the discarded vectors.
+    // With the code above, Eigen is smart enough not to compute the discarded vectors.
 
     m = B2.rows();
     n = B2.cols();
@@ -77,6 +77,8 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd> low_rank_merge(
 std::pair<double,double> test_low_rank_merge(size_t n)
 {
 #if SOLUTION
+
+    // Build X1, X2 defined in sub-problem (2.4.a)
     Eigen::MatrixXd X1(n,n), X2(n,n);
     for(double i=0.; i<n; ++i) {
         for(double j=0.; j<n; ++j) {
@@ -87,12 +89,12 @@ std::pair<double,double> test_low_rank_merge(size_t n)
     Eigen::MatrixXd Z(n,2*n);
     Z << X1, X2;
 
-    Eigen::JacobiSVD<Eigen::MatrixXd> SVD1(X1, Eigen::ComputeThinU | Eigen::ComputeThinV);
+    Eigen::JacobiSVD<Eigen::MatrixXd> SVD1(X1, Eigen::ComputeThinU | Eigen::ComputeThinV); // Compute an SVD decomposition of X1 and X2, that is U, S1, V
     Eigen::VectorXd s1 = SVD1.singularValues();
     Eigen::MatrixXd S1; S1.setZero(SVD1.rank(), SVD1.rank());
-    S1.diagonal() = s1.head(SVD1.rank());
+    S1.diagonal() = s1.head(SVD1.rank()); // Keep a number of singular values up to the rank
     Eigen::MatrixXd A1 = SVD1.matrixU().leftCols(SVD1.rank()) * S1;
-    Eigen::MatrixXd B1 = SVD1.matrixV().leftCols(SVD1.rank());
+    Eigen::MatrixXd B1 = SVD1.matrixV().leftCols(SVD1.rank()); // Build matrices A1 and A2 out of the SVD decomposition
     Eigen::JacobiSVD<Eigen::MatrixXd> SVD2(X2, Eigen::ComputeThinU | Eigen::ComputeThinV);
     Eigen::VectorXd s2 = SVD2.singularValues();
     Eigen::MatrixXd S2; S2.setZero(SVD2.rank(), SVD2.rank());
@@ -100,11 +102,11 @@ std::pair<double,double> test_low_rank_merge(size_t n)
     Eigen::MatrixXd A2 = SVD2.matrixU().leftCols(SVD2.rank()) * S2;
     Eigen::MatrixXd B2 = SVD2.matrixV().leftCols(SVD2.rank());
 
-    std::pair<Eigen::MatrixXd,Eigen::MatrixXd> AB = low_rank_merge(A1, B1, A2, B2);
+    std::pair<Eigen::MatrixXd,Eigen::MatrixXd> AB = low_rank_merge(A1, B1, A2, B2); // Call the function low_rank_marge implemented in sub-problem (2.4.b)
     Eigen::MatrixXd Ztilde = AB.first * AB.second.transpose();
 
     Eigen::MatrixXd diff = Z - Ztilde;
-    double err_Frob = diff.norm()/n;
+    double err_Frob = diff.norm()/n; // $n^{-1} \| Z - \widetilde{Z} \|_F$
     double err_max  = diff.cwiseAbs().maxCoeff();
 
     return {err_Frob,err_max};
@@ -148,7 +150,8 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd> adap_rank_merge(
 
     unsigned p = s.size();
     for(unsigned q=1; q<s.size(); ++q) {
-        if(s(q) <= s(0) * rtol) {
+    // $q \in \{0 , ..., p-1\}$ : $\sigma_{q} \le \text{rtol} \cdot \sigma_0$
+        if(s(q) <= s(0) * rtol) { 
             p = q;
             break;
         }
@@ -196,10 +199,10 @@ std::pair<double,size_t> test_adap_rank_merge(size_t n, double rtol) {
     Eigen::MatrixXd Z(n,2*n);
     Z << X1, X2;
 
-    Eigen::JacobiSVD<Eigen::MatrixXd> SVD1(X1, Eigen::ComputeThinU | Eigen::ComputeThinV);
+    Eigen::JacobiSVD<Eigen::MatrixXd> SVD1(X1, Eigen::ComputeThinU | Eigen::ComputeThinV); // Compute an SVD decomposition of X1 and X2, that is U, S1, V
     Eigen::VectorXd s1 = SVD1.singularValues();
     Eigen::MatrixXd S1; S1.setZero(SVD1.rank(), SVD1.rank());
-    S1.diagonal() = s1.head(SVD1.rank());
+    S1.diagonal() = s1.head(SVD1.rank()); // Keep a number of singular values up to the rank
     Eigen::MatrixXd A1 = SVD1.matrixU().leftCols(SVD1.rank()) * S1;
     Eigen::MatrixXd B1 = SVD1.matrixV().leftCols(SVD1.rank());
     Eigen::JacobiSVD<Eigen::MatrixXd> SVD2(X2, Eigen::ComputeThinU | Eigen::ComputeThinV);
@@ -207,9 +210,9 @@ std::pair<double,size_t> test_adap_rank_merge(size_t n, double rtol) {
     Eigen::MatrixXd S2; S2.setZero(SVD2.rank(), SVD2.rank());
     S2.diagonal() = s2.head(SVD2.rank());
     Eigen::MatrixXd A2 = SVD2.matrixU().leftCols(SVD2.rank()) * S2;
-    Eigen::MatrixXd B2 = SVD2.matrixV().leftCols(SVD2.rank());
+    Eigen::MatrixXd B2 = SVD2.matrixV().leftCols(SVD2.rank()); // Build matrices A1 and A2 out of the SVD decomposition
 
-    std::pair<Eigen::MatrixXd,Eigen::MatrixXd> AB = adap_rank_merge(A1, B1, A2, B2, rtol);
+    std::pair<Eigen::MatrixXd,Eigen::MatrixXd> AB = adap_rank_merge(A1, B1, A2, B2, rtol); // Call the function adap_rank_merge from sub-problem (2.4.d)
     Eigen::MatrixXd Ztilde = AB.first * AB.second.transpose();
 
     Eigen::MatrixXd diff = Z - Ztilde;
