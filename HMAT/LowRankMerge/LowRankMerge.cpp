@@ -102,7 +102,7 @@ std::pair<double,double> test_low_rank_merge(size_t n)
     Eigen::MatrixXd A2 = SVD2.matrixU().leftCols(SVD2.rank()) * S2;
     Eigen::MatrixXd B2 = SVD2.matrixV().leftCols(SVD2.rank());
 
-    std::pair<Eigen::MatrixXd,Eigen::MatrixXd> AB = low_rank_merge(A1, B1, A2, B2); // Call the function low_rank_marge implemented in sub-problem (2.4.b)
+    std::pair<Eigen::MatrixXd,Eigen::MatrixXd> AB = low_rank_merge(A1, B1, A2, B2); // Call the function implemented in sub-problem (2.4.b)
     Eigen::MatrixXd Ztilde = AB.first * AB.second.transpose();
 
     Eigen::MatrixXd diff = Z - Ztilde;
@@ -212,7 +212,7 @@ std::pair<double,size_t> test_adap_rank_merge(size_t n, double rtol) {
     Eigen::MatrixXd A2 = SVD2.matrixU().leftCols(SVD2.rank()) * S2;
     Eigen::MatrixXd B2 = SVD2.matrixV().leftCols(SVD2.rank()); // Build matrices A1 and A2 out of the SVD decomposition
 
-    std::pair<Eigen::MatrixXd,Eigen::MatrixXd> AB = adap_rank_merge(A1, B1, A2, B2, rtol); // Call the function adap_rank_merge from sub-problem (2.4.d)
+    std::pair<Eigen::MatrixXd,Eigen::MatrixXd> AB = adap_rank_merge(A1, B1, A2, B2, rtol); // Call the function from sub-problem (2.4.d)
     Eigen::MatrixXd Ztilde = AB.first * AB.second.transpose();
 
     Eigen::MatrixXd diff = Z - Ztilde;
