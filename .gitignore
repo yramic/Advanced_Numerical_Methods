@@ -1,2 +1,4 @@
 CMakeLists.txt.user
 *.*~
+# Ignore build and lib dirs
+build
