@@ -297,6 +297,7 @@ buildRec(const Node *nx,const Node *ny,double eta0) {
 	    // Next level of recursion for non-leaves
 	    rec= true; buildRec(nx->sons[isx],ny->sons[isy],eta0);
 	  }}}
+      // At least one leaf cluster:
       // Add cluster pair to near field
       if (!rec) // \Label[line]{bpr:1}
 	nearField.push_back(makeNearFieldBlock(*nx,*ny));
