@@ -21,6 +21,7 @@
 #include "logweight_quadrature.hpp"
 #include "parametrized_mesh.hpp"
 #include <Eigen/Dense>
+#include <limits>
 
 namespace parametricbem2d {
 namespace double_layer {
@@ -29,7 +30,7 @@ Eigen::MatrixXd InteractionMatrix(const AbstractParametrizedCurve &pi,
                                   const AbstractBEMSpace &trial_space,
                                   const AbstractBEMSpace &test_space,
                                   const unsigned int &N) {
-  double tol = 1e-5;
+  double tol = std::numeric_limits<double>::epsilon();
 
   if (&pi == &pi_p) // Same Panels case
     return ComputeIntegralCoinciding(pi, pi_p, trial_space, test_space, N);
@@ -69,7 +70,7 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
 
       // Lambda expression for the integrand in eq. 1.4.174
       auto integrand = [&](double s, double t) {
-        double sqrt_epsilon = std::sqrt(std::numeric_limits< double >::epsilon());
+        double sqrt_epsilon = std::sqrt(std::numeric_limits<double>::epsilon());
         double k;
         // Finding the tangent of pi_p to get its normal
         Eigen::Vector2d tangent = pi_p.Derivative(t);
@@ -92,7 +93,8 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
 
       // Getting Gauss Legendre quadrature weights and points
       Eigen::RowVectorXd weights, points;
-      std::tie(points, weights) = gauleg(-1, 1, N);
+      std::tie(points, weights) =
+          gauleg(-1, 1, N, std::numeric_limits<double>::epsilon());
 
       // Tensor product quadrature for double integral in eq. 1.4.174
       for (unsigned int i = 0; i < N; ++i) {
@@ -150,7 +152,7 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
       };
       // Lambda expressions for the integrand in eq. 1.4.179
       auto integrand = [&](double r, double phi) {
-        double sqrt_epsilon = std::sqrt(std::numeric_limits< double >::epsilon());
+        double sqrt_epsilon = std::sqrt(std::numeric_limits<double>::epsilon());
         // Transforming to local arclength parameter range
         double s_pr = r * cos(phi);
         // Transforming to standard parameter range [-1,1] using swap
@@ -184,7 +186,8 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
 
       // Getting Gauss Legendre quadrature weights and nodes
       Eigen::RowVectorXd weights, points;
-      std::tie(points, weights) = gauleg(-1, 1, N);
+      std::tie(points, weights) =
+          gauleg(-1, 1, N, std::numeric_limits<double>::epsilon());
 
       // The integral is split into two parts according to eq. 1.4.178
       // part 1 is where phi goes from 0 to alpha
@@ -289,7 +292,8 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
 
       // Getting quadrature weights and points
       Eigen::RowVectorXd weights, points;
-      std::tie(points, weights) = gauleg(-1, 1, N);
+      std::tie(points, weights) =
+          gauleg(-1, 1, N, std::numeric_limits<double>::epsilon());
 
       // Tensor product quadrature for double integral
       for (unsigned int i = 0; i < N; ++i) {
@@ -307,9 +311,9 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
 }
 
 Eigen::MatrixXd GalerkinMatrix(const ParametrizedMesh mesh,
-                                  const AbstractBEMSpace &trial_space,
-                                  const AbstractBEMSpace &test_space,
-                                  const unsigned int &N) {
+                               const AbstractBEMSpace &trial_space,
+                               const AbstractBEMSpace &test_space,
+                               const unsigned int &N) {
   // Getting number of panels in the mesh
   unsigned int numpanels = mesh.getNumPanels();
   // Getting dimensions for trial and test spaces
