@@ -34,7 +34,7 @@ int main () {
   unsigned int order = 50;
   // BEM space for evaluating the Single Layer Galerkin matrix
   parametricbem2d::DiscontinuousSpace<0> space;
-  Eigen::MatrixXd galerkin = parametricbem2d::single_layer::SingleLayerMatrix(uniform_mesh,space,order);
+  Eigen::MatrixXd galerkin = parametricbem2d::single_layer::GalerkinMatrix(uniform_mesh,space,order);
   // Verifying that Galerkin matrix is circulant
   for (unsigned int i = 0 ; i < N-1 ; ++i) {
     Eigen::VectorXd col1 = galerkin.col(i);
