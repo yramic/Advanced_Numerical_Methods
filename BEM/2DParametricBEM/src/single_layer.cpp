@@ -21,6 +21,7 @@
 #include "logweight_quadrature.hpp"
 #include "parametrized_mesh.hpp"
 #include <Eigen/Dense>
+#include <limits>
 
 namespace parametricbem2d {
 namespace single_layer {
@@ -62,14 +63,14 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
 
       // Lambda expression for the 1st integrand in eq. 1.4.159
       auto integrand1 = [&](double s, double t) {
-        double tol = 1e-5;
+        double sqrt_epsilon = std::sqrt(std::numeric_limits< double >::epsilon());
         double s_st;
-        if (fabs(s - t) > tol) // Away from singularity
+        if (fabs(s - t) > sqrt_epsilon) // Away from singularity
           // Simply evaluating the expression
           s_st = (pi(s) - pi_p(t)).squaredNorm() / (s - t) / (s - t);
         else // Near singularity
           // Using analytic limit for s - > t
-          s_st = pi.Derivative(t).squaredNorm();
+          s_st = pi.Derivative(0.5*(t+s)).squaredNorm();
         return 0.5 * log(s_st) * F(t) * G(s);
       };
 
@@ -157,6 +158,7 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
       };
 
       auto D_r_phi = [&](double r, double phi) { // eq. 1.4.172
+        double sqrt_epsilon = std::sqrt(std::numeric_limits< double >::epsilon());
         // Transforming to local arclength parameter range
         double s_pr = r * cos(phi);
         // Transforming to standard parameter range [-1,1] using swap
@@ -166,7 +168,7 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
         // Transforming to standard parameter range [-1,1] using swap
         double t =
             swap ? 1 - 2 * t_pr / length_pi_p : 2 * t_pr / length_pi_p - 1;
-        if (r != 0) // Away from singularity, simply use the formula
+        if (r > sqrt_epsilon) // Away from singularity, simply use the formula
           return (pi(s) - pi_p(t)).squaredNorm() / r / r;
         else // Near singularity, use analytically evaluated limit for r -> 0
           return 1 - sin(2 * phi) * pi.Derivative(s).dot(pi_p.Derivative(t));
@@ -308,7 +310,7 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
   return interaction_matrix;
 }
 
-Eigen::MatrixXd SingleLayerMatrix(const ParametrizedMesh mesh,
+Eigen::MatrixXd GalerkinMatrix(const ParametrizedMesh mesh,
                                   const AbstractBEMSpace &space,
                                   const unsigned int &N) {
   // Getting the number of panels in the mesh

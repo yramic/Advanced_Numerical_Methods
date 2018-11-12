@@ -45,14 +45,13 @@ int main () {
   Eigen::EigenSolver<Eigen::MatrixXd> es(galerkin);
   Eigen::Matrix<std::complex<double>,Eigen::Dynamic,1> eigs = es.eigenvalues();
   Eigen::VectorXd eigs_r(N);
+  // Extracting the real part of eigenvalues (imaginary zero in this case)
   for (unsigned int i = 0 ; i < N ; ++i)
     eigs_r(i) = eigs(i).real();
-  //Eigen::VectorXd sorted_eigs = eigs;
+  // Sorting the real parts of eigenvalues
   std::sort(eigs_r.data(),eigs_r.data()+eigs_r.size());
-  std::cout << "Galerkin matrix = \n" << galerkin <<  std::endl;
-  std::cout << "eigs = \n" << eigs_r <<  std::endl;
+  // Saving the real parts to a file
   for (unsigned int i = 0 ; i < N ; ++i)
     output << eigs_r(i) << std::endl;
-    //std::cout << val << std::endl;
   return 0;
 }

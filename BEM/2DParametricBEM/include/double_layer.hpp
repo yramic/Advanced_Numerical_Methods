@@ -19,6 +19,10 @@
 #include "parametrized_mesh.hpp"
 
 namespace parametricbem2d {
+/**
+ * This namespace contains all the functions for evaluating the Double Layer
+ * Galerkin Matrix using quadrature and panel oriented assembly
+ */
 namespace double_layer {
 
 /**
@@ -134,10 +138,10 @@ Eigen::MatrixXd InteractionMatrix(const AbstractParametrizedCurve &pi,
  * @param N The order for gauss/log-weighted quadrature.
  * @return An Eigen::MatrixXd type Galerkin Matrix for the given mesh and space
  */
-Eigen::MatrixXd DoubleLayerMatrix(const ParametrizedMesh mesh,
-                                  const AbstractBEMSpace &trial_space,
-                                  const AbstractBEMSpace &test_space,
-                                  const unsigned int &N);
+Eigen::MatrixXd GalerkinMatrix(const ParametrizedMesh mesh,
+                               const AbstractBEMSpace &trial_space,
+                               const AbstractBEMSpace &test_space,
+                               const unsigned int &N);
 
 } // namespace double_layer
 } // namespace parametricbem2d

@@ -69,7 +69,7 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
 
       // Lambda expression for the integrand in eq. 1.4.174
       auto integrand = [&](double s, double t) {
-        double tol = 1e-5;
+        double sqrt_epsilon = std::sqrt(std::numeric_limits< double >::epsilon());
         double k;
         // Finding the tangent of pi_p to get its normal
         Eigen::Vector2d tangent = pi_p.Derivative(t);
@@ -78,7 +78,7 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
         normal << -tangent(1), tangent(0);
         // Normalizing the normal vector
         normal = normal / normal.norm();
-        if (fabs(s - t) > tol) // Away from singularity
+        if (fabs(s - t) > sqrt_epsilon) // Away from singularity
           k = (pi(s) - pi_p(t)).dot(normal) / (pi(s) - pi_p(t)).squaredNorm();
         else // Near singularity
           // Limit evaluated analytically for s -> t
@@ -150,6 +150,7 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
       };
       // Lambda expressions for the integrand in eq. 1.4.179
       auto integrand = [&](double r, double phi) {
+        double sqrt_epsilon = std::sqrt(std::numeric_limits< double >::epsilon());
         // Transforming to local arclength parameter range
         double s_pr = r * cos(phi);
         // Transforming to standard parameter range [-1,1] using swap
@@ -166,7 +167,7 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
         normal << -tangent(1), tangent(0);
         // Normalizing the normal vector
         normal = normal / normal.norm();
-        if (r > 1e-5) // Away from singularity
+        if (r > sqrt_epsilon) // Away from singularity
           // Simply evaluating the formula
           return r * (pi(s) - pi_p(t)).dot(normal) /
                  (pi(s) - pi_p(t)).squaredNorm();
@@ -305,7 +306,7 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
   return interaction_matrix;
 }
 
-Eigen::MatrixXd DoubleLayerMatrix(const ParametrizedMesh mesh,
+Eigen::MatrixXd GalerkinMatrix(const ParametrizedMesh mesh,
                                   const AbstractBEMSpace &trial_space,
                                   const AbstractBEMSpace &test_space,
                                   const unsigned int &N) {

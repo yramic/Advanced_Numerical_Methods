@@ -338,7 +338,7 @@ TEST(SingleLayer_0, PanelOrientedAssembly) {
   parametricbem2d::ParametrizedMesh mesh(panels);
   parametricbem2d::DiscontinuousSpace<0> space;
   Eigen::MatrixXd galerkin =
-      parametricbem2d::single_layer::SingleLayerMatrix(mesh, space, 32);
+      parametricbem2d::single_layer::GalerkinMatrix(mesh, space, 32);
   unsigned int numpanels = mesh.getNumPanels();
   EXPECT_EQ(numpanels, galerkin.cols());
   EXPECT_EQ(numpanels, galerkin.rows());
@@ -370,7 +370,7 @@ TEST(SingleLayer_1, PanelOrientedAssembly) {
   parametricbem2d::ParametrizedMesh mesh(panels);
   parametricbem2d::DiscontinuousSpace<1> space;
   Eigen::MatrixXd galerkin =
-      parametricbem2d::single_layer::SingleLayerMatrix(mesh, space, 32);
+      parametricbem2d::single_layer::GalerkinMatrix(mesh, space, 32);
   unsigned int numpanels = mesh.getNumPanels();
   EXPECT_EQ(8, galerkin.cols());
   EXPECT_EQ(8, galerkin.rows());
@@ -402,7 +402,7 @@ TEST(SingleLayer_0, CppHilbertComparison) {
   parametricbem2d::ParametrizedMesh parametrizedmesh(panels);
   parametricbem2d::DiscontinuousSpace<0> space;
   Eigen::MatrixXd galerkinnew =
-      parametricbem2d::single_layer::SingleLayerMatrix(parametrizedmesh, space,
+      parametricbem2d::single_layer::GalerkinMatrix(parametrizedmesh, space,
                                                        32);
   Eigen::MatrixXd coords(4, 2);
   coords << x1, x2, x3, x4;
@@ -440,7 +440,7 @@ TEST(DoubleLayer_1_0, PanelOrientedAssembly) {
   parametricbem2d::ParametrizedMesh mesh(panels);
   parametricbem2d::DiscontinuousSpace<0> test_space;
   parametricbem2d::ContinuousSpace<1> trial_space;
-  Eigen::MatrixXd galerkin = parametricbem2d::double_layer::DoubleLayerMatrix(
+  Eigen::MatrixXd galerkin = parametricbem2d::double_layer::GalerkinMatrix(
       mesh, trial_space, test_space, 32);
   unsigned int numpanels = mesh.getNumPanels();
   EXPECT_EQ(numpanels, galerkin.cols());
@@ -473,7 +473,7 @@ TEST(DoubleLayer_1_0, CppHilbertComparison) {
   parametricbem2d::ParametrizedMesh parametrizedmesh(panels);
   parametricbem2d::DiscontinuousSpace<0> test_space;
   parametricbem2d::ContinuousSpace<1> trial_space;
-  Eigen::MatrixXd galerkin = parametricbem2d::double_layer::DoubleLayerMatrix(
+  Eigen::MatrixXd galerkin = parametricbem2d::double_layer::GalerkinMatrix(
       parametrizedmesh, trial_space, test_space, 32);
   Eigen::MatrixXd coords(4, 2);
   coords << x1, x2, x3, x4;
@@ -511,7 +511,7 @@ TEST(DoubleLayer_0_0, PanelOrientedAssembly) {
   parametricbem2d::ParametrizedMesh mesh(panels);
   parametricbem2d::DiscontinuousSpace<0> test_space;
   parametricbem2d::DiscontinuousSpace<0> trial_space;
-  Eigen::MatrixXd galerkin = parametricbem2d::double_layer::DoubleLayerMatrix(
+  Eigen::MatrixXd galerkin = parametricbem2d::double_layer::GalerkinMatrix(
       mesh, trial_space, test_space, 32);
   unsigned int numpanels = mesh.getNumPanels();
   EXPECT_EQ(numpanels, galerkin.cols());
@@ -544,7 +544,7 @@ TEST(DoubleLayer_0_0, CppHilbertComparison) {
   parametricbem2d::ParametrizedMesh parametrizedmesh(panels);
   parametricbem2d::DiscontinuousSpace<0> test_space;
   parametricbem2d::DiscontinuousSpace<0> trial_space;
-  Eigen::MatrixXd galerkin = parametricbem2d::double_layer::DoubleLayerMatrix(
+  Eigen::MatrixXd galerkin = parametricbem2d::double_layer::GalerkinMatrix(
       parametrizedmesh, trial_space, test_space, 32);
   Eigen::MatrixXd coords(4, 2);
   coords << x1, x2, x3, x4;

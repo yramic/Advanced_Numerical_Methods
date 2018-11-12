@@ -19,6 +19,10 @@
 #include "parametrized_mesh.hpp"
 
 namespace parametricbem2d {
+/**
+ * This namespace contains all the functions for evaluating the Single Layer
+ * Galerkin Matrix using quadrature and panel oriented assembly
+ */
 namespace single_layer {
 
 /**
@@ -122,9 +126,9 @@ Eigen::MatrixXd InteractionMatrix(const AbstractParametrizedCurve &pi,
  * @param N Order for Gauss Quadrature
  * @return An Eigen::MatrixXd type Galerkin Matrix for the given mesh and space
  */
-Eigen::MatrixXd SingleLayerMatrix(const ParametrizedMesh mesh,
-                                  const AbstractBEMSpace &space,
-                                  const unsigned int &N);
+Eigen::MatrixXd GalerkinMatrix(const ParametrizedMesh mesh,
+                               const AbstractBEMSpace &space,
+                               const unsigned int &N);
 
 } // namespace single_layer
 } // namespace parametricbem2d
