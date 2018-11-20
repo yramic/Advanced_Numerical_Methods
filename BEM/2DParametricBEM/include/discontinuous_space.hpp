@@ -2,7 +2,7 @@
  * \file discontinuous_space.hpp
  * \brief This file declares a templated class inherited from AbstractBEMSpace
  *        and represents discontinuous spaces of the form \f$S^{-1}_{p}\f$
- * (eq.1.4.22) using full template specialization.
+ *        as defined in \f$\eqref{eq:Qp}\f$, using full template specialization.
  *
  * This File is a part of the 2D-Parametric BEM package
  */
@@ -21,11 +21,10 @@ namespace parametricbem2d {
  * \class DiscontinuousSpace
  * \brief This template class inherits from the class AbstractBEMSpace
  *        . This class implements the BEM spaces of the form \f$S^{-1}_{p}\f$
- *        defined in eq. 1.4.22. The class is implemented through full template
- *        specialization for different values of p.
+ *        defined in \f$\eqref{eq:Qp}\f$. The class is implemented through full
+ *        template specialization for different values of p.
  */
-template <unsigned int p>
-class DiscontinuousSpace : public AbstractBEMSpace {
+template <unsigned int p> class DiscontinuousSpace : public AbstractBEMSpace {
 public:
   DiscontinuousSpace() {
     std::cout << "Error! No specialization defined for p = " << p << std::endl;
@@ -36,8 +35,7 @@ public:
  * \brief This is a specialization of the templated class for p = 0.
  *        This class represents the space \f$S^{-1}_{0}\f$
  */
-template <>
-class DiscontinuousSpace<0> : public AbstractBEMSpace {
+template <> class DiscontinuousSpace<0> : public AbstractBEMSpace {
 public:
   // Local to Global Map
   unsigned int LocGlobMap(unsigned int q, unsigned int n,
@@ -47,7 +45,7 @@ public:
     assert(q <= q_ && n <= N);
     return n;
   }
-  // Space Dimensions
+  // Space Dimensions as defined in \f$\ref{T:thm:dimbe}\f$
   unsigned int getSpaceDim(unsigned int numpanels) const {
     return numpanels * q_;
   }
@@ -66,8 +64,7 @@ public:
  * \brief This is a specialization of the templated class for p = 1.
  *        This class represents the space \f$S^{-1}_{1}\f$
  */
-template <>
-class DiscontinuousSpace<1> : public AbstractBEMSpace {
+template <> class DiscontinuousSpace<1> : public AbstractBEMSpace {
 public:
   // Local to Global Map
   unsigned int LocGlobMap(unsigned int q, unsigned int n,
@@ -80,7 +77,7 @@ public:
     else
       return N + n;
   }
-  // Space Dimensions
+  // Space Dimensions as defined in \f$\ref{T:thm:dimbe}\f$
   unsigned int getSpaceDim(unsigned int numpanels) const {
     return numpanels * q_;
   }

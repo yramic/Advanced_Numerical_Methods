@@ -39,7 +39,7 @@ using PanelVector = std::vector<std::shared_ptr<AbstractParametrizedCurve>>;
  * \class AbstractParametrizedCurve
  * \brief This abstract class provides the interface for a parametric
  *        curve. The interface follows the one outlined in
- *        Section 1.4.3.4 in the lecture material for
+ *        \f$\ref{cpp:crv}\f$ in the lecture material for
  *        Advanced Numerical Methods for CSE.
  */
 class AbstractParametrizedCurve {

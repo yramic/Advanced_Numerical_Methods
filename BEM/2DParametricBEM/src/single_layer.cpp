@@ -2,9 +2,9 @@
  * \file single_layer.cpp
  * \brief This file declares the functions to evaluate the entries of
  *        Galerkin matrices based on the bilinear form induced by the
- *        Single Layer BIO, using the transformations given in section
- *        1.4.3.4 in the Lecture Notes for Advanced Numerical Methods
- *        for CSE.
+ *        Single Layer BIO, using the transformations given in
+ *        \f$\ref{ss:quadapprox}\f$ in the Lecture Notes for Advanced Numerical
+ *        Methods for CSE.
  *
  * This File is a part of the 2D-Parametric BEM package
  */
@@ -52,7 +52,7 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
   // Computing the (i,j)th matrix entry
   for (int i = 0; i < Q; ++i) {
     for (int j = 0; j < Q; ++j) {
-      // Lambda expression for functions F and G in eq. 1.4.154
+      // Lambda expression for functions F and G in \f$\eqref{eq:Vidp}\f$
       auto F = [&](double t) { // Function associated with panel pi_p
         return space.evaluateShapeFunction(j, t) * pi_p.Derivative(t).norm();
       };
@@ -61,7 +61,7 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
         return space.evaluateShapeFunction(i, s) * pi.Derivative(s).norm();
       };
 
-      // Lambda expression for the 1st integrand in eq. 1.4.159
+      // Lambda expression for the 1st integrand in \f$\eqref{eq:Isplit}\f$
       auto integrand1 = [&](double s, double t) {
         double sqrt_epsilon = std::sqrt(std::numeric_limits<double>::epsilon());
         double s_st;
@@ -69,27 +69,28 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
           // Simply evaluating the expression
           s_st = (pi(s) - pi_p(t)).squaredNorm() / (s - t) / (s - t);
         else // Near singularity
-          // Using analytic limit for s - > t
+          // Using analytic limit for s - > t given in \f$\eqref{eq:Sdef}\f$
           s_st = pi.Derivative(0.5 * (t + s)).squaredNorm();
         return 0.5 * log(s_st) * F(t) * G(s);
       };
 
-      double i1 = 0., i2 = 0.; // The two integrals in eq. 1.4.159
+      double i1 = 0., i2 = 0.; // The two integrals in \f$\eqref{eq:Isplit}\f$
 
       // Getting Gauss Legendre quadrature weights and points
       Eigen::RowVectorXd weights, points;
       std::tie(points, weights) =
           gauleg(-1, 1, N, std::numeric_limits<double>::epsilon());
 
-      // Tensor product quadrature for double 1st integral in eq. 1.4.159
+      // Tensor product quadrature for double 1st integral in
+      // \f$\eqref{eq:Isplit}\f$
       for (unsigned int i = 0; i < N; ++i) {
         for (unsigned int j = 0; j < N; ++j) {
           i1 += weights(i) * weights(j) * integrand1(points(i), points(j));
         }
       }
 
-      // Lambda expression for 2nd integrand (1.4.159) in transformed
-      // coordinates (1.4.163)
+      // Lambda expression for inner integrand in transformed coordinates in
+      // \f$\eqref{eq:I21}\f$
       auto integrand2 = [&](double w, double z) {
         return F(0.5 * (w - z)) * G(0.5 * (w + z)) +
                F(0.5 * (w + z)) * G(0.5 * (w - z));
@@ -98,7 +99,7 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
       // Getting log weighted quadrature nodes and weights
       QuadRule logweightQR = getLogWeightQR(2., N);
 
-      // Double loop for 2nd double integral (1.4.163)
+      // Double loop for 2nd double integral \f$\eqref{eq:I21}\f$
       for (unsigned int i = 0; i < N; ++i) {
         // Outer integral evaluated with Log weighted quadrature
         double z = logweightQR.x(i);
@@ -131,8 +132,9 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
   // Computing the (i,j)th matrix entry
   for (int i = 0; i < Q; ++i) {
     for (int j = 0; j < Q; ++j) {
-      // Panel lengths for local arclength parametrization. Actual values are
-      // not required so a length of 1 is used for both the panels
+      // Panel lengths for local arclength parametrization in
+      // \f$\eqref{eq:ap}\f$. Actual values are not required so a length of 1 is
+      // used for both the panels
       double length_pi = 1.;   // Length for panel pi
       double length_pi_p = 1.; // Length for panel pi_p
 
@@ -142,7 +144,8 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
       // in both arclength parametrizations
       bool swap = (pi(1) != pi_p(-1));
 
-      // Lambda expressions for the functions F,G and D(r,phi) in eq. 1.4.172
+      // Lambda expressions for the functions F,G and D(r,phi) in
+      // \f$\eqref{eq:Isplitapn}\f$
       auto F = [&](double t_pr) { // Function associated with panel pi_p
         // Transforming the local arclength parameter to standard parameter
         // range [-1,1] using swap
@@ -158,7 +161,7 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
         return space.evaluateShapeFunction(i, s) * pi.Derivative(s).norm();
       };
 
-      auto D_r_phi = [&](double r, double phi) { // eq. 1.4.172
+      auto D_r_phi = [&](double r, double phi) { // \f$\eqref{eq:Ddef}\f$
         double sqrt_epsilon = std::sqrt(std::numeric_limits<double>::epsilon());
         // Transforming to local arclength parameter range
         double s_pr = r * cos(phi);
@@ -180,9 +183,9 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
       std::tie(points, weights) =
           gauleg(-1, 1, N, std::numeric_limits<double>::epsilon());
 
-      // The two integrals in eq. 1.4.172 have to be further split into two
-      // parts part 1 is where phi goes from 0 to alpha part 2 is where phi goes
-      // from alpha to pi/2
+      // The two integrals in \f$\eqref{eq:Isplitapn}\f$ have to be further
+      // split into two parts part 1 is where phi goes from 0 to alpha part 2 is
+      // where phi goes from alpha to pi/2
       double alpha = atan(length_pi_p / length_pi); // the split point
 
       // i_IJ -> Integral I, part J
@@ -281,7 +284,8 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
   // Computing the (i,j)th matrix entry
   for (int i = 0; i < Q; ++i) {
     for (int j = 0; j < Q; ++j) {
-      // Lambda expression for functions F and G in eq. 1.4.154
+      // Lambda expression for functions F and G in \f$\eqref{eq:titg}\f$ for
+      // Single Layer BIO
       auto F = [&](double t) { // Function associated with panel pi_p
         return space.evaluateShapeFunction(j, t) * pi_p.Derivative(t).norm();
       };
@@ -326,7 +330,7 @@ Eigen::MatrixXd GalerkinMatrix(const ParametrizedMesh mesh,
   unsigned int Q = space.getQ();
   // Initializing the Galerkin matrix with zeros
   Eigen::MatrixXd output = Eigen::MatrixXd::Zero(dims, dims);
-  // Panel oriented assembly
+  // Panel oriented assembly \f$\ref{pc:ass}\f$
   for (unsigned int i = 0; i < numpanels; ++i) {
     for (unsigned int j = 0; j < numpanels; ++j) {
       // Getting the interaction matrix for the pair of panels i and j

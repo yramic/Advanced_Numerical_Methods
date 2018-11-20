@@ -8,10 +8,10 @@
 #ifndef ABSTRACTBEMSPACEHPP
 #define ABSTRACTBEMSPACEHPP
 
+#include <cassert>
+#include <functional>
 #include <utility>
 #include <vector>
-#include <functional>
-#include <cassert>
 
 namespace parametricbem2d {
 /**
@@ -22,8 +22,9 @@ class AbstractBEMSpace {
 public:
   /**
    * This function maps a local shape function to the corresponding global shape
-   * function for a BEM space on the given number of panels. This is a pure
-   * virtual function and has to be implemented in the derived classes.
+   * function for a BEM space on the given number of panels, defined in
+   * \f$\eqref{eq:lgm}\f$. This is a pure virtual function and has to be
+   * implemented in the derived classes.
    *
    * @param q Index of the local/reference shape function
    * @param n Index of the panel for which this map is applied

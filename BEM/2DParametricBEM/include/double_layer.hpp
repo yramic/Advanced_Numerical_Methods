@@ -2,9 +2,9 @@
  * \file double_layer.hpp
  * \brief This file declares the functions to evaluate the entries of
  *        Galerkin matrices based on the bilinear form induced by the
- *        Double Layer BIO, using the transformations given in section
- *        1.4.3.4 in the Lecture Notes for Advanced Numerical Methods
- *        for CSE.
+ *        Double Layer BIO, using the transformations given in
+ *        \f$\ref{ss:quadapprox}\f$ in the Lecture Notes for Advanced Numerical
+ *        Methods for CSE.
  *
  * This File is a part of the 2D-Parametric BEM package
  */
@@ -30,8 +30,9 @@ namespace double_layer {
  * panels \f$\Pi\f$ and \f$\Pi\f$' for the bilinear form induced by the Double
  * Layer BIO, using the given trial and test spaces. It implements the case
  * where the panels \f$\Pi\f$ and \f$\Pi\f$' are adjacent. This function
- * calculates a matrix entry by using a local arclength parametrization and the
- * transformations mentioned in eq. 1.4.165 to eq. 1.4.172
+ * calculates a matrix entry by using a local arclength parametrization given in
+ * \f$\eqref{eq:ap}\f$ and the transformations mentioned in
+ * \f$\ref{par:Kadpan}\f$
  *
  * @param pi Parametrization for the first panel \f$\Pi\f$.
  * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
@@ -52,7 +53,7 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
  * Layer BIO, using the given trial and test spaces. It implements the case
  * where the panels \f$\Pi\f$ and \f$\Pi\f$' are coinciding. This function
  * calculates a matrix entry by using the transformations mentioned in
- * eq. 1.4.153 to eq. 1.4.163
+ * \f$\ref{par:Kidpan}\f$
  *
  * @param pi Parametrization for the first panel \f$\Pi\f$.
  * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
@@ -87,9 +88,9 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
                                        const AbstractBEMSpace &test_space,
                                        const unsigned int &N);
 /**
- * This function is used to evaluate the Interaction Matrix for
- * the pair of panels \f$\Pi\f$ and \f$\Pi\f$' for the bilinear
- * form induced by the Double Layer BIO; given by the formula :
+ * This function is used to evaluate the Interaction Matrix defined in
+ * \f$\eqref{eq:Al}\f$ for the pair of panels \f$\Pi\f$ and \f$\Pi\f$' for the
+ * bilinear form induced by the Double Layer BIO; given by the formula :
  * \f$I_{ij}\f$ = \f$-\frac{1}{2\pi} \int_{-1}^{1} \int_{-1}^{1}
  * \frac{(\gamma_{\Pi}(s)-\gamma_{\Pi'}(t))}
  * {\|\gamma_{\Pi}(s)-\gamma_{\Pi'}(t)\|^2}.\textbf{n}(\gamma_{\Pi'}(t))
@@ -127,9 +128,9 @@ Eigen::MatrixXd InteractionMatrix(const AbstractParametrizedCurve &pi,
  * This function is used to evaluate the full Galerkin matrix based on the
  * Bilinear form for Double Layer BIO. It uses the trial and test spaces
  * and the parametrized mesh object, specified in the inputs to the function.
- * It evaluates the matrix by panel oriented assembly by first evaluating the
- * interaction matrix for all possible pairs of panels and then using the local
- * to global map of BEM spaces to fill the matrix entries.
+ * It evaluates the matrix by panel oriented assembly (\f$\ref{pc:ass}\f$) by
+ * first evaluating the interaction matrix for all possible pairs of panels and
+ * then using the local to global map of BEM spaces to fill the matrix entries.
  *
  * @param mesh ParametrizedMesh object containing all the panels in the form
  *             of small parametrized curves

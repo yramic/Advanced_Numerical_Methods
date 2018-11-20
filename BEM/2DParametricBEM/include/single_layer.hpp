@@ -30,7 +30,7 @@ namespace single_layer {
  * of panels \f$\Pi\f$ and \f$\Pi\f$', for the bilinear form induced by
  * the Single Layer BIO. It implements the case where the panels are adjacent.
  * The matrix entries are calculated by using a local arclength parametrization
- * and the transformations mentioned in eq. 1.4.165 to eq. 1.4.172
+ * and the transformations mentioned in \f$\ref{par:Vadj}\f$
  *
  * @param pi Parametrization for the first panel \f$\Pi\f$.
  * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
@@ -49,7 +49,7 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
  * of panels \f$\Pi\f$ and \f$\Pi\f$', for the bilinear form induced by
  * the Single Layer BIO. It implements the case where the panels are coinciding.
  * The matrix entries are calculated by using transformations mentioned in
- * eq. 1.4.153 to eq. 1.4.163
+ * \f$\ref{par:Vidp}\f$
  *
  * @param pi Parametrization for the first panel \f$\Pi\f$.
  * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
@@ -81,9 +81,9 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
                                        const AbstractBEMSpace &space,
                                        const unsigned int &N);
 /**
- * This function is used to evaluate the Interaction Matrix for
- * the pair of panels \f$\Pi\f$ and \f$\Pi\f$' for the bilinear
- * form induced by the Single Layer BIO given by the formula :
+ * This function is used to evaluate the Interaction Matrix defined in
+ * \f$\eqref{eq:Al}\f$ for the pair of panels \f$\Pi\f$ and \f$\Pi\f$', for the
+ * bilinear form induced by the Single Layer BIO given by the formula :
  * \f$I_{ij}\f$ = \f$-\frac{1}{2\pi} \int_{-1}^{1} \int_{-1}^{1}
  * \log{(\|\gamma_{\Pi}(s)-\gamma_{\Pi'}(t)\|)} \hat{b}^{j}(t) \hat{b}^{i}(s)
  * \|\dot{\gamma}_{\Pi}(s)\| \|\dot{\gamma}_{\Pi'}(t)\| dt ds \f$ where
@@ -115,9 +115,9 @@ Eigen::MatrixXd InteractionMatrix(const AbstractParametrizedCurve &pi,
  * This function is used to evaluate the full Galerkin matrix based on the
  * Bilinear form for Single Layer BIO. It uses the trial and test spaces and
  * Parametrized mesh specified as inputs. It evaluates the matrix by panel
- * oriented assembly by first evaluating the interaction matrix for all possible
- * pairs of panels and then using the local to global map of BEM spaces to fill
- * the matrix entries.
+ * oriented assembly (\f$\ref{pc:ass}\f$) by first evaluating the interaction
+ * matrix for all possible pairs of panels and then using the local to global
+ * map of BEM spaces to fill the matrix entries.
  *
  * @param mesh ParametrizedMesh object containing all the parametrized
  *             panels in the mesh
