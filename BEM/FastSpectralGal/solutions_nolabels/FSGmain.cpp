@@ -1,7 +1,7 @@
 //// 
 //// Copyright (C) 2017 SAM (D-MATH) @ ETH Zurich
-//// Author(s): ascapin < > 
-//// Contributors:  ppanchal 
+//// Author(s): curzuato < > 
+//// Contributors:  dcasati 
 //// This file is part of the AdvNumCSE repository.
 ////
 #include <Eigen/Dense>
@@ -10,6 +10,7 @@
 #include <fstream>
 #include <iostream>
 #include <istream>
+#include <iomanip>
 
 using namespace Eigen;
 

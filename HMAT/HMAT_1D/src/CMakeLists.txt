@@ -12,6 +12,8 @@ set(cpp_files
     PARENT_SCOPE
 )
 
+set(CMAKE_CXX_FLAGS "-std=c++11")
+
 add_subdirectory(solutions)
 set(  cpp_files_sols
     ${cpp_files_sols}

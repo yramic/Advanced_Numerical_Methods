@@ -4,6 +4,7 @@ project(HMAT_1D)
 
 add_subdirectory(include)
 add_subdirectory(src)
+set(CMAKE_CXX_FLAGS "-std=c++11")
 
 # Main target to get familiar with HMAT_1D code
 # Template target
