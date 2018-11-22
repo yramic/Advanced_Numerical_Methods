@@ -172,7 +172,7 @@ int main() {
             for(int i=0; i<N+1; ++i) {
                 u_ex(i) = u(grid(i));
             }
-
+            
             VectorXd u_app = cq_ieul_abel(y, N);
             VectorXd diff  = u_ex - u_app;
             double err_max = diff.cwiseAbs().maxCoeff();
