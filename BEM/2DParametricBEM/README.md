@@ -79,4 +79,4 @@ root<br/>
 ## Documentation and examples
 
 * Directory "doxygen" contains the Doxygen configuration file for generating the documentation which can be done by invoking the command "make doxygen_parametricbem2d" from the build folder.
-* For getting started with examples, refer to this [page](md__home_piyush_ETH_work_Code_BEM_2DParametricBEM_examples_README.html)
+* For getting started with examples, refer to "README.md" in "examples" directory.

@@ -15,6 +15,4 @@ add_subdirectory(googletest)
 
 add_executable(parametricbem2d_tests tests.cpp)
 
-target_link_libraries(parametricbem2d_tests parametrizations gtest single_layer double_layer quadrature CppHilbert)
-
-
+target_link_libraries(parametricbem2d_tests parametrizations gtest hypersingular single_layer double_layer quadrature CppHilbert)

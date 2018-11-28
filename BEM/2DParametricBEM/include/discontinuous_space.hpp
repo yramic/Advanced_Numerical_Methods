@@ -57,6 +57,10 @@ public:
     BasisFunctionType b1 = [&](double t) { return 1.; };
     // Adding the reference shape functions to the vector
     referenceshapefunctions_.push_back(b1);
+    // Reference shape function 1 derivative, defined using a lambda expression
+    BasisFunctionType b1dot = [&](double t) { return 0.; };
+    // Adding the reference shape function derivatives to the vector
+    referenceshapefunctiondots_.push_back(b1dot);
   }
 };
 
@@ -92,6 +96,13 @@ public:
     // Adding the reference shape functions to the vector
     referenceshapefunctions_.push_back(b1);
     referenceshapefunctions_.push_back(b2);
+    // Reference shape function 1 derivative, defined using a lambda expression
+    BasisFunctionType b1dot = [&](double t) { return 0.; };
+    // Reference shape function 2 derivative, defined using a lambda expression
+    BasisFunctionType b2dot = [&](double t) { return 0.5; };
+    // Adding the reference shape function derivatives to the vector
+    referenceshapefunctiondots_.push_back(b1dot);
+    referenceshapefunctiondots_.push_back(b2dot);
   }
 };
 } // namespace parametricbem2d

@@ -9,6 +9,7 @@
 #include "abstract_bem_space.hpp"
 #include "buildK.hpp"
 #include "buildV.hpp"
+#include "buildW.hpp"
 #include "continuous_space.hpp"
 #include "discontinuous_space.hpp"
 #include "doubleLayerPotential.hpp"
@@ -23,6 +24,10 @@
 #include "single_layer.hpp"
 #include "gtest/gtest.h"
 #include <Eigen/Dense>
+#include <Eigen/Sparse>
+#include "hypersingular.hpp"
+#include "dirichlet.hpp"
+#include "buildM.hpp"
 
 #define _USE_MATH_DEFINES // for pi
 
@@ -325,7 +330,7 @@ TEST(Split, ParametrizedFourierSum) {
         0, eps);
 }
 
-TEST(ParametrizedMeshTest, MemberFunctions) {
+TEST(ParametrizedMeshTest, DISABLED_MemberFunctions) {
   using PanelVector = parametricbem2d::PanelVector;
   // Definition of corner points for the polygon
   Eigen::RowVectorXd x1(2);
@@ -362,7 +367,7 @@ TEST(ParametrizedMeshTest, MemberFunctions) {
   EXPECT_NEAR(vertex2(1), 0, eps);
 }
 
-TEST(SingleLayer_0, PanelOrientedAssembly) {
+TEST(SingleLayer_0, DISABLED_PanelOrientedAssembly) {
   using PanelVector = parametricbem2d::PanelVector;
   // Corner points for the polygon
   Eigen::RowVectorXd x1(2);
@@ -402,7 +407,7 @@ TEST(SingleLayer_0, PanelOrientedAssembly) {
   EXPECT_EQ(numpanels, galerkin.rows());
 }
 
-TEST(SingleLayer_1, PanelOrientedAssembly) {
+TEST(SingleLayer_1, DISABLED_PanelOrientedAssembly) {
   using PanelVector = parametricbem2d::PanelVector;
   // Corner points for the polygon
   Eigen::RowVectorXd x1(2);
@@ -443,7 +448,7 @@ TEST(SingleLayer_1, PanelOrientedAssembly) {
   EXPECT_EQ(8, galerkin.rows());
 }
 
-TEST(SingleLayer_0, CppHilbertComparison) {
+TEST(SingleLayer_0, DISABLED_CppHilbertComparison) {
   using PanelVector = parametricbem2d::PanelVector;
   // Corner points for the polygon
   Eigen::RowVectorXd x1(2);
@@ -496,7 +501,7 @@ TEST(SingleLayer_0, CppHilbertComparison) {
   EXPECT_NEAR((galerkinold - galerkinnew).norm(), 0, eps);
 }
 
-TEST(DoubleLayer_1_0, PanelOrientedAssembly) {
+TEST(DoubleLayer_1_0, DISABLED_PanelOrientedAssembly) {
   using PanelVector = parametricbem2d::PanelVector;
   // Corner points for the polygon
   Eigen::RowVectorXd x1(2);
@@ -538,7 +543,7 @@ TEST(DoubleLayer_1_0, PanelOrientedAssembly) {
   EXPECT_EQ(numpanels, galerkin.rows());
 }
 
-TEST(DoubleLayer_1_0, CppHilbertComparison) {
+TEST(DoubleLayer_1_0, DISABLED_CppHilbertComparison) {
   using PanelVector = parametricbem2d::PanelVector;
   // Corner points for the polygon
   Eigen::RowVectorXd x1(2);
@@ -592,7 +597,7 @@ TEST(DoubleLayer_1_0, CppHilbertComparison) {
   EXPECT_NEAR((galerkinold - galerkin).norm(), 0, eps);
 }
 
-TEST(DoubleLayer_0_0, PanelOrientedAssembly) {
+TEST(DoubleLayer_0_0, DISABLED_PanelOrientedAssembly) {
   using PanelVector = parametricbem2d::PanelVector;
   // Corner points for the polygon
   Eigen::RowVectorXd x1(2);
@@ -634,7 +639,7 @@ TEST(DoubleLayer_0_0, PanelOrientedAssembly) {
   EXPECT_EQ(numpanels, galerkin.rows());
 }
 
-TEST(DoubleLayer_0_0, CppHilbertComparison) {
+TEST(DoubleLayer_0_0, DISABLED_CppHilbertComparison) {
   using PanelVector = parametricbem2d::PanelVector;
   // Corner points for the polygon
   Eigen::RowVectorXd x1(2);
@@ -693,15 +698,269 @@ TEST(AbstractParametrizedCurve,DistanceTo) {
   parametricbem2d::ParametrizedCircularArc curve1(center,1.,0,M_PI/2);
   Eigen::Vector2d point1(1+0.1,0); Eigen::Vector2d point2(1+0.1,1);
   parametricbem2d::ParametrizedLine curve2(point1,point2);
-  double distance; Eigen::Vector2d solution;
-  std::tie(solution,distance) = curve1.distanceTo(curve2);
+  double distance = curve1.distanceTo(curve2);
   EXPECT_NEAR(distance,0.1,eps);
   /*Eigen::Vector2d point3(1,0); Eigen::Vector2d point4(0,1);
   parametricbem2d::ParametrizedLine curve3(point3,point4);
   std::tie(solution,distance) = curve3.distanceTo(curve2);
   EXPECT_NEAR(distance,0.1,eps);*/
   std::cout << "Distance = " << distance << std::endl;
-  std::cout << "Solution = " << solution << std::endl;
+}
+
+TEST(Hypersingular_1, DISABLED_PanelOrientedAssembly) {
+  using PanelVector = parametricbem2d::PanelVector;
+  // Corner points for the polygon
+  Eigen::RowVectorXd x1(2);
+  x1 << 0, 0; // Point (0,0)
+  Eigen::RowVectorXd x2(2);
+  x2 << 1, 0; // Point (1,0)
+  Eigen::RowVectorXd x3(2);
+  x3 << 1, .5; // Point (1,0.5)
+  Eigen::RowVectorXd x4(2);
+  x4 << 0, 1.5; // Point (0,1.5)
+  // Parametrized line segments forming the edges of the polygon
+  parametricbem2d::ParametrizedLine line1(x1, x2);
+  parametricbem2d::ParametrizedLine line2(x2, x3);
+  parametricbem2d::ParametrizedLine line3(x3, x4);
+  parametricbem2d::ParametrizedLine line4(x4, x1);
+  // Splitting the parametrized lines into panels for a mesh to be used for
+  // BEM (Discretization)
+  PanelVector line1panels = line1.split(1);
+  PanelVector line2panels = line2.split(2);
+  PanelVector line3panels = line3.split(3);
+  PanelVector line4panels = line4.split(4);
+  PanelVector panels;
+  // Storing all the panels in order so that they form a polygon
+  panels.insert(panels.end(), line1panels.begin(), line1panels.end());
+  panels.insert(panels.end(), line2panels.begin(), line2panels.end());
+  panels.insert(panels.end(), line3panels.begin(), line3panels.end());
+  panels.insert(panels.end(), line4panels.begin(), line4panels.end());
+  // Construction of a ParametrizedMesh object from the vector of panels
+  parametricbem2d::ParametrizedMesh mesh(panels);
+  // BEM space to be used for computing the Galerkin Matrix
+  parametricbem2d::ContinuousSpace<1> space;
+  Eigen::MatrixXd galerkin =
+      parametricbem2d::hypersingular::GalerkinMatrix(mesh, space, 32);
+  unsigned int numpanels = mesh.getNumPanels();
+  // Checking the size of the obtained Galerkin Matrix
+  EXPECT_EQ(numpanels, galerkin.cols());
+  EXPECT_EQ(numpanels, galerkin.rows());
+}
+
+TEST(Hypersingular_1, DISABLED_CppHilbertComparison) {
+  using PanelVector = parametricbem2d::PanelVector;
+  // Corner points for the polygon
+  Eigen::RowVectorXd x1(2);
+  x1 << 0, 0; // Point (0,0)
+  Eigen::RowVectorXd x2(2);
+  x2 << 1, 0; // Point (1,0)
+  Eigen::RowVectorXd x3(2);
+  x3 << 1, .5; // Point (1,0.5)
+  Eigen::RowVectorXd x4(2);
+  x4 << 0, 1.5; // Point (0,1.5)
+  // Parametrized line segments forming the edges of the polygon
+  parametricbem2d::ParametrizedLine line1(x1, x2);
+  parametricbem2d::ParametrizedLine line2(x2, x3);
+  parametricbem2d::ParametrizedLine line3(x3, x4);
+  parametricbem2d::ParametrizedLine line4(x4, x1);
+  // Splitting the parametrized lines into panels for a mesh to be used for
+  // BEM (Discretization). Here Split is used with input "1" implying that the
+  // original edges are used as panels in our mesh.
+  PanelVector line1panels = line1.split(1);
+  PanelVector line2panels = line2.split(1);
+  PanelVector line3panels = line3.split(1);
+  PanelVector line4panels = line4.split(1);
+  PanelVector panels;
+  // Storing all the panels in order so that they form a polygon
+  panels.insert(panels.end(), line1panels.begin(), line1panels.end());
+  panels.insert(panels.end(), line2panels.begin(), line2panels.end());
+  panels.insert(panels.end(), line3panels.begin(), line3panels.end());
+  panels.insert(panels.end(), line4panels.begin(), line4panels.end());
+  // Construction of a ParametrizedMesh object from the vector of panels
+  parametricbem2d::ParametrizedMesh parametrizedmesh(panels);
+  // BEM space to be used for computing the Galerkin Matrix
+  parametricbem2d::ContinuousSpace<1> space;
+  Eigen::MatrixXd galerkinnew =
+      parametricbem2d::hypersingular::GalerkinMatrix(parametrizedmesh, space,
+                                                       32);
+  // Matrix to store Vertices/Corners of panels in the mesh to compute Galerkin
+  // Matrix using CppHilbert
+  Eigen::MatrixXd coords(4, 2);
+  coords << x1, x2, x3, x4;
+  // Matrix to store the end points of elements/edges of the panels in our mesh
+  // used to compute Galerkin Matrix using CppHilbert
+  Eigen::Matrix<int, 4, 2> elems;
+  elems << 0, 1, 1, 2, 2, 3, 3, 0;
+  // Creating a boundarymesh object used in CppHilbert library
+  BoundaryMesh boundarymesh(coords, elems);
+  // Galerkin Matrix computed using CppHilbert
+  Eigen::MatrixXd galerkinold;
+  computeW(galerkinold, boundarymesh, 0);
+  // Finding error using matrix norm
+  EXPECT_NEAR((galerkinold - galerkinnew).norm(), 0, eps);
+}
+
+TEST(MassMatrix00, CppHilbertComparison) {
+  using PanelVector = parametricbem2d::PanelVector;
+  // Corner points for the polygon
+  Eigen::RowVectorXd x1(2);
+  x1 << 0, 0; // Point (0,0)
+  Eigen::RowVectorXd x2(2);
+  x2 << 1, 0; // Point (1,0)
+  Eigen::RowVectorXd x3(2);
+  x3 << 1, .5; // Point (1,0.5)
+  Eigen::RowVectorXd x4(2);
+  x4 << 0, 1.5; // Point (0,1.5)
+  // Parametrized line segments forming the edges of the polygon
+  parametricbem2d::ParametrizedLine line1(x1, x2);
+  parametricbem2d::ParametrizedLine line2(x2, x3);
+  parametricbem2d::ParametrizedLine line3(x3, x4);
+  parametricbem2d::ParametrizedLine line4(x4, x1);
+  // Splitting the parametrized lines into panels for a mesh to be used for
+  // BEM (Discretization). Here Split is used with input "1" implying that the
+  // original edges are used as panels in our mesh.
+  PanelVector line1panels = line1.split(1);
+  PanelVector line2panels = line2.split(1);
+  PanelVector line3panels = line3.split(1);
+  PanelVector line4panels = line4.split(1);
+  PanelVector panels;
+  // Storing all the panels in order so that they form a polygon
+  panels.insert(panels.end(), line1panels.begin(), line1panels.end());
+  panels.insert(panels.end(), line2panels.begin(), line2panels.end());
+  panels.insert(panels.end(), line3panels.begin(), line3panels.end());
+  panels.insert(panels.end(), line4panels.begin(), line4panels.end());
+  // Construction of a ParametrizedMesh object from the vector of panels
+  parametricbem2d::ParametrizedMesh parametrizedmesh(panels);
+  // BEM space to be used for computing the Galerkin Matrix
+  parametricbem2d::DiscontinuousSpace<0> space;
+  Eigen::MatrixXd massnew =
+      parametricbem2d::MassMatrix(parametrizedmesh, space, space,
+                                                       32);
+  // Matrix to store Vertices/Corners of panels in the mesh to compute Galerkin
+  // Matrix using CppHilbert
+  Eigen::MatrixXd coords(4, 2);
+  coords << x1, x2, x3, x4;
+  // Matrix to store the end points of elements/edges of the panels in our mesh
+  // used to compute Galerkin Matrix using CppHilbert
+  Eigen::Matrix<int, 4, 2> elems;
+  elems << 0, 1, 1, 2, 2, 3, 3, 0;
+  // Creating a boundarymesh object used in CppHilbert library
+  BoundaryMesh boundarymesh(coords, elems);
+  // Galerkin Matrix computed using CppHilbert
+  Eigen::SparseMatrix<double> massold(4,4);
+  computeM00(massold, boundarymesh);
+  Eigen::MatrixXd fullmass =  massold * Eigen::MatrixXd::Identity(4,4);
+  // Finding error using matrix norm
+  EXPECT_NEAR((fullmass - massnew).norm(), 0, eps);
+}
+
+TEST(MassMatrix11, CppHilbertComparison) {
+  using PanelVector = parametricbem2d::PanelVector;
+  // Corner points for the polygon
+  Eigen::RowVectorXd x1(2);
+  x1 << 0, 0; // Point (0,0)
+  Eigen::RowVectorXd x2(2);
+  x2 << 1, 0; // Point (1,0)
+  Eigen::RowVectorXd x3(2);
+  x3 << 1, .5; // Point (1,0.5)
+  Eigen::RowVectorXd x4(2);
+  x4 << 0, 1.5; // Point (0,1.5)
+  // Parametrized line segments forming the edges of the polygon
+  parametricbem2d::ParametrizedLine line1(x1, x2);
+  parametricbem2d::ParametrizedLine line2(x2, x3);
+  parametricbem2d::ParametrizedLine line3(x3, x4);
+  parametricbem2d::ParametrizedLine line4(x4, x1);
+  // Splitting the parametrized lines into panels for a mesh to be used for
+  // BEM (Discretization). Here Split is used with input "1" implying that the
+  // original edges are used as panels in our mesh.
+  PanelVector line1panels = line1.split(1);
+  PanelVector line2panels = line2.split(1);
+  PanelVector line3panels = line3.split(1);
+  PanelVector line4panels = line4.split(1);
+  PanelVector panels;
+  // Storing all the panels in order so that they form a polygon
+  panels.insert(panels.end(), line1panels.begin(), line1panels.end());
+  panels.insert(panels.end(), line2panels.begin(), line2panels.end());
+  panels.insert(panels.end(), line3panels.begin(), line3panels.end());
+  panels.insert(panels.end(), line4panels.begin(), line4panels.end());
+  // Construction of a ParametrizedMesh object from the vector of panels
+  parametricbem2d::ParametrizedMesh parametrizedmesh(panels);
+  // BEM space to be used for computing the Galerkin Matrix
+  parametricbem2d::ContinuousSpace<1> space;
+  Eigen::MatrixXd massnew =
+      parametricbem2d::MassMatrix(parametrizedmesh, space, space,
+                                                       32);
+  // Matrix to store Vertices/Corners of panels in the mesh to compute Galerkin
+  // Matrix using CppHilbert
+  Eigen::MatrixXd coords(4, 2);
+  coords << x1, x2, x3, x4;
+  // Matrix to store the end points of elements/edges of the panels in our mesh
+  // used to compute Galerkin Matrix using CppHilbert
+  Eigen::Matrix<int, 4, 2> elems;
+  elems << 0, 1, 1, 2, 2, 3, 3, 0;
+  // Creating a boundarymesh object used in CppHilbert library
+  BoundaryMesh boundarymesh(coords, elems);
+  // Galerkin Matrix computed using CppHilbert
+  Eigen::SparseMatrix<double> massold(4,4);
+  computeM11(massold, boundarymesh);
+  Eigen::MatrixXd fullmass =  massold * Eigen::MatrixXd::Identity(4,4);
+  // Finding error using matrix norm
+  EXPECT_NEAR((fullmass - massnew).norm(), 0, eps);
+}
+
+TEST(MassMatrix01, CppHilbertComparison) {
+  using PanelVector = parametricbem2d::PanelVector;
+  // Corner points for the polygon
+  Eigen::RowVectorXd x1(2);
+  x1 << 0, 0; // Point (0,0)
+  Eigen::RowVectorXd x2(2);
+  x2 << 1, 0; // Point (1,0)
+  Eigen::RowVectorXd x3(2);
+  x3 << 1, .5; // Point (1,0.5)
+  Eigen::RowVectorXd x4(2);
+  x4 << 0, 1.5; // Point (0,1.5)
+  // Parametrized line segments forming the edges of the polygon
+  parametricbem2d::ParametrizedLine line1(x1, x2);
+  parametricbem2d::ParametrizedLine line2(x2, x3);
+  parametricbem2d::ParametrizedLine line3(x3, x4);
+  parametricbem2d::ParametrizedLine line4(x4, x1);
+  // Splitting the parametrized lines into panels for a mesh to be used for
+  // BEM (Discretization). Here Split is used with input "1" implying that the
+  // original edges are used as panels in our mesh.
+  PanelVector line1panels = line1.split(1);
+  PanelVector line2panels = line2.split(1);
+  PanelVector line3panels = line3.split(1);
+  PanelVector line4panels = line4.split(1);
+  PanelVector panels;
+  // Storing all the panels in order so that they form a polygon
+  panels.insert(panels.end(), line1panels.begin(), line1panels.end());
+  panels.insert(panels.end(), line2panels.begin(), line2panels.end());
+  panels.insert(panels.end(), line3panels.begin(), line3panels.end());
+  panels.insert(panels.end(), line4panels.begin(), line4panels.end());
+  // Construction of a ParametrizedMesh object from the vector of panels
+  parametricbem2d::ParametrizedMesh parametrizedmesh(panels);
+  // BEM space to be used for computing the Galerkin Matrix
+  parametricbem2d::DiscontinuousSpace<0> space1;
+  parametricbem2d::ContinuousSpace<1> space2;
+  Eigen::MatrixXd massnew =
+      parametricbem2d::MassMatrix(parametrizedmesh, space1, space2,
+                                                       32);
+  // Matrix to store Vertices/Corners of panels in the mesh to compute Galerkin
+  // Matrix using CppHilbert
+  Eigen::MatrixXd coords(4, 2);
+  coords << x1, x2, x3, x4;
+  // Matrix to store the end points of elements/edges of the panels in our mesh
+  // used to compute Galerkin Matrix using CppHilbert
+  Eigen::Matrix<int, 4, 2> elems;
+  elems << 0, 1, 1, 2, 2, 3, 3, 0;
+  // Creating a boundarymesh object used in CppHilbert library
+  BoundaryMesh boundarymesh(coords, elems);
+  // Galerkin Matrix computed using CppHilbert
+  Eigen::SparseMatrix<double> massold(4,4);
+  computeM01(massold, boundarymesh);
+  Eigen::MatrixXd fullmass =  massold * Eigen::MatrixXd::Identity(4,4);
+  // Finding error using matrix norm
+  EXPECT_NEAR((fullmass - massnew).norm(), 0, eps);
 }
 
 int main(int argc, char **argv) {

@@ -76,6 +76,22 @@ public:
   }
 
   /**
+   * This function is used to evaluate the derivative of a particular reference
+   * shape function of the BEM space at a given point.
+   *
+   * @return Value of the local shape function at the given point
+   */
+  double evaluateShapeFunctionDot(unsigned int q, double t) const {
+    // Asserting that the requested shape function index is valid
+    assert(q < q_);
+    // Asserting that the evaluation point is within parameter domain
+    assert(IsWithinParameterRange(t));
+    // Evaluating the requested reference shape function which is stored in a
+    // vector with others
+    return referenceshapefunctiondots_[q](t);
+  }
+
+  /**
    * This function is used for checking whether a value t is within the
    * valid parameter range. This function is non virtual to prevent it
    * from being overriden as the parameter interval is fixed. It is
@@ -117,6 +133,10 @@ protected:
    * A protected vector containing all the reference shape functions.
    */
   std::vector<BasisFunctionType> referenceshapefunctions_;
+  /**
+   * A protected vector containing all the reference shape function derivatives.
+   */
+  std::vector<BasisFunctionType> referenceshapefunctiondots_;
   /**
    * A protected integer which stores the number of reference shape
    * functions in the derived concrete classes

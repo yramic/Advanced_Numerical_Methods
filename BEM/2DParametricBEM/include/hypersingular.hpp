@@ -1,16 +1,16 @@
 /**
- * \file single_layer.hpp
+ * \file hypersingular.hpp
  * \brief This file declares the functions to evaluate the entries of
  *        Galerkin matrices based on the bilinear form induced by the
- *        Single Layer BIO, using the transformations given in
+ *        Hypersingular BIO, using the transformations given in
  *        \f$\ref{ss:quadapprox}\f$ in the Lecture Notes for Advanced Numerical
  *        Methods for CSE.
  *
  * This File is a part of the 2D-Parametric BEM package
  */
 
-#ifndef SINGLELAYERHPP
-#define SINGLELAYERHPP
+#ifndef HYPERSINGULARHPP
+#define HYPERSINGULARHPP
 
 #include <Eigen/Dense>
 
@@ -20,15 +20,15 @@
 
 namespace parametricbem2d {
 /**
- * This namespace contains all the functions for evaluating the Single Layer
+ * This namespace contains all the functions for evaluating the Hypersingular
  * Galerkin Matrix using quadrature and panel oriented assembly
  */
-namespace single_layer {
+namespace hypersingular {
 
 /**
  * This function is used to evaluate the Interaction Matrix for the pair
  * of panels \f$\Pi\f$ and \f$\Pi\f$', for the bilinear form induced by
- * the Single Layer BIO. It implements the case where the panels are adjacent.
+ * the Hypersingular BIO. It implements the case where the panels are adjacent.
  * The matrix entries are calculated by using a local arclength parametrization
  * and the transformations mentioned in \f$\ref{par:Vadj}\f$
  *
@@ -47,7 +47,7 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
 /**
  * This function is used to evaluate the Interaction Matrix for the pair
  * of panels \f$\Pi\f$ and \f$\Pi\f$', for the bilinear form induced by
- * the Single Layer BIO. It implements the case where the panels are coinciding.
+ * the Hypersingular BIO. It implements the case where the panels are coinciding.
  * The matrix entries are calculated by using transformations mentioned in
  * \f$\ref{par:Vidp}\f$
  *
@@ -66,7 +66,7 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
 /**
  * This function is used to evaluate the Interaction Matrix for the pair
  * of panels \f$\Pi\f$ and \f$\Pi\f$', for the bilinear form induced by
- * the Single Layer BIO. It implements the case where the panels are completely
+ * the Hypersingular BIO. It implements the case where the panels are completely
  * disjoint. The matrix entries are calculated by Gauss Legendre quadrature.
  *
  * @param pi Parametrization for the first panel \f$\Pi\f$.
@@ -83,7 +83,7 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
 /**
  * This function is used to evaluate the Interaction Matrix defined in
  * \f$\eqref{eq:Al}\f$ for the pair of panels \f$\Pi\f$ and \f$\Pi\f$', for the
- * bilinear form induced by the Single Layer BIO given by the formula :
+ * bilinear form induceHypersingular BIOingle Layer BIO given by the formula :
  * \f$I_{ij}\f$ = \f$-\frac{1}{2\pi} \int_{-1}^{1} \int_{-1}^{1}
  * \log{(\|\gamma_{\Pi}(s)-\gamma_{\Pi'}(t)\|)} \hat{b}^{j}(t) \hat{b}^{i}(s)
  * \|\dot{\gamma}_{\Pi}(s)\| \|\dot{\gamma}_{\Pi'}(t)\| dt ds \f$ where
@@ -113,7 +113,7 @@ Eigen::MatrixXd InteractionMatrix(const AbstractParametrizedCurve &pi,
 
 /**
  * This function is used to evaluate the full Galerkin matrix based on the
- * Bilinear form for Single Layer BIO. It uses the trial and test spaces and
+ * Bilinear form for Hypersingular BIO. It uses the trial and test spaces and
  * Parametrized mesh specified as inputs. It evaluates the matrix by panel
  * oriented assembly (\f$\ref{pc:ass}\f$) by first evaluating the interaction
  * matrix for all possible pairs of panels and then using the local to global
@@ -133,4 +133,4 @@ Eigen::MatrixXd GalerkinMatrix(const ParametrizedMesh mesh,
 } // namespace single_layer
 } // namespace parametricbem2d
 
-#endif // SINGLELAYERHPP
+#endif // HYPERSINGULARHPP
