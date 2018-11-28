@@ -27,6 +27,7 @@
 #include <Eigen/Sparse>
 #include "hypersingular.hpp"
 #include "dirichlet.hpp"
+#include "neumann.hpp"
 #include "buildM.hpp"
 
 #define _USE_MATH_DEFINES // for pi
@@ -961,6 +962,136 @@ TEST(MassMatrix01, CppHilbertComparison) {
   Eigen::MatrixXd fullmass =  massold * Eigen::MatrixXd::Identity(4,4);
   // Finding error using matrix norm
   EXPECT_NEAR((fullmass - massnew).norm(), 0, eps);
+}
+
+TEST(DirichletBVP, DirectFirstKind) {
+  using PanelVector = parametricbem2d::PanelVector;
+  // Corner points for the polygon
+  Eigen::RowVectorXd x1(2);
+  x1 << 0, -1.5; // Point (0,0)
+  Eigen::RowVectorXd x2(2);
+  x2 << 1, 0.5; // Point (1,0)
+  Eigen::RowVectorXd x3(2);
+  x3 << 0.1, .33; // Point (1,0.5)
+  Eigen::RowVectorXd x4(2);
+  x4 << -1, -.1; // Point (0,1.5)
+  // Parametrized line segments forming the edges of the polygon
+  parametricbem2d::ParametrizedLine line1(x1, x2);
+  parametricbem2d::ParametrizedLine line2(x2, x3);
+  parametricbem2d::ParametrizedLine line3(x3, x4);
+  parametricbem2d::ParametrizedLine line4(x4, x1);
+  // Splitting the parametrized lines into panels for a mesh to be used for
+  // BEM (Discretization). Here Split is used with input "1" implying that the
+  // original edges are used as panels in our mesh.
+  PanelVector line1panels = line1.split(1);
+  PanelVector line2panels = line2.split(1);
+  PanelVector line3panels = line3.split(1);
+  PanelVector line4panels = line4.split(1);
+  PanelVector panels;
+  // Storing all the panels in order so that they form a polygon
+  panels.insert(panels.end(), line1panels.begin(), line1panels.end());
+  panels.insert(panels.end(), line2panels.begin(), line2panels.end());
+  panels.insert(panels.end(), line3panels.begin(), line3panels.end());
+  panels.insert(panels.end(), line4panels.begin(), line4panels.end());
+  // Construction of a ParametrizedMesh object from the vector of panels
+  parametricbem2d::ParametrizedMesh parametrizedmesh(panels);
+  // dirichlet data
+  std::function<double(double,double)> g = [](double x1, double x2) {
+    return sin(x1-x2)*sinh(x1+x2);
+  };
+  Eigen::MatrixXd solnew =
+      parametricbem2d::dirichlet_bvp::direct_first_kind::solve(parametrizedmesh, g,32);
+  // Matrix to store Vertices/Corners of panels in the mesh to compute Galerkin
+  // Matrix using CppHilbert
+  Eigen::MatrixXd coords(4, 2);
+  coords << x1, x2, x3, x4;
+  // Matrix to store the end points of elements/edges of the panels in our mesh
+  // used to compute Galerkin Matrix using CppHilbert
+  Eigen::Matrix<int, 4, 2> elems;
+  elems << 0, 1, 1, 2, 2, 3, 3, 0;
+  // Creating a boundarymesh object used in CppHilbert library
+  BoundaryMesh boundarymesh(coords, elems);
+  // Galerkin Matrices computed using CppHilbert
+  Eigen::SparseMatrix<double> M(4,4);
+  Eigen::MatrixXd V,K;
+  computeV(V,boundarymesh,0.);
+  computeK(K,boundarymesh,0.);
+  computeM01(M, boundarymesh);
+  Eigen::VectorXd g_N(coords.rows());
+  for (unsigned i = 0 ; i < coords.rows() ; ++ i)
+    g_N(i) = g(coords(i,0),coords(i,1));
+  Eigen::VectorXd rhs = (0.5*M-K)*g_N;
+  Eigen::VectorXd sol_old = V.lu().solve(rhs);
+  std::cout << "new sol \n" << solnew << std::endl;
+  std::cout << "old sol \n" << sol_old << std::endl;
+  // Finding error using matrix norm
+  EXPECT_NEAR((sol_old - solnew).norm(), 0, eps);
+}
+
+TEST(NeumannBVP, DirectFirstKind) {
+  using PanelVector = parametricbem2d::PanelVector;
+  // Corner points for the polygon
+  Eigen::RowVectorXd x1(2);
+  x1 << 0, -1.5; // Point (0,0)
+  Eigen::RowVectorXd x2(2);
+  x2 << 1, 0.5; // Point (1,0)
+  Eigen::RowVectorXd x3(2);
+  x3 << 0.1, .33; // Point (1,0.5)
+  Eigen::RowVectorXd x4(2);
+  x4 << -1, -.1; // Point (0,1.5)
+  // Parametrized line segments forming the edges of the polygon
+  parametricbem2d::ParametrizedLine line1(x1, x2);
+  parametricbem2d::ParametrizedLine line2(x2, x3);
+  parametricbem2d::ParametrizedLine line3(x3, x4);
+  parametricbem2d::ParametrizedLine line4(x4, x1);
+  // Splitting the parametrized lines into panels for a mesh to be used for
+  // BEM (Discretization). Here Split is used with input "1" implying that the
+  // original edges are used as panels in our mesh.
+  PanelVector line1panels = line1.split(1);
+  PanelVector line2panels = line2.split(1);
+  PanelVector line3panels = line3.split(1);
+  PanelVector line4panels = line4.split(1);
+  PanelVector panels;
+  // Storing all the panels in order so that they form a polygon
+  panels.insert(panels.end(), line1panels.begin(), line1panels.end());
+  panels.insert(panels.end(), line2panels.begin(), line2panels.end());
+  panels.insert(panels.end(), line3panels.begin(), line3panels.end());
+  panels.insert(panels.end(), line4panels.begin(), line4panels.end());
+  // Construction of a ParametrizedMesh object from the vector of panels
+  parametricbem2d::ParametrizedMesh parametrizedmesh(panels);
+  // dirichlet data
+  std::function<double(double,double)> Tn = [](double x1, double x2) {
+    return sin(x1-x2)*sinh(x1+x2);
+  };
+  Eigen::MatrixXd solnew =
+      parametricbem2d::neumann_bvp::direct_first_kind::solve(parametrizedmesh, Tn,32);
+  std::cout << "Solution to the Neumann BVP \n" << solnew << std::endl;
+  /*// Matrix to store Vertices/Corners of panels in the mesh to compute Galerkin
+  // Matrix using CppHilbert
+  Eigen::MatrixXd coords(4, 2);
+  coords << x1, x2, x3, x4;
+  // Matrix to store the end points of elements/edges of the panels in our mesh
+  // used to compute Galerkin Matrix using CppHilbert
+  Eigen::Matrix<int, 4, 2> elems;
+  elems << 0, 1, 1, 2, 2, 3, 3, 0;
+  // Creating a boundarymesh object used in CppHilbert library
+  BoundaryMesh boundarymesh(coords, elems);
+  // Galerkin Matrices computed using CppHilbert
+  Eigen::SparseMatrix<double> M(4,4);
+  Eigen::MatrixXd V,K;
+  computeV(V,boundarymesh,0.);
+  computeK(K,boundarymesh,0.);
+  computeM01(M, boundarymesh);
+  Eigen::VectorXd g_N(coords.rows());
+  for (unsigned i = 0 ; i < coords.rows() ; ++ i)
+    g_N(i) = g(coords(i,0),coords(i,1));
+  Eigen::VectorXd rhs = (0.5*M-K)*g_N;
+  Eigen::VectorXd sol_old = V.lu().solve(rhs);
+  std::cout << "new sol \n" << solnew << std::endl;
+  std::cout << "old sol \n" << sol_old << std::endl;
+  // Finding error using matrix norm
+  EXPECT_NEAR((sol_old - solnew).norm(), 0, eps);*/
+  EXPECT_EQ(solnew.rows(),5);
 }
 
 int main(int argc, char **argv) {

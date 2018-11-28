@@ -1,8 +1,8 @@
 /**
- * \file single_layer.cpp
+ * \file hypersingular.cpp
  * \brief This file declares the functions to evaluate the entries of
  *        Galerkin matrices based on the bilinear form induced by the
- *        Single Layer BIO, using the transformations given in
+ *        Hypersingular BIO, using the transformations given in
  *        \f$\ref{ss:quadapprox}\f$ in the Lecture Notes for Advanced Numerical
  *        Methods for CSE.
  *
