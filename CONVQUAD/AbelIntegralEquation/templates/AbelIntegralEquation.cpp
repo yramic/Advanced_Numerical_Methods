@@ -3,7 +3,9 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <ctime>
 #include "gauleg.hpp"
+#include "utilities.hpp"
 
 using namespace Eigen;
 using namespace std;
@@ -26,17 +28,6 @@ VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau)
 /* SAM_LISTING_END_0 */
 
 
-MatrixXd toeplitz_triangular(const VectorXd& c)
-{
-    size_t n = c.size();
-    MatrixXd T = MatrixXd::Zero(n, n);
-    for(int i=0; i<n; ++i) {
-        T.col(i).tail(n-i) = c.head(n-i);
-    }
-    return T;
-}
-
-
 /* @brief Find the unknown function u in the Abel integral equation
  * using convolution quadrature (implicit Euler)
  * \param y Template function for the right-hand side
@@ -50,25 +41,6 @@ VectorXd cq_ieul_abel(const FUNC& y, size_t N)
     // TODO: Find the unknown function u in the Abel integral equation with convolution quadrature (implicit Euler)
 }
 /* SAM_LISTING_END_2 */
-
-
-VectorXcd pconvfft(const VectorXcd& u, const VectorXcd& x)
-{
-    FFT<double> fft;
-    VectorXcd tmp = ( fft.fwd(u) ).cwiseProduct( fft.fwd(x) );
-    return fft.inv(tmp);
-}
-
-
-VectorXcd myconv(const VectorXcd& h, const VectorXcd& x) {
-  const long n = h.size();
-  // Zero padding, cf. \eqref{eq:zeropad}
-  VectorXcd hp(2*n - 1), xp(2*n - 1);
-  hp << h, VectorXcd::Zero(n - 1);
-  xp << x, VectorXcd::Zero(n - 1);
-  // Periodic discrete convolution of length \Blue{$2n-1$}, \cref{cpp:pconffft}
-  return pconvfft(hp, xp);
-}
 
 
 /* @brief Find the unknown function u in the Abel integral equation
@@ -94,4 +66,5 @@ int main() {
     /* SAM_LISTING_BEGIN_4 */
     // TODO: Tabulate the max error of the convolution quadratures
     /* SAM_LISTING_END_4 */
+
 }
