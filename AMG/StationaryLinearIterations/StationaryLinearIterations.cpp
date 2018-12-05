@@ -148,7 +148,7 @@ double gaussSeidelRate(const int n, double c, double TOL=1.0E-03)
 /* SAM_LISTING_END_3 */
 
 
-/* SAM_LISTING_BEGIN_4 */
+#if SOLUTION
 double comp_lmax_jacobi(const SparseMatrix<double> &X, double w, double TOL=1.0E-03)
 {
     int N = X.rows();
@@ -173,7 +173,7 @@ double comp_lmax_jacobi(const SparseMatrix<double> &X, double w, double TOL=1.0E
     
     return lambda_new;
 }
-/* SAM_LISTING_END_4 */
+
 
 /* @brief Determines the asymptotic convergence rate of the Jacobi
  * iterative method using power iteration, 
@@ -182,28 +182,20 @@ double comp_lmax_jacobi(const SparseMatrix<double> &X, double w, double TOL=1.0E
  * \param w relaxation parameter
  * \\return asymptotic convergence rate
  */
-/* SAM_LISTING_BEGIN_5 */
 double jacobiRate(const int n, double w, double TOL=1.0E-03)
 {
-#if SOLUTION
     int N = (n-1)*(n-1);
-    
     SparseMatrix<double> A = poissonMatrix(n);
     double lambda_max = comp_lmax_jacobi(A, w, TOL);
-    
     return lambda_max;
-#else // TEMPLATE
-    // TODO: Implement power iteration to compute the asymptotic convergence rate
-    // of the Jacobi iterative method for the matrix $\mathbf{A}$.
-#endif // TEMPLATE
 }
-/* SAM_LISTING_END_5 */
+#endif
 
 
 int main() {
 
 #if SOLUTION
-/* SAM_LISTING_BEGIN_6 */
+/* SAM_LISTING_BEGIN_4 */
     {
         cout << "\n\nAccuracy test of the Gauss-Seidel method" << endl;
         for (int l=2; l<=3; l++)
@@ -222,10 +214,10 @@ int main() {
             cout << n << "\t" << (mu_exact - mu).norm()/mu_exact.norm() << endl;
         }
     }
-/* SAM_LISTING_END_6 */
+/* SAM_LISTING_END_4 */
 
-/* SAM_LISTING_BEGIN_7 */
-    {
+/* SAM_LISTING_BEGIN_5 */
+    {    
         cout << "\n\nCompute asymptotic convergence rates of the Gauss-Seidel method" << endl;
         
         VectorXd c(3);
@@ -243,21 +235,20 @@ int main() {
             }
         }
     }
-/* SAM_LISTING_END_7 */
+/* SAM_LISTING_END_5 */
 
-/* SAM_LISTING_BEGIN_8 */
     {
         cout << "\n\nCompute asymptotic convergence rates of the Jacobi method" << endl;
         
         VectorXd w(10);
         for (int i=0; i<10; i++)
             w(i) = (i+1)*0.1;
-        double TOL=1.0E-03;
+        double TOL=1.0E-06;
         
         for (int k=0; k<w.size(); k++)
         {
             cout << "\nFor w = " << w(k) << ":"<< endl;
-            for (int l=2; l<=10; l++)
+            for (int l=2; l<=6; l++)
             {
                 int n = pow(2,l);
                 double lambda_max = jacobiRate(n, w(k), TOL);
@@ -265,7 +256,6 @@ int main() {
             }
         }
     }
-/* SAM_LISTING_END_8 */
 #else // TEMPLATE
     // TODO: Run tests
 #endif // TEMPLATE
