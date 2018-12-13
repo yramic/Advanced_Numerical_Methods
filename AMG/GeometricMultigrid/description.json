@@ -1,0 +1,8 @@
+{
+    "author" : "prbansal",
+    "email" : "pratyuksh.bansal@sam.math.ethz.ch",
+    "contributors" : "",
+
+    "name": "GeometricMultigrid",
+    "all" : ["GeometricMultigrid.cpp"]
+}
