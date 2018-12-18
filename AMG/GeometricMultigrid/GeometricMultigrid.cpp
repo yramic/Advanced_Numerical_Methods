@@ -255,6 +255,7 @@ void gaussSeidel(const SparseMatrix<double> &A, const VectorXd &phi, VectorXd &m
     {
         delta = A.triangularView<Lower>().solve(phi - A*mu);
         mu += delta;
+        //cout << i << "\t" << delta.norm() << endl;
         if( delta.norm() <= TOL*mu.norm() )
             break;
     }
@@ -322,7 +323,6 @@ void multiGridIter(const VectorXd &phi, VectorXd &mu, int l, int max_n_steps, do
             multiGridIter(rhoH, vH, l-1, TOL, max_n_steps);
             mu += P * vH;
             
-            cout << "Iteration " << nsteps << ", error: " << (mu - mu_old).norm()/mu.norm() << endl; 
             if ((mu - mu_old).norm() < TOL * mu.norm())
                 break;
         }
@@ -332,6 +332,59 @@ void multiGridIter(const VectorXd &phi, VectorXd &mu, int l, int max_n_steps, do
 #endif
 }
 /* SAM_LISTING_END_4 */
+
+
+/* @brief Computes the residual for the Multi-grid method with max_n_steps=1
+ * \param L mesh level
+ * \param max_itr maximum number of multi-grid iterations
+ * \param TOL error tolerance for termination criteria
+ */
+/* SAM_LISTING_BEGIN_5 */
+VectorXd test_multigrid_residual(const int L, int max_itr, double TOL=1.0E-08)
+{
+    VectorXd rho_norm(max_itr);
+    
+    unsigned n = std::pow(2, L);
+    unsigned N = 0.5 * (n + 2) * (n + 1); // Number of nodes
+    
+    SparseMatrix<double> A = genGalerkinMat(L);
+    VectorXd phi = VectorXd::Zero(N);
+    VectorXd mu = VectorXd::Random(N);
+    
+    unsigned int count=0;    
+    for (int i=0; i<max_itr; i++)
+    {
+        multiGridIter(phi, mu, L, 1);
+        rho_norm(i) = (phi - A*mu).norm();
+        
+        count++;
+        if (rho_norm(i) <= TOL)
+            break;
+    }
+    
+    return rho_norm.head(count);
+}
+/* SAM_LISTING_END_5 */
+
+
+/* @brief Computes the asymptotic convergence rates of the Multi-grid method
+ * by measuring the quotient of the residuals from successive iterations.
+ */
+/* SAM_LISTING_BEGIN_6 */
+void test_multigrid_convergence()
+{
+    int max_itr = 100;
+    cout << "L\trate" << endl;
+    for (int L=2; L<=8; L++)
+    {
+        VectorXd rho_norm = test_multigrid_residual(L, max_itr);
+        VectorXd rates(rho_norm.size()-1);
+        for (int i=0; i<rates.size(); i++)
+            rates(i) = rho_norm(i+1)/rho_norm(i);
+        cout << L << "\t" << rates.tail(1) << endl;
+    }
+}
+/* SAM_LISTING_END_6 */
 
 
 int main() {
@@ -353,7 +406,11 @@ int main() {
     int max_nsteps = 1000;
     multiGridIter(phi, mu, l, max_nsteps, TOL);
     //cout << "\n" << mu.transpose() << endl;
-    
+
+#if SOLUTION    
+    cout << "Multi-grid convergence test:" << endl;
+    test_multigrid_convergence();
+#endif
 }
 
 
