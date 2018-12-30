@@ -8,6 +8,7 @@
 #ifndef GAULEGHPP
 #define GAULEGHPP
 
+#include "logweight_quadrature.hpp"
 #include <Eigen/Dense>
 #include <cmath>
 #include <iostream>
@@ -61,6 +62,19 @@ gauleg(double a, double b, int n, double eps = 1.e-13) {
 
   // return
   return std::make_pair(xq, wq);
+}
+
+inline QuadRule getGaussQR(unsigned N) {
+  // Getting standard Gauss Legendre Quadrature weights and nodes
+  Eigen::RowVectorXd weights, points;
+  std::tie(points, weights) =
+      gauleg(-1, 1, N, std::numeric_limits<double>::epsilon());
+  QuadRule gauss;
+  gauss.dim = 1;
+  gauss.n = N;
+  gauss.x = points;
+  gauss.w = weights;
+  return gauss;
 }
 
 #endif

@@ -17,6 +17,7 @@
 #include "abstract_bem_space.hpp"
 #include "abstract_parametrized_curve.hpp"
 #include "parametrized_mesh.hpp"
+#include "logweight_quadrature.hpp"
 
 namespace parametricbem2d {
 /**
@@ -42,7 +43,8 @@ namespace hypersingular {
 Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
                                         const AbstractParametrizedCurve &pi_p,
                                         const AbstractBEMSpace &space,
-                                        const unsigned int &N);
+                                        const unsigned int &N,
+                                      const QuadRule &GaussQR);
 
 /**
  * This function is used to evaluate the Interaction Matrix for the pair
@@ -61,7 +63,8 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
 Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
                                           const AbstractParametrizedCurve &pi_p,
                                           const AbstractBEMSpace &space,
-                                          const unsigned int &N);
+                                          const unsigned int &N,
+                                        const QuadRule &GaussQR);
 
 /**
  * This function is used to evaluate the Interaction Matrix for the pair
@@ -79,7 +82,8 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
 Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
                                        const AbstractParametrizedCurve &pi_p,
                                        const AbstractBEMSpace &space,
-                                       const unsigned int &N);
+                                       const unsigned int &N,
+                                     const QuadRule &GaussQR);
 /**
  * This function is used to evaluate the Interaction Matrix defined in
  * \f$\eqref{eq:Al}\f$ for the pair of panels \f$\Pi\f$ and \f$\Pi\f$', for the
@@ -109,7 +113,8 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
 Eigen::MatrixXd InteractionMatrix(const AbstractParametrizedCurve &pi,
                                   const AbstractParametrizedCurve &pi_p,
                                   const AbstractBEMSpace &space,
-                                  const unsigned int &N);
+                                  const unsigned int &N,
+                                const QuadRule &GaussQR);
 
 /**
  * This function is used to evaluate the full Galerkin matrix based on the

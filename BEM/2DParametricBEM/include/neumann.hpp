@@ -13,7 +13,11 @@
 
 #include "abstract_bem_space.hpp"
 #include "abstract_parametrized_curve.hpp"
+#include "adj_double_layer.hpp"
+#include "double_layer.hpp"
+#include "hypersingular.hpp"
 #include "parametrized_mesh.hpp"
+#include "single_layer.hpp"
 
 namespace parametricbem2d {
 /**
@@ -69,7 +73,7 @@ namespace neumann_bvp {
 /**
  * This namespace contains the solver using the direct first kind method which
  * has the variational formulation as given in \f$\eqref{eq:aWdir}\f$. The
- * Solver used the lowest order BEM spaces for computation.
+ * Solver uses the lowest order BEM spaces for computation.
  */
 namespace direct_first_kind {
 /**
@@ -79,7 +83,7 @@ namespace direct_first_kind {
  * trace of the solution u.
  *
  * @param mesh Parametrized mesh representing the boundary \f$\Gamma\f$.
- * @param g Neumann boundary condition in 2D using a function of the form
+ * @param Tn Neumann boundary condition in 2D using a function of the form
  *          double(double,double)
  * @param order The order for gauss/log-weighted quadrature
  * @return An Eigen::VectorXd type representing the Dirichlet trace of the
@@ -92,21 +96,23 @@ Eigen::VectorXd solve(const ParametrizedMesh &mesh,
   ContinuousSpace<1> trial_space;
   ContinuousSpace<1> test_space;
   // Space used for interpolation of Neumann data
-  DiscontinuousSpace<0>
-      Tn_interpol_space;
+  DiscontinuousSpace<0> Tn_interpol_space;
   // Computing W matrix
   Eigen::MatrixXd W = hypersingular::GalerkinMatrix(mesh, trial_space, order);
-  // Computing K matrix
-  Eigen::MatrixXd K =
-      double_layer::GalerkinMatrix(mesh, Tn_interpol_space, test_space, order);
+  // Computing Kp matrix
+  Eigen::MatrixXd Kp = adj_double_layer::GalerkinMatrix(mesh, Tn_interpol_space,
+                                                        test_space, order);
   // Computing mass matrix
   Eigen::MatrixXd M = MassMatrix(mesh, test_space, Tn_interpol_space, order);
-  // Midpoint interpolation of Neumann data
   unsigned numpanels = mesh.getNumPanels();
+  // Vector for storing Neumann data
   Eigen::VectorXd Tn_N(numpanels);
   using PanelVector = parametricbem2d::PanelVector;
+  // Getting the panels from the mesh object
   PanelVector panels = mesh.getPanels();
   for (unsigned i = 0; i < numpanels; ++i) {
+    // Getting Neumann data at the midpoint of parameter range, interpolation by
+    // \f$S_{-1}^{0}\f$
     Eigen::Vector2d pt = panels[i]->operator()(0.);
     Tn_N(i) = Tn(pt(0), pt(1));
   }
@@ -114,27 +120,213 @@ Eigen::VectorXd solve(const ParametrizedMesh &mesh,
   Eigen::VectorXd c(W.rows() + 1);
   c << MassVector(mesh, test_space, order), 0;
   // Building the augmented lhs matrix for solving.
-  Eigen::MatrixXd lhs = Eigen::MatrixXd::Zero(K.rows() + 1, K.cols() + 1);
+  Eigen::MatrixXd lhs = Eigen::MatrixXd::Zero(W.rows() + 1, W.cols() + 1);
   // Filling in different blocks
-  lhs.block(0, 0, K.rows(), K.cols()) = K;
-  lhs.row(K.rows()) = c.transpose();
-  lhs.col(K.cols()) = c;
+  lhs.block(0, 0, W.rows(), W.cols()) = W;
+  lhs.row(W.rows()) = c.transpose();
+  lhs.col(W.cols()) = c;
   // Building the augmented rhs matrix for solving
-  Eigen::MatrixXd rhs = Eigen::MatrixXd::Zero(K.rows() + 1, K.cols());
-  lhs.block(0, 0, K.rows(), K.cols()) = (0.5 * M - K).transpose();
+  Eigen::MatrixXd rhs = Eigen::MatrixXd::Zero(Kp.rows() + 1, Kp.cols());
+  rhs.block(0, 0, Kp.rows(), Kp.cols()) = (0.5 * M - Kp);
   // Build rhs vector for solving
   Eigen::VectorXd rhs_vector = rhs * Tn_N;
   // Solving for coefficients
   Eigen::VectorXd sol = lhs.lu().solve(rhs_vector);
-  return sol;
+  return sol.segment(0, W.rows());
 }
 } // namespace direct_first_kind
 
-namespace direct_second_kind {} // namespace direct_second_kind
+/**
+ * This namespace contains the solver using the direct second kind method which
+ * has the variational formulation as given in \f$\eqref{eq:bie2dbvpv}\f$. The
+ * Solver uses the lowest order BEM spaces for computation.
+ */
+namespace direct_second_kind {
+/**
+ * This function is used to solve the Neumann boundary value problem given
+ * in \f$\eqref{eq:neubvp}\f$ using the variational formulation given in
+ * \f$\eqref{eq:l2nv}\f$ which is obtained after lifting the variational
+ * formulation in \f$\eqref{eq:bie2dbvpv}\f$ to \f$L^{2}(\Gamma)\f$. The
+ * function outputs a vector of estimated Dirichlet trace of the solution u.
+ *
+ * @param mesh Parametrized mesh representing the boundary \f$\Gamma\f$.
+ * @param Tn Neumann boundary condition in 2D using a function of the form
+ *          double(double,double)
+ * @param order The order for gauss/log-weighted quadrature
+ * @return An Eigen::VectorXd type representing the Dirichlet trace of the
+ * solution u
+ */
+Eigen::VectorXd solve(const ParametrizedMesh &mesh,
+                      std::function<double(double, double)> Tn,
+                      unsigned order) {
+  // Same trial and test spaces
+  DiscontinuousSpace<0> trial_space;
+  DiscontinuousSpace<0> test_space;
+  // Space used for interpolation of Neumann data
+  DiscontinuousSpace<0> Tn_interpol_space;
+  // Computing V matrix
+  Eigen::MatrixXd V =
+      single_layer::GalerkinMatrix(mesh, Tn_interpol_space, order);
+  // Computing K matrix
+  Eigen::MatrixXd K =
+      double_layer::GalerkinMatrix(mesh, trial_space, test_space, order);
+  // Computing mass matrix
+  Eigen::MatrixXd M = MassMatrix(mesh, test_space, trial_space, order);
+  // Midpoint interpolation of Neumann data
+  unsigned numpanels = mesh.getNumPanels();
+  // Vector for storing Neumann data
+  Eigen::VectorXd Tn_N(numpanels);
+  using PanelVector = parametricbem2d::PanelVector;
+  // Getting the panels from the mesh object
+  PanelVector panels = mesh.getPanels();
+  for (unsigned i = 0; i < numpanels; ++i) {
+    // Getting Neumann data at the midpoint of parameter range, interpolation by
+    // \f$S_{-1}^{0}\f$
+    Eigen::Vector2d pt = panels[i]->operator()(0.);
+    Tn_N(i) = Tn(pt(0), pt(1));
+  }
+  // The vector c used in augmented formulation
+  Eigen::VectorXd c(K.rows() + 1);
+  c << MassVector(mesh, test_space, order), 0;
+  // Building the augmented lhs matrix for solving.
+  Eigen::MatrixXd lhs = Eigen::MatrixXd::Zero(K.rows() + 1, K.cols() + 1);
+  // Filling in different blocks
+  lhs.block(0, 0, K.rows(), K.cols()) = 0.5 * M + K;
+  lhs.row(K.rows()) = c.transpose();
+  lhs.col(K.cols()) = c;
+  // Build rhs vector for solving
+  Eigen::VectorXd rhs_vector(numpanels + 1);
+  rhs_vector << V * Tn_N, 0;
+  // Solving for coefficients
+  Eigen::VectorXd sol = lhs.lu().solve(rhs_vector);
+  return sol.segment(0, numpanels);
+}
+} // namespace direct_second_kind
 
-namespace direct_second_kind {}
+/**
+ * This namespace contains the solver using the indirect first kind method which
+ * has the variational formulation as given in \f$\eqref{eq:idneuWv}\f$. The
+ * Solver uses the lowest order BEM spaces for computation.
+ */
+namespace indirect_first_kind {
+/**
+ * This function is used to solve the Neumann boundary value problem given
+ * in \f$\eqref{eq:neubvp}\f$ using the variational formulation given in
+ * \f$\eqref{eq:idneuWv}\f$. The function outputs a vector \f$\Phi\f$ such that
+ * the solution u to the BVP can be constructed as \f$u =
+ * \Psi^{\Delta}_{DL}(\Phi)\f$
+ *
+ * @param mesh Parametrized mesh representing the boundary \f$\Gamma\f$.
+ * @param Tn Neumann boundary condition in 2D using a function of the form
+ *          double(double,double)
+ * @param order The order for gauss/log-weighted quadrature
+ * @return An Eigen::VectorXd type representing the Dirichlet trace of the
+ * solution u
+ */
+Eigen::VectorXd solve(const ParametrizedMesh &mesh,
+                      std::function<double(double, double)> Tn,
+                      unsigned order) {
+  // Same trial and test spaces
+  ContinuousSpace<1> trial_space;
+  ContinuousSpace<1> test_space;
+  // Space used for interpolation of Neumann data
+  DiscontinuousSpace<0> Tn_interpol_space;
+  // Computing W matrix
+  Eigen::MatrixXd W = hypersingular::GalerkinMatrix(mesh, trial_space, order);
+  // Computing mass matrix
+  Eigen::MatrixXd M = MassMatrix(mesh, test_space, Tn_interpol_space, order);
+  // Midpoint interpolation of Neumann data
+  unsigned numpanels = mesh.getNumPanels();
+  // Vector for storing Neumann data
+  Eigen::VectorXd Tn_N(numpanels);
+  using PanelVector = parametricbem2d::PanelVector;
+  // Getting the panels from the mesh object
+  PanelVector panels = mesh.getPanels();
+  for (unsigned i = 0; i < numpanels; ++i) {
+    // Getting Neumann data at the midpoint of parameter range, interpolation by
+    // \f$S_{-1}^{0}\f$
+    Eigen::Vector2d pt = panels[i]->operator()(0.);
+    Tn_N(i) = Tn(pt(0), pt(1));
+  }
+  // The vector c used in augmented formulation
+  Eigen::VectorXd c(W.rows() + 1);
+  c << MassVector(mesh, test_space, order), 0;
+  // Building the augmented lhs matrix for solving.
+  Eigen::MatrixXd lhs = Eigen::MatrixXd::Zero(W.rows() + 1, W.cols() + 1);
+  // Filling in different blocks
+  lhs.block(0, 0, W.rows(), W.cols()) = W;
+  lhs.row(W.rows()) = c.transpose();
+  lhs.col(W.cols()) = c;
+  // Build rhs vector for solving
+  Eigen::VectorXd rhs_vector(numpanels + 1);
+  rhs_vector << -M * Tn_N, 0;
+  // Solving for coefficients
+  Eigen::VectorXd sol = lhs.lu().solve(rhs_vector);
+  return sol.segment(0, numpanels);
+}
+} // namespace indirect_first_kind
 
-namespace direct_second_kind {}
+/**
+ * This namespace contains the solver using the indirect second kind method. The
+ * Solver uses the lowest order BEM spaces for computation.
+ */
+namespace indirect_second_kind {
+/**
+ * This function is used to solve the Neumann boundary value problem given
+ * in \f$\eqref{eq:neubvp}\f$. The function outputs a vector \f$\Phi\f$ such
+ * that the solution u to the BVP can be constructed as \f$u =
+ * \Psi^{\Delta}_{SL}(\Phi)\f$
+ *
+ * @param mesh Parametrized mesh representing the boundary \f$\Gamma\f$.
+ * @param Tn Neumann boundary condition in 2D using a function of the form
+ *          double(double,double)
+ * @param order The order for gauss/log-weighted quadrature
+ * @return An Eigen::VectorXd type representing the Dirichlet trace of the
+ * solution u
+ */
+Eigen::VectorXd solve(const ParametrizedMesh &mesh,
+                      std::function<double(double, double)> Tn,
+                      unsigned order) {
+  // Same trial and test spaces
+  DiscontinuousSpace<0> trial_space;
+  DiscontinuousSpace<0> test_space;
+  // Space used for interpolation of Neumann data
+  DiscontinuousSpace<0> Tn_interpol_space;
+  // Computing Kp matrix
+  Eigen::MatrixXd Kp =
+      adj_double_layer::GalerkinMatrix(mesh, trial_space, test_space, order);
+  // Computing mass matrix
+  Eigen::MatrixXd M = MassMatrix(mesh, test_space, Tn_interpol_space, order);
+  // Midpoint interpolation of Neumann data
+  unsigned numpanels = mesh.getNumPanels();
+  // Vector for storing Neumann data
+  Eigen::VectorXd Tn_N(numpanels);
+  using PanelVector = parametricbem2d::PanelVector;
+  // Getting the panels from the mesh object
+  PanelVector panels = mesh.getPanels();
+  for (unsigned i = 0; i < numpanels; ++i) {
+    // Getting Neumann data at the midpoint of parameter range, interpolation by
+    // \f$S_{-1}^{0}\f$
+    Eigen::Vector2d pt = panels[i]->operator()(0.);
+    Tn_N(i) = Tn(pt(0), pt(1));
+  }
+  // The vector c used in augmented formulation
+  Eigen::VectorXd c(Kp.rows() + 1);
+  c << MassVector(mesh, test_space, order), 0;
+  // Building the augmented lhs matrix for solving.
+  Eigen::MatrixXd lhs = Eigen::MatrixXd::Zero(Kp.rows() + 1, Kp.cols() + 1);
+  // Filling in different blocks
+  lhs.block(0, 0, Kp.rows(), Kp.cols()) = 0.5 * M + Kp;
+  lhs.row(Kp.rows()) = c.transpose();
+  lhs.col(Kp.cols()) = c;
+  // Build rhs vector for solving
+  Eigen::VectorXd rhs_vector(numpanels + 1);
+  rhs_vector << M * Tn_N, 0;
+  // Solving for coefficients
+  Eigen::VectorXd sol = lhs.lu().solve(rhs_vector);
+  return sol.segment(0, numpanels);
+}
+} // namespace indirect_second_kind
 } // namespace neumann_bvp
 } // namespace parametricbem2d
 

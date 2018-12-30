@@ -1,7 +1,7 @@
 /**
  * \file dirichlet.hpp
- * \brief This file defines various solvers to solve a Dirichlet Boundary Value
- *        problem of the form given in \f$\eqref{eq:dirbvp}\f$
+ * \brief This file defines lowest order indirect/direct BVP solvers to solve a
+ * Dirichlet Boundary Value problem of the form given in \f$\eqref{eq:dirbvp}\f$
  *
  * This File is a part of the 2D-Parametric BEM package
  */
@@ -13,7 +13,14 @@
 
 #include "abstract_bem_space.hpp"
 #include "abstract_parametrized_curve.hpp"
+#include "adj_double_layer.hpp"
+#include "continuous_space.hpp"
+#include "discontinuous_space.hpp"
+#include "double_layer.hpp"
+#include "hypersingular.hpp"
+#include "integral_gauss.hpp"
 #include "parametrized_mesh.hpp"
+#include "single_layer.hpp"
 
 namespace parametricbem2d {
 /**
@@ -83,7 +90,7 @@ namespace dirichlet_bvp {
 /**
  * This namespace contains the solver using the direct first kind method which
  * has the variational formulation as given in \f$\eqref{eq:aVdir}\f$. The
- * Solver used the lowest order BEM spaces for computation.
+ * Solver uses the lowest order BEM spaces for computation.
  */
 namespace direct_first_kind {
 /**
@@ -121,18 +128,170 @@ Eigen::VectorXd solve(const ParametrizedMesh &mesh,
     g_N(i) = g(pt(0), pt(1));
   }
   // Build rhs for solving
-  Eigen::VectorXd rhs = (0.5 * M - K) * g_N;
+  Eigen::VectorXd rhs = (0.5 * M + K) * g_N;
   // Solving for coefficients
   Eigen::VectorXd sol = V.lu().solve(rhs);
   return sol;
 }
 } // namespace direct_first_kind
 
-namespace direct_second_kind {} // namespace direct_second_kind
+/**
+ * This namespace contains the solver using the direct second kind method which
+ * has the variational formulation as given in \f$\eqref{eq:l2dv}\f$. The
+ * Solver uses the lowest order BEM spaces for computation.
+ */
+namespace direct_second_kind {
+/**
+ * This function is used to solve the Dirichlet boundary value problem given
+ * in \f$\eqref{eq:dirbvp}\f$ using the variational formulation given in
+ * \f$\eqref{eq:l2dv}\f$ after lifting of the variation formulation given in
+ * \f$\eqref{eq:bie2nbpvv}\f$ to the \f$L^{2}(\Gamma)\f$ space. The function
+ * outputs a vector of estimated Neumann trace of the solution u.
+ *
+ * @param mesh Parametrized mesh representing the boundary \f$\Gamma\f$.
+ * @param g Dirichlet boundary condition in 2D using a function of the form
+ *          double(double,double)
+ * @param order The order for gauss/log-weighted quadrature
+ * @return An Eigen::VectorXd type representing the Neumann trace of the
+ * solution u
+ */
+Eigen::VectorXd solve(const ParametrizedMesh &mesh,
+                      std::function<double(double, double)> g, unsigned order) {
+  // Same trial and test spaces
+  DiscontinuousSpace<0> trial_space;
+  DiscontinuousSpace<0> test_space;
+  // Space used for interpolation of Dirichlet data
+  DiscontinuousSpace<0> g_interpol_space;
+  // Computing V matrix
+  Eigen::MatrixXd W =
+      hypersingular::GalerkinMatrix(mesh, g_interpol_space, order);
+  // Computing K' matrix
+  Eigen::MatrixXd Kp =
+      adj_double_layer::GalerkinMatrix(mesh, trial_space, test_space, order);
+  // Computing mass matrix
+  Eigen::MatrixXd M = MassMatrix(mesh, test_space, trial_space, order);
+  unsigned numpanels = mesh.getNumPanels();
+  using PanelVector = parametricbem2d::PanelVector;
+  PanelVector panels = mesh.getPanels();
+  // Getting Dirichlet data at the midpoint of parameter range, interpolation by
+  // \f$S_{-1}^{0}\f$
+  Eigen::VectorXd g_N(numpanels);
+  for (unsigned i = 0; i < numpanels; ++i) {
+    // Eigen::Vector2d pt1 = mesh.getVertex(i % numpanels);
+    // Eigen::Vector2d pt2 = mesh.getVertex((i + 1) % numpanels);
+    // Eigen::Vector2d pt = 0.5 * ( pt1 + pt2 );
+    Eigen::Vector2d pt = panels[i]->operator()(0.);
+    g_N(i) = g(pt(0), pt(1));
+  }
+  // Build lhs for solving
+  Eigen::MatrixXd lhs = (0.5 * M - Kp);
+  // Build rhs for solving
+  Eigen::VectorXd rhs = W * g_N;
+  // Solving for coefficients in a homogeneous system
+  /*auto qr = lhs.transpose().colPivHouseholderQr();
+  Eigen::MatrixXd Q = qr.householderQ();
+  Eigen::VectorXd sol = Q.col(lhs.rows() - 1);
+  Eigen::FullPivLU<MatrixXd> lu(lhs);
+  std::cout << "Is matrix invertible?: " << lu.isInvertible() << std::endl;*/
+  // sol.normalize();
+  Eigen::VectorXd sol = lhs.lu().solve(rhs);
+  return sol;
+}
+} // namespace direct_second_kind
 
-namespace direct_second_kind {}
+/**
+ * This namespace contains the solver using the indirect first kind method which
+ * has the variational formulation as given in \f$\eqref{eq:iddirVv}\f$. The
+ * Solver uses the lowest order BEM spaces for computation.
+ */
+namespace indirect_first_kind {
+/**
+ * This function is used to solve the Dirichlet boundary value problem given
+ * in \f$\eqref{eq:dirbvp}\f$ using the variational formulation given in
+ * \f$\eqref{eq:iddirVv}\f$. The function outputs a vector \f$\Phi\f$ such that
+ * the solution u to the BVP can be constructed as \f$u =
+ * \Psi^{\Delta}_{SL}(\Phi)\f$
+ *
+ * @param mesh Parametrized mesh representing the boundary \f$\Gamma\f$.
+ * @param g Dirichlet boundary condition in 2D using a function of the form
+ *          double(double,double)
+ * @param order The order for gauss/log-weighted quadrature
+ * @return An Eigen::VectorXd type representing \f$\Phi\f$ as described above
+ */
+Eigen::VectorXd solve(const ParametrizedMesh &mesh,
+                      std::function<double(double, double)> g, unsigned order) {
+  // Same trial and test spaces
+  DiscontinuousSpace<0> trial_space;
+  DiscontinuousSpace<0> test_space;
+  // Space used for interpolation of Dirichlet data
+  ContinuousSpace<1> g_interpol_space;
+  // Computing V matrix
+  Eigen::MatrixXd V = single_layer::GalerkinMatrix(mesh, trial_space, order);
+  // Computing mass matrix
+  Eigen::MatrixXd M = MassMatrix(mesh, test_space, g_interpol_space, order);
+  unsigned numpanels = mesh.getNumPanels();
+  // Getting Dirichlet data at the vertices, interpolation by \f$S_{1}^{0}\f$
+  Eigen::VectorXd g_N(numpanels);
+  for (unsigned i = 0; i < numpanels; ++i) {
+    Eigen::Vector2d pt = mesh.getVertex(i);
+    g_N(i) = g(pt(0), pt(1));
+  }
+  // Build rhs for solving
+  Eigen::VectorXd rhs = M * g_N;
+  // Solving for coefficients
+  Eigen::VectorXd sol = V.lu().solve(rhs);
+  return sol;
+}
+} // namespace indirect_first_kind
 
-namespace direct_second_kind {}
+/**
+ * This namespace contains the solver using the indirect second kind method. The
+ * Solver uses the lowest order BEM spaces for computation.
+ */
+namespace indirect_second_kind {
+/**
+ * This function is used to solve the Dirichlet boundary value problem given
+ * in \f$\eqref{eq:dirbvp}\f$ using the variational formulation of indirect
+ * second kind BIE. The function outputs a vector \f$\Phi\f$ such that the
+ * solution u to the BVP can be constructed as \f$u =
+ * \Psi^{\Delta}_{DL}(\Phi)\f$
+ *
+ * @param mesh Parametrized mesh representing the boundary \f$\Gamma\f$.
+ * @param g Dirichlet boundary condition in 2D using a function of the form
+ *          double(double,double)
+ * @param order The order for gauss/log-weighted quadrature
+ * @return An Eigen::VectorXd type representing \f$\Phi\f$ as described above
+ */
+Eigen::VectorXd solve(const ParametrizedMesh &mesh,
+                      std::function<double(double, double)> g, unsigned order) {
+  // Same trial and test spaces
+  DiscontinuousSpace<0> trial_space;
+  DiscontinuousSpace<0> test_space;
+  // Space used for interpolation of Dirichlet data
+  ContinuousSpace<1> g_interpol_space;
+  // Computing V matrix
+  Eigen::MatrixXd K =
+      double_layer::GalerkinMatrix(mesh, trial_space, trial_space, order);
+  // Computing mass matrix for lhs
+  Eigen::MatrixXd Ml = MassMatrix(mesh, test_space, trial_space, order);
+  // Computing mass matrix for rhs
+  Eigen::MatrixXd Mr = MassMatrix(mesh, test_space, g_interpol_space, order);
+  unsigned numpanels = mesh.getNumPanels();
+  // Getting Dirichlet data at the vertices, interpolation by \f$S_{1}^{0}\f$
+  Eigen::VectorXd g_N(numpanels);
+  for (unsigned i = 0; i < numpanels; ++i) {
+    Eigen::Vector2d pt = mesh.getVertex(i);
+    g_N(i) = g(pt(0), pt(1));
+  }
+  // Build lhs for solving
+  Eigen::MatrixXd lhs = (-0.5 * Ml + K);
+  // Build rhs for solving
+  Eigen::VectorXd rhs = Mr * g_N;
+  // Solving for coefficients
+  Eigen::VectorXd sol = lhs.lu().solve(rhs);
+  return sol;
+}
+} // namespace indirect_second_kind
 } // namespace dirichlet_bvp
 } // namespace parametricbem2d
 

@@ -145,10 +145,14 @@ public:
    * @return double Distance between the parametric curves
    */
   double distanceTo(const AbstractParametrizedCurve &curve) const {
+    // Number of points sampled in one dimension for naive distance calculation
     unsigned N = 5;
     double tmin, tmax, min_dist;
+    // Getting the parameter range
     std::tie(tmin, tmax) = ParameterRange();
+    // Sample points over the domain
     Eigen::VectorXd t = Eigen::VectorXd::LinSpaced(N, tmin, tmax);
+    // Evaluating distances over all possible pairs
     for (unsigned i = 0; i < N; ++i) {
       for (unsigned j = 0; j < N; ++j) {
         double temp = (this->operator()(t(i)) - curve.operator()(t(j))).norm();
@@ -158,7 +162,49 @@ public:
     }
     return min_dist;
   }
+
+  /**
+   * This function is used for calculating the length of a panel. The function
+   * in this abstract base class naively calculates distance by dividing the
+   * curve into line segments. The function is virtual and can be overriden in
+   * derived classes for a more accurate implementation.
+   *
+   * @return double Approximate length of the parametrized curve
+   */
+  virtual double length() const {
+    // Number of points sampled for naive length calculation
+    unsigned N = 10;
+    double tmin, tmax, length = 0.;
+    // Getting the parameter range
+    std::tie(tmin, tmax) = ParameterRange();
+    // Sample points over the domain
+    Eigen::VectorXd t = Eigen::VectorXd::LinSpaced(N, tmin, tmax);
+    for (unsigned i = 0; i < N - 1; ++i) {
+      length += (this->operator()(t(i)) - this->operator()(t(i + 1))).norm();
+    }
+    return length;
+  }
 }; // class AbstractParametrizedCurve
+
+/**
+ * This function is used for calculating the admissibility of two disjoint
+ * parametrized curves. It is defined as \f$\rho(\Pi,\Pi') = \frac
+ * {max(|\Pi|,|\Pi'|)} {dist(\Pi,\Pi')}\f$
+ *
+ * @param pi First parametrized curve
+ * @param pi_p Second parametrized curve
+ * @return Admissibility value for the given pair of panels
+ */
+inline double rho(const AbstractParametrizedCurve &pi,
+                  const AbstractParametrizedCurve &pi_p) {
+  // Numerator: longer panel length
+  double num = std::max(pi.length(), pi_p.length());
+  // Denominator: distance between panels
+  double denom = pi.distanceTo(pi_p);
+  // Admissibility formula
+  return num / denom;
+}
+
 } // namespace parametricbem2d
 
 #endif // PARAMETRIZEDCURVEHPP

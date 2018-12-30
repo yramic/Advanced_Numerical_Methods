@@ -56,6 +56,11 @@ public:
    */
   PanelVector split(unsigned int) const;
 
+  /**
+   * See documentation in AbstractParametrizedCurve
+   */
+  double length() const;
+
 private:
   /**
    * Private const field for storing the center

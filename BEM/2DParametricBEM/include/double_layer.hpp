@@ -17,6 +17,7 @@
 #include "abstract_bem_space.hpp"
 #include "abstract_parametrized_curve.hpp"
 #include "parametrized_mesh.hpp"
+#include "logweight_quadrature.hpp"
 
 namespace parametricbem2d {
 /**
@@ -45,7 +46,8 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
                                         const AbstractParametrizedCurve &pi_p,
                                         const AbstractBEMSpace &trial_space,
                                         const AbstractBEMSpace &test_space,
-                                        const unsigned int &N);
+                                        const unsigned int &N,
+                                      const QuadRule &GaussQR);
 
 /**
  * This function is used to evaluate the Interaction Matrix for a pair of
@@ -66,7 +68,8 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
                                           const AbstractParametrizedCurve &pi_p,
                                           const AbstractBEMSpace &trial_space,
                                           const AbstractBEMSpace &test_space,
-                                          const unsigned int &N);
+                                          const unsigned int &N,
+                                        const QuadRule &GaussQR);
 
 /**
  * This function is used to evaluate the Interaction Matrix for a pair of
@@ -86,7 +89,8 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
                                        const AbstractParametrizedCurve &pi_p,
                                        const AbstractBEMSpace &trial_space,
                                        const AbstractBEMSpace &test_space,
-                                       const unsigned int &N);
+                                       const unsigned int &N,
+                                     const QuadRule &GaussQR);
 /**
  * This function is used to evaluate the Interaction Matrix defined in
  * \f$\eqref{eq:Al}\f$ for the pair of panels \f$\Pi\f$ and \f$\Pi\f$' for the
@@ -122,7 +126,8 @@ Eigen::MatrixXd InteractionMatrix(const AbstractParametrizedCurve &pi,
                                   const AbstractParametrizedCurve &pi_p,
                                   const AbstractBEMSpace &trial_space,
                                   const AbstractBEMSpace &test_space,
-                                  const unsigned int &N);
+                                  const unsigned int &N,
+                                const QuadRule &GaussQR);
 
 /**
  * This function is used to evaluate the full Galerkin matrix based on the
@@ -143,6 +148,28 @@ Eigen::MatrixXd GalerkinMatrix(const ParametrizedMesh mesh,
                                const AbstractBEMSpace &trial_space,
                                const AbstractBEMSpace &test_space,
                                const unsigned int &N);
+
+/**
+ * This function is used to evaluate the Double Layer Potential given by
+ * \f$\Psi^{\Delta}_{DL}\Phi(x) = \int_{\Gamma} \frac{1}{2\Pi}
+ * \frac{x-y}{||x-y||^{2}} \cdot n(y) \Phi(y) dS(y)\f$ for the function \f$\Phi
+ * = \sum_{i=1}^{N} c_{i} b^{i}_{N}\f$ where \f$c_{i}\f$ are the coefficients
+ * and \f$b^{i}_{N}\f$ are the basis functions for the given BEM space and mesh.
+ * The Double Layer Potential is evaluated using quadrature, at the evaluation
+ * point x passed as an input.
+ *
+ * @param x An Eigen::Vector2d type for the evaluation point
+ * @param coeffs An Eigen::VectorXd type containing the coefficients \f$c_{i}\f$
+ *               as mentioned above
+ * @param mesh ParametrizedMesh object containing all the parametrized
+ *             panels in the mesh
+ * @param space The BEM space used for evaluating the Double Layer Potential
+ * @param N Order for Gauss Quadrature
+ * @return double representing the Double Layer Potential at the test point
+ */
+double Potential(const Eigen::Vector2d &x, const Eigen::VectorXd &coeffs,
+                 const ParametrizedMesh &mesh, const AbstractBEMSpace &space,
+                 const unsigned int &N);
 
 } // namespace double_layer
 } // namespace parametricbem2d

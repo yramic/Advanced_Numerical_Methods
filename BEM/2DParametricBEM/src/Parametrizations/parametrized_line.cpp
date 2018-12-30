@@ -67,4 +67,12 @@ PanelVector ParametrizedLine::split(unsigned int N) const {
   }
   return parametrization_parts;
 }
+
+double ParametrizedLine::length() const {
+  double tmin, tmax;
+  // Getting the parameter range
+  std::tie(tmin, tmax) = ParameterRange();
+  return (this->operator()(tmax) - this->operator()(tmin)).norm();
+}
+
 } // namespace parametricbem2d

@@ -70,4 +70,8 @@ PanelVector ParametrizedCircularArc::split(unsigned int N) const {
   return parametrization_parts;
 }
 
+double ParametrizedCircularArc::length() const {
+  return radius_ * (phi_end_ - phi_start_);
+}
+
 } // namespace parametricbem2d
