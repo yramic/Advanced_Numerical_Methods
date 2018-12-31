@@ -12,7 +12,9 @@
 
 #include <math.h>
 #include <vector>
+#include <limits>
 
+#include <Eigen/Dense>
 #include "abstract_bem_space.hpp"
 #include "abstract_parametrized_curve.hpp"
 #include "discontinuous_space.hpp"
@@ -20,8 +22,6 @@
 #include "gauleg.hpp"
 #include "logweight_quadrature.hpp"
 #include "parametrized_mesh.hpp"
-#include <Eigen/Dense>
-#include <limits>
 
 namespace parametricbem2d {
 namespace adj_double_layer {

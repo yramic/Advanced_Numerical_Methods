@@ -13,15 +13,15 @@
 
 #include <math.h>
 #include <vector>
+#include <limits>
 
+#include <Eigen/Dense>
 #include "abstract_bem_space.hpp"
 #include "abstract_parametrized_curve.hpp"
 #include "discontinuous_space.hpp"
 #include "gauleg.hpp"
 #include "logweight_quadrature.hpp"
 #include "parametrized_mesh.hpp"
-#include <Eigen/Dense>
-#include <limits>
 
 namespace parametricbem2d {
 namespace hypersingular {
@@ -79,9 +79,9 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
       double i1 = 0., i2 = 0.; // The two integrals in \f$\eqref{eq:Isplit}\f$
 
       // Getting Gauss Legendre quadrature weights and points
-      Eigen::RowVectorXd weights, points;
-      std::tie(points, weights) =
-          gauleg(-1, 1, N, std::numeric_limits<double>::epsilon());
+      //Eigen::RowVectorXd weights, points;
+      //std::tie(points, weights) =
+      //    gauleg(-1, 1, N, std::numeric_limits<double>::epsilon());
 
       // Tensor product quadrature for double 1st integral in
       // \f$\eqref{eq:Isplit}\f$
@@ -182,9 +182,9 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
       };
 
       // Getting Gauss Legendre Quadrature weights and nodes
-      Eigen::RowVectorXd weights, points;
-      std::tie(points, weights) =
-          gauleg(-1, 1, N, std::numeric_limits<double>::epsilon());
+      //Eigen::RowVectorXd weights, points;
+      //std::tie(points, weights) =
+      //    gauleg(-1, 1, N, std::numeric_limits<double>::epsilon());
 
       // The two integrals in \f$\eqref{eq:Isplitapn}\f$ have to be further
       // split into two parts part 1 is where phi goes from 0 to alpha part 2 is
@@ -301,9 +301,9 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
       double integral = 0.;
 
       // Getting Gauss Legendre quadrature weights and points
-      Eigen::RowVectorXd weights, points;
-      std::tie(points, weights) =
-          gauleg(-1, 1, N, std::numeric_limits<double>::epsilon());
+      //Eigen::RowVectorXd weights, points;
+      //std::tie(points, weights) =
+      //    gauleg(-1, 1, N, std::numeric_limits<double>::epsilon());
 
       // Tensor product quadrature rule
       for (unsigned int i = 0; i < N; ++i) {

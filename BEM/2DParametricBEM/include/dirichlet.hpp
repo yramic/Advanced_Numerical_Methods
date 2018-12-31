@@ -10,7 +10,6 @@
 #define DIRICHLETHPP
 
 #include <Eigen/Dense>
-
 #include "abstract_bem_space.hpp"
 #include "abstract_parametrized_curve.hpp"
 #include "adj_double_layer.hpp"

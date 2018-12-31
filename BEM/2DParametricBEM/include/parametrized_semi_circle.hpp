@@ -9,11 +9,11 @@
 #ifndef PARAMETRIZEDSEMICIRCLEHPP
 #define PARAMETRIZEDSEMICIRCLEHPP
 
+#include "abstract_parametrized_curve.hpp"
+
 #include <utility>
 
 #include <Eigen/Dense>
-
-#include "abstract_parametrized_curve.hpp"
 
 namespace parametricbem2d {
 /**

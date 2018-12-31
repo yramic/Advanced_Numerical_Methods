@@ -9,9 +9,10 @@
 #ifndef PARAMETRIZEDCIRCULARARCHPP
 #define PARAMETRIZEDCIRCULARARCHPP
 
+#include "abstract_parametrized_curve.hpp"
+
 #include <utility>
 
-#include "abstract_parametrized_curve.hpp"
 #include <Eigen/Dense>
 
 namespace parametricbem2d {

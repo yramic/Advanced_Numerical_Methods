@@ -13,7 +13,9 @@
 
 #include <math.h>
 #include <vector>
+#include <limits>
 
+#include <Eigen/Dense>
 #include "abstract_bem_space.hpp"
 #include "abstract_parametrized_curve.hpp"
 #include "discontinuous_space.hpp"
@@ -21,8 +23,6 @@
 #include "integral_gauss.hpp"
 #include "logweight_quadrature.hpp"
 #include "parametrized_mesh.hpp"
-#include <Eigen/Dense>
-#include <limits>
 
 namespace parametricbem2d {
 namespace single_layer {
@@ -382,6 +382,8 @@ double Potential(const Eigen::Vector2d &x, const Eigen::VectorXd &coeffs,
   PanelVector panels = mesh.getPanels();
   // Getting the number of local shape functions in the BEM space
   unsigned int Q = space.getQ();
+  // Getting general Gauss Quadrature rule
+  QuadRule GaussQR = getGaussQR(N);
   // Initializing the single layer potential vector for the bases, with zeros
   Eigen::VectorXd potentials = Eigen::VectorXd::Zero(dims);
   // Looping over all the panels
@@ -397,7 +399,7 @@ double Potential(const Eigen::Vector2d &x, const Eigen::VectorXd &coeffs,
                panels[panel]->Derivative(t).norm();
       };
       // Local to global mapping
-      double local = ComputeIntegral(integrand, -1., 1., N);
+      double local = ComputeIntegral(integrand, -1., 1., GaussQR);
       unsigned ii = space.LocGlobMap(i + 1, panel + 1, numpanels) - 1;
       // Filling the potentials vector
       potentials(ii) += local;

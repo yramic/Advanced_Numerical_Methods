@@ -13,7 +13,6 @@
 #define SINGLELAYERHPP
 
 #include <Eigen/Dense>
-
 #include "abstract_bem_space.hpp"
 #include "abstract_parametrized_curve.hpp"
 #include "parametrized_mesh.hpp"

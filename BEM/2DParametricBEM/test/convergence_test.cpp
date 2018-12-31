@@ -1,20 +1,25 @@
+#include <stdlib.h>
 #include <cassert>
 #include <cmath>
 #include <iostream>
 #include <stdexcept>
-#include <stdlib.h>
 #include <utility>
 #include <string>
 #include <fstream>
 
-#include "BoundaryMesh.hpp"
-#include "abstract_bem_space.hpp"
+#include <Eigen/Sparse>
+#include <Eigen/Dense>
+#include "gtest/gtest.h"
 #include "buildK.hpp"
 #include "buildV.hpp"
 #include "buildW.hpp"
+#include "buildM.hpp"
+#include "BoundaryMesh.hpp"
+#include "doubleLayerPotential.hpp"
+#include "singleLayerPotential.hpp"
+#include "abstract_bem_space.hpp"
 #include "continuous_space.hpp"
 #include "discontinuous_space.hpp"
-#include "doubleLayerPotential.hpp"
 #include "double_layer.hpp"
 #include "integral_gauss.hpp"
 #include "parametrized_circular_arc.hpp"
@@ -22,15 +27,10 @@
 #include "parametrized_line.hpp"
 #include "parametrized_mesh.hpp"
 #include "parametrized_semi_circle.hpp"
-#include "singleLayerPotential.hpp"
 #include "single_layer.hpp"
-#include "gtest/gtest.h"
-#include <Eigen/Dense>
-#include <Eigen/Sparse>
 #include "hypersingular.hpp"
 #include "dirichlet.hpp"
 #include "neumann.hpp"
-#include "buildM.hpp"
 
 int main() {
   std::string filename = "convergence.txt";
