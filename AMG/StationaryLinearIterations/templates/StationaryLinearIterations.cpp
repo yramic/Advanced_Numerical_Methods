@@ -78,47 +78,6 @@ double gaussSeidelRate(const int n, double c, double TOL=1.0E-03)
 /* SAM_LISTING_END_3 */
 
 
-/* SAM_LISTING_BEGIN_4 */
-double comp_lmax_jacobi(const SparseMatrix<double> &X, double w, double TOL=1.0E-03)
-{
-    int N = X.rows();
-    
-    VectorXd v = MatrixXd::Random(N,1);
-    double lambda_new = 0;
-    double lambda_old = 1;
-    
-    VectorXd D = X.diagonal();
-    int itr=0;
-    do
-    {
-        lambda_old = lambda_new;
-        v /= v.norm();
-        VectorXd X_mult_v = X*v;
-        for (int i=0; i<N; i++) {// E = I - M*A; M = w*inv(diag(A))
-            v(i) -= w*X_mult_v(i)/D(i);
-        }
-        lambda_new = v.norm();
-    }
-    while (fabs(lambda_new-lambda_old) > TOL*lambda_new);
-    
-    return lambda_new;
-}
-/* SAM_LISTING_END_4 */
-
-/* @brief Determines the asymptotic convergence rate of the Jacobi
- * iterative method using power iteration, 
- * for the Poisson matrix $\mathbf{A}$ on a unit square domain.
- * \param N matrix size
- * \param w relaxation parameter
- * \\return asymptotic convergence rate
- */
-/* SAM_LISTING_BEGIN_5 */
-double jacobiRate(const int n, double w, double TOL=1.0E-03)
-{
-    // TODO: Implement power iteration to compute the asymptotic convergence rate
-    // of the Jacobi iterative method for the matrix $\mathbf{A}$.
-}
-/* SAM_LISTING_END_5 */
 
 
 int main() {

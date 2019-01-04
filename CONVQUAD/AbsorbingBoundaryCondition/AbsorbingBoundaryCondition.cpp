@@ -41,8 +41,7 @@ VectorXd conv_wght_ieu(const FFUNC& F, size_t n, int p, double r=1.0E-7)
             w(l) += coeff*integrand(F, tau, s, l);
         }
     }
-    
-    w *= -0.5*tau / complex<double>(0.,p); // $\tau$ times quadrature weight $1./(2*p)$
+    w *= -0.5*tau/p; // $\tau$ times quadrature weight $1./(2*p)$
     
     return w.real();
 }
@@ -83,9 +82,8 @@ VectorXd conv_wght_bdf2(const FFUNC& F, size_t n, int p, double r=1.0E-7)
             w(l) += coeff*integrand(F, tau, s, l);
         }
     }
-    
-    w *= 0.5*tau / complex<double>(0.,p); // $\tau$ times quadrature weight $1./(2*p)$
-    
+    w *= -0.5*tau/p; // $\tau$ times quadrature weight $1./(2*p)$
+
     return w.real();
 #else // TEMPLATE
     // TODO: Compute the convolution weights for Laplace transform F
@@ -185,7 +183,7 @@ int main() {
     /* SAM_LISTING_BEGIN_3 */
 #if SOLUTION
     auto g = [](double t) { return sin(M_PI*t); };
-    
+
     // compute reference solution
     int M_ref = 4096;
     int N_ref = 4096;
