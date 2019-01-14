@@ -9,7 +9,6 @@
 #ifndef DIRICHLETHPP
 #define DIRICHLETHPP
 
-#include <Eigen/Dense>
 #include "abstract_bem_space.hpp"
 #include "abstract_parametrized_curve.hpp"
 #include "adj_double_layer.hpp"
@@ -20,6 +19,7 @@
 #include "integral_gauss.hpp"
 #include "parametrized_mesh.hpp"
 #include "single_layer.hpp"
+#include <Eigen/Dense>
 
 namespace parametricbem2d {
 /**
@@ -119,13 +119,8 @@ Eigen::VectorXd solve(const ParametrizedMesh &mesh,
       double_layer::GalerkinMatrix(mesh, g_interpol_space, test_space, order);
   // Computing mass matrix
   Eigen::MatrixXd M = MassMatrix(mesh, test_space, g_interpol_space, order);
-  unsigned numpanels = mesh.getNumPanels();
   // Getting Dirichlet data at the vertices, interpolation by \f$S_{1}^{0}\f$
-  Eigen::VectorXd g_N(numpanels);
-  for (unsigned i = 0; i < numpanels; ++i) {
-    Eigen::Vector2d pt = mesh.getVertex(i);
-    g_N(i) = g(pt(0), pt(1));
-  }
+  Eigen::VectorXd g_N = g_interpol_space.Interpolate(g, mesh);
   // Build rhs for solving
   Eigen::VectorXd rhs = (0.5 * M + K) * g_N;
   // Solving for coefficients
@@ -157,10 +152,10 @@ namespace direct_second_kind {
 Eigen::VectorXd solve(const ParametrizedMesh &mesh,
                       std::function<double(double, double)> g, unsigned order) {
   // Same trial and test spaces
-  ContinuousSpace<1> trial_space;
-  ContinuousSpace<1> test_space;
+  DiscontinuousSpace<1> trial_space;
+  DiscontinuousSpace<1> test_space;
   // Space used for interpolation of Dirichlet data
-  ContinuousSpace<1> g_interpol_space;
+  DiscontinuousSpace<1> g_interpol_space;
   // Computing W matrix
   Eigen::MatrixXd W =
       hypersingular::GalerkinMatrix(mesh, g_interpol_space, order);
@@ -169,25 +164,8 @@ Eigen::VectorXd solve(const ParametrizedMesh &mesh,
       adj_double_layer::GalerkinMatrix(mesh, trial_space, test_space, order);
   // Computing mass matrix
   Eigen::MatrixXd M = MassMatrix(mesh, test_space, trial_space, order);
-  unsigned numpanels = mesh.getNumPanels();
-  using PanelVector = parametricbem2d::PanelVector;
-  PanelVector panels = mesh.getPanels();
-  // Getting Dirichlet data at the midpoint of parameter range, interpolation by
-  // \f$S_{-1}^{1}\f$
-  unsigned dims = g_interpol_space.getSpaceDim(numpanels);
-  Eigen::VectorXd g_N(dims);
-  for (unsigned i = 0; i < numpanels; ++i) {
-    //Eigen::Vector2d ptm1 = mesh.getVertex(i);
-    //Eigen::Vector2d ptp1 = mesh.getVertex((i+1)%numpanels);
-    Eigen::Vector2d ptm1 = panels[i]->operator()(-1.);
-    //Eigen::Vector2d ptp1 = panels[i]->operator()(1.);
-    Eigen::Vector2d pt0 = panels[i]->operator()(0.);
-    double gm1 = g(ptm1(0),ptm1(1));
-    double g0 = g(pt0(0),pt0(1));
-    Eigen::Vector2d pt_cont = mesh.getVertex(i);
-    g_N(i) = g(pt_cont(0),pt_cont(1));
-    //g_N(i+numpanels) = g0 - gm1;
-  }
+  // Getting Dirichlet data
+  Eigen::VectorXd g_N = g_interpol_space.Interpolate(g, mesh);
   // Build lhs for solving
   Eigen::MatrixXd lhs = (0.5 * M - Kp);
   // Build rhs for solving
@@ -227,13 +205,8 @@ Eigen::VectorXd solve(const ParametrizedMesh &mesh,
   Eigen::MatrixXd V = single_layer::GalerkinMatrix(mesh, trial_space, order);
   // Computing mass matrix
   Eigen::MatrixXd M = MassMatrix(mesh, test_space, g_interpol_space, order);
-  unsigned numpanels = mesh.getNumPanels();
   // Getting Dirichlet data at the vertices, interpolation by \f$S_{1}^{0}\f$
-  Eigen::VectorXd g_N(numpanels);
-  for (unsigned i = 0; i < numpanels; ++i) {
-    Eigen::Vector2d pt = mesh.getVertex(i);
-    g_N(i) = g(pt(0), pt(1));
-  }
+  Eigen::VectorXd g_N = g_interpol_space.Interpolate(g, mesh);
   // Build rhs for solving
   Eigen::VectorXd rhs = M * g_N;
   // Solving for coefficients
@@ -274,13 +247,8 @@ Eigen::VectorXd solve(const ParametrizedMesh &mesh,
   Eigen::MatrixXd Ml = MassMatrix(mesh, test_space, trial_space, order);
   // Computing mass matrix for rhs
   Eigen::MatrixXd Mr = MassMatrix(mesh, test_space, g_interpol_space, order);
-  unsigned numpanels = mesh.getNumPanels();
   // Getting Dirichlet data at the vertices, interpolation by \f$S_{1}^{0}\f$
-  Eigen::VectorXd g_N(numpanels);
-  for (unsigned i = 0; i < numpanels; ++i) {
-    Eigen::Vector2d pt = mesh.getVertex(i);
-    g_N(i) = g(pt(0), pt(1));
-  }
+  Eigen::VectorXd g_N = g_interpol_space.Interpolate(g, mesh);
   // Build lhs for solving
   Eigen::MatrixXd lhs = (-0.5 * Ml + K);
   // Build rhs for solving

@@ -9,7 +9,6 @@
 #ifndef NEUMANNHPP
 #define NEUMANNHPP
 
-#include <Eigen/Dense>
 #include "abstract_bem_space.hpp"
 #include "abstract_parametrized_curve.hpp"
 #include "adj_double_layer.hpp"
@@ -17,6 +16,7 @@
 #include "hypersingular.hpp"
 #include "parametrized_mesh.hpp"
 #include "single_layer.hpp"
+#include <Eigen/Dense>
 
 namespace parametricbem2d {
 /**
@@ -103,18 +103,8 @@ Eigen::VectorXd solve(const ParametrizedMesh &mesh,
                                                         test_space, order);
   // Computing mass matrix
   Eigen::MatrixXd M = MassMatrix(mesh, test_space, Tn_interpol_space, order);
-  unsigned numpanels = mesh.getNumPanels();
   // Vector for storing Neumann data
-  Eigen::VectorXd Tn_N(numpanels);
-  using PanelVector = parametricbem2d::PanelVector;
-  // Getting the panels from the mesh object
-  PanelVector panels = mesh.getPanels();
-  for (unsigned i = 0; i < numpanels; ++i) {
-    // Getting Neumann data at the midpoint of parameter range, interpolation by
-    // \f$S_{-1}^{0}\f$
-    Eigen::Vector2d pt = panels[i]->operator()(0.);
-    Tn_N(i) = Tn(pt(0), pt(1));
-  }
+  Eigen::VectorXd Tn_N = Tn_interpol_space.Interpolate(Tn, mesh);
   // The vector c used in augmented formulation
   Eigen::VectorXd c(W.rows() + 1);
   c << MassVector(mesh, test_space, order), 0;
@@ -171,19 +161,8 @@ Eigen::VectorXd solve(const ParametrizedMesh &mesh,
       double_layer::GalerkinMatrix(mesh, trial_space, test_space, order);
   // Computing mass matrix
   Eigen::MatrixXd M = MassMatrix(mesh, test_space, trial_space, order);
-  // Midpoint interpolation of Neumann data
-  unsigned numpanels = mesh.getNumPanels();
   // Vector for storing Neumann data
-  Eigen::VectorXd Tn_N(numpanels);
-  using PanelVector = parametricbem2d::PanelVector;
-  // Getting the panels from the mesh object
-  PanelVector panels = mesh.getPanels();
-  for (unsigned i = 0; i < numpanels; ++i) {
-    // Getting Neumann data at the midpoint of parameter range, interpolation by
-    // \f$S_{-1}^{0}\f$
-    Eigen::Vector2d pt = panels[i]->operator()(0.);
-    Tn_N(i) = Tn(pt(0), pt(1));
-  }
+  Eigen::VectorXd Tn_N = Tn_interpol_space.Interpolate(Tn, mesh);
   // The vector c used in augmented formulation
   Eigen::VectorXd c(K.rows() + 1);
   c << MassVector(mesh, test_space, order), 0;
@@ -194,11 +173,11 @@ Eigen::VectorXd solve(const ParametrizedMesh &mesh,
   lhs.row(K.rows()) = c.transpose();
   lhs.col(K.cols()) = c;
   // Build rhs vector for solving
-  Eigen::VectorXd rhs_vector(numpanels + 1);
+  Eigen::VectorXd rhs_vector(Tn_N.rows() + 1);
   rhs_vector << V * Tn_N, 0;
   // Solving for coefficients
   Eigen::VectorXd sol = lhs.lu().solve(rhs_vector);
-  return sol.segment(0, numpanels);
+  return sol.segment(0, Tn_N.rows());
 }
 } // namespace direct_second_kind
 
@@ -234,19 +213,8 @@ Eigen::VectorXd solve(const ParametrizedMesh &mesh,
   Eigen::MatrixXd W = hypersingular::GalerkinMatrix(mesh, trial_space, order);
   // Computing mass matrix
   Eigen::MatrixXd M = MassMatrix(mesh, test_space, Tn_interpol_space, order);
-  // Midpoint interpolation of Neumann data
-  unsigned numpanels = mesh.getNumPanels();
   // Vector for storing Neumann data
-  Eigen::VectorXd Tn_N(numpanels);
-  using PanelVector = parametricbem2d::PanelVector;
-  // Getting the panels from the mesh object
-  PanelVector panels = mesh.getPanels();
-  for (unsigned i = 0; i < numpanels; ++i) {
-    // Getting Neumann data at the midpoint of parameter range, interpolation by
-    // \f$S_{-1}^{0}\f$
-    Eigen::Vector2d pt = panels[i]->operator()(0.);
-    Tn_N(i) = Tn(pt(0), pt(1));
-  }
+  Eigen::VectorXd Tn_N = Tn_interpol_space.Interpolate(Tn, mesh);
   // The vector c used in augmented formulation
   Eigen::VectorXd c(W.rows() + 1);
   c << MassVector(mesh, test_space, order), 0;
@@ -257,11 +225,11 @@ Eigen::VectorXd solve(const ParametrizedMesh &mesh,
   lhs.row(W.rows()) = c.transpose();
   lhs.col(W.cols()) = c;
   // Build rhs vector for solving
-  Eigen::VectorXd rhs_vector(numpanels + 1);
+  Eigen::VectorXd rhs_vector(Tn_N.rows() + 1);
   rhs_vector << -M * Tn_N, 0;
   // Solving for coefficients
   Eigen::VectorXd sol = lhs.lu().solve(rhs_vector);
-  return sol.segment(0, numpanels);
+  return sol.segment(0, Tn_N.rows());
 }
 } // namespace indirect_first_kind
 
@@ -296,19 +264,8 @@ Eigen::VectorXd solve(const ParametrizedMesh &mesh,
       adj_double_layer::GalerkinMatrix(mesh, trial_space, test_space, order);
   // Computing mass matrix
   Eigen::MatrixXd M = MassMatrix(mesh, test_space, Tn_interpol_space, order);
-  // Midpoint interpolation of Neumann data
-  unsigned numpanels = mesh.getNumPanels();
   // Vector for storing Neumann data
-  Eigen::VectorXd Tn_N(numpanels);
-  using PanelVector = parametricbem2d::PanelVector;
-  // Getting the panels from the mesh object
-  PanelVector panels = mesh.getPanels();
-  for (unsigned i = 0; i < numpanels; ++i) {
-    // Getting Neumann data at the midpoint of parameter range, interpolation by
-    // \f$S_{-1}^{0}\f$
-    Eigen::Vector2d pt = panels[i]->operator()(0.);
-    Tn_N(i) = Tn(pt(0), pt(1));
-  }
+  Eigen::VectorXd Tn_N = Tn_interpol_space.Interpolate(Tn, mesh);
   // The vector c used in augmented formulation
   Eigen::VectorXd c(Kp.rows() + 1);
   c << MassVector(mesh, test_space, order), 0;
@@ -319,11 +276,11 @@ Eigen::VectorXd solve(const ParametrizedMesh &mesh,
   lhs.row(Kp.rows()) = c.transpose();
   lhs.col(Kp.cols()) = c;
   // Build rhs vector for solving
-  Eigen::VectorXd rhs_vector(numpanels + 1);
+  Eigen::VectorXd rhs_vector(Tn_N.rows() + 1);
   rhs_vector << M * Tn_N, 0;
   // Solving for coefficients
   Eigen::VectorXd sol = lhs.lu().solve(rhs_vector);
-  return sol.segment(0, numpanels);
+  return sol.segment(0, Tn_N.rows());
 }
 } // namespace indirect_second_kind
 } // namespace neumann_bvp

@@ -13,6 +13,9 @@
 #include <utility>
 #include <vector>
 
+#include <Eigen/Dense>
+#include "parametrized_mesh.hpp"
+
 namespace parametricbem2d {
 /**
  * \class AbstractBEMSpace
@@ -120,16 +123,20 @@ public:
   virtual unsigned int getSpaceDim(unsigned int numpanels) const = 0;
 
   /**
-   * This function returns the dimension of the given BEM space on the given
-   * number of panels. It is a pure virtual function and has to be implemented
-   * by the inherited class.
+   * This function interpolates the function func, provided as an input of the
+   * form std::function<double(double,double)>, on the given mesh. It is a pure
+   * virtual function which uses the BEM space implementation for the
+   * interpolation. The output is a vector \f$c_{i}\f$ which containes the
+   * interpolation coefficients such that \f$func =
+   * \sum_{i=1}^{N}c_{i}b_{i}^{N}\f$ on the mesh.
    *
-   * @param numpanels Number of panels in the mesh
-   * @return Dimension of the BEM space
+   * @param func Function to be interpolated with the signature mentioned above
+   * @param mesh Parametrized mesh object on which interpolation is done
+   * @return An Eigen::VectorXd type containing the interpolation coefficients
    */
-  /*virtual Eigen::VectorXd
+  virtual Eigen::VectorXd
   Interpolate(const std::function<double(double, double)> &func,
-              const ParametrizedMesh &mesh) const = 0;*/
+              const ParametrizedMesh &mesh) const = 0;
 
 protected:
   /**

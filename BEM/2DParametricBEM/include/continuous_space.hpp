@@ -15,6 +15,10 @@
 #include <utility>
 #include <vector>
 
+#include <Eigen/Dense>
+#include "abstract_parametrized_curve.hpp"
+#include "parametrized_mesh.hpp"
+
 namespace parametricbem2d {
 /**
  * \class ContinuousSpace
@@ -47,10 +51,28 @@ public:
     else
       return (n % N == 0) ? 1 : (n + 1);
   }
+
   // Space Dimensions as defined in \f$\ref{T:thm:dimbe}\f$
   unsigned int getSpaceDim(unsigned int numpanels) const {
     return numpanels * (q_ - 1);
   }
+
+  // Function for interpolating the input function
+  Eigen::VectorXd Interpolate(const std::function<double(double, double)> &func,
+                              const ParametrizedMesh &mesh) const {
+    // The output vector
+    unsigned numpanels = mesh.getNumPanels();
+    unsigned coeffs_size = getSpaceDim(numpanels);
+    Eigen::VectorXd coeffs(coeffs_size);
+    // using PanelVector = parametricbem2d::PanelVector;
+    // Filling the coefficients
+    for (unsigned i = 0; i < coeffs_size; ++i) {
+      Eigen::Vector2d pt = mesh.getVertex(i);
+      coeffs(i) = func(pt(0), pt(1));
+    }
+    return coeffs;
+  }
+
   // Constructor
   ContinuousSpace() {
     // Number of reference shape functions for the space
@@ -90,10 +112,28 @@ public:
     else
       return N + n;
   }
+
   // Space Dimensions as defined in \f$\ref{T:thm:dimbe}\f$
   unsigned int getSpaceDim(unsigned int numpanels) const {
     return numpanels * (q_ - 1);
   }
+
+  // Function for interpolating the input function
+  Eigen::VectorXd Interpolate(const std::function<double(double, double)> &func,
+                              const ParametrizedMesh &mesh) const {
+    // The output vector
+    unsigned numpanels = mesh.getNumPanels();
+    unsigned coeffs_size = getSpaceDim(numpanels);
+    Eigen::VectorXd coeffs(coeffs_size);
+    // using PanelVector = parametricbem2d::PanelVector;
+    // Filling the coefficients
+    for (unsigned i = 0; i < coeffs_size; ++i) {
+      // TODO
+      coeffs(i) = 0;
+    }
+    return coeffs;
+  }
+
   // Constructor
   ContinuousSpace() {
     // Number of reference shape functions for the space
@@ -113,7 +153,7 @@ public:
     // Reference shape function 2 derivative, defined using a lambda expression
     BasisFunctionType b2dot = [&](double t) { return -0.5; };
     // Reference shape function 3 derivative, defined using a lambda expression
-    BasisFunctionType b3dot = [&](double t) { return - 2 * t; };
+    BasisFunctionType b3dot = [&](double t) { return -2 * t; };
     // Adding the reference shape function derivatives to the vector
     referenceshapefunctiondots_.push_back(b1dot);
     referenceshapefunctiondots_.push_back(b2dot);

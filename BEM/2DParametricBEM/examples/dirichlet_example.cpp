@@ -117,7 +117,7 @@ int main() {
     //for (unsigned i = 0 ; i < numpanels ; ++i) {
     //  Tn_dsk(i) = 0.5 * (dsk_sol(i) + dsk_sol((i+1)%numpanels) );
     //}
-    Eigen::VectorXd Tn_dsk = dsk_sol;
+    Eigen::VectorXd Tn_dsk = 0.5*dsk_sol.segment(0,numpanels);
 
     // Solving the Dirichlet Problem using indirect first kind method
     Eigen::VectorXd sol_idfk =

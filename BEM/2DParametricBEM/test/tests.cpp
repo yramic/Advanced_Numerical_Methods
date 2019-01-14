@@ -1074,7 +1074,7 @@ TEST(ADNUMCSE_1_9, DISABLED_DirectFirstKind) {
             << err_coeff.transpose().dot(V * err_coeff) << std::endl;
 }
 
-TEST(ADNUMCSE_1_9, DirectSecondKind) {
+TEST(ADNUMCSE_1_9, DISABLED_DirectSecondKind) {
   // Solving the Dirichlet BVP given in problem 1.9 in ADNUMCSE problems
   using namespace parametricbem2d;
   using PanelVector = parametricbem2d::PanelVector;
@@ -1241,7 +1241,7 @@ TEST(NEUMANNBVP, DISABLED_DirectFirstKind) {
   // Parametrization of unit circle centered at 0,0
   parametricbem2d::ParametrizedCircularArc curve(center, R, 0, 2 * M_PI);
   // The number of panels for the mesh
-  unsigned numpanels = 40;
+  unsigned numpanels = 80;
   // Getting the mesh by splitting the fourier parametrization
   parametricbem2d::ParametrizedMesh mesh(curve.split(numpanels));
   PanelVector panels = mesh.getPanels();
@@ -1284,7 +1284,7 @@ TEST(NEUMANNBVP, DISABLED_DirectSecondKind) {
   // Parametrization of unit circle centered at 0,0
   parametricbem2d::ParametrizedCircularArc curve(center, R, 0, 2 * M_PI);
   // The number of panels for the mesh
-  unsigned numpanels = 40;
+  unsigned numpanels = 80;
   // Getting the mesh by splitting the fourier parametrization
   parametricbem2d::ParametrizedMesh mesh(curve.split(numpanels));
   PanelVector panels = mesh.getPanels();
@@ -1328,7 +1328,7 @@ TEST(NEUMANNBVP, DISABLED_IndirectFirstKind) {
   // Parametrization of unit circle centered at 0,0
   parametricbem2d::ParametrizedCircularArc curve(center, R, 0, 2 * M_PI);
   // The number of panels for the mesh
-  unsigned numpanels = 40;
+  unsigned numpanels = 20;
   // Getting the mesh by splitting the fourier parametrization
   parametricbem2d::ParametrizedMesh mesh(curve.split(numpanels));
   PanelVector panels = mesh.getPanels();

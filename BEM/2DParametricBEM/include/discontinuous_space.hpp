@@ -16,6 +16,10 @@
 #include <utility>
 #include <vector>
 
+#include <Eigen/Dense>
+#include "abstract_parametrized_curve.hpp"
+#include "parametrized_mesh.hpp"
+
 namespace parametricbem2d {
 /**
  * \class DiscontinuousSpace
@@ -45,10 +49,28 @@ public:
     assert(q <= q_ && n <= N);
     return n;
   }
+
   // Space Dimensions as defined in \f$\ref{T:thm:dimbe}\f$
   unsigned int getSpaceDim(unsigned int numpanels) const {
     return numpanels * q_;
   }
+
+  // Function for interpolating the input function
+  Eigen::VectorXd Interpolate(const std::function<double(double, double)> &func,
+                              const ParametrizedMesh &mesh) const {
+    // The output vector
+    unsigned coeffs_size = getSpaceDim(mesh.getNumPanels());
+    Eigen::VectorXd coeffs(coeffs_size);
+    // using PanelVector = parametricbem2d::PanelVector;
+    PanelVector panels = mesh.getPanels();
+    // Filling the coefficients
+    for (unsigned i = 0; i < coeffs_size; ++i) {
+      Eigen::Vector2d pt = panels[i]->operator()(0);
+      coeffs(i) = func(pt(0), pt(1));
+    }
+    return coeffs;
+  }
+
   // Constructor
   DiscontinuousSpace() {
     // Number of reference shape functions for the space
@@ -81,10 +103,30 @@ public:
     else
       return N + n;
   }
+
   // Space Dimensions as defined in \f$\ref{T:thm:dimbe}\f$
   unsigned int getSpaceDim(unsigned int numpanels) const {
     return numpanels * q_;
   }
+
+  // Function for interpolating the input function
+  Eigen::VectorXd Interpolate(const std::function<double(double, double)> &func,
+                              const ParametrizedMesh &mesh) const {
+    // The output vector
+    unsigned numpanels = mesh.getNumPanels();
+    unsigned coeffs_size = getSpaceDim(numpanels);
+    Eigen::VectorXd coeffs(coeffs_size);
+    // using PanelVector = parametricbem2d::PanelVector;
+    // Filling the coefficients
+    for (unsigned i = 0; i < numpanels; ++i) {
+      Eigen::Vector2d ptl = mesh.getVertex(i);
+      Eigen::Vector2d ptr = mesh.getVertex((i + 1) % numpanels);
+      coeffs(i) = func(ptl(0), ptl(1)) + func(ptr(0), ptr(1));
+      coeffs(i + numpanels) = func(ptr(0), ptr(1)) - func(ptl(0), ptl(1));
+    }
+    return coeffs;
+  }
+
   // Constructor
   DiscontinuousSpace() {
     // Number of reference shape functions for the space
@@ -92,7 +134,7 @@ public:
     // Reference shape function 1, defined using a lambda expression
     BasisFunctionType b1 = [&](double t) { return 0.5; };
     // Reference shape function 2, defined using a lambda expression
-    BasisFunctionType b2 = [&](double t) { return 0.5*t; };
+    BasisFunctionType b2 = [&](double t) { return 0.5 * t; };
     // Adding the reference shape functions to the vector
     referenceshapefunctions_.push_back(b1);
     referenceshapefunctions_.push_back(b2);
