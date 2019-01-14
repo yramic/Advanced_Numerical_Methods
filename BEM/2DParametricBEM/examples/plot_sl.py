@@ -1,3 +1,8 @@
+"""
+This python script generates a plot of the eigenvalues obtained in the
+Single Layer Galerkin Matrix Example (See README.md).
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 

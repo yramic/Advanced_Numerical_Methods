@@ -11,11 +11,10 @@
 
 #include "double_layer.hpp"
 
+#include <limits>
 #include <math.h>
 #include <vector>
-#include <limits>
 
-#include <Eigen/Dense>
 #include "abstract_bem_space.hpp"
 #include "abstract_parametrized_curve.hpp"
 #include "discontinuous_space.hpp"
@@ -23,6 +22,7 @@
 #include "integral_gauss.hpp"
 #include "logweight_quadrature.hpp"
 #include "parametrized_mesh.hpp"
+#include <Eigen/Dense>
 
 namespace parametricbem2d {
 namespace double_layer {
@@ -30,27 +30,27 @@ Eigen::MatrixXd InteractionMatrix(const AbstractParametrizedCurve &pi,
                                   const AbstractParametrizedCurve &pi_p,
                                   const AbstractBEMSpace &trial_space,
                                   const AbstractBEMSpace &test_space,
-                                  const unsigned int &N,
-                                const QuadRule &GaussQR) {
+                                  const QuadRule &GaussQR) {
   double tol = std::numeric_limits<double>::epsilon();
 
   if (&pi == &pi_p) // Same Panels case
-    return ComputeIntegralCoinciding(pi, pi_p, trial_space, test_space, N,GaussQR);
+    return ComputeIntegralCoinciding(pi, pi_p, trial_space, test_space,
+                                     GaussQR);
 
   else if (fabs((pi(1) - pi_p(-1)).norm()) < tol ||
            fabs((pi(-1) - pi_p(1)).norm()) < tol) // Adjacent Panels case
-    return ComputeIntegralAdjacent(pi, pi_p, trial_space, test_space, N,GaussQR);
+    return ComputeIntegralAdjacent(pi, pi_p, trial_space, test_space, GaussQR);
 
   else // Disjoint panels case
-    return ComputeIntegralGeneral(pi, pi_p, trial_space, test_space, N,GaussQR);
+    return ComputeIntegralGeneral(pi, pi_p, trial_space, test_space, GaussQR);
 }
 
 Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
                                           const AbstractParametrizedCurve &pi_p,
                                           const AbstractBEMSpace &trial_space,
                                           const AbstractBEMSpace &test_space,
-                                          const unsigned int &N,
-                                        const QuadRule &GaussQR) {
+                                          const QuadRule &GaussQR) {
+  unsigned N = GaussQR.n; // Quadrature order for the GaussQR object.
   // The number of Reference Shape Functions in trial space
   int Qtrial = trial_space.getQ();
   // The number of Reference Shape Functions in test space
@@ -94,15 +94,11 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
 
       double integral = 0;
 
-      // Getting Gauss Legendre quadrature weights and points
-      //Eigen::RowVectorXd weights, points;
-      //std::tie(points, weights) =
-      //    gauleg(-1, 1, N, std::numeric_limits<double>::epsilon());
-
       // Tensor product quadrature for double integral in \f$\eqref{eq:Kidp}\f$
       for (unsigned int i = 0; i < N; ++i) {
         for (unsigned int j = 0; j < N; ++j) {
-          integral += GaussQR.w(i) * GaussQR.w(j) * integrand(GaussQR.x(i), GaussQR.x(j));
+          integral += GaussQR.w(i) * GaussQR.w(j) *
+                      integrand(GaussQR.x(i), GaussQR.x(j));
         }
       }
       // Filling the matrix entry
@@ -116,8 +112,8 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
                                         const AbstractParametrizedCurve &pi_p,
                                         const AbstractBEMSpace &trial_space,
                                         const AbstractBEMSpace &test_space,
-                                        const unsigned int &N,
-                                      const QuadRule &GaussQR) {
+                                        const QuadRule &GaussQR) {
+  unsigned N = GaussQR.n; // Quadrature order for the GaussQR object.
   // The number of Reference Shape Functions in trial space
   int Qtrial = trial_space.getQ();
   // The number of Reference Shape Functions in test space
@@ -192,11 +188,6 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
         }
       };
 
-      // Getting Gauss Legendre quadrature weights and nodes
-      //Eigen::RowVectorXd weights, points;
-      //std::tie(points, weights) =
-      //    gauleg(-1, 1, N, std::numeric_limits<double>::epsilon());
-
       // The integral is split into two parts according to eq. 1.4.178
       // part 1 is where phi goes from 0 to alpha
       // part 2 is where phi goes from alpha to pi/2
@@ -265,8 +256,8 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
                                        const AbstractParametrizedCurve &pi_p,
                                        const AbstractBEMSpace &trial_space,
                                        const AbstractBEMSpace &test_space,
-                                       const unsigned int &N,
-                                     const QuadRule &GaussQR) {
+                                       const QuadRule &GaussQR) {
+  unsigned N = GaussQR.n; // Quadrature order for the GaussQR object.
   // Calculating the quadrature order for stable evaluation of integrands for
   // disjoint panels as mentioned in \f$\ref{par:distpan}\f$
   unsigned n0 = 5; // Order for admissible cases
@@ -319,7 +310,8 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
         for (unsigned int j = 0; j < N; ++j) {
           double s = GaussQR.x(i);
           double t = GaussQR.x(j);
-          integral += GaussQR.w(i) * GaussQR.w(j) * integrand(s, t) * F(t) * G(s);
+          integral +=
+              GaussQR.w(i) * GaussQR.w(j) * integrand(s, t) * F(t) * G(s);
         }
       }
       // Filling the matrix entry
@@ -351,8 +343,8 @@ Eigen::MatrixXd GalerkinMatrix(const ParametrizedMesh mesh,
   for (unsigned int i = 0; i < numpanels; ++i) {
     for (unsigned int j = 0; j < numpanels; ++j) {
       // Getting the interaction matrix for the pair of panels i and j
-      Eigen::MatrixXd interaction_matrix =
-          InteractionMatrix(*panels[i], *panels[j], trial_space, test_space, N, GaussQR);
+      Eigen::MatrixXd interaction_matrix = InteractionMatrix(
+          *panels[i], *panels[j], trial_space, test_space, GaussQR);
       // Local to global mapping of the elements in interaction matrix
       for (unsigned int I = 0; I < Qtest; ++I) {
         for (unsigned int J = 0; J < Qtrial; ++J) {
@@ -409,7 +401,8 @@ double Potential(const Eigen::Vector2d &x, const Eigen::VectorXd &coeffs,
       potentials(ii) += local;
     }
   }
-  //std::cout << "calculated potentials: " << std::endl << potentials << std::endl;
+  // std::cout << "calculated potentials: " << std::endl << potentials <<
+  // std::endl;
   // Dot product with coefficients to get the final double layer potential
   return coeffs.dot(potentials);
 }

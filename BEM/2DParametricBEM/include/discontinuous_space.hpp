@@ -92,7 +92,7 @@ public:
     // Reference shape function 1, defined using a lambda expression
     BasisFunctionType b1 = [&](double t) { return 0.5; };
     // Reference shape function 2, defined using a lambda expression
-    BasisFunctionType b2 = [&](double t) { return 0.5 * t; };
+    BasisFunctionType b2 = [&](double t) { return 0.5*t; };
     // Adding the reference shape functions to the vector
     referenceshapefunctions_.push_back(b1);
     referenceshapefunctions_.push_back(b2);

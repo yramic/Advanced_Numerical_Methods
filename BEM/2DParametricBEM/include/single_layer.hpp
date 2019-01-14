@@ -15,8 +15,8 @@
 #include <Eigen/Dense>
 #include "abstract_bem_space.hpp"
 #include "abstract_parametrized_curve.hpp"
-#include "parametrized_mesh.hpp"
 #include "logweight_quadrature.hpp"
+#include "parametrized_mesh.hpp"
 
 namespace parametricbem2d {
 /**
@@ -35,15 +35,15 @@ namespace single_layer {
  * @param pi Parametrization for the first panel \f$\Pi\f$.
  * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
  * @param space The BEM space to be used for calculations
- * @param N The order for gauss/log-weighted quadrature
+ * @param GaussQR QuadRule object containing the Gaussian Quadrature to be
+ * applied.
  * @return An Eigen::MatrixXd type Interaction Matrix (QXQ)
  *         where Q is number of local shape functions in BEM space
  */
 Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
                                         const AbstractParametrizedCurve &pi_p,
                                         const AbstractBEMSpace &space,
-                                        const unsigned int &N,
-                                      const QuadRule &GaussQR);
+                                        const QuadRule &GaussQR);
 
 /**
  * This function is used to evaluate the Interaction Matrix for the pair
@@ -55,15 +55,15 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
  * @param pi Parametrization for the first panel \f$\Pi\f$.
  * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
  * @param space The BEM space to be used for calculations
- * @param N The order for gauss/log-weighted quadrature
+ * @param GaussQR QuadRule object containing the Gaussian Quadrature to be
+ * applied.
  * @return An Eigen::MatrixXd type Interaction Matrix (QXQ)
  *         where Q is number of local shape functions in BEM space
  */
 Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
                                           const AbstractParametrizedCurve &pi_p,
                                           const AbstractBEMSpace &space,
-                                          const unsigned int &N,
-                                        const QuadRule &GaussQR);
+                                          const QuadRule &GaussQR);
 
 /**
  * This function is used to evaluate the Interaction Matrix for the pair
@@ -74,15 +74,15 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
  * @param pi Parametrization for the first panel \f$\Pi\f$.
  * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
  * @param space The BEM space to be used for calculations
- * @param N The order for gauss/log-weighted quadrature
+ * @param GaussQR QuadRule object containing the Gaussian Quadrature to be
+ * applied.
  * @return An Eigen::MatrixXd type Interaction Matrix (QXQ)
  *         where Q is number of local shape functions in BEM space
  */
 Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
                                        const AbstractParametrizedCurve &pi_p,
                                        const AbstractBEMSpace &space,
-                                       const unsigned int &N,
-                                     const QuadRule &GaussQR);
+                                       const QuadRule &GaussQR);
 /**
  * This function is used to evaluate the Interaction Matrix defined in
  * \f$\eqref{eq:Al}\f$ for the pair of panels \f$\Pi\f$ and \f$\Pi\f$', for the
@@ -105,15 +105,15 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
  * @param pi Parametrization for the first panel \f$\Pi\f$.
  * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
  * @param space The BEM space to be used for calculations
- * @param N The order for gauss/log-weighted quadrature
+ * @param GaussQR QuadRule object containing the Gaussian Quadrature to be
+ * applied.
  * @return An Eigen::MatrixXd type Interaction Matrix (QXQ)
  *         where Q is number of local shape functions in BEM space
  */
 Eigen::MatrixXd InteractionMatrix(const AbstractParametrizedCurve &pi,
                                   const AbstractParametrizedCurve &pi_p,
                                   const AbstractBEMSpace &space,
-                                  const unsigned int &N,
-                                const QuadRule &GaussQR);
+                                  const QuadRule &GaussQR);
 
 /**
  * This function is used to evaluate the full Galerkin matrix based on the

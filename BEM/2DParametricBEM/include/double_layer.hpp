@@ -15,8 +15,8 @@
 #include <Eigen/Dense>
 #include "abstract_bem_space.hpp"
 #include "abstract_parametrized_curve.hpp"
-#include "parametrized_mesh.hpp"
 #include "logweight_quadrature.hpp"
+#include "parametrized_mesh.hpp"
 
 namespace parametricbem2d {
 /**
@@ -38,15 +38,15 @@ namespace double_layer {
  * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
  * @param trial_space The trial space for evaluating the matrix.
  * @param test_space The test space for evaluating the matrix.
- * @param N The order for gauss/log-weighted quadrature.
+ * @param GaussQR QuadRule object containing the Gaussian Quadrature to be
+ * applied.
  * @return The matrix K for Double Layer BIO bilinear form.
  */
 Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
                                         const AbstractParametrizedCurve &pi_p,
                                         const AbstractBEMSpace &trial_space,
                                         const AbstractBEMSpace &test_space,
-                                        const unsigned int &N,
-                                      const QuadRule &GaussQR);
+                                        const QuadRule &GaussQR);
 
 /**
  * This function is used to evaluate the Interaction Matrix for a pair of
@@ -60,15 +60,15 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
  * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
  * @param trial_space The trial space for evaluating the matrix.
  * @param test_space The test space for evaluating the matrix.
- * @param N The order for gauss/log-weighted quadrature.
+ * @param GaussQR QuadRule object containing the Gaussian Quadrature to be
+ * applied.
  * @return The matrix K for Double Layer BIO bilinear form.
  */
 Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
                                           const AbstractParametrizedCurve &pi_p,
                                           const AbstractBEMSpace &trial_space,
                                           const AbstractBEMSpace &test_space,
-                                          const unsigned int &N,
-                                        const QuadRule &GaussQR);
+                                          const QuadRule &GaussQR);
 
 /**
  * This function is used to evaluate the Interaction Matrix for a pair of
@@ -81,15 +81,15 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
  * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
  * @param trial_space The trial space for evaluating the matrix.
  * @param test_space The test space for evaluating the matrix.
- * @param N The order for gauss/log-weighted quadrature.
+ * @param GaussQR QuadRule object containing the Gaussian Quadrature to be
+ * applied.
  * @return The matrix K for Double Layer BIO bilinear form.
  */
 Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
                                        const AbstractParametrizedCurve &pi_p,
                                        const AbstractBEMSpace &trial_space,
                                        const AbstractBEMSpace &test_space,
-                                       const unsigned int &N,
-                                     const QuadRule &GaussQR);
+                                       const QuadRule &GaussQR);
 /**
  * This function is used to evaluate the Interaction Matrix defined in
  * \f$\eqref{eq:Al}\f$ for the pair of panels \f$\Pi\f$ and \f$\Pi\f$' for the
@@ -117,7 +117,8 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
  * @param pi_p Parametrization for the second panel \f$\Pi\f$'.
  * @param trial_space The trial space for evaluating the matrix.
  * @param test_space The test space for evaluating the matrix.
- * @param N The order for gauss/log-weighted quadrature.
+ * @param GaussQR QuadRule object containing the Gaussian Quadrature to be
+ * applied.
  * @return An Eigen::MatrixXd type Interaction Matrix
  * (\f$Q_{test}\f$X\f$Q_{trial}\f$)
  */
@@ -125,8 +126,7 @@ Eigen::MatrixXd InteractionMatrix(const AbstractParametrizedCurve &pi,
                                   const AbstractParametrizedCurve &pi_p,
                                   const AbstractBEMSpace &trial_space,
                                   const AbstractBEMSpace &test_space,
-                                  const unsigned int &N,
-                                const QuadRule &GaussQR);
+                                  const QuadRule &GaussQR);
 
 /**
  * This function is used to evaluate the full Galerkin matrix based on the

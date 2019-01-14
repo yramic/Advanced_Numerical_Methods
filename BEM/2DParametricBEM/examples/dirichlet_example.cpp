@@ -1,18 +1,13 @@
-#include "1_9_a.cpp"
-#include "BoundaryMesh.hpp"
-#include "buildK.hpp"
-#include "buildM.hpp"
-#include "buildV.hpp"
-#include "buildW.hpp"
+#include <cmath>
+#include <iomanip>
+
+#include <Eigen/Dense>
 #include "dirichlet.hpp"
 #include "double_layer.hpp"
 #include "parametrized_circular_arc.hpp"
 #include "parametrized_fourier_sum.hpp"
 #include "parametrized_mesh.hpp"
 #include "single_layer.hpp"
-#include <Eigen/Dense>
-#include <cmath>
-#include <iomanip>
 #define _USE_MATH_DEFINES
 
 int main() {
@@ -32,20 +27,25 @@ int main() {
             << std::setw(16) << "####" << std::endl;
 
   // Loop over number of panels
-  for (unsigned numpanels = 5; numpanels < 201; numpanels += 10) {
+  for (unsigned numpanels = 5; numpanels < 201; numpanels += 5) {
     // Defining the boundary of domain using fourier sum parametrization
     // Coefficients for cosine terms
     Eigen::MatrixXd cos_list(2, 2);
-    cos_list << 1., 0, 0, 0.5;
+    cos_list << 0.25, 0.1625, 0, 0;
     // Coefficients for sine terms
     Eigen::MatrixXd sin_list(2, 2);
-    sin_list << 0, -0.5, 1., 0;
-    // Parametrized curve for heart shaped boundary
-    parametricbem2d::ParametrizedFourierSum heart(cos_list, sin_list, 0,
+    sin_list << 0, 0, 0.375, 0;
+    // Cardioid domain
+    // cos_list << 1., 0, 0, 0.5;
+    // sin_list << 0, -0.5, 1., 0;
+    // Parametrized curve for kite shaped boundary
+    parametricbem2d::ParametrizedFourierSum curve(cos_list, sin_list, 0,
                                                   2 * M_PI);
+    // parametricbem2d::ParametrizedCircularArc curve(Eigen::Vector2d
+    // (0,0),1.,0,2*M_PI);
 
     // Making a ParametrizedMesh object
-    parametricbem2d::ParametrizedMesh mesh(heart.split(numpanels));
+    parametricbem2d::ParametrizedMesh mesh(curve.split(numpanels));
     // Getting the panels
     using PanelVector = parametricbem2d::PanelVector;
     PanelVector panels = mesh.getPanels();
@@ -84,6 +84,24 @@ int main() {
       return 1. / 2. / M_PI * dotprod * q;
     };
 
+    // Lambda function for evaluating the Neumann Trace
+    auto Tn0 = [&](const parametricbem2d::AbstractParametrizedCurve &gamma) {
+      // The evaluation point -> mid point of parameter interval
+      double t = -1.;
+      Eigen::Vector2d x = gamma.operator()(t);
+      // Getting the tangent vector to evaluate normal
+      Eigen::Vector2d tangent = gamma.Derivative(t);
+      Eigen::Vector2d normal;
+      // Outward normal vector assuming anticlockwise curve
+      normal << tangent(1), -tangent(0);
+      // Normalizing the normal vector
+      normal /= normal.norm();
+      double dotprod =
+          (source_pt - x).dot(normal) / (source_pt - x).squaredNorm();
+      // Neumann trace
+      return 1. / 2. / M_PI * dotprod * q;
+    };
+
     // Solving the Dirichlet Problem using direct first kind method
     // Getting the estimated Neumann Traces from the solver
     Eigen::VectorXd Tn_dfk =
@@ -92,9 +110,14 @@ int main() {
 
     // Solving the Dirichlet Problem using direct first second method
     // Getting the estimated Neumann Traces from the solver
-    Eigen::VectorXd Tn_dsk =
+    Eigen::VectorXd dsk_sol =
         parametricbem2d::dirichlet_bvp::direct_second_kind::solve(
             mesh, potential, order);
+    //Eigen::VectorXd Tn_dsk(numpanels);
+    //for (unsigned i = 0 ; i < numpanels ; ++i) {
+    //  Tn_dsk(i) = 0.5 * (dsk_sol(i) + dsk_sol((i+1)%numpanels) );
+    //}
+    Eigen::VectorXd Tn_dsk = dsk_sol;
 
     // Solving the Dirichlet Problem using indirect first kind method
     Eigen::VectorXd sol_idfk =
@@ -117,70 +140,17 @@ int main() {
     for (unsigned i = 0; i < numpanels; ++i)
       Tn_ex(i) = Tn(*panels[i]);
 
+      Eigen::VectorXd Tn_ex0(numpanels);
+      for (unsigned i = 0; i < numpanels; ++i)
+        Tn_ex0(i) = Tn0(*panels[i]);
+
     // Finding the solutions using cpp hilbert
-    auto potentialcpp = [&](const VectorXd &pt) {
+    auto potentialcpp = [&](const Eigen::VectorXd &pt) {
       return potential(pt(0), pt(1));
     };
 
     // Evaluation point for indirect solutions
     Eigen::Vector2d eval_pt(0, 0);
-
-    BoundaryMesh bmesh = createMeshwithGamma(heart, numpanels);
-    bool debug = false;
-    if (debug) {
-      // Getting parametricbem galerkin matrices
-      // Same trial and test spaces
-      parametricbem2d::DiscontinuousSpace<0> trial_space;
-      parametricbem2d::DiscontinuousSpace<0> test_space;
-      // Space used for interpolation of Dirichlet data
-      parametricbem2d::ContinuousSpace<1> g_interpol_space;
-      // Computing V matrix
-      Eigen::MatrixXd V = parametricbem2d::single_layer::GalerkinMatrix(
-          mesh, trial_space, order);
-      // Computing mass matrix
-      Eigen::MatrixXd M = parametricbem2d::MassMatrix(mesh, test_space,
-                                                      g_interpol_space, order);
-
-      // Getting Cpp Hilbert Galerkin matrices
-      std::cout << "Debugging Dirichlet indirect first kind method; numpanels: "
-                << numpanels << std::endl;
-      Eigen::MatrixXd Vcpp;
-      double eta = 0;
-      BoundaryMesh bmesh = createMeshwithGamma(heart, numpanels);
-      computeV(Vcpp, bmesh, eta);
-      Eigen::SparseMatrix<double> M01(bmesh.numElements(), bmesh.numElements());
-      computeM01(M01, bmesh);
-      Eigen::MatrixXd Mcpp(M01);
-
-      // Evaluating errors for Galerkin matrices
-      std::cout << "V error: " << (V - Vcpp).norm() << std::endl;
-      std::cout << "M error: " << (M - Mcpp).norm() << std::endl;
-
-      Eigen::VectorXd g_N(numpanels);
-      for (unsigned i = 0; i < numpanels; ++i) {
-        Eigen::Vector2d pt = mesh.getVertex(i);
-        g_N(i) = potential(pt(0), pt(1));
-      }
-
-      int N = bmesh.numVertices();
-      Eigen::VectorXd gNcoeff(N);
-      for (int i = 0; i < N; ++i)
-        gNcoeff(i) = potentialcpp(bmesh.getVertex(i));
-      std::cout << "Dirichlet data eroor: " << (gNcoeff - g_N).norm()
-                << std::endl;
-      // solution from cpp hilbert
-      Eigen::VectorXd sol_idfk_cpp = Vcpp.lu().solve(Mcpp * gNcoeff);
-      std::cout << "sol_idfk error: " << (sol_idfk - sol_idfk_cpp).norm()
-                << std::endl;
-      std::cout << "sol_idfk:" << std::endl << sol_idfk << std::endl;
-      std::cout << "sol_idfk_cpp:" << std::endl << sol_idfk_cpp << std::endl;
-      Eigen::VectorXd SLphi_x(1);
-      evaluateV(SLphi_x, bmesh, sol_idfk_cpp, eval_pt.transpose(), eta);
-      double u_idfk = parametricbem2d::single_layer::Potential(
-          eval_pt, sol_idfk, mesh, space, order);
-      std::cout << "potential diff idfk: " << fabs(u_idfk - SLphi_x(0))
-                << std::endl;
-    }
 
     // Evaluating the errors
     // Direct First Kind
@@ -188,7 +158,8 @@ int main() {
         fabs((Tn_ex - Tn_dfk).transpose().dot(V * (Tn_ex - Tn_dfk))); // av norm
     // Direct Second Kind
     double err_dsk =
-        fabs((Tn_ex - Tn_dsk).transpose().dot(V * (Tn_ex - Tn_dsk))); // av norm
+        //fabs((Tn_ex - Tn_dsk).transpose().dot(V * (Tn_ex - Tn_dsk))); // av norm
+        fabs((Tn_ex0 - Tn_dsk).transpose().dot( (Tn_ex0 - Tn_dsk)));
     // Indirect First Kind, point error evaluation
     double err_idfk = fabs(potential(eval_pt(0), eval_pt(1)) -
                            parametricbem2d::single_layer::Potential(
@@ -201,6 +172,31 @@ int main() {
     std::cout << std::setw(12) << numpanels << std::setw(16) << err_dfk
               << std::setw(16) << err_dsk << std::setw(16) << err_idfk
               << std::setw(16) << err_idsk << std::endl;
+    /*Eigen::VectorXd test(2*numpanels);
+    for (unsigned j = 0 ; j < numpanels ; ++j) {
+      // The evaluation point -> mid point of parameter interval
+      Eigen::Vector2d x = panels[j]->operator()(-1);
+      // Getting the tangent vector to evaluate normal
+      Eigen::Vector2d tangent = panels[j]->Derivative(-1);
+      Eigen::Vector2d normal;
+      // Outward normal vector assuming anticlockwise curve
+      normal << tangent(1), -tangent(0);
+      // Normalizing the normal vector
+      normal /= normal.norm();
+      double dotprod =
+          (source_pt - x).dot(normal) / (source_pt - x).squaredNorm();
+      // Neumann trace
+      test(j) = 1. / 2. / M_PI * dotprod * q;
+      test(j+numpanels) = -test(j);
+    }
+    Eigen::VectorXd add(numpanels);
+    add << test.segment(1,numpanels-1),test(0);
+    Eigen::VectorXd addd(2*numpanels);
+    addd << add,add;
+    test += addd;
+    parametricbem2d::DiscontinuousSpace<1> sapace;
+    Eigen::MatrixXd wee = parametricbem2d::single_layer::GalerkinMatrix(mesh, sapace, order);
+    std::cout << "wee arror: " << (test-dsk_sol).transpose().dot(wee * (test-dsk_sol)) << std::endl;*/
   }
   return 0;
 }

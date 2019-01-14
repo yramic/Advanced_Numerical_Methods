@@ -16,7 +16,6 @@
 #include "doubleLayerPotential.hpp"
 #include "singleLayerPotential.hpp"
 #include "BoundaryMesh.hpp"
-#include "1_9_a.cpp"
 #include "abstract_bem_space.hpp"
 #include "continuous_space.hpp"
 #include "dirichlet.hpp"
@@ -998,7 +997,7 @@ TEST(ADNUMCSE_1_9, DISABLED_DirectFirstKind) {
   // Parametrization of the kite given
   parametricbem2d::ParametrizedFourierSum kite(cos_list, sin_list, -M_PI, M_PI);
   // The number of panels for the mesh
-  unsigned numpanels = 50;
+  unsigned numpanels = 30;
   // Getting the mesh by splitting the fourier parametrization
   parametricbem2d::ParametrizedMesh mesh(kite.split(numpanels));
   PanelVector panels = mesh.getPanels();
@@ -1075,7 +1074,7 @@ TEST(ADNUMCSE_1_9, DISABLED_DirectFirstKind) {
             << err_coeff.transpose().dot(V * err_coeff) << std::endl;
 }
 
-TEST(ADNUMCSE_1_9, DISABLED_DirectSecondKind) {
+TEST(ADNUMCSE_1_9, DirectSecondKind) {
   // Solving the Dirichlet BVP given in problem 1.9 in ADNUMCSE problems
   using namespace parametricbem2d;
   using PanelVector = parametricbem2d::PanelVector;
@@ -1088,7 +1087,7 @@ TEST(ADNUMCSE_1_9, DISABLED_DirectSecondKind) {
   // Parametrization of the kite given
   parametricbem2d::ParametrizedFourierSum kite(cos_list, sin_list, -M_PI, M_PI);
   // The number of panels for the mesh
-  unsigned numpanels = 50;
+  unsigned numpanels = 10;
   // Getting the mesh by splitting the fourier parametrization
   parametricbem2d::ParametrizedMesh mesh(kite.split(numpanels));
   PanelVector panels = mesh.getPanels();
@@ -1130,6 +1129,9 @@ TEST(ADNUMCSE_1_9, DISABLED_DirectSecondKind) {
   Eigen::VectorXd soldfk =
       parametricbem2d::dirichlet_bvp::direct_first_kind::solve(mesh, Td, order);
 
+  std::cout << "dfk Tn: \n" << soldfk << std::endl;
+  std::cout << "dsk Tn: \n" <<  sol << std::endl;
+
   // Same trial and test spaces
   DiscontinuousSpace<0> trial_space;
   Eigen::MatrixXd V = single_layer::GalerkinMatrix(mesh, trial_space, order);
@@ -1137,11 +1139,12 @@ TEST(ADNUMCSE_1_9, DISABLED_DirectSecondKind) {
   for (int i = 0; i < numpanels; ++i) {
     exTn(i) = Tn(i);
   }
+  /*
   Eigen::VectorXd err_coeff = sol - exTn;
   std::cout << "dsk error using av norm: "
             << err_coeff.transpose().dot(V * err_coeff) << std::endl;
   std::cout << "solution error with direct first kind " << (sol - soldfk).norm()
-            << std::endl;
+            << std::endl;*/
 }
 
 TEST(ADNUMCSE_1_9, DISABLED_IndirectFirstKind) {
@@ -1606,162 +1609,6 @@ TEST(Potential, DISABLED_DoubleLayer_1) {
   std::cout << "exact: " << i0 - i1 << " " << i0 + i1 << std::endl;
   // EXPECT_NEAR((sol_old - solnew).norm(), 0, eps);
 }*/
-
-TEST(TimingTest, SingleLayer_0) {
-// Global mesh for timing test
-using PanelVector = parametricbem2d::PanelVector;
-// Corner points for the polygon
-Eigen::RowVectorXd x1(2);
-x1 << 0, 0; // Point (0,0)
-Eigen::RowVectorXd x2(2);
-x2 << 1, 0; // Point (1,0)
-Eigen::RowVectorXd x3(2);
-x3 << 1, .5; // Point (1,0.5)
-Eigen::RowVectorXd x4(2);
-x4 << 0, 1.5; // Point (0,1.5)
-// Parametrized line segments forming the edges of the polygon
-parametricbem2d::ParametrizedLine line1(x1, x2);
-parametricbem2d::ParametrizedLine line2(x2, x3);
-parametricbem2d::ParametrizedLine line3(x3, x4);
-parametricbem2d::ParametrizedLine line4(x4, x1);
-// Splitting the parametrized lines into panels for a mesh to be used for
-// BEM (Discretization). Here Split is used with input "1" implying that the
-// original edges are used as panels in our mesh.
-PanelVector line1panels = line1.split(1);
-PanelVector line2panels = line2.split(1);
-PanelVector line3panels = line3.split(1);
-PanelVector line4panels = line4.split(1);
-PanelVector panels;
-// Storing all the panels in order so that they form a polygon
-panels.insert(panels.end(), line1panels.begin(), line1panels.end());
-panels.insert(panels.end(), line2panels.begin(), line2panels.end());
-panels.insert(panels.end(), line3panels.begin(), line3panels.end());
-panels.insert(panels.end(), line4panels.begin(), line4panels.end());
-// Construction of a ParametrizedMesh object from the vector of panels
-parametricbem2d::ParametrizedMesh parametrizedmesh(panels);
-  // BEM space to be used for computing the Galerkin Matrix
-  parametricbem2d::DiscontinuousSpace<0> space;
-  Eigen::MatrixXd galerkinnew = parametricbem2d::single_layer::GalerkinMatrix(
-      parametrizedmesh, space, 32);
-}
-
-TEST(TimingTest, DoubleLayer_1_0) {
-// Global mesh for timing test
-using PanelVector = parametricbem2d::PanelVector;
-// Corner points for the polygon
-Eigen::RowVectorXd x1(2);
-x1 << 0, 0; // Point (0,0)
-Eigen::RowVectorXd x2(2);
-x2 << 1, 0; // Point (1,0)
-Eigen::RowVectorXd x3(2);
-x3 << 1, .5; // Point (1,0.5)
-Eigen::RowVectorXd x4(2);
-x4 << 0, 1.5; // Point (0,1.5)
-// Parametrized line segments forming the edges of the polygon
-parametricbem2d::ParametrizedLine line1(x1, x2);
-parametricbem2d::ParametrizedLine line2(x2, x3);
-parametricbem2d::ParametrizedLine line3(x3, x4);
-parametricbem2d::ParametrizedLine line4(x4, x1);
-// Splitting the parametrized lines into panels for a mesh to be used for
-// BEM (Discretization). Here Split is used with input "1" implying that the
-// original edges are used as panels in our mesh.
-PanelVector line1panels = line1.split(1);
-PanelVector line2panels = line2.split(1);
-PanelVector line3panels = line3.split(1);
-PanelVector line4panels = line4.split(1);
-PanelVector panels;
-// Storing all the panels in order so that they form a polygon
-panels.insert(panels.end(), line1panels.begin(), line1panels.end());
-panels.insert(panels.end(), line2panels.begin(), line2panels.end());
-panels.insert(panels.end(), line3panels.begin(), line3panels.end());
-panels.insert(panels.end(), line4panels.begin(), line4panels.end());
-// Construction of a ParametrizedMesh object from the vector of panels
-parametricbem2d::ParametrizedMesh parametrizedmesh(panels);
-  // Test BEM space to be used for computing the Galerkin Matrix
-  parametricbem2d::DiscontinuousSpace<0> test_space;
-  // Trial BEM space to be used for computing the Galerkin Matrix
-  parametricbem2d::ContinuousSpace<1> trial_space;
-  Eigen::MatrixXd galerkin = parametricbem2d::double_layer::GalerkinMatrix(
-      parametrizedmesh, trial_space, test_space, 32);
-}
-
-TEST(TimingTest, DoubleLayer_0_0) {
-// Global mesh for timing test
-using PanelVector = parametricbem2d::PanelVector;
-// Corner points for the polygon
-Eigen::RowVectorXd x1(2);
-x1 << 0, 0; // Point (0,0)
-Eigen::RowVectorXd x2(2);
-x2 << 1, 0; // Point (1,0)
-Eigen::RowVectorXd x3(2);
-x3 << 1, .5; // Point (1,0.5)
-Eigen::RowVectorXd x4(2);
-x4 << 0, 1.5; // Point (0,1.5)
-// Parametrized line segments forming the edges of the polygon
-parametricbem2d::ParametrizedLine line1(x1, x2);
-parametricbem2d::ParametrizedLine line2(x2, x3);
-parametricbem2d::ParametrizedLine line3(x3, x4);
-parametricbem2d::ParametrizedLine line4(x4, x1);
-// Splitting the parametrized lines into panels for a mesh to be used for
-// BEM (Discretization). Here Split is used with input "1" implying that the
-// original edges are used as panels in our mesh.
-PanelVector line1panels = line1.split(1);
-PanelVector line2panels = line2.split(1);
-PanelVector line3panels = line3.split(1);
-PanelVector line4panels = line4.split(1);
-PanelVector panels;
-// Storing all the panels in order so that they form a polygon
-panels.insert(panels.end(), line1panels.begin(), line1panels.end());
-panels.insert(panels.end(), line2panels.begin(), line2panels.end());
-panels.insert(panels.end(), line3panels.begin(), line3panels.end());
-panels.insert(panels.end(), line4panels.begin(), line4panels.end());
-// Construction of a ParametrizedMesh object from the vector of panels
-parametricbem2d::ParametrizedMesh parametrizedmesh(panels);
-  // Test BEM space to be used for computing the Galerkin Matrix
-  parametricbem2d::DiscontinuousSpace<0> test_space;
-  // Trial BEM space to be used for computing the Galerkin Matrix
-  parametricbem2d::DiscontinuousSpace<0> trial_space;
-  Eigen::MatrixXd galerkin = parametricbem2d::double_layer::GalerkinMatrix(
-      parametrizedmesh, trial_space, test_space, 32);
-}
-
-TEST(TimingTest, HyperSingular_1) {
-// Global mesh for timing test
-using PanelVector = parametricbem2d::PanelVector;
-// Corner points for the polygon
-Eigen::RowVectorXd x1(2);
-x1 << 0, 0; // Point (0,0)
-Eigen::RowVectorXd x2(2);
-x2 << 1, 0; // Point (1,0)
-Eigen::RowVectorXd x3(2);
-x3 << 1, .5; // Point (1,0.5)
-Eigen::RowVectorXd x4(2);
-x4 << 0, 1.5; // Point (0,1.5)
-// Parametrized line segments forming the edges of the polygon
-parametricbem2d::ParametrizedLine line1(x1, x2);
-parametricbem2d::ParametrizedLine line2(x2, x3);
-parametricbem2d::ParametrizedLine line3(x3, x4);
-parametricbem2d::ParametrizedLine line4(x4, x1);
-// Splitting the parametrized lines into panels for a mesh to be used for
-// BEM (Discretization). Here Split is used with input "1" implying that the
-// original edges are used as panels in our mesh.
-PanelVector line1panels = line1.split(1);
-PanelVector line2panels = line2.split(1);
-PanelVector line3panels = line3.split(1);
-PanelVector line4panels = line4.split(1);
-PanelVector panels;
-// Storing all the panels in order so that they form a polygon
-panels.insert(panels.end(), line1panels.begin(), line1panels.end());
-panels.insert(panels.end(), line2panels.begin(), line2panels.end());
-panels.insert(panels.end(), line3panels.begin(), line3panels.end());
-panels.insert(panels.end(), line4panels.begin(), line4panels.end());
-// Construction of a ParametrizedMesh object from the vector of panels
-parametricbem2d::ParametrizedMesh parametrizedmesh(panels);
-  // BEM space to be used for computing the Galerkin Matrix
-  parametricbem2d::DiscontinuousSpace<0> space;
-  Eigen::MatrixXd galerkinnew = parametricbem2d::hypersingular::GalerkinMatrix(
-      parametrizedmesh, space, 32);
-}
 
 int main(int argc, char **argv) {
   srand(time(NULL));

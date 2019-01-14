@@ -15,8 +15,6 @@ add_subdirectory(googletest)
 
 add_executable(parametricbem2d_tests tests.cpp)
 add_executable(convergence convergence_test.cpp)
-add_executable(adncse 1_9_a.cpp)
 
 target_link_libraries(parametricbem2d_tests parametrizations gtest adj_double_layer hypersingular single_layer double_layer quadrature CppHilbert)
 target_link_libraries(convergence parametrizations gtest adj_double_layer hypersingular single_layer double_layer quadrature CppHilbert)
-target_link_libraries(adncse parametrizations gtest adj_double_layer hypersingular single_layer double_layer quadrature CppHilbert)

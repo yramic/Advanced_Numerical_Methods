@@ -1,10 +1,11 @@
-#include "integral_gauss.hpp"
-#include <Eigen/Dense>
 #include <cmath>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <string>
+
+#include <Eigen/Dense>
+#include "integral_gauss.hpp"
 
 int main() {
   unsigned int num_pts = 100;
@@ -38,12 +39,6 @@ int main() {
     else
       return ((1 - y) * (log(y - 1) - 1) + (1 + y) * (log(1 + y) - 1));
   };
-  /*// Function to analytically compute the integral for f2
-  std::function<double(double,double)> analytic_integral_f2 = [] (double a,
-  double b) { double A = a-1 ; double B = b-1 ; double C = a+1; double D = b+1;
-    return -log(B)*B*B/2.+log(A)*A*A/2.+3./4.*(B*B-A*A)
-            +log(D)*D*D/2.-log(C)*C*C/2.+3./4.*(C*C-D*D);
-  };*/
   // Exact integral values computed analytically
   double int_f1_exact = 4 * log(2) - 6;
   double int_f2_exact = 4.5 * log(3) - 2 * log(2) - 3;

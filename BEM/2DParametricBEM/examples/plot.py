@@ -1,3 +1,10 @@
+"""
+This python script is used to generate plots for the example Double Integration
+of Logarithmic Kernel. It plots the function mentioned in the README file and
+also plots the errors for Gaussian Quadrature when used to integrate these
+functions.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -10,6 +17,7 @@ y1 = data[:,1]
 x2 = data[:,2]
 y2 = data[:,3]
 
+# Plot of the functions
 plt.figure()
 plt.plot(x1,y1)
 
@@ -44,6 +52,7 @@ order = data[:,0]
 error1 = data[:,1]
 error2 = data[:,2]
 
+# Plot of the Quadrature Error
 plt.figure()
 plt.loglog(order,error1,'b')
 plt.loglog(order,error2,'r')

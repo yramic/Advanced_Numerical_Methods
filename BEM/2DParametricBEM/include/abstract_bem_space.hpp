@@ -119,6 +119,18 @@ public:
    */
   virtual unsigned int getSpaceDim(unsigned int numpanels) const = 0;
 
+  /**
+   * This function returns the dimension of the given BEM space on the given
+   * number of panels. It is a pure virtual function and has to be implemented
+   * by the inherited class.
+   *
+   * @param numpanels Number of panels in the mesh
+   * @return Dimension of the BEM space
+   */
+  /*virtual Eigen::VectorXd
+  Interpolate(const std::function<double(double, double)> &func,
+              const ParametrizedMesh &mesh) const = 0;*/
+
 protected:
   /**
    * This typedef defines the basis function type. This is helpful in

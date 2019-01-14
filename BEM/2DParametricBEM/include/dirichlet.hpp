@@ -157,11 +157,11 @@ namespace direct_second_kind {
 Eigen::VectorXd solve(const ParametrizedMesh &mesh,
                       std::function<double(double, double)> g, unsigned order) {
   // Same trial and test spaces
-  DiscontinuousSpace<0> trial_space;
-  DiscontinuousSpace<0> test_space;
+  ContinuousSpace<1> trial_space;
+  ContinuousSpace<1> test_space;
   // Space used for interpolation of Dirichlet data
-  DiscontinuousSpace<0> g_interpol_space;
-  // Computing V matrix
+  ContinuousSpace<1> g_interpol_space;
+  // Computing W matrix
   Eigen::MatrixXd W =
       hypersingular::GalerkinMatrix(mesh, g_interpol_space, order);
   // Computing K' matrix
@@ -173,26 +173,25 @@ Eigen::VectorXd solve(const ParametrizedMesh &mesh,
   using PanelVector = parametricbem2d::PanelVector;
   PanelVector panels = mesh.getPanels();
   // Getting Dirichlet data at the midpoint of parameter range, interpolation by
-  // \f$S_{-1}^{0}\f$
-  Eigen::VectorXd g_N(numpanels);
+  // \f$S_{-1}^{1}\f$
+  unsigned dims = g_interpol_space.getSpaceDim(numpanels);
+  Eigen::VectorXd g_N(dims);
   for (unsigned i = 0; i < numpanels; ++i) {
-    // Eigen::Vector2d pt1 = mesh.getVertex(i % numpanels);
-    // Eigen::Vector2d pt2 = mesh.getVertex((i + 1) % numpanels);
-    // Eigen::Vector2d pt = 0.5 * ( pt1 + pt2 );
-    Eigen::Vector2d pt = panels[i]->operator()(0.);
-    g_N(i) = g(pt(0), pt(1));
+    //Eigen::Vector2d ptm1 = mesh.getVertex(i);
+    //Eigen::Vector2d ptp1 = mesh.getVertex((i+1)%numpanels);
+    Eigen::Vector2d ptm1 = panels[i]->operator()(-1.);
+    //Eigen::Vector2d ptp1 = panels[i]->operator()(1.);
+    Eigen::Vector2d pt0 = panels[i]->operator()(0.);
+    double gm1 = g(ptm1(0),ptm1(1));
+    double g0 = g(pt0(0),pt0(1));
+    Eigen::Vector2d pt_cont = mesh.getVertex(i);
+    g_N(i) = g(pt_cont(0),pt_cont(1));
+    //g_N(i+numpanels) = g0 - gm1;
   }
   // Build lhs for solving
   Eigen::MatrixXd lhs = (0.5 * M - Kp);
   // Build rhs for solving
   Eigen::VectorXd rhs = W * g_N;
-  // Solving for coefficients in a homogeneous system
-  /*auto qr = lhs.transpose().colPivHouseholderQr();
-  Eigen::MatrixXd Q = qr.householderQ();
-  Eigen::VectorXd sol = Q.col(lhs.rows() - 1);
-  Eigen::FullPivLU<MatrixXd> lu(lhs);
-  std::cout << "Is matrix invertible?: " << lu.isInvertible() << std::endl;*/
-  // sol.normalize();
   Eigen::VectorXd sol = lhs.lu().solve(rhs);
   return sol;
 }
@@ -268,7 +267,7 @@ Eigen::VectorXd solve(const ParametrizedMesh &mesh,
   DiscontinuousSpace<0> test_space;
   // Space used for interpolation of Dirichlet data
   ContinuousSpace<1> g_interpol_space;
-  // Computing V matrix
+  // Computing K matrix
   Eigen::MatrixXd K =
       double_layer::GalerkinMatrix(mesh, trial_space, trial_space, order);
   // Computing mass matrix for lhs
