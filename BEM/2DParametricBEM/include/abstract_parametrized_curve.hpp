@@ -9,14 +9,13 @@
 #ifndef PARAMETRIZEDCURVEHPP
 #define PARAMETRIZEDCURVEHPP
 
+#include <iostream>
 #include <iterator>
 #include <memory>
 #include <utility>
 #include <vector>
-#include <iostream>
 
 #include <Eigen/Dense>
-#include "gradient_descent.hpp"
 /**
  * \namespace parametricbem2d
  * \brief This namespace contains all the classes and functions for
@@ -39,7 +38,7 @@ using PanelVector = std::vector<std::shared_ptr<AbstractParametrizedCurve>>;
  * \class AbstractParametrizedCurve
  * \brief This abstract class provides the interface for a parametric
  *        curve. The interface follows the one outlined in
- *        Section 1.4.3.4 in the lecture material for
+ *        \f$\ref{cpp:crv}\f$ in the lecture material for
  *        Advanced Numerical Methods for CSE.
  */
 class AbstractParametrizedCurve {
@@ -134,106 +133,78 @@ public:
   virtual PanelVector split(unsigned int N) const = 0;
 
   /**
-   * This function is used for splitting a parametrized curve into several
-   * self-similar part curves. It is useful to make a parametrized mesh as it
-   * returns all the part-parametrizations stored in a sequence in a PanelVector
-   * such that the end point of a part is the starting point of the next part.
+   * This function is used for calculating distance to another parametrized
+   * curve which is passed as an input to the function. This distance
+   * computation is done approximately by evaluating distances on a sample and
+   * finding the minimum out of them. A sample of size 5 X 5 is hard coded into
+   * the function. Please note that this is an approximate computation which is
+   * intended for evaluating the admissibility in the case of not intersecting
+   * panels
    *
-   * @param N Integer indicating the number of parts for split
-   * @return PanelVector containing all the part parametrizations
+   * @param curve Parametrized curve, distance to which is evaluated
+   * @return double Distance between the parametric curves
    */
-  std::pair<Eigen::Vector2d, double>
-  distanceTo(const AbstractParametrizedCurve &curve) const {
-    // The vector to store the solution for minimum distance between two curves
-    Eigen::Vector2d initial(2);
-    initial << 0,0;
-    Eigen::Vector2d interior_solution(2);
-    // Finding an interior solution
-    std::function<Eigen::Vector2d(Eigen::Vector2d)> gradient = [&] (Eigen::Vector2d x) {
-      double s, t;
-      s = x(0);
-      t = x(1);
-      return Eigen::Vector2d(
-                (this->operator()(s) - curve(t)).dot(this->Derivative(s)),
-                -(this->operator()(s) - curve(t)).dot(curve.Derivative(t)));
-    };
-    bool interior_soln_exists;
-    std::tie(interior_solution,interior_soln_exists) = GradientDescent(gradient,initial);
-    std::cout << "Interior solution " << interior_solution << std::endl;
-    if (interior_soln_exists)
-      std::cout << "interior solution exists " << std::endl;
-    // Find minima on the boundary
-    double guess = 0.;
-    bool boundary;
-    double solution;
-    double min_dist;
-    Eigen::Vector2d final_solution;
-    // this curve(-1)
-    /*std::function<double(double)> gradient1 = [&] (double t) {
-      return -(this->operator()(-1) - curve(t)).dot(curve.Derivative(t));
-    };
-    std::tie(solution,boundary) = GradientDescent(gradient1,guess);
-    if (boundary)
-      solution = std::signbit(solution);
-    double dist1 = (this->operator()(-1) - curve(solution)).norm();
-    min_dist = dist1;
-    final_solution = Eigen::Vector2d(-1,solution);
-
-    // this curve(1)
-    std::function<double(double)> gradient2 = [&] (double t) {
-      return -(this->operator()(1) - curve(t)).dot(curve.Derivative(t));
-    };
-    std::tie(solution,boundary) = GradientDescent(gradient2,guess);
-    if (boundary)
-      solution = std::signbit(solution);
-    double dist2 = (this->operator()(1) - curve(solution)).norm();
-    if (dist2 < min_dist) {
-      min_dist = dist2;
-      final_solution = Eigen::Vector2d(1,solution);
-    }
-
-    // curve(-1)
-    std::function<double(double)> gradient3 = [&] (double s) {
-      return (this->operator()(s) - curve(-1)).dot(this->Derivative(s));
-    };
-    std::tie(solution,boundary) = GradientDescent(gradient3,guess);
-    if (boundary)
-      solution = std::signbit(solution);
-    double dist3 = (this->operator()(solution) - curve(-1)).norm();
-    if (dist3 < min_dist) {
-      min_dist = dist3;
-      final_solution = Eigen::Vector2d(solution,-1);
-    }
-
-    // curve(1)
-    std::function<double(double)> gradient4 = [&] (double s) {
-      return (this->operator()(s) - curve(1)).dot(this->Derivative(s));
-    };
-    std::tie(solution,boundary) = GradientDescent(gradient4,guess);
-    if (boundary)
-      solution = std::signbit(solution);
-    double dist4 = (this->operator()(solution) - curve(1)).norm();
-    if (dist4 < min_dist) {
-      min_dist = dist4;
-      final_solution = Eigen::Vector2d(solution,1);
-    }
-
-    */
-    // gradient descent stopped on the boundary
-    if (interior_soln_exists || true) {
-      double s, t;
-      s = interior_solution(0);
-      t = interior_solution(1);
-      double interior_distance = (this->operator()(s) - curve(t)).norm();
-      if (interior_distance < min_dist || true) {
-        min_dist = interior_distance;
-        final_solution = interior_solution;
+  double distanceTo(const AbstractParametrizedCurve &curve) const {
+    // Number of points sampled in one dimension for naive distance calculation
+    unsigned N = 5;
+    double tmin, tmax, min_dist;
+    // Getting the parameter range
+    std::tie(tmin, tmax) = ParameterRange();
+    // Sample points over the domain
+    Eigen::VectorXd t = Eigen::VectorXd::LinSpaced(N, tmin, tmax);
+    // Evaluating distances over all possible pairs
+    for (unsigned i = 0; i < N; ++i) {
+      for (unsigned j = 0; j < N; ++j) {
+        double temp = (this->operator()(t(i)) - curve.operator()(t(j))).norm();
+        min_dist =
+            i == 0 && j == 0 ? temp : (temp < min_dist ? temp : min_dist);
       }
     }
+    return min_dist;
+  }
 
-    return std::make_pair(final_solution,min_dist);
+  /**
+   * This function is used for calculating the length of a panel. The function
+   * in this abstract base class naively calculates distance by dividing the
+   * curve into line segments. The function is virtual and can be overriden in
+   * derived classes for a more accurate implementation.
+   *
+   * @return double Approximate length of the parametrized curve
+   */
+  virtual double length() const {
+    // Number of points sampled for naive length calculation
+    unsigned N = 10;
+    double tmin, tmax, length = 0.;
+    // Getting the parameter range
+    std::tie(tmin, tmax) = ParameterRange();
+    // Sample points over the domain
+    Eigen::VectorXd t = Eigen::VectorXd::LinSpaced(N, tmin, tmax);
+    for (unsigned i = 0; i < N - 1; ++i) {
+      length += (this->operator()(t(i)) - this->operator()(t(i + 1))).norm();
+    }
+    return length;
   }
 }; // class AbstractParametrizedCurve
+
+/**
+ * This function is used for calculating the admissibility of two disjoint
+ * parametrized curves. It is defined as \f$\rho(\Pi,\Pi') = \frac
+ * {max(|\Pi|,|\Pi'|)} {dist(\Pi,\Pi')}\f$
+ *
+ * @param pi First parametrized curve
+ * @param pi_p Second parametrized curve
+ * @return Admissibility value for the given pair of panels
+ */
+inline double rho(const AbstractParametrizedCurve &pi,
+                  const AbstractParametrizedCurve &pi_p) {
+  // Numerator: longer panel length
+  double num = std::max(pi.length(), pi_p.length());
+  // Denominator: distance between panels
+  double denom = pi.distanceTo(pi_p);
+  // Admissibility formula
+  return num / denom;
+}
+
 } // namespace parametricbem2d
 
 #endif // PARAMETRIZEDCURVEHPP

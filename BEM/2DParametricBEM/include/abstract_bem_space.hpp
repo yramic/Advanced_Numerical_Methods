@@ -8,10 +8,13 @@
 #ifndef ABSTRACTBEMSPACEHPP
 #define ABSTRACTBEMSPACEHPP
 
+#include <cassert>
+#include <functional>
 #include <utility>
 #include <vector>
-#include <functional>
-#include <cassert>
+
+#include <Eigen/Dense>
+#include "parametrized_mesh.hpp"
 
 namespace parametricbem2d {
 /**
@@ -22,8 +25,9 @@ class AbstractBEMSpace {
 public:
   /**
    * This function maps a local shape function to the corresponding global shape
-   * function for a BEM space on the given number of panels. This is a pure
-   * virtual function and has to be implemented in the derived classes.
+   * function for a BEM space on the given number of panels, defined in
+   * \f$\eqref{eq:lgm}\f$. This is a pure virtual function and has to be
+   * implemented in the derived classes.
    *
    * @param q Index of the local/reference shape function
    * @param n Index of the panel for which this map is applied
@@ -75,6 +79,22 @@ public:
   }
 
   /**
+   * This function is used to evaluate the derivative of a particular reference
+   * shape function of the BEM space at a given point.
+   *
+   * @return Value of the local shape function at the given point
+   */
+  double evaluateShapeFunctionDot(unsigned int q, double t) const {
+    // Asserting that the requested shape function index is valid
+    assert(q < q_);
+    // Asserting that the evaluation point is within parameter domain
+    assert(IsWithinParameterRange(t));
+    // Evaluating the requested reference shape function which is stored in a
+    // vector with others
+    return referenceshapefunctiondots_[q](t);
+  }
+
+  /**
    * This function is used for checking whether a value t is within the
    * valid parameter range. This function is non virtual to prevent it
    * from being overriden as the parameter interval is fixed. It is
@@ -102,6 +122,22 @@ public:
    */
   virtual unsigned int getSpaceDim(unsigned int numpanels) const = 0;
 
+  /**
+   * This function interpolates the function func, provided as an input of the
+   * form std::function<double(double,double)>, on the given mesh. It is a pure
+   * virtual function which uses the BEM space implementation for the
+   * interpolation. The output is a vector \f$c_{i}\f$ which containes the
+   * interpolation coefficients such that \f$func =
+   * \sum_{i=1}^{N}c_{i}b_{i}^{N}\f$ on the mesh.
+   *
+   * @param func Function to be interpolated with the signature mentioned above
+   * @param mesh Parametrized mesh object on which interpolation is done
+   * @return An Eigen::VectorXd type containing the interpolation coefficients
+   */
+  virtual Eigen::VectorXd
+  Interpolate(const std::function<double(double, double)> &func,
+              const ParametrizedMesh &mesh) const = 0;
+
 protected:
   /**
    * This typedef defines the basis function type. This is helpful in
@@ -116,6 +152,10 @@ protected:
    * A protected vector containing all the reference shape functions.
    */
   std::vector<BasisFunctionType> referenceshapefunctions_;
+  /**
+   * A protected vector containing all the reference shape function derivatives.
+   */
+  std::vector<BasisFunctionType> referenceshapefunctiondots_;
   /**
    * A protected integer which stores the number of reference shape
    * functions in the derived concrete classes

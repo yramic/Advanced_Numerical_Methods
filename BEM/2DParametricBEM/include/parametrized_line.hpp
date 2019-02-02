@@ -9,11 +9,11 @@
 #ifndef PARAMETRIZEDLINEHPP
 #define PARAMETRIZEDLINEHPP
 
+#include "abstract_parametrized_curve.hpp"
+
 #include <utility>
 
 #include <Eigen/Dense>
-
-#include "abstract_parametrized_curve.hpp"
 
 namespace parametricbem2d {
 /**
@@ -57,6 +57,11 @@ public:
    * See documentation in AbstractParametrizedCurve
    */
   PanelVector split(unsigned int) const;
+
+  /**
+   * See documentation in AbstractParametrizedCurve
+   */
+  double length() const;
 
 private:
   /**

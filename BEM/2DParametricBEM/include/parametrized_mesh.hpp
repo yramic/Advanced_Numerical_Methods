@@ -9,10 +9,11 @@
 #ifndef PARAMETRIZEDMESHHPP
 #define PARAMETRIZEDMESHHPP
 
+#include "abstract_parametrized_curve.hpp"
+
 #include <iterator>
 #include <utility>
 
-#include "abstract_parametrized_curve.hpp"
 #include <Eigen/Dense>
 
 namespace parametricbem2d {

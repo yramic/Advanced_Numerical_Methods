@@ -1,6 +1,6 @@
 # A 2D Boundary Element Code using Transformation-Based Quadrature
 
-* This code implements the approach outlined in Section 1.4.3.4 of the course.
+* This code implements the approach outlined in Section 1.4.3.4 of the course Advanced Numerical Methods for CSE which describes various transformations to evaluate Galerkin Matrices using parametric curves. 
 
 * Lead developer: Piyush Panchal
 
@@ -63,20 +63,20 @@
 
 ## Directory structure
 
-root
-
-    |-doxygen
-
-    |-include
-
-    |-src
-
-    | |-Parametrizations
-
-    | |-Quadrature
-
-    |-test
+root<br/>
+&nbsp;&nbsp;|- doxygen<br/>
+&nbsp;&nbsp;|- include<br/>
+&nbsp;&nbsp;|- src<br/>
+&nbsp;&nbsp;|&nbsp;&nbsp;|- Parametrizations<br/>
+&nbsp;&nbsp;|&nbsp;&nbsp;|- Quadrature<br/>
+&nbsp;&nbsp;|- test
 
 ## Demos and tests
 
-* Directory Tests contains tests.cpp which contains unit tests for different parts of this project.
+* Directory "test" contains tests.cpp which contains unit tests for different parts of this project.
+* Build the test executable from the build directory using the command "make parametricbem2d_tests".
+
+## Documentation and examples
+
+* Directory "doxygen" contains the Doxygen configuration file for generating the documentation which can be done by invoking the command "make doxygen_parametricbem2d" from the build folder.
+* For getting started with examples, refer to "README.md" in "examples" directory.

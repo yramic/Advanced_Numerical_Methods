@@ -61,8 +61,8 @@ Eigen::Vector2d ParametrizedFourierSum::Derivative(double t) const {
   // Filling the vectors with derivatives
   for (int i = 0; i < N; ++i) {
     // Computing the derivatives for cosine and sine terms
-    cos_theta_dot(i) = -(i + 1) * sin((i + 1) * t);
-    sin_theta_dot(i) = (i + 1) * cos((i + 1) * t);
+    cos_theta_dot(i) = -(i + 1) * (tmax_ - tmin_) / 2 * sin((i + 1) * t);
+    sin_theta_dot(i) = (i + 1) * (tmax_ - tmin_) / 2 * cos((i + 1) * t);
   }
   // Matrix multiplication to create the derivative of Fourier Sum (in vector
   // form) [2 x N] X [N x 1] = [2 x 1]
@@ -82,8 +82,10 @@ Eigen::Vector2d ParametrizedFourierSum::DoubleDerivative(double t) const {
   // Filling the vectors with double derivatives
   for (int i = 0; i < N; ++i) {
     // Computing the double derivatives for cosine and sine terms
-    cos_theta_ddot(i) = -(i + 1) * (i + 1) * cos((i + 1) * t);
-    sin_theta_ddot(i) = -(i + 1) * (i + 1) * sin((i + 1) * t);
+    cos_theta_ddot(i) = -(i + 1) * (i + 1) * (tmax_ - tmin_) / 2 *
+                        (tmax_ - tmin_) / 2 * cos((i + 1) * t);
+    sin_theta_ddot(i) = -(i + 1) * (i + 1) * (tmax_ - tmin_) / 2 *
+                        (tmax_ - tmin_) / 2 * sin((i + 1) * t);
   }
   // Matrix multiplication to create the double derivative of Fourier Sum
   // [2 x N] X [N x 1] = [2 x 1]

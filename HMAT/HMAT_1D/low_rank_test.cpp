@@ -28,7 +28,7 @@ int main() {
   myfile.open(filename);
   myfile << std::setw(15) << "#n" << std::setw(15) << "exact(us)"
          << std::setw(15) << "approx(us)" << std::endl;
-  KernelLog G(100.); // Kernel initialization
+  KernelCosine G(100.); // Kernel initialization
   for (unsigned N : {1,  2,  3,  4,  5,  6,  7,  8,  9,  10}) {
     // Number of collocation points
     unsigned n = std::pow(2,N) * 10;
@@ -36,7 +36,7 @@ int main() {
     unsigned iter = 100;
     double time_approx = 0., time_exact = 0.;
     // Collocation points
-    Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(n, 0., 1.);
+    Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(n, 0., 100.);
     // Vector to be multiplied
     Eigen::VectorXd c = Eigen::VectorXd::Random(n);
     std::vector<Point> GPoints; // initializing Grid Points properties
@@ -55,7 +55,7 @@ int main() {
       for (int j = 0; j < n; ++j)
         M(i, j) = G(GPoints[i].getX(), GPoints[j].getX());
     // Admissibility constant
-    double eta = 0.5;
+    double eta = 0.1;
     // Degree of interpolation
     unsigned q = 2;
     // Constructor for Hierarchical matrix

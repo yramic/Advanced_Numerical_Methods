@@ -1,15 +1,15 @@
 /**
- * \file single_layer.cpp
+ * \file hypersingular.cpp
  * \brief This file declares the functions to evaluate the entries of
  *        Galerkin matrices based on the bilinear form induced by the
- *        Single Layer BIO, using the transformations given in
+ *        Hypersingular BIO, using the transformations given in
  *        \f$\ref{ss:quadapprox}\f$ in the Lecture Notes for Advanced Numerical
  *        Methods for CSE.
  *
  * This File is a part of the 2D-Parametric BEM package
  */
 
-#include "single_layer.hpp"
+#include "hypersingular.hpp"
 
 #include <limits>
 #include <math.h>
@@ -19,13 +19,12 @@
 #include "abstract_parametrized_curve.hpp"
 #include "discontinuous_space.hpp"
 #include "gauleg.hpp"
-#include "integral_gauss.hpp"
 #include "logweight_quadrature.hpp"
 #include "parametrized_mesh.hpp"
 #include <Eigen/Dense>
 
 namespace parametricbem2d {
-namespace single_layer {
+namespace hypersingular {
 Eigen::MatrixXd InteractionMatrix(const AbstractParametrizedCurve &pi,
                                   const AbstractParametrizedCurve &pi_p,
                                   const AbstractBEMSpace &space,
@@ -57,20 +56,18 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
     for (int j = 0; j < Q; ++j) {
       // Lambda expression for functions F and G in \f$\eqref{eq:Vidp}\f$
       auto F = [&](double t) { // Function associated with panel pi_p
-        return space.evaluateShapeFunction(j, t) * pi_p.Derivative(t).norm();
+        return space.evaluateShapeFunctionDot(j, t);
       };
 
       auto G = [&](double s) { // Function associated with panel pi
-        return space.evaluateShapeFunction(i, s) * pi.Derivative(s).norm();
+        return space.evaluateShapeFunctionDot(i, s);
       };
 
       // Lambda expression for the 1st integrand in \f$\eqref{eq:Isplit}\f$
       auto integrand1 = [&](double s, double t) {
         double sqrt_epsilon = std::sqrt(std::numeric_limits<double>::epsilon());
         double s_st;
-        if (fabs(s - t) >
-            sqrt_epsilon) // Away from singularity for stable evaluation as
-                          // mentioned in \f$\eqref{eq:Stab}\f$
+        if (fabs(s - t) > sqrt_epsilon) // Away from singularity
           // Simply evaluating the expression
           s_st = (pi(s) - pi_p(t)).squaredNorm() / (s - t) / (s - t);
         else // Near singularity
@@ -154,14 +151,14 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
         // range [-1,1] using swap
         double t =
             swap ? 1 - 2 * t_pr / length_pi_p : 2 * t_pr / length_pi_p - 1;
-        return space.evaluateShapeFunction(j, t) * pi_p.Derivative(t).norm();
+        return space.evaluateShapeFunctionDot(j, t);
       };
 
       auto G = [&](double s_pr) { // Function associated with panel pi
         // Transforming the local arclength parameter to standard parameter
         // range [-1,1] using swap
         double s = swap ? 2 * s_pr / length_pi - 1 : 1 - 2 * s_pr / length_pi;
-        return space.evaluateShapeFunction(i, s) * pi.Derivative(s).norm();
+        return space.evaluateShapeFunctionDot(i, s);
       };
 
       auto D_r_phi = [&](double r, double phi) { // \f$\eqref{eq:Ddef}\f$
@@ -177,8 +174,7 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
             swap ? 1 - 2 * t_pr / length_pi_p : 2 * t_pr / length_pi_p - 1;
         if (r > sqrt_epsilon) // Away from singularity, simply use the formula
           return (pi(s) - pi_p(t)).squaredNorm() / r / r;
-        else // Near singularity, use analytically evaluated limit at r -> 0 for
-             // stable evaluation \f$\eqref{eq:Dstab}\f$
+        else // Near singularity, use analytically evaluated limit for r -> 0
           return 1 - sin(2 * phi) * pi.Derivative(s).dot(pi_p.Derivative(t));
       };
 
@@ -277,17 +273,9 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
                                        const AbstractParametrizedCurve &pi_p,
                                        const AbstractBEMSpace &space,
                                        const QuadRule &GaussQR) {
-  unsigned N = GaussQR.n; // Quadrature order for the GaussQR object.
-  // Calculating the quadrature order for stable evaluation of integrands for
-  // disjoint panels as mentioned in \f$\ref{par:distpan}\f$
-  unsigned n0 = 30; // Order for admissible cases
-  // Admissibility criteria
-  double eta = 0.5;
-  // Calculating the quadrature order
-  unsigned n = n0 * std::max(1., 1. + log(rho(pi, pi_p) / eta));
-  // std::cout << "ComputeIntegralGeneral used with order " << N << std::endl;
-  // No. of Reference Shape Functions in trial/test space
-  int Q = space.getQ();
+  unsigned N = GaussQR.n; // Quadrature order for the GaussQR object. Same order
+                          // to be used for log weighted quadrature
+  int Q = space.getQ(); // No. of Reference Shape Functions in trial/test space
   // Interaction matrix with size Q x Q
   Eigen::MatrixXd interaction_matrix(Q, Q);
   // Computing the (i,j)th matrix entry
@@ -296,11 +284,11 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
       // Lambda expression for functions F and G in \f$\eqref{eq:titg}\f$ for
       // Single Layer BIO
       auto F = [&](double t) { // Function associated with panel pi_p
-        return space.evaluateShapeFunction(j, t) * pi_p.Derivative(t).norm();
+        return space.evaluateShapeFunctionDot(j, t);
       };
 
       auto G = [&](double s) { // Function associated with panel pi
-        return space.evaluateShapeFunction(i, s) * pi.Derivative(s).norm();
+        return space.evaluateShapeFunctionDot(i, s);
       };
 
       double integral = 0.;
@@ -356,44 +344,5 @@ Eigen::MatrixXd GalerkinMatrix(const ParametrizedMesh mesh,
   return output;
 }
 
-double Potential(const Eigen::Vector2d &x, const Eigen::VectorXd &coeffs,
-                 const ParametrizedMesh &mesh, const AbstractBEMSpace &space,
-                 const unsigned int &N) {
-  // Getting the number of panels in the mesh
-  unsigned int numpanels = mesh.getNumPanels();
-  // Getting dimensions of BEM space
-  unsigned int dims = space.getSpaceDim(numpanels);
-  // asserting that the space dimension matches with coefficients
-  assert(coeffs.rows() == dims);
-  // Getting the panels from the mesh
-  PanelVector panels = mesh.getPanels();
-  // Getting the number of local shape functions in the BEM space
-  unsigned int Q = space.getQ();
-  // Getting general Gauss Quadrature rule
-  QuadRule GaussQR = getGaussQR(N);
-  // Initializing the single layer potential vector for the bases, with zeros
-  Eigen::VectorXd potentials = Eigen::VectorXd::Zero(dims);
-  // Looping over all the panels
-  for (unsigned panel = 0; panel < numpanels; ++panel) {
-    // Looping over all reference shape functions
-    for (unsigned i = 0; i < Q; ++i) {
-      // The local integrand for a panel and a reference shape function
-      auto integrand = [&](double t) {
-        // Single Layer Potential
-        return -1. / 2. / M_PI *
-               log((x - panels[panel]->operator()(t)).norm()) *
-               space.evaluateShapeFunction(i, t) *
-               panels[panel]->Derivative(t).norm();
-      };
-      // Local to global mapping
-      double local = ComputeIntegral(integrand, -1., 1., GaussQR);
-      unsigned ii = space.LocGlobMap(i + 1, panel + 1, numpanels) - 1;
-      // Filling the potentials vector
-      potentials(ii) += local;
-    }
-  }
-  return coeffs.dot(potentials);
-}
-
-} // namespace single_layer
+} // namespace hypersingular
 } // namespace parametricbem2d

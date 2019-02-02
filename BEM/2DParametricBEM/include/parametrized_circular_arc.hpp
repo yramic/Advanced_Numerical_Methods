@@ -9,9 +9,10 @@
 #ifndef PARAMETRIZEDCIRCULARARCHPP
 #define PARAMETRIZEDCIRCULARARCHPP
 
+#include "abstract_parametrized_curve.hpp"
+
 #include <utility>
 
-#include "abstract_parametrized_curve.hpp"
 #include <Eigen/Dense>
 
 namespace parametricbem2d {
@@ -55,6 +56,11 @@ public:
    * See documentation in AbstractParametrizedCurve
    */
   PanelVector split(unsigned int) const;
+
+  /**
+   * See documentation in AbstractParametrizedCurve
+   */
+  double length() const;
 
 private:
   /**
