@@ -1,7 +1,7 @@
 //// 
 //// Copyright (C) 2017 SAM (D-MATH) @ ETH Zurich
-//// Author(s): ascapin < > 
-//// Contributors:  ppanchal 
+//// Author(s): curzuato < > 
+//// Contributors:  dcasati 
 //// This file is part of the AdvNumCSE repository.
 ////
 #include <Eigen/Dense>
@@ -9,7 +9,9 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <ctime>
 #include "gauleg.hpp"
+#include "utilities.hpp"
 
 using namespace Eigen;
 using namespace std;
@@ -26,52 +28,43 @@ using namespace std;
 template<typename FUNC>
 VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau)
 {
-    MatrixXd A = MatrixXd::Zero(p,p);
-    VectorXd b = VectorXd::Zero(p);
-
+    MatrixXd A = MatrixXd::Zero(p+1,p+1);
+    VectorXd b = VectorXd::Zero(p+1);
+    
+    // generate Gauss-Legendre points and weights
+    int ng = p;
     Eigen::RowVectorXd gauss_pts_p, gauss_wht_p;
-    std::tie(gauss_pts_p,gauss_wht_p) = gauleg(0., 1., p);
-
-    for(int i=1; i<=p; ++i) {
-
-        for(int j=1; j<=p; ++j) {
-
-            A(i-1,j-1) = 2.*sqrt(M_PI)*tgamma(1+j) / ((3.+2.*i+2.*j)*tgamma(3./2.+j)); // tgamma(1+j) == j! if j is integer
-        }
-
-        for(int k=0; k<p; ++k) {
-
+    std::tie(gauss_pts_p,gauss_wht_p) = gauleg(0., 1., ng);
+    
+    // set-up the Galerkin matrix and rhs vector
+    for(int i=0; i<=p; i++)
+    {
+        for(int j=0; j<=p; j++)
+            A(i,j) = 2.*sqrt(M_PI)*tgamma(1+j) / ((3.+2.*i+2.*j)*tgamma(3./2.+j)); // tgamma(1+j) == j! if j is integer
+    
+        for(int k=0; k<ng; k++)
+        {
             double tk = gauss_pts_p(k);
             double wk = gauss_wht_p(k);
-
-            b(i-1) += wk * pow(tk,i) * y(tk);
+            b(i) += wk * pow(tk,i) * y(tk);
         }
     }
 
+    // linear system solve using QR decomposition
     VectorXd x = A.colPivHouseholderQr().solve(b);
-
+    
     size_t N = round(1./tau);
     VectorXd grid = VectorXd::LinSpaced(N+1, 0., 1.);
     VectorXd u    = VectorXd::Zero(N+1);
-
-    for(int i=0; i<N+1; ++i) {
-        for(int j=1; j<=p; ++j) {
-            u(i) += x(j-1) * pow(grid(i),j);
+    
+    // generate solution at grid points
+    for(int i=0; i<=N; i++) {
+        for(int j=0; j<=p; j++) {
+            u(i) += x(j) * pow(grid(i),j);
         }
     }
 
     return u;
-}
-
-
-MatrixXd toeplitz_triangular(const VectorXd& c)
-{
-    size_t n = c.size();
-    MatrixXd T = MatrixXd::Zero(n, n);
-    for(int i=0; i<n; ++i) {
-        T.col(i).tail(n-i) = c.head(n-i);
-    }
-    return T;
 }
 
 
@@ -97,30 +90,11 @@ VectorXd cq_ieul_abel(const FUNC& y, size_t N)
     for(int i=0; i<N+1; ++i) {
         y_N(i) = y(grid(i));
     }
-
+    
     MatrixXd T = toeplitz_triangular(w);
     VectorXd u = T.triangularView<Lower>().solve(y_N);
-
+    
     return u;
-}
-
-
-VectorXcd pconvfft(const VectorXcd& u, const VectorXcd& x)
-{
-    FFT<double> fft;
-    VectorXcd tmp = ( fft.fwd(u) ).cwiseProduct( fft.fwd(x) );
-    return fft.inv(tmp);
-}
-
-
-VectorXcd myconv(const VectorXcd& h, const VectorXcd& x) {
-  const long n = h.size();
-  // Zero padding, cf. \eqref{eq:zeropad}
-  VectorXcd hp(2*n - 1), xp(2*n - 1);
-  hp << h, VectorXcd::Zero(n - 1);
-  xp << x, VectorXcd::Zero(n - 1);
-  // Periodic discrete convolution of length \Blue{$2n-1$}, \cref{cpp:pconffft}
-  return pconvfft(hp, xp);
 }
 
 
@@ -163,17 +137,18 @@ VectorXd cq_bdf2_abel(const FUNC& y, size_t N)
 
 int main() {
     {
+        auto u = [](double t) { return 2./M_PI*sqrt(t); };
         auto y = [](double t) { return t; };
-
+        
         double tau = 0.01;
         size_t N = round(1./tau);
         VectorXd grid = VectorXd::LinSpaced(N+1,0.,1.);
         VectorXd u_ex(N+1);
         for(int i=0; i<N+1; ++i) {
-            u_ex(i) = 2./M_PI*sqrt(grid(i));
+            u_ex(i) = u(grid(i));
         }
-
-        cout << "Problem 3.1.g" << endl;
+    
+        cout << "\nSpectral Galerkin\n" << endl;
         for(int p=2; p<=10; ++p) {
             VectorXd u_app = poly_spec_abel(y, p, tau);
             VectorXd diff  = u_ex - u_app;
@@ -186,18 +161,18 @@ int main() {
     }
 
     {
+        auto u = [](double t) { return 2./M_PI*sqrt(t); };
         auto y = [](double t) { return t; };
 
-        cout << "Problem 3.1.l"  << endl;
-        cout << "Implicit Euler" << endl;
-        for(int N=10; N<=1280; N*=2) {
+        cout << "\n\nConvolution Quadrature, Implicit Euler\n"  << endl;
+        for(int N=16; N<=2048; N*=2) {
 
             VectorXd grid = VectorXd::LinSpaced(N+1,0.,1.);
             VectorXd u_ex(N+1);
             for(int i=0; i<N+1; ++i) {
-                u_ex(i) = 2./M_PI*sqrt(grid(i));
+                u_ex(i) = u(grid(i));
             }
-
+            
             VectorXd u_app = cq_ieul_abel(y, N);
             VectorXd diff  = u_ex - u_app;
             double err_max = diff.cwiseAbs().maxCoeff();
@@ -206,16 +181,16 @@ int main() {
                  << scientific << setprecision(3)
                  << err_max << endl;
         }
-
-        cout << "BDF-2" << endl;
-        for(int N=10; N<=1280; N*=2) {
-
+        
+        cout << "\n\nConvolution Quadrature, BDF-2\n"  << endl;
+        for(int N=16; N<=2048; N*=2) {
+            
             VectorXd grid = VectorXd::LinSpaced(N+1,0.,1.);
             VectorXd u_ex(N+1);
             for(int i=0; i<N+1; ++i) {
                 u_ex(i) = 2./M_PI*sqrt(grid(i));
             }
-
+            
             VectorXd u_app = cq_bdf2_abel(y, N);
             VectorXd diff  = u_ex - u_app;
             double err_max = diff.cwiseAbs().maxCoeff();
@@ -225,4 +200,5 @@ int main() {
                  << err_max << endl;
         }
     }
+
 }

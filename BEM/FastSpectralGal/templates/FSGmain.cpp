@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <istream>
+#include <iomanip>
 
 using namespace Eigen;
 
@@ -61,6 +62,7 @@ VectorXd solveBIE(const FUNC &g, int N) {
  */
 /* SAM_LISTING_BEGIN_3b */
 double L2norm(const VectorXd &coeffs) {
+  double norm = 0.;
   // TODO: implement the computation of the L2norm
   return std::sqrt(norm);
 }
