@@ -22,9 +22,9 @@ include(${CMAKE_SOURCE_DIR}/cmake/functions/get_target_name_advnumcse.cmake)
 
 # DISALLOW IN-SOURCE BUILD
 ###########################################################################
-#if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
-#    message(FATAL_ERROR "Use an out of source build. Create a separate binary directory and run CMake there.")
-#endif("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
+if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
+    message(FATAL_ERROR "Use an out of source build. Create a separate binary directory and run CMake there.")
+endif("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
 
 # STORE BINARIES IN ./bin
 #(else CMake cannot find files to link for automatic targets)
@@ -40,7 +40,7 @@ endif()
 
 # COMPILATION FLAGS
 ###########################################################################
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 # IGNORE WARNINGS
 ###########################################################################
@@ -70,8 +70,8 @@ add_definitions(-DEIGEN3_ACTIVATED)
 # INCLUDE DIRECTORIES
 #
 ###########################################################################
-include_directories("BEM/CppHilbert/Library")
-include_directories("third_party")
+# include_directories("BEM/CppHilbert/Library")
+# include_directories("third_party")
 
 ###########################################################################
 #
@@ -84,53 +84,53 @@ include_directories("third_party")
 
 # There is too much hassle handling these corner cases, so we just require the
 # people who have Betl installed to undefine these
-if (DEFINED ENV{ETH_ROOT})
-  message(FATAL_ERROR "EE: Environment variable ETH_ROOT found. Please unset using\n    unset ETH_ROOT")
-endif()
+# if (DEFINED ENV{ETH_ROOT})
+#  message(FATAL_ERROR "EE: Environment variable ETH_ROOT found. Please unset using\n    unset ETH_ROOT")
+# endif()
 
-if (DEFINED ENV{BETL2_ROOT})
-  message(FATAL_ERROR "EE: Environment variable BETL2_ROOT found. Please unset using\n    unset BETL2_ROOT")
-endif()
+# if (DEFINED ENV{BETL2_ROOT})
+#  message(FATAL_ERROR "EE: Environment variable BETL2_ROOT found. Please unset using\n    unset BETL2_ROOT")
+# endif()
 
 # Make sure they have checked out the repository
-if (NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/Betl2/CMakeLists.txt)
-  message(FATAL_ERROR "You have not downloaded the Betl2 submodule. Please do\n    git submodule update --init --recursive\n\nRemember you have to have a gitlab.math.ethz.ch account for this. Go to https://www.gitlab.math.ethz.ch and log in to get an account, then send an email to the organizers to get access.")
-endif()
+# if (NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/Betl2/CMakeLists.txt)
+#  message(FATAL_ERROR "You have not downloaded the Betl2 submodule. Please do\n    git submodule update --init --recursive\n\nRemember you have to have a gitlab.math.ethz.ch account for this. Go to https://www.gitlab.math.ethz.ch and log in to get an account, then send an email to the organizers to get access.")
+# endif()
 
-if (NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/Betl2/3rd_Party/ethGenericGrid/CMakeLists.txt)
-  message(FATAL_ERROR "You have not downloaded the ethGenericGrid submodule. Please do\n    git submodule update --init --recursive\nRemember you have to have a gitlab.math.ethz.ch account for this. Go to https://www.gitlab.math.ethz.ch and log in to get an account, then send an email to the organizers to get access.")
-endif()
+# if (NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/Betl2/3rd_Party/ethGenericGrid/CMakeLists.txt)
+#  message(FATAL_ERROR "You have not downloaded the ethGenericGrid submodule. Please do\n    git submodule update --init --recursive\nRemember you have to have a gitlab.math.ethz.ch account for this. Go to https://www.gitlab.math.ethz.ch and log in to get an account, then send an email to the organizers to get access.")
+# endif()
 
-set(ETH_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/ethGenericGrid_install/include)
-set(ETH_LIBRARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/ethGenericGrid_install/lib)
+# set(ETH_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/ethGenericGrid_install/include)
+# set(ETH_LIBRARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/ethGenericGrid_install/lib)
 
 # ETH GENERIC GRID
 ###########################################################################
-ExternalProject_Add(
-    ethGenericGrid
-    SOURCE_DIR ${PROJECT_SOURCE_DIR}/third_party/Betl2/3rd_Party/ethGenericGrid
-    INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/ethGenericGrid_install
-    CMAKE_ARGS ${EXTERNAL_PROJECT_CMAKE_ARGS_PREFIX} -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/ethGenericGrid_install -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/Eigen_install -DETH_ROOT=${CMAKE_CURRENT_BINARY_DIR}/ethGenericGrid_install -DCMAKE_INCLUDE_DIRECTORIES_BEFORE=${NUMPDE_INCLUDE_DIRECTORIES_BEFORE}
-)
+# ExternalProject_Add(
+#     ethGenericGrid
+#     SOURCE_DIR ${PROJECT_SOURCE_DIR}/third_party/Betl2/3rd_Party/ethGenericGrid
+#     INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/ethGenericGrid_install
+#     CMAKE_ARGS ${EXTERNAL_PROJECT_CMAKE_ARGS_PREFIX} -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/ethGenericGrid_install -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/Eigen_install -DETH_ROOT=${CMAKE_CURRENT_BINARY_DIR}/ethGenericGrid_install -DCMAKE_INCLUDE_DIRECTORIES_BEFORE=${NUMPDE_INCLUDE_DIRECTORIES_BEFORE}
+# )
 
-add_dependencies(ethGenericGrid Eigen)
+# add_dependencies(ethGenericGrid Eigen)
 
 # BETL2
 ###########################################################################
-ExternalProject_Add(
-    Betl2
-    SOURCE_DIR ${PROJECT_SOURCE_DIR}/third_party/Betl2/Library
-    CMAKE_ARGS ${EXTERNAL_PROJECT_CMAKE_ARGS_PREFIX} -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/betl2_install
-    -DETH_INCLUDE_DIRS=${ETH_INCLUDE_DIRS}/eth ${CMAKE_BINARY_DIR}/Eigen_install/include -DETH_BASE_LIB=${ETH_LIBRARY_DIR} -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/betl2_install -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/Eigen_install -DETH_ROOT=${CMAKE_CURRENT_BINARY_DIR}/ethGenericGrid_install
--DCMAKE_INCLUDE_DIRECTORIES_BEFORE=${NUMPDE_INCLUDE_DIRECTORIES_BEFORE}
-    )
-add_dependencies(Betl2 ethGenericGrid)
-add_dependencies(Betl2 Eigen)
+# ExternalProject_Add(
+#     Betl2
+#     SOURCE_DIR ${PROJECT_SOURCE_DIR}/third_party/Betl2/Library
+#     CMAKE_ARGS ${EXTERNAL_PROJECT_CMAKE_ARGS_PREFIX} -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/betl2_install
+#     -DETH_INCLUDE_DIRS=${ETH_INCLUDE_DIRS}/eth ${CMAKE_BINARY_DIR}/Eigen_install/include -DETH_BASE_LIB=${ETH_LIBRARY_DIR} -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/betl2_install -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/Eigen_install -DETH_ROOT=${CMAKE_CURRENT_BINARY_DIR}/ethGenericGrid_install
+# -DCMAKE_INCLUDE_DIRECTORIES_BEFORE=${NUMPDE_INCLUDE_DIRECTORIES_BEFORE}
+#     )
+# add_dependencies(Betl2 ethGenericGrid)
+# add_dependencies(Betl2 Eigen)
 
-include_directories(${ETH_INCLUDE_DIRS} ${ETH_INCLUDE_DIRS}/eth)
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/betl2_install/include)
-link_directories(${ETH_LIBRARY_DIR})
-link_directories(${CMAKE_CURRENT_BINARY_DIR}/betl2_install/lib)
+# include_directories(${ETH_INCLUDE_DIRS} ${ETH_INCLUDE_DIRS}/eth)
+# include_directories(${CMAKE_CURRENT_BINARY_DIR}/betl2_install/include)
+# link_directories(${ETH_LIBRARY_DIR})
+# link_directories(${CMAKE_CURRENT_BINARY_DIR}/betl2_install/lib)
 
 find_package(Boost REQUIRED COMPONENTS program_options)
 if (${Boost_MAJOR_VERSION} VERSION_LESS 1 OR ${Boost_MINOR_VERSION} VERSION_LESS 58)
@@ -156,23 +156,23 @@ endif()
 include_directories (${Boost_INCLUDE_DIRS})
 message(${Boost_INCLUDE_DIRS})
 
-set(BETL2_LIBRARIES bem_integration
-cmdl_parser
-fe
-functional
-fundsol
-gmsh_input
-grid
-hypre_bindings
-material
-petsc_bindings
-utils
-vtu_exporter
-eth_eth_base
-eth_interface
-${ETH_LIBRARIES}
-${Boost_LIBRARIES}
-)
+# set(BETL2_LIBRARIES bem_integration
+# cmdl_parser
+# fe
+# functional
+# fundsol
+# gmsh_input
+# grid
+# hypre_bindings
+# material
+# petsc_bindings
+# utils
+# vtu_exporter
+# eth_eth_base
+# eth_interface
+# ${ETH_LIBRARIES}
+# ${Boost_LIBRARIES}
+# )
 
 ###########################################################################
 #
@@ -180,7 +180,7 @@ ${Boost_LIBRARIES}
 #
 ###########################################################################
 
-add_subdirectory(BEM)
+# add_subdirectory(BEM)
 add_subdirectory(HMAT)
 add_subdirectory(CONVQUAD)
 #add_subdirectory(AMG)

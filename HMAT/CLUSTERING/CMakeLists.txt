@@ -1,1 +1,1 @@
-add_executable_advnumcse(solution Clustering.cpp)
+add_executable_advnumcse(demo Clustering.cpp)
