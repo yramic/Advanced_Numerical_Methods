@@ -1,0 +1,2 @@
+add_executable_advnumcse(mastersolution gravitationalforces_main.cpp gravitationalforces.cpp)
+
