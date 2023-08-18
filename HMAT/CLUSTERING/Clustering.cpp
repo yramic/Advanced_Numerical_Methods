@@ -43,7 +43,7 @@ struct BBox {
   // Bounding box from sequence of points
   BBox(const std::vector<Point<d>> pts);
   // Size \cob{$\diam(B)$} of a bounding box
-  double diam(void) const { return (maxc - minc).cwiseAbs().maxCoeff(); }
+  double diam() const { return (maxc - minc).cwiseAbs().maxCoeff(); }
   // Coordinate vectors of Corner points of bounding box
   Eigen::Matrix<double, d, 1> minc, maxc;
 };
@@ -103,18 +103,18 @@ class CtNode {
   explicit CtNode(const std::vector<Point<d>> _pts, int _dir = 0)
       : pts(_pts), sons{nullptr, nullptr}, dir(_dir) {}
   // Destructor (also attempts to destroy sons!)
-  virtual ~CtNode(void) {
+  virtual ~CtNode() {
     if (sons[0]) delete sons[0];
     if (sons[1]) delete sons[1];
   }
   // Number of indices owned by the cluster
-  [[nodiscard]] std::size_t noIdx(void) const { return pts.size(); }
+  [[nodiscard]] std::size_t noIdx() const { return pts.size(); }
   // Function \cob{$\Ci$}: access to owned indices
-  [[nodiscard]] std::vector<size_t> I(void) const;
+  [[nodiscard]] std::vector<size_t> I() const;
   // Access to bounding box (computed on the fly)
-  [[nodiscard]] BBox<d> getBBox(void) const { return BBox<d>(pts); }
+  [[nodiscard]] BBox<d> getBBox() const { return BBox<d>(pts); }
   // Is the node a leaf node ?
-  [[nodiscard]] inline bool isLeaf(void) const {
+  [[nodiscard]] inline bool isLeaf() const {
     return (!sons[0] || !sons[1]);
   }
   // Output operator or recursive output
@@ -131,7 +131,7 @@ class CtNode {
 
 /* SAM_LISTING_BEGIN_8 */
 template <int d>
-std::vector<size_t> CtNode<d>::I(void) const {
+std::vector<size_t> CtNode<d>::I() const {
   std::vector<size_t> idx;
   for (const Point<d> &pt : pts) idx.push_back(pt.idx);
   return idx;
@@ -165,12 +165,12 @@ class ClusterTree {
  public:
   constexpr static std::size_t dim = Node::dim;  // space dimension d
   // Idle constructor
-  ClusterTree(void) : root(nullptr) {}
+  ClusterTree() : root(nullptr) {}
   // Effective Constructor taking a sequence of points
   // (needed, because polynorphism not supported in constructor)
   void init(const std::vector<Point<dim>> pts, std::size_t minpts = 1);
   // Recursive destruction
-  virtual ~ClusterTree(void) {
+  virtual ~ClusterTree() {
     if (root) delete root;
   }
   // Output of tree
@@ -244,7 +244,7 @@ struct IndexBlock {
   // Constructors extracts indices from clusters
   IndexBlock(const Node &_nx, const Node &_ny)
       : nx(_nx), ny(_ny), i_idx(_nx.I()), j_idx(ny.I()) {}
-  virtual ~IndexBlock(void) {}
+  virtual ~IndexBlock() {}
   const Node &nx, &ny;                     // contributing clusters
   const std::vector<size_t> i_idx, j_idx;  // contained indices
 };
@@ -260,7 +260,7 @@ class BlockPartition {
   // Trigger recursive construction of partition
   // (Needed, because polymorphic functions not available in constructor)
   void init(double eta0 = 0.5);
-  virtual ~BlockPartition(void) {}
+  virtual ~BlockPartition() {}
   // Admissibility condition \cob{$\adm$}, see \cref{def:ac}
   virtual bool adm(const Node *nx, const Node *ny, double eta0) const;
 
@@ -365,7 +365,7 @@ std::ostream &operator<<(std::ostream &o,
 // For local low-rank approximation
 // ======================================================================
 
-/** Node supporting degenerate approximation by interpolation */
+/** Node supporting separable approximation by interpolation */
 /* SAM_LISTING_BEGIN_Y */
 template <int d>
 class InterpNode : public CtNode<d> {
@@ -375,23 +375,25 @@ class InterpNode : public CtNode<d> {
       : CtNode<d>(_pts, _dir), q(_q), sons{nullptr, nullptr}, k(_pts.size()) {
     initV();
   }
-  virtual ~InterpNode(void) {}
+  virtual ~InterpNode() {}
 
  protected:
   // Initialization of matrix \cob{$\VV$}
-  void initV(void);
+  void initV();
 
  public:
-  const int q;          // Rank, no of interpolation nodes
-  std::size_t k;        // Number of indices contained
-  Eigen::MatrixXd V;    // low-rank factor \cob{$\VV\in\bbR^{k,q}$}
-  InterpNode *sons[2];  // Pointers to sons (of type InterpNode!)
+  const int q;                       // Rank, no of interpolation nodes
+  std::size_t k;                     // Number of indices contained
+  Eigen::MatrixXd V;                 // low-rank factor \cob{$\VV\in\bbR^{k,q}$}
+  std::array<InterpNode *, 2> sons;  // Pointers to sons (of type InterpNode!)
 };
 /* SAM_LISTING_END_Y */
 
+// >> Implementation required
+  
 /* SAM_LISTING_BEGIN_Z */
 template <int d>
-void InterpNode<d>::initV(void) {
+void InterpNode<d>::initV() {
   static_assert(d == 1, "Implemented only for 1D");
   std::cerr << "Rank-" << q
             << " InterpNode: Initialization of V not implemented" << std::endl;
@@ -425,7 +427,7 @@ class LowRankClusterTree : public ClusterTree<Node> {
   explicit LowRankClusterTree(size_t _q) : q(_q) {}
   // Actual constructor taking a sequence of points
   void init(const std::vector<Point<Node::dim>> pts, std::size_t minpts = 1);
-  virtual ~LowRankClusterTree(void) {}
+  virtual ~LowRankClusterTree() {}
 
  protected:
   // factory method for relevant type of node takine rank argument
@@ -434,7 +436,7 @@ class LowRankClusterTree : public ClusterTree<Node> {
   }
 
  public:
-  const std::size_t q;  // rank of degenerate approximation on cluster boxes
+  const std::size_t q;  // rank of separable approximation on cluster boxes
 };
 
 template <class Node>
@@ -452,7 +454,7 @@ class BiDirChebInterpBlock : public IndexBlock<Node> {
   using kernel_t = KERNEL;
   BiDirChebInterpBlock(const Node &nx, const Node &ny, kernel_t _G,
                        std::size_t _q);
-  virtual ~BiDirChebInterpBlock(void) {}
+  virtual ~BiDirChebInterpBlock() {}
   // Invalid constructor throwing exception
   BiDirChebInterpBlock(const Node &nx, const Node &ny);
 
@@ -487,7 +489,7 @@ class NearFieldBlock : public IndexBlock<Node> {
  public:
   using kernel_t = KERNEL;
   NearFieldBlock(const Node &nx, const Node &ny, kernel_t _G);
-  virtual ~NearFieldBlock(void) {}
+  virtual ~NearFieldBlock() {}
   // Invalid constructor throwing exception
   NearFieldBlock(const Node &nx, const Node &ny);
 
@@ -522,7 +524,7 @@ class HierMatBlockPartition : public BlockPartition<Node, FFB, NFB> {
       : BlockPartition<Node, FFB, NFB>(_xT, _yT), G(_G), q(_q) {
     BlockPartition<Node, FFB, NFB>::init(eta0);
   }
-  virtual ~HierMatBlockPartition(void) {}
+  virtual ~HierMatBlockPartition() {}
 
  protected:
   // Construct an instance of far-field block type
@@ -537,7 +539,7 @@ class HierMatBlockPartition : public BlockPartition<Node, FFB, NFB> {
   }
 
  public:
-  const kernel_t G;    // Reference to the kernel function
+  const kernel_t G;     // Reference to the kernel function
   const std::size_t q;  // degree+1 of interpolating polynomial
 };
 /* SAM_LISTING_END_H */
