@@ -1,0 +1,1 @@
+add_executable_advnumcse(exe kernmatllrapprox_test.cpp kernmatllrapprox.cpp)

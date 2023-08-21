@@ -23,35 +23,42 @@ namespace HMAT {
 
 /** @brief Data structure for a collocation point
    A collocation point has an index and coordinates
-   @tparam d dimension of ambient space
+   @tparam DIM dimension of ambient space
 */
 /* SAM_LISTING_BEGIN_1 */
-template <int d>  // dimension \cob{$d$} as template argument
+template <int DIM>  // dimension \cob{$d$} as template argument
 struct Point {
-  std::size_t idx;                // number of collocation point
-  Eigen::Matrix<double, d, 1> x;  // coordinate vector
+  std::size_t idx;                  // number of collocation point
+  Eigen::Matrix<double, DIM, 1> x;  // coordinate vector
 };
 /* SAM_LISTING_END_1 */
 
 /** @brief Data structure for bounding box
-   a bounding box is defined by two position vectors
-   @tparam d dimension of ambient spacew
-*/
+ *  a bounding box is defined by two position vectors corresponding to
+ * lower-left and upper-right corners, defining d intervals
+ *  @tparam d dimension of ambient spacew
+ */
 /* SAM_LISTING_BEGIN_2 */
-template <int d>  // dimension \cob{$d$} as template argument
+template <int DIM>  // dimension \cob{$d$} as template argument
 struct BBox {
   // Bounding box from sequence of points
-  BBox(const std::vector<Point<d>> pts);
+  BBox(const std::vector<Point<DIM>> pts);
   // Size \cob{$\diam(B)$} of a bounding box
   double diam() const { return (maxc - minc).cwiseAbs().maxCoeff(); }
   // Coordinate vectors of Corner points of bounding box
-  Eigen::Matrix<double, d, 1> minc, maxc;
+  Eigen::Matrix<double, DIM, 1> minc;  // Lower-left corner
+  Eigen::Matrix<double, DIM, 1> maxc;  // Upper-right corner
 };
 /* SAM_LISTING_END_2 */
-// distance of intervals \cob{$\cintv{a,b}$} and \cob{$\cintv{c,d}$}
+
+// distance of 1D intervals \cob{$\cintv{a,b}$} and \cob{$\cintv{c,d}$}
 double dist(double a, double b, double c, double d) {
-  if (b < a) std::swap(a, b);
-  if (d < c) std::swap(c, d);
+  if (b < a) {
+    std::swap(a, b);
+  }
+  if (d < c) {
+    std::swap(c, d);
+  }
   if (c < a) {
     std::swap(a, c);
     std::swap(b, d);
@@ -59,32 +66,38 @@ double dist(double a, double b, double c, double d) {
   return (c < b) ? 0.0 : c - b;
 }
 // distance of d-dimensional boxes
-template <int d>
-double dist(const BBox<d> &bx, const BBox<d> &by) {
+template <int DIM>
+double dist(const BBox<DIM> &bx, const BBox<DIM> &by) {
   double dst = 0.0;
-  for (int l = 0; l < d; ++l)
+  for (int l = 0; l < DIM; ++l) {
     dst += pow(dist(bx.minc[l], bx.maxc[l], by.minc[l], by.maxc[l]), 2);
+  }
   return sqrt(dst);
 }
 
 // output bounding box
-template <int d>
-std::ostream &operator<<(std::ostream &o, const BBox<d> &box) {
-  return o << "BBOX: " << box.minc << ',' << box.maxc << ' ';
+template <int DIM>
+std::ostream &operator<<(std::ostream &o, const BBox<DIM> &box) {
+  return o << "BBOX: " << box.minc.transpose() << ',' << box.maxc.transpose()
+           << ' ';
 }
 
 /* SAM_LISTING_BEGIN_3 */
-template <int d>
-BBox<d>::BBox(const std::vector<Point<d>> pts) {
+template <int DIM>
+BBox<DIM>::BBox(const std::vector<Point<DIM>> pts) {
   double tmp;
-  minc =
-      std::numeric_limits<double>::max() * Eigen::Matrix<double, d, 1>::Ones();
+  minc = std::numeric_limits<double>::max() *
+         Eigen::Matrix<double, DIM, 1>::Ones();
   maxc = -minc;
-  for (const Point<d> &v : pts) {
-    for (int l = 0; l < d; l++) {
+  for (const Point<DIM> &v : pts) {
+    for (int l = 0; l < DIM; l++) {
       const double tmp = v.x[l];
-      if (tmp < minc[l]) minc[l] = tmp;
-      if (tmp > maxc[l]) maxc[l] = tmp;
+      if (tmp < minc[l]) {
+        minc[l] = tmp;
+      }
+      if (tmp > maxc[l]) {
+        maxc[l] = tmp;
+      }
     }
   }
 }  // end BBox constructor
@@ -92,30 +105,34 @@ BBox<d>::BBox(const std::vector<Point<d>> pts) {
 
 /** @brief Data structure for the node of a binary cluster tree
    A node of a cluster tree contains a set of collocation points.
-   @tparam d dimension of ambient space
+   @tparam DIM dimension of ambient space
 */
 /* SAM_LISTING_BEGIN_4 */
-template <int d>
+template <int DIM>
 class CtNode {
  public:
-  const static std::size_t dim = d;
+  constexpr static std::size_t dim = DIM; 
   // Constructors taking a sequence of points
-  explicit CtNode(const std::vector<Point<d>> _pts, int _dir = 0)
+  explicit CtNode(const std::vector<Point<DIM>> _pts, int _dir = 0)
       : pts(_pts), sons{nullptr, nullptr}, dir(_dir) {}
   // Destructor (also attempts to destroy sons!)
   virtual ~CtNode() {
-    if (sons[0]) delete sons[0];
-    if (sons[1]) delete sons[1];
+    if (sons[0]) {
+      delete sons[0];
+    }
+    if (sons[1]) {
+      delete sons[1];
+    }
   }
   // Number of indices owned by the cluster
   [[nodiscard]] std::size_t noIdx() const { return pts.size(); }
   // Function \cob{$\Ci$}: access to owned indices
   [[nodiscard]] std::vector<size_t> I() const;
   // Access to bounding box (computed on the fly)
-  [[nodiscard]] BBox<d> getBBox() const { return BBox<d>(pts); }
+  [[nodiscard]] BBox<DIM> getBBox() const { return BBox<DIM>(pts); }
   // Is the node a leaf node ?
   [[nodiscard]] inline bool isLeaf() const {
-    return (!sons[0] || !sons[1]);
+    return ((sons[0] == nullptr) and (sons[1] == nullptr));
   }
   // Output operator or recursive output
   template <int dim>
@@ -123,17 +140,17 @@ class CtNode {
   // Data member: Pointers to two (binary tree!) sons
   std::array<CtNode *, 2> sons;
   // Data member: Points contained in the cluster
-  std::vector<Point<d>> pts;
+  std::vector<Point<DIM>> pts;
   // Direction for sorting, passed by the constructor
   int dir;
 };
 /* SAM_LISTING_END_4 */
 
 /* SAM_LISTING_BEGIN_8 */
-template <int d>
-std::vector<size_t> CtNode<d>::I() const {
+template <int DIM>
+std::vector<size_t> CtNode<DIM>::I() const {
   std::vector<size_t> idx;
-  for (const Point<d> &pt : pts) idx.push_back(pt.idx);
+  for (const Point<DIM> &pt : pts) idx.push_back(pt.idx);
   return idx;
 }
 /* SAM_LISTING_END_8 */
@@ -149,8 +166,12 @@ std::ostream &operator<<(std::ostream &o, const CtNode<dim> &node) {
     o << "]";
   }
   o << std::endl;
-  if (node.sons[0]) o << *(node.sons[0]);
-  if (node.sons[1]) o << *(node.sons[1]);
+  if (node.sons[0]) {
+    o << *(node.sons[0]);
+  }
+  if (node.sons[1]) {
+    o << *(node.sons[1]);
+  }
   return o;
 }
 
@@ -168,7 +189,7 @@ class ClusterTree {
   ClusterTree() : root(nullptr) {}
   // Effective Constructor taking a sequence of points
   // (needed, because polynorphism not supported in constructor)
-  void init(const std::vector<Point<dim>> pts, std::size_t minpts = 1);
+  void init(const std::vector<Point<dim>> &pts, std::size_t minpts = 1);
   // Recursive destruction
   virtual ~ClusterTree() {
     if (root) delete root;
@@ -192,11 +213,12 @@ class ClusterTree {
 
 /* SAM_LISTING_BEGIN_6 */
 template <class Node>
-void ClusterTree<Node>::init(const std::vector<Point<dim>> pts,
+void ClusterTree<Node>::init(const std::vector<Point<dim>> &pts,
                              std::size_t minpts) {
-  if (!(root = createNode(pts, 0)))
+  if (!(root = createNode(pts, 0))) {
     throw(std::runtime_error("Cannot allocate root"));
-  if (minpts < 1) throw(std::runtime_error("minpts must be at least 1"));
+  }
+  if (minpts < 1) { throw(std::runtime_error("minpts must be at least 1")); }
   buildRec(root, minpts);
 }
 /* SAM_LISTING_END_6 */
@@ -390,7 +412,7 @@ class InterpNode : public CtNode<d> {
 /* SAM_LISTING_END_Y */
 
 // >> Implementation required
-  
+
 /* SAM_LISTING_BEGIN_Z */
 template <int d>
 void InterpNode<d>::initV() {
