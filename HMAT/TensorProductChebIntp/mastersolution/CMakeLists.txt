@@ -1,0 +1,1 @@
+add_executable_advnumcse(exe tensorproductchebintp_main.cpp tensorproductchebintp.cpp)
