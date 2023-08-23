@@ -1,12 +1,12 @@
 /**
- * @file xxx_test.cc
- * @brief NPDE homework XXX test code
+ * @file kernmatllrapprox_test.cc
+ * @brief NPDE homework KernMatLLRApprox test code
  * @author
  * @date
  * @copyright Developed at SAM, ETH Zurich
  */
 
 #include <gtest/gtest.h>
-#include "../mastersolution/xxx.h"
+#include "../mastersolution/kernmatllrapprox.h"
 
-namespace XXX::test {}  // namespace XXX::test
+namespace KernMatLLRApprox::test {}  // namespace KernMatLLRApprox::test

@@ -1,11 +1,11 @@
 /**
- * @ file xxx_main.cpp
+ * @ file kernmatllrapprox_main.cpp
  * @ brief NPDE homework XXX MAIN FILE
  * @ author
  * @ date
  * @ copyright Developed at SAM, ETH Zurich
  */
 
-#include "xxx.h"
+#include "kernmatllrapprox.h"
 
 int main(int /*argc*/, char** /*argv*/) { return 0; }

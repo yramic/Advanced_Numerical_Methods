@@ -68,7 +68,7 @@ double dist(const BBox<DIM> &bx, const BBox<DIM> &by) {
 // output bounding box
 template <int DIM>
 std::ostream &operator<<(std::ostream &o, const BBox<DIM> &box) {
-  return o << "BBOX: " << box.minc.transpose() << ',' << box.maxc.transpose()
+  return o << "BBOX: " << box.minc.transpose() << " - " << box.maxc.transpose()
            << ' ';
 }
 
@@ -117,7 +117,7 @@ class CtNode {
   // Number of indices owned by the cluster
   [[nodiscard]] std::size_t noIdx() const { return pts.size(); }
   // Function \cob{$\Ci$}: access to owned indices
-  [[nodiscard]] std::vector<size_t> I() const;
+  [[nodiscard]] std::vector<std::size_t> I() const;
   // Access to bounding box (computed on the fly)
   [[nodiscard]] BBox<DIM> getBBox() const { return BBox<DIM>(pts); }
   // Is the node a leaf node ?
@@ -127,9 +127,9 @@ class CtNode {
   // Output operator or recursive output
   template <int dim>
   friend std::ostream &operator<<(std::ostream &o, const CtNode<dim> &node);
-  // Data member: Pointers to two (binary tree!) sons
+  // Public data member: Pointers to two (binary tree!) sons
   std::array<CtNode *, 2> sons;
-  // Data member: Points contained in the cluster
+  // Public data member: Points contained in the cluster
   std::vector<Point<DIM>> pts;
   // Direction for sorting, passed by the constructor
   int dir;
@@ -252,18 +252,5 @@ void ClusterTree<Node>::buildRec(Node *nptr, std::size_t minpts) {
   }
 }
 /* SAM_LISTING_END_7 */
-
-/** @brief Data structure for both far-field and near-field blocks */
-/* SAM_LISTING_BEGIN_9 */
-template <class Node>
-struct IndexBlock {
-  // Constructors extracts indices from clusters
-  IndexBlock(const Node &_nx, const Node &_ny)
-      : nx(_nx), ny(_ny), i_idx(_nx.I()), j_idx(ny.I()) {}
-  virtual ~IndexBlock() {}
-  const Node &nx, &ny;                     // contributing clusters
-  const std::vector<size_t> i_idx, j_idx;  // contained indices
-};
-/* SAM_LISTING_END_9 */
 
 }  // end namespace HMAT
