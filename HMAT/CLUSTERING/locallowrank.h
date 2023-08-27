@@ -135,7 +135,7 @@ BiDirChebInterpBlock<Node, KERNEL>::BiDirChebInterpBlock(const Node &_nx,
 /* SAM_LISTING_END_B */
 
 /** General type for generic near-field cluster pair */
-/* SAM_LISTING_BEGIN_Gfun */
+/* SAM_LISTING_BEGIN_G */
 template <class Node, typename KERNEL>
 class NearFieldBlock : public IndexBlock<Node> {
  public:
@@ -152,7 +152,7 @@ class NearFieldBlock : public IndexBlock<Node> {
   KERNEL G;              // kernel function \cob{$\krn$}
   Eigen::MatrixXd Mloc;  // local kernel collocation matrix
 };
-/* SAM_LISTING_END_Gfun */
+/* SAM_LISTING_END_G */
 
 /* SAM_LISTING_BEGIN_Q */
 template <class Node, typename KERNEL>
@@ -205,9 +205,36 @@ using BiDirChebPartMat1D = HMAT::BiDirChebBlockPartition<
     HMAT::NearFieldBlock<HMAT::CtNode<1>, KERNEL>>;
 
 // Matrix x Vector based on compressed kernel collocation matrix
+/* SAM_LISTING_BEGIN_U */
 template <typename KERNEL>
 Eigen::VectorXd mvLLRPartMat(const BiDirChebPartMat1D<KERNEL> &Mt,
-                             const Eigen::VectorXd &x) {}
+                             const Eigen::VectorXd &x) {
+  // **********************************************************************
+  // TODO
+  // **********************************************************************
+}
+/* SAM_LISTING_END_U */
+
+// Computing scaled Frobenius norm for local low-rank matrix approximation error
+/* SAM_LISTING_BEGIN_V */
+template <typename KERNEL>
+double approxErrorLLR(const BiDirChebPartMat1D<KERNEL> &Mt) {
+  // **********************************************************************
+  // TODO
+  // *********************************************************************
+}
+/* SAM_LISTING_END_V */
+
+// Validation of implementation of local low-rank compression based on
+// bi-directional Chebychev interpolation
+bool validateLLR(unsigned int q);
+
+// Tabulate approximation errors
+void tabulateConvergenceLLR(std::vector<unsigned int> &&n,
+                            std::vector<unsigned int> &&q);
+
+// Measure runtimes
+void runtimeMatVec(std::vector<unsigned int> &&n);
 
 }  // namespace HMAT
 

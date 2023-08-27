@@ -121,6 +121,16 @@ void BlockPartition<Node, FFB, NFB>::buildRec(const Node *nx, const Node *ny,
 }
 /* SAM_LISTING_END_D */
 
+  // Computation of sparsity measure of a clustertree-based matrix partitioning
+  template <typename NODE, typename FFB, typename NFB>
+  unsigned int computeSparsityMeasure(const BlockPartition<NODE,FFB,NFB> &bockpart) {
+    unsigned int spm = 0;
+  // **********************************************************************
+  // TODO
+  // **********************************************************************
+    return spm;
+  }
+  
 template <class Node, typename FFB, typename NFB>
 std::ostream &operator<<(std::ostream &o,
                          const BlockPartition<Node, FFB, NFB> &bp) {
