@@ -27,7 +27,7 @@ Eigen::VectorXcd evalTrigPoly(const Eigen::VectorXcd &gamma,
 /* SAM_LISTING_END_2 */
 
 /* SAM_LISTING_BEGIN_3 */
-std::vector<unsigned int> checkX(const Eigen::VectorXcd &gamma, ,
+std::vector<unsigned int> checkX(const Eigen::VectorXcd &gamma,
                                  const Eigen::VectorXd &x, double tau) {
   // **********************************************************************
   // TODO

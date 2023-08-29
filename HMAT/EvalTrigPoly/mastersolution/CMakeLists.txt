@@ -1,1 +1,1 @@
-add_executable_advnumcse(exe evaltrigpoly_main.cpp evaltrigpoly.cpp)
+add_executable(exe evaltrigpoly_main.cpp evaltrigpoly.cpp)

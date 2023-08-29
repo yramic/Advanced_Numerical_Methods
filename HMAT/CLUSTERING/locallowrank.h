@@ -74,43 +74,43 @@ std::ostream &operator<<(std::ostream &o, const InterpNode<dim> &node) {
 
 /** Extended class for cluster trees for local low-rank approximation */
 /* SAM_LISTING_BEGIN_E */
-template <class Node>
-class LLRClusterTree : public ClusterTree<Node> {
+template <class NODE>
+class LLRClusterTree : public ClusterTree<NODE> {
  public:
   // Idle constructor just setting rank argument q
   explicit LLRClusterTree(size_t _q) : q(_q) {}
   // Actual constructor taking a sequence of points
-  void init(const std::vector<Point<Node::dim>> pts, std::size_t minpts = 1);
+  void init(const std::vector<Point<NODE::dim>> pts, std::size_t minpts = 1);
   virtual ~LLRClusterTree() = default;
 
  protected:
   // factory method for relevant type of node taking rank argument
-  virtual Node *createNode(const std::vector<Point<Node::dim>> pts, int dir) {
-    return new Node(pts, q, dir);
+  virtual NODE *createNode(const std::vector<Point<NODE::dim>> pts, int dir) {
+    return new NODE(pts, q, dir);
   }
 
  public:
   const std::size_t q;  // rank of separable approximation on cluster boxes
 };
 
-template <class Node>
-void LLRClusterTree<Node>::init(const std::vector<Point<Node::dim>> pts,
+template <class NODE>
+void LLRClusterTree<NODE>::init(const std::vector<Point<NODE::dim>> pts,
                                 std::size_t minpts) {
-  ClusterTree<Node>::init(pts, minpts);
+  ClusterTree<NODE>::init(pts, minpts);
 }
 /* SAM_LISTING_END_E */
 
 /** Type for far field cluster */
 /* SAM_LISTING_BEGIN_F */
-template <class Node, typename KERNEL>
-class BiDirChebInterpBlock : public IndexBlock<Node> {
+template <class NODE, typename KERNEL>
+class BiDirChebInterpBlock : public IndexBlock<NODE> {
  public:
   using kernel_t = KERNEL;
-  BiDirChebInterpBlock(const Node &_nx, const Node &_ny, KERNEL _Gfun,
+  BiDirChebInterpBlock(const NODE &_nx, const NODE &_ny, KERNEL _Gfun,
                        std::size_t _q);
   // Constructor that should not be called, needed to avoid compilation errors
-  BiDirChebInterpBlock(const Node &_nx, const Node &_ny)
-      : IndexBlock<Node>(_nx, _ny), q(0) {
+  BiDirChebInterpBlock(const NODE &_nx, const NODE &_ny)
+      : IndexBlock<NODE>(_nx, _ny), q(0) {
     throw std::runtime_error("Invalid constructor");
   }
   virtual ~BiDirChebInterpBlock() = default;
@@ -122,12 +122,12 @@ class BiDirChebInterpBlock : public IndexBlock<Node> {
 /* SAM_LISTING_END_F */
 
 /* SAM_LISTING_BEGIN_B */
-template <class Node, typename KERNEL>
-BiDirChebInterpBlock<Node, KERNEL>::BiDirChebInterpBlock(const Node &_nx,
-                                                         const Node &_ny,
+template <class NODE, typename KERNEL>
+BiDirChebInterpBlock<NODE, KERNEL>::BiDirChebInterpBlock(const NODE &_nx,
+                                                         const NODE &_ny,
                                                          KERNEL _Gfun,
                                                          std::size_t _q)
-    : IndexBlock<Node>(_nx, _ny), G(std::move(_Gfun)), q(_q) {
+    : IndexBlock<NODE>(_nx, _ny), G(std::move(_Gfun)), q(_q) {
   // **********************************************************************
   // TODO
   // **********************************************************************
@@ -136,14 +136,14 @@ BiDirChebInterpBlock<Node, KERNEL>::BiDirChebInterpBlock(const Node &_nx,
 
 /** General type for generic near-field cluster pair */
 /* SAM_LISTING_BEGIN_G */
-template <class Node, typename KERNEL>
-class NearFieldBlock : public IndexBlock<Node> {
+template <class NODE, typename KERNEL>
+class NearFieldBlock : public IndexBlock<NODE> {
  public:
   using kernel_t = KERNEL;
-  NearFieldBlock(const Node &nx, const Node &ny, KERNEL _Gfun);
+  NearFieldBlock(const NODE &nx, const NODE &ny, KERNEL _Gfun);
   // Constructor that should not be called, needed to avoid compilation errors
-  NearFieldBlock(const Node &_nx, const Node &_ny)
-      : IndexBlock<Node>(_nx, _ny) {
+  NearFieldBlock(const NODE &_nx, const NODE &_ny)
+      : IndexBlock<NODE>(_nx, _ny) {
     throw std::runtime_error("Invalid constructor");
   }
 
@@ -155,10 +155,10 @@ class NearFieldBlock : public IndexBlock<Node> {
 /* SAM_LISTING_END_G */
 
 /* SAM_LISTING_BEGIN_Q */
-template <class Node, typename KERNEL>
-NearFieldBlock<Node, KERNEL>::NearFieldBlock(const Node &_nx, const Node &_ny,
+template <class NODE, typename KERNEL>
+NearFieldBlock<NODE, KERNEL>::NearFieldBlock(const NODE &_nx, const NODE &_ny,
                                              KERNEL _Gfun)
-    : IndexBlock<Node>(_nx, _ny), G(std::move(_Gfun)) {
+    : IndexBlock<NODE>(_nx, _ny), G(std::move(_Gfun)) {
   // **********************************************************************
   // TODO
   // **********************************************************************
@@ -167,26 +167,26 @@ NearFieldBlock<Node, KERNEL>::NearFieldBlock(const Node &_nx, const Node &_ny,
 
 /** Extended class for block partition, knowing low-rank compression */
 /* SAM_LISTING_BEGIN_H */
-template <class Node, typename FFB, typename NFB>
-class BiDirChebBlockPartition : public BlockPartition<Node, FFB, NFB> {
+template <class NODE, typename FFB, typename NFB>
+class BiDirChebBlockPartition : public BlockPartition<NODE, FFB, NFB> {
  public:
   using kernel_t = typename NFB::kernel_t;
-  BiDirChebBlockPartition(std::shared_ptr<const LLRClusterTree<Node>> _xT,
-                          std::shared_ptr<const LLRClusterTree<Node>> _yT,
+  BiDirChebBlockPartition(std::shared_ptr<const LLRClusterTree<NODE>> _xT,
+                          std::shared_ptr<const LLRClusterTree<NODE>> _yT,
                           kernel_t _Gfun, std::size_t _q, double eta0 = 0.5)
-      : BlockPartition<Node, FFB, NFB>(_xT, _yT), G(_Gfun), q(_q) {
-    BlockPartition<Node, FFB, NFB>::init(eta0);
+      : BlockPartition<NODE, FFB, NFB>(_xT, _yT), G(_Gfun), q(_q) {
+    BlockPartition<NODE, FFB, NFB>::init(eta0);
   }
   virtual ~BiDirChebBlockPartition() = default;
 
  protected:
   // Construct an instance of far-field block type
-  virtual FFB makeFarFieldBlock(const Node &nx, const Node &ny) const {
+  virtual FFB makeFarFieldBlock(const NODE &nx, const NODE &ny) const {
     std::cout << "BiDirChebBlockPartition: makeFarFieldBlock" << std::endl;
     return FFB(nx, ny, G, q);
   }
   // Construct an instance of near-field block type
-  virtual NFB makeNearFieldBlock(const Node &nx, const Node &ny) const {
+  virtual NFB makeNearFieldBlock(const NODE &nx, const NODE &ny) const {
     std::cout << "BiDirChebBlockPartition: makeNearFieldBlock" << std::endl;
     return NFB(nx, ny, G);
   }
@@ -206,8 +206,8 @@ using BiDirChebPartMat1D = HMAT::BiDirChebBlockPartition<
 
 // Matrix x Vector based on compressed kernel collocation matrix
 /* SAM_LISTING_BEGIN_U */
-template <typename KERNEL>
-Eigen::VectorXd mvLLRPartMat(const BiDirChebPartMat1D<KERNEL> &Mt,
+template <typename PARTMAT1D>
+Eigen::VectorXd mvLLRPartMat(const PARTMAT1D &Mt,
                              const Eigen::VectorXd &x) {
   // **********************************************************************
   // TODO

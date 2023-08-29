@@ -20,24 +20,29 @@
 namespace HMAT {
 /** @brief Data structure for both far-field and near-field blocks */
 /* SAM_LISTING_BEGIN_9 */
-template <class Node>
+template <class NODE>
 struct IndexBlock {
+  using node_t = NODE;
+  constexpr static std::size_t dim = NODE::dim;
   // Constructors extracts indices from clusters
-  IndexBlock(const Node &_nx, const Node &_ny)
+  IndexBlock(const NODE &_nx, const NODE &_ny)
       : nx(_nx), ny(_ny), i_idx(_nx.I()), j_idx(ny.I()) {}
-  virtual ~IndexBlock() {}
-  const Node &nx, &ny;                     // contributing clusters
+  virtual ~IndexBlock() = default;
+  const NODE &nx, &ny;                     // contributing clusters
   const std::vector<size_t> i_idx, j_idx;  // contained indices
 };
 /* SAM_LISTING_END_9 */
 
 /* SAM_LISTING_BEGIN_A */
-template <class Node, typename FFB, typename NFB>
+template <class NODE, typename FFB, typename NFB>
 class BlockPartition {
  public:
+  using node_t = NODE;
+  using farfieldblock_t = FFB;
+  using nearfieldblock_t = NFB;
   // Idle constructor
-  BlockPartition(std::shared_ptr<const ClusterTree<Node>> _xT,
-                 std::shared_ptr<const ClusterTree<Node>> _yT)
+  BlockPartition(std::shared_ptr<const ClusterTree<NODE>> _xT,
+                 std::shared_ptr<const ClusterTree<NODE>> _yT)
       : xT(_xT), yT(_yT) {
     assertm((xT != nullptr), "No valid x-tree!");
     assertm((yT != nullptr), "No valid y-tree!");
@@ -47,54 +52,54 @@ class BlockPartition {
   void init(double eta0 = 0.5);
   virtual ~BlockPartition() {}
   // Admissibility condition \cob{$\adm$}, see \cref{def:ac}
-  virtual bool adm(const Node *nx, const Node *ny, double eta0) const;
+  virtual bool adm(const NODE *nx, const NODE *ny, double eta0) const;
 
  protected:
   // Recursive construction from cluster pair
-  virtual void buildRec(const Node *nx, const Node *ny, double eta0);
+  virtual void buildRec(const NODE *nx, const NODE *ny, double eta0);
   // Construct an instance of far-field block type
-  virtual FFB makeFarFieldBlock(const Node &nx, const Node &ny) const {
+  virtual FFB makeFarFieldBlock(const NODE &nx, const NODE &ny) const {
     return FFB(nx, ny);
   }
   // Construct an instance of near-field block type
-  virtual NFB makeNearFieldBlock(const Node &nx, const Node &ny) const {
+  virtual NFB makeNearFieldBlock(const NODE &nx, const NODE &ny) const {
     return NFB(nx, ny);
   }
 
  public:
-  std::shared_ptr<const ClusterTree<Node>> xT, yT;  // underlying cluster trees
+  std::shared_ptr<const ClusterTree<NODE>> xT, yT;  // underlying cluster trees
   std::vector<FFB> farField;   // index blocks in the far field
   std::vector<NFB> nearField;  // index blocks in the near field
   static bool dbg;             // Debugging flag
 };
 /* SAM_LISTING_END_A */
 
-template <class Node, typename FFB, typename NFB>
-bool BlockPartition<Node, FFB, NFB>::dbg = false;
+template <class NODE, typename FFB, typename NFB>
+bool BlockPartition<NODE, FFB, NFB>::dbg = false;
 
 /* SAM_LISTING_BEGIN_B */
-template <class Node, typename FFB, typename NFB>
-void BlockPartition<Node, FFB, NFB>::init(double eta0) {
+template <class NODE, typename FFB, typename NFB>
+void BlockPartition<NODE, FFB, NFB>::init(double eta0) {
   buildRec(xT->root, yT->root, eta0);
 }
 /* SAM_LISTING_END_B */
 
 /* SAM_LISTING_BEGIN_C */
-template <class Node, typename FFB, typename NFB>
-bool BlockPartition<Node, FFB, NFB>::adm(const Node *nx, const Node *ny,
+template <class NODE, typename FFB, typename NFB>
+bool BlockPartition<NODE, FFB, NFB>::adm(const NODE *nx, const NODE *ny,
                                          double eta0) const {
   // Neither node must be a leaf.
   if (nx->isLeaf() || ny->isLeaf()) return false;
   // Geometric admissibility condition, see \cref{eq:etadef}.
-  const BBox<Node::dim> Bx = nx->getBBox(), By = ny->getBBox();
+  const BBox<NODE::dim> Bx = nx->getBBox(), By = ny->getBBox();
   const double eta = std::max(Bx.diam(), By.diam()) / (2 * dist(Bx, By));
   return (eta < eta0);
 }
 /* SAM_LISTING_END_C */
 
 /* SAM_LISTING_BEGIN_D */
-template <class Node, typename FFB, typename NFB>
-void BlockPartition<Node, FFB, NFB>::buildRec(const Node *nx, const Node *ny,
+template <class NODE, typename FFB, typename NFB>
+void BlockPartition<NODE, FFB, NFB>::buildRec(const NODE *nx, const NODE *ny,
                                               double eta0) {
   if (nx && ny) {
     // Add admissible pair to far field

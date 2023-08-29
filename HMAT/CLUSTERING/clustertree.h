@@ -27,6 +27,7 @@ namespace HMAT {
 /* SAM_LISTING_BEGIN_1 */
 template <int DIM>  // dimension \cob{$d$} as template argument
 struct Point {
+  constexpr static std::size_t dim = DIM;
   std::size_t idx;                  // number of collocation point
   Eigen::Matrix<double, DIM, 1> x;  // coordinate vector
 };
@@ -40,6 +41,7 @@ struct Point {
 /* SAM_LISTING_BEGIN_2 */
 template <int DIM>  // dimension \cob{$d$} as template argument
 struct BBox {
+  constexpr static std::size_t dim = DIM;
   // Bounding box from sequence of points
   explicit BBox(const std::vector<Point<DIM>> pts);
   // Size \cob{$\diam(B)$} of a bounding box
@@ -171,10 +173,11 @@ std::ostream &operator<<(std::ostream &o, const CtNode<dim> &node) {
    @tparam Node Data type for a single node, see CtNode
 */
 /* SAM_LISTING_BEGIN_5 */
-template <class Node>
+template <class NODE>
 class ClusterTree {
  public:
-  constexpr static std::size_t dim = Node::dim;  // space dimension d
+  using node_t = NODE; 
+  constexpr static std::size_t dim = NODE::dim;  // space dimension d
   // Idle constructor
   ClusterTree() : root(nullptr) {}
   // Effective Constructor taking a sequence of points
@@ -190,20 +193,20 @@ class ClusterTree {
 
  protected:
   // Recursive construction
-  virtual void buildRec(Node *nptr, std::size_t minpts);
+  virtual void buildRec(NODE *nptr, std::size_t minpts);
   // Node factory
-  virtual Node *createNode(const std::vector<Point<dim>> pts, int dir) {
-    return new Node(pts, dir);
+  virtual NODE *createNode(const std::vector<Point<dim>> pts, int dir) {
+    return new NODE(pts, dir);
   }
 
  public:
-  Node *root;  // pointer to root node
+  NODE *root;  // pointer to root node
 };
 /* SAM_LISTING_END_5 */
 
 /* SAM_LISTING_BEGIN_6 */
-template <class Node>
-void ClusterTree<Node>::init(const std::vector<Point<dim>> &pts,
+template <class NODE>
+void ClusterTree<NODE>::init(const std::vector<Point<dim>> &pts,
                              std::size_t minpts) {
   if (!(root = createNode(pts, 0))) {
     throw(std::runtime_error("Cannot allocate root"));
@@ -215,14 +218,14 @@ void ClusterTree<Node>::init(const std::vector<Point<dim>> &pts,
 }
 /* SAM_LISTING_END_6 */
 
-template <class Node>
-std::ostream &operator<<(std::ostream &o, const ClusterTree<Node> &T) {
+template <class NODE>
+std::ostream &operator<<(std::ostream &o, const ClusterTree<NODE> &T) {
   return o << "ROOT: " << *(T.root) << "END CLUSTER TREE" << std::endl;
 }
 
 /* SAM_LISTING_BEGIN_7 */
-template <class Node>
-void ClusterTree<Node>::buildRec(Node *nptr, std::size_t minpts) {
+template <class NODE>
+void ClusterTree<NODE>::buildRec(NODE *nptr, std::size_t minpts) {
   const std::size_t n = nptr->pts.size();  // Number of held indices
   // Leaf, if minimal number of indices reached
   if (n > minpts) {  // \Label[line]{brc:1}

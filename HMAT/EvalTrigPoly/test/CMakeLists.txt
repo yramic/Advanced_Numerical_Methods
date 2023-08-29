@@ -1,1 +1,1 @@
-add_executable_advnumcse(exe evaltrigpoly_test.cpp evaltrigpoly.cpp)
+add_executable(test evaltrigpoly_test.cpp ../mastersolution/evaltrigpoly.cpp)
