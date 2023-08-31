@@ -1,187 +1,75 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.10)
 
-project(AdvNumCSE)
+include("cmake/HunterGate.cmake")
+HunterGate(
+    URL "https://github.com/cpp-pm/hunter/archive/v0.23.321.tar.gz"
+    SHA1 "5e53cbb0429037ea8e2592bfd92704b8ff3ab492"
+    LOCAL
+)
 
-###########################################################################
-#
-# INCLUDE MODULES AND FUNCTIONS FOR CMAKE
-#
-###########################################################################
+project(ADVNUMCSE)
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
-include(${CMAKE_SOURCE_DIR}/cmake/functions/add_all_subdirectories.cmake)
-include(${CMAKE_SOURCE_DIR}/cmake/functions/add_executable_advnumcse.cmake)
-include(${CMAKE_SOURCE_DIR}/cmake/functions/add_executable_advnumcse_betl2.cmake)
-include(${CMAKE_SOURCE_DIR}/cmake/functions/get_target_name_advnumcse.cmake)
+message("Project source dir =" "${PROJECT_SOURCE_DIR}")
+message("Project binary dir =" "${PROJECT_BINARY_DIR}")
 
-###########################################################################
-#
-# COMPILATION SETTINGS
-#
-###########################################################################
-
-# DISALLOW IN-SOURCE BUILD
-###########################################################################
-if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
-    message(FATAL_ERROR "Use an out of source build. Create a separate binary directory and run CMake there.")
-endif("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
-
-# STORE BINARIES IN ./bin
-#(else CMake cannot find files to link for automatic targets)
-###########################################################################
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
-
-# SET DEFAULT BUILD TYPE
-###########################################################################
-if( NOT CMAKE_BUILD_TYPE )
-    message(STATUS "No build type selected. Default to Debug")
-    set(CMAKE_BUILD_TYPE "Debug")
+# Check that this is not an in-source build:
+if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
+   message(SEND_ERROR "In-source builds are not allowed.")
 endif()
 
-# COMPILATION FLAGS
-###########################################################################
+#setup compiler
 set(CMAKE_CXX_STANDARD 17)
 
-# IGNORE WARNINGS
-###########################################################################
+#enable warnings
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG(-Wall COMPILER_SUPPORTS_WALL)
+CHECK_CXX_COMPILER_FLAG(-Wextra COMPILER_SUPPORTS_WEXTRA)
+CHECK_CXX_COMPILER_FLAG(-Wconversion COMPILER_SUPPORTS_WCONVERSION)
 
-if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-    add_definitions(-Wno-deprecated-register -Wno-return-type-c-linkage -Wno-keyword-macro -Wno-missing-braces)
+add_library(warning_flags INTERFACE)
+if(COMPILER_SUPPORTS_WALL)
+  target_compile_options(warning_flags INTERFACE -Wall)
+endif()
+if(COMPILER_SUPPORTS_WEXTRA)
+  target_compile_options(warning_flags INTERFACE -Wextra)
+endif()
+if(COMPILER_SUPPORTS_WCONVERSION)
+  target_compile_options(warning_flags INTERFACE -Wconversion)
 endif()
 
-if("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
-    add_definitions(-Wno-deprecated-declarations -Wno-ignored-attributes -Wno-misleading-indentation -Wno-unknown-pragmas)
+# Add switches
+###############################################################################
+option(LECTURECODES "usage: cmake -DLECTURECODES=ON/OFF .." ON)
+message(STATUS "LECTURECODES ${LECTURECODES}")
+
+option(MASTERSOLUTION "usage: cmake -DMASTERSOLUTION=ON/OFF .." ON)
+message(STATUS "MASTERSOLUTION ${MASTERSOLUTION}")
+
+option(MYSOLUTION "usage: cmake -DMYSOLUTION=ON/OFF .." ON)
+message(STATUS "MYSOLUTION ${MYSOLUTION}")
+
+# Get Dependencies
+# (don't forget to update cmake/Config.cmake.in !
+###############################################################################
+# Get Eigen
+hunter_add_package(Eigen)
+find_package(Eigen3 CONFIG REQUIRED)
+
+# Get LehrFEMpp
+hunter_add_package(lehrfempp)
+find_package(lehrfempp CONFIG REQUIRED)
+
+# Get Google Test
+hunter_add_package(GTest)
+find_package(GTest CONFIG REQUIRED)
+
+# Get some boost program options if LectureCodes are enabled:
+if(LECTURECODES)
+  hunter_add_package(Boost COMPONENTS program_options)
+  find_package(Boost CONFIG REQUIRED program_options)
 endif()
 
-###########################################################################
-#
-# FIND DEPENDENCIES
-#
-###########################################################################
 
-# FIND EIGEN
-###########################################################################
 
-include(${CMAKE_SOURCE_DIR}/cmake/functions/GetEIGEN3.cmake)
-add_definitions(-DEIGEN3_ACTIVATED)
-
-###########################################################################
-#
-# INCLUDE DIRECTORIES
-#
-###########################################################################
-# include_directories("BEM/CppHilbert/Library")
-# include_directories("third_party")
-
-###########################################################################
-#
-# BETL AND ETHGENERICGRID
-#
-###########################################################################
-
-# SAFETY CHECKUPS
-###########################################################################
-
-# There is too much hassle handling these corner cases, so we just require the
-# people who have Betl installed to undefine these
-# if (DEFINED ENV{ETH_ROOT})
-#  message(FATAL_ERROR "EE: Environment variable ETH_ROOT found. Please unset using\n    unset ETH_ROOT")
-# endif()
-
-# if (DEFINED ENV{BETL2_ROOT})
-#  message(FATAL_ERROR "EE: Environment variable BETL2_ROOT found. Please unset using\n    unset BETL2_ROOT")
-# endif()
-
-# Make sure they have checked out the repository
-# if (NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/Betl2/CMakeLists.txt)
-#  message(FATAL_ERROR "You have not downloaded the Betl2 submodule. Please do\n    git submodule update --init --recursive\n\nRemember you have to have a gitlab.math.ethz.ch account for this. Go to https://www.gitlab.math.ethz.ch and log in to get an account, then send an email to the organizers to get access.")
-# endif()
-
-# if (NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/Betl2/3rd_Party/ethGenericGrid/CMakeLists.txt)
-#  message(FATAL_ERROR "You have not downloaded the ethGenericGrid submodule. Please do\n    git submodule update --init --recursive\nRemember you have to have a gitlab.math.ethz.ch account for this. Go to https://www.gitlab.math.ethz.ch and log in to get an account, then send an email to the organizers to get access.")
-# endif()
-
-# set(ETH_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/ethGenericGrid_install/include)
-# set(ETH_LIBRARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/ethGenericGrid_install/lib)
-
-# ETH GENERIC GRID
-###########################################################################
-# ExternalProject_Add(
-#     ethGenericGrid
-#     SOURCE_DIR ${PROJECT_SOURCE_DIR}/third_party/Betl2/3rd_Party/ethGenericGrid
-#     INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/ethGenericGrid_install
-#     CMAKE_ARGS ${EXTERNAL_PROJECT_CMAKE_ARGS_PREFIX} -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/ethGenericGrid_install -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/Eigen_install -DETH_ROOT=${CMAKE_CURRENT_BINARY_DIR}/ethGenericGrid_install -DCMAKE_INCLUDE_DIRECTORIES_BEFORE=${NUMPDE_INCLUDE_DIRECTORIES_BEFORE}
-# )
-
-# add_dependencies(ethGenericGrid Eigen)
-
-# BETL2
-###########################################################################
-# ExternalProject_Add(
-#     Betl2
-#     SOURCE_DIR ${PROJECT_SOURCE_DIR}/third_party/Betl2/Library
-#     CMAKE_ARGS ${EXTERNAL_PROJECT_CMAKE_ARGS_PREFIX} -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/betl2_install
-#     -DETH_INCLUDE_DIRS=${ETH_INCLUDE_DIRS}/eth ${CMAKE_BINARY_DIR}/Eigen_install/include -DETH_BASE_LIB=${ETH_LIBRARY_DIR} -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/betl2_install -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/Eigen_install -DETH_ROOT=${CMAKE_CURRENT_BINARY_DIR}/ethGenericGrid_install
-# -DCMAKE_INCLUDE_DIRECTORIES_BEFORE=${NUMPDE_INCLUDE_DIRECTORIES_BEFORE}
-#     )
-# add_dependencies(Betl2 ethGenericGrid)
-# add_dependencies(Betl2 Eigen)
-
-# include_directories(${ETH_INCLUDE_DIRS} ${ETH_INCLUDE_DIRS}/eth)
-# include_directories(${CMAKE_CURRENT_BINARY_DIR}/betl2_install/include)
-# link_directories(${ETH_LIBRARY_DIR})
-# link_directories(${CMAKE_CURRENT_BINARY_DIR}/betl2_install/lib)
-
-find_package(Boost REQUIRED COMPONENTS program_options)
-if (${Boost_MAJOR_VERSION} VERSION_LESS 1 OR ${Boost_MINOR_VERSION} VERSION_LESS 58)
-  message(STATUS "Downloading odeint, since boost version too old.")
-  ExternalProject_Add(
-    ODEINT
-    URL https://github.com/headmyshoulder/odeint-v2/archive/v2.6_boost1.60.zip
-    SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/odeint_source
-    INSTALL_COMMAND  ""
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND ""
-    )
-  include_directories (${CMAKE_CURRENT_BINARY_DIR}/odeint_source/include)
-else()
-  add_custom_target(ODEINT) # dependency dummy
-endif()
-# Ugly fix errors with boost versions lower then 1.66
-if(${Boost_MAJOR_VERSION} VERSION_LESS 1 OR ${Boost_MINOR_VERSION} VERSION_LESS 66)
-  message("Boost version to old to contain chebyshev interpolation. Downloading manually")
-  file(DOWNLOAD "https://raw.githubusercontent.com/boostorg/math/develop/include/boost/math/special_functions/chebyshev.hpp" "boost_missing/boost/math/special_functions/chebyshev.hpp")
-  include_directories("${CMAKE_CURRENT_BINARY_DIR}/boost_missing")
-endif()
-include_directories (${Boost_INCLUDE_DIRS})
-message(${Boost_INCLUDE_DIRS})
-
-# set(BETL2_LIBRARIES bem_integration
-# cmdl_parser
-# fe
-# functional
-# fundsol
-# gmsh_input
-# grid
-# hypre_bindings
-# material
-# petsc_bindings
-# utils
-# vtu_exporter
-# eth_eth_base
-# eth_interface
-# ${ETH_LIBRARIES}
-# ${Boost_LIBRARIES}
-# )
-
-###########################################################################
-#
-# ADD SUBDIRECTORIES
-#
-###########################################################################
-
-# add_subdirectory(BEM)
-add_subdirectory(HMAT)
-add_subdirectory(CONVQUAD)
-#add_subdirectory(AMG)
-
+# Add subdirectories
+add_subdirectory(DUMMYCHAPTER)

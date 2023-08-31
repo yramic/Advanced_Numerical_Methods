@@ -1,0 +1,9 @@
+{
+  "working_dir" : "./",
+  "source_dir" : "../",
+
+  "Problems" :
+  [
+    "DUMMYCHAPTER/UpwindQuadrature"
+  ]
+}

@@ -9,7 +9,7 @@ endmacro(LIST_REPLACE)
 # note: install rpath is disabled for now since this is only required for relocatable binaries
 
 macro(add_executable_advnumcse _name)
-    # cmake targets need to be unique
+    # cmake_old targets need to be unique
     # as such we prepend a prefix from the source path
     # all of this is done by get_executable_name_advnumcse
     get_target_name_advnumcse(${_name} target_name)
