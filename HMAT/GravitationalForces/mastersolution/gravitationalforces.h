@@ -100,6 +100,9 @@ class StarQuadTreeClustering : public StarQuadTree {
 std::vector<double> forceError(const StarQuadTreeClustering &qt,
                                const std::vector<double> &etas);
 
+// Runtime measurements
+std::pair<double, double> measureRuntimes(unsigned int n);
+
 }  // namespace GravitationalForces
 
 // Code demonstrating how to measure runtimes
