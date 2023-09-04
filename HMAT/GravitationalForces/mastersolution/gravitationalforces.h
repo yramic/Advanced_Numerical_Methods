@@ -19,6 +19,10 @@
 
 #define assertm(exp, msg) assert(((void)msg, exp))
 
+// Defines how many times the same method should be called for timing reasons.
+// Set to 0, if no timings are required.
+constexpr unsigned int TIMING_MODE = 5;
+
 namespace GravitationalForces {
 
 /** @brief Random distribution of mass points in the unit square;
@@ -51,9 +55,10 @@ class StarQuadTree {
  protected:
   struct StarQuadTreeNode {
     // Constructor: does the recursive construction of the quadtree
-    StarQuadTreeNode(std::vector<unsigned int> star_idx,
+    StarQuadTreeNode(std::vector<unsigned int> star_idx, Eigen::Matrix2d bbox,
                      const StarQuadTree &tree);
     virtual ~StarQuadTreeNode() = default;
+    bool isLeaf() const;
     std::vector<unsigned int> star_idx_;  // Indices of stars in sub-cluster
     Eigen::Matrix2d bbox_;                // Bounding box of sub-cluster
     Eigen::Vector2d center;               // Center of gravity of sub-cluster
@@ -61,9 +66,10 @@ class StarQuadTree {
     // Pointers to children nodes
     std::array<std::unique_ptr<StarQuadTreeNode>, 4> sons_{nullptr};
   };
-  const int n;                              // Total number of stars
-  std::unique_ptr<StarQuadTreeNode> root_;  // Root node
+
  public:
+  const int n;                                  // Total number of stars
+  std::unique_ptr<StarQuadTreeNode> root_;      // Root node
   const std::vector<Eigen::Vector2d> starpos_;  // "Point star" positions
   const std::vector<double> starmasses_;        // Star masses
 };
