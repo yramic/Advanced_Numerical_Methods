@@ -6,7 +6,7 @@
  * @copyright Developed at SAM, ETH Zurich
  */
 
-#include "../mastersolution/tensorproductchebintp.h"
+#include "../tensorproductchebintp.h"
 
 #include <gtest/gtest.h>
 

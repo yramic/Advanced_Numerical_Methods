@@ -39,6 +39,9 @@ endif()
 
 # Add switches
 ###############################################################################
+option(LEHRFEM "usage: cmake -DLEHRFEM=ON/OFF .." OFF)
+message(STATUS "LEHRFEM ${LEHRFEM}")
+
 option(LECTURECODES "usage: cmake -DLECTURECODES=ON/OFF .." ON)
 message(STATUS "LECTURECODES ${LECTURECODES}")
 
@@ -56,9 +59,10 @@ hunter_add_package(Eigen)
 find_package(Eigen3 CONFIG REQUIRED)
 
 # Get LehrFEMpp
-hunter_add_package(lehrfempp)
-find_package(lehrfempp CONFIG REQUIRED)
-
+if(LEHRFEM)
+  hunter_add_package(lehrfempp)
+  find_package(lehrfempp CONFIG REQUIRED)
+endif()
 # Get Google Test
 hunter_add_package(GTest)
 find_package(GTest CONFIG REQUIRED)
@@ -72,4 +76,8 @@ endif()
 
 
 # Add subdirectories
-add_subdirectory(DUMMYCHAPTER)
+if(LEHRFEM)
+  add_subdirectory(DUMMYCHAPTER)
+endif()
+
+add_subdirectory(HMAT)

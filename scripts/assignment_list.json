@@ -4,6 +4,7 @@
 
   "Problems" :
   [
-    "DUMMYCHAPTER/UpwindQuadrature"
+    "DUMMYCHAPTER/UpwindQuadrature",
+    "HMAT/TensorProductChebIntp"
   ]
 }
