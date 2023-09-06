@@ -58,7 +58,7 @@ class StarQuadTree {
     StarQuadTreeNode(std::vector<unsigned int> star_idx, Eigen::Matrix2d bbox,
                      const StarQuadTree &tree);
     virtual ~StarQuadTreeNode() = default;
-    bool isLeaf() const;
+    inline bool isLeaf() const { return this->star_idx_.size() == 1; }
     std::vector<unsigned int> star_idx_;  // Indices of stars in sub-cluster
     Eigen::Matrix2d bbox_;                // Bounding box of sub-cluster
     Eigen::Vector2d center;               // Center of gravity of sub-cluster
