@@ -162,7 +162,9 @@ StarQuadTreeClustering::StarQuadTreeClustering(
 // TODO: Implementation of distance is not correct
 bool StarQuadTreeClustering::isAdmissible(const StarQuadTreeNode &node,
                                           Eigen::Vector2d p, double eta) const {
-  if (node.isLeaf()) return true;  // Leafs are admissible
+  if (node.isLeaf()) {
+    return node.center != p;  // Leafs (except self-leafs) are admissible
+  }
 
   // @ToDo This line is called four times, once for each brother with same diam.
   // Make a struct for bbox to avoid multiple computations of same diam.
@@ -178,7 +180,6 @@ bool StarQuadTreeClustering::isAdmissible(const StarQuadTreeNode &node,
   if (tmp > dist) dist = tmp;  // Corner point 4
 
   return (dist > eta * diam);  // Admissibility condition
-
 }
 /* SAM_LISTING_END_5 */
 
@@ -193,12 +194,7 @@ Eigen::Vector2d StarQuadTreeClustering::forceOnStar(unsigned int j,
   std::function<void(const std::unique_ptr<StarQuadTreeNode> &)> traverse =
       [&](const std::unique_ptr<StarQuadTreeNode> &node) {
         if (!node) return;  // In case if the cluster has no stars in it
-        // @ToDo check this with boss. Point p is considered not admissible, if
-        // it lies itself in the current subcluster.
-        // Alternatively, check at least the following condition:
-        // node->star_idx_[0] != j (if node is a Leaf, its star cannot be x^j!)
-        if (!std::count(node->star_idx_.begin(), node->star_idx_.end(), j) &&
-            isAdmissible(*node, starpos_[j], eta)) {
+        if (isAdmissible(*node, starpos_[j], eta)) {
           diff_masspositions = node->center - starpos_[j];
           acc += diff_masspositions * node->mass /
                  pow(diff_masspositions.norm(), 3);
@@ -222,46 +218,14 @@ std::vector<double> forceError(const StarQuadTreeClustering &qt,
   std::vector<double> error(etas.size());
   std::vector<Eigen::Vector2d> exact_forces;
 
-  // time the evaluation of computeForces_direct
-  if constexpr (TIMING_MODE > 0) {
-    auto t1 = std::chrono::high_resolution_clock::now();
-    for (unsigned int trange = 0; trange < TIMING_MODE; trange++) {
-      exact_forces = computeForces_direct(qt.starpos_, qt.starmasses_);
-    }
-    auto t2 = std::chrono::high_resolution_clock::now();
-    /* Getting number of milliseconds as a double. */
-    std::chrono::duration<double, std::milli> ms_double =
-        (t2 - t1) / TIMING_MODE;
-    std::cout << "Runtime computeForces_direct= " << ms_double.count()
-              << "ms\n";
-  } else {  // evaluate computeForces_direct without timings
-    exact_forces = computeForces_direct(qt.starpos_, qt.starmasses_);
-  }
+  exact_forces = computeForces_direct(qt.starpos_, qt.starmasses_);
 
   std::vector<double> normed_errors(qt.n);
   for (int eta_i = 0; eta_i < etas.size(); eta_i++) {
-    if constexpr (TIMING_MODE > 0) {  // compute and time forceOnStar
-      auto t1 = std::chrono::high_resolution_clock::now();
-      for (unsigned int trange = 0; trange < TIMING_MODE; trange++) {
-        for (unsigned int j = 0; j < qt.n; j++) {
-          normed_errors[j] =
-              (exact_forces[j] - qt.forceOnStar(j, etas[eta_i])).norm();
-        }
-      }
-      auto t2 = std::chrono::high_resolution_clock::now();
-      /* Getting number of milliseconds as a double. */
-      std::chrono::duration<double, std::milli> ms_double =
-          (t2 - t1) / TIMING_MODE;
-      std::cout << "Runtime forceOnStar[eta=" << etas[eta_i]
-                << "]= " << ms_double.count() << "ms\n";
-    } else {  // compute forceOnStar without timings
-      for (unsigned int j = 0; j < qt.n; j++) {
-        normed_errors[j] =
-            (exact_forces[j] - qt.forceOnStar(j, etas[eta_i])).norm();
-        // std::cout<<"Normed error "<<j<<": "<<normed_errors[j]<<std::endl;
-      }
+    for (unsigned int j = 0; j < qt.n; j++) {
+      normed_errors[j] =
+          (exact_forces[j] - qt.forceOnStar(j, etas[eta_i])).norm();
     }
-
     error[eta_i] =
         *std::max_element(normed_errors.begin(), normed_errors.end());
   }
@@ -270,15 +234,50 @@ std::vector<double> forceError(const StarQuadTreeClustering &qt,
 }
 /* SAM_LISTING_END_7 */
 
-/* SAM_LISTING_BEGIN_Y */
-std::pair<double, double> measureRuntimes(unsigned int n) {
-  // TO BE SUPPLEMENTED
+/* SAM_LISTING_BEGIN_8 */
+std::vector<double> measureRuntimes(const StarQuadTreeClustering &qt,
+                                    const std::vector<double> &etas,
+                                    unsigned int n) {
+  if (n <= 0) return forceError(qt, etas);
+
+  std::vector<double> error(etas.size());
+  std::vector<Eigen::Vector2d> exact_forces;
+
+  auto t1 = std::chrono::high_resolution_clock::now();
+  for (unsigned int trange = 0; trange < n; trange++) {
+    exact_forces = computeForces_direct(qt.starpos_, qt.starmasses_);
+  }
+  auto t2 = std::chrono::high_resolution_clock::now();
+  /* Getting number of milliseconds as a double. */
+  std::chrono::duration<double, std::milli> ms_double = (t2 - t1) / n;
+  std::cout << "Runtime computeForces_direct= " << ms_double.count() << "ms\n";
+
+  std::vector<double> normed_errors(qt.n);
+  for (int eta_i = 0; eta_i < etas.size(); eta_i++) {
+    auto t1 = std::chrono::high_resolution_clock::now();
+    for (unsigned int trange = 0; trange < n; trange++) {
+      for (unsigned int j = 0; j < qt.n; j++) {
+        normed_errors[j] =
+            (exact_forces[j] - qt.forceOnStar(j, etas[eta_i])).norm();
+      }
+    }
+    auto t2 = std::chrono::high_resolution_clock::now();
+    /* Getting number of milliseconds as a double. */
+    std::chrono::duration<double, std::milli> ms_double = (t2 - t1) / n;
+    std::cout << "Runtime forceOnStar[eta=" << etas[eta_i]
+              << "]= " << ms_double.count() << "ms\n";
+
+    error[eta_i] =
+        *std::max_element(normed_errors.begin(), normed_errors.end());
+  }
+
+  return error;
 }
-/* SAM_LISTING_END_Y */
+/* SAM_LISTING_END_8 */
 
 }  // namespace GravitationalForces
 
-/* SAM_LISTING_BEGIN_8 */
+/* SAM_LISTING_BEGIN_9 */
 void runtimemeasuredemo(void) {
   auto t1 = std::chrono::high_resolution_clock::now();
   double s = 0.0;
@@ -290,4 +289,4 @@ void runtimemeasuredemo(void) {
   std::chrono::duration<double, std::milli> ms_double = t2 - t1;
   std::cout << "Runtime = " << ms_double.count() << "ms\n";
 }
-/* SAM_LISTING_END_8 */
+/* SAM_LISTING_END_9 */

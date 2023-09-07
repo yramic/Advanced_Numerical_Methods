@@ -19,10 +19,6 @@
 
 #define assertm(exp, msg) assert(((void)msg, exp))
 
-// Defines how many times the same method should be called for timing reasons.
-// Set to 0, if no timings are required.
-constexpr unsigned int TIMING_MODE = 5;
-
 namespace GravitationalForces {
 
 /** @brief Random distribution of mass points in the unit square;
@@ -101,7 +97,9 @@ std::vector<double> forceError(const StarQuadTreeClustering &qt,
                                const std::vector<double> &etas);
 
 // Runtime measurements
-std::pair<double, double> measureRuntimes(unsigned int n);
+std::vector<double> measureRuntimes(const StarQuadTreeClustering &qt,
+                                    const std::vector<double> &etas,
+                                    unsigned int n);
 
 }  // namespace GravitationalForces
 

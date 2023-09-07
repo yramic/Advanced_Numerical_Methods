@@ -6,13 +6,34 @@
  * @ copyright Developed at SAM, ETH Zurich
  */
 
+#include <string_view>
+
 #include "gravitationalforces.h"
 
 using namespace GravitationalForces;
+using namespace std::literals;
 
-int main(int /*argc*/, char ** /*argv*/) {
-  // Initialize 100 stars
-  const int n = 320;
+int main(int argc, char **argv) {
+  // default number of stars (can be adjusted using args "-n", "-s" or,
+  // "-stars")
+  unsigned int n = 320;
+
+  // default mode (can be adjusted using args "-t", "-timing" or "-e", "-error")
+  unsigned int timing_mode = 0;
+
+  if (argc > 2) {
+    for (int i = 1; i < argc; i += 2) {
+      if (argv[i] == "-n"sv || argv[i] == "-s"sv || argv[i] == "-stars"sv) {
+        n = strtol(argv[i + 1], nullptr, 0);
+      }
+      if (argv[i] == "-t"sv || argv[i] == "-e"sv || argv[i] == "-timing"sv ||
+          argv[i] == "-error"sv) {
+        timing_mode = strtol(argv[i + 1], nullptr, 0);
+      }
+    }
+  }
+
+  // Initialize stars
   std::vector<Eigen::Vector2d> pos = GravitationalForces::initStarPositions(n);
   const std::vector<double> mass(n, 1.0);
 
@@ -105,7 +126,7 @@ int main(int /*argc*/, char ** /*argv*/) {
   // Work with a single eta or comment out the following single line
   // etas.clear(); etas.push_back(1);
 
-  etas = forceError(*clustering, etas);
+  etas = measureRuntimes(*clustering, etas, timing_mode);
 
   std::cout << std::endl << "Errors(eta): ";
   std::stringstream ss;
