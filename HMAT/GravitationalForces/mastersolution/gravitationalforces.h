@@ -19,10 +19,6 @@
 
 #define assertm(exp, msg) assert(((void)msg, exp))
 
-// Defines how many times the same method should be called for timing reasons.
-// Set to 0, if no timings are required.
-constexpr unsigned int TIMING_MODE = 5;
-
 namespace GravitationalForces {
 
 /** @brief Random distribution of mass points in the unit square;
@@ -58,7 +54,7 @@ class StarQuadTree {
     StarQuadTreeNode(std::vector<unsigned int> star_idx, Eigen::Matrix2d bbox,
                      const StarQuadTree &tree);
     virtual ~StarQuadTreeNode() = default;
-    bool isLeaf() const;
+    inline bool isLeaf() const { return this->star_idx_.size() == 1; }
     std::vector<unsigned int> star_idx_;  // Indices of stars in sub-cluster
     Eigen::Matrix2d bbox_;                // Bounding box of sub-cluster
     Eigen::Vector2d center;               // Center of gravity of sub-cluster
@@ -101,7 +97,9 @@ std::vector<double> forceError(const StarQuadTreeClustering &qt,
                                const std::vector<double> &etas);
 
 // Runtime measurements
-std::pair<double, double> measureRuntimes(unsigned int n);
+std::vector<double> measureRuntimes(const StarQuadTreeClustering &qt,
+                                    const std::vector<double> &etas,
+                                    unsigned int n);
 
 }  // namespace GravitationalForces
 
