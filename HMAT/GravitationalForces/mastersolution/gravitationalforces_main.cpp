@@ -126,7 +126,7 @@ int main(int argc, char **argv) {
   // Work with a single eta or comment out the following single line
   // etas.clear(); etas.push_back(1);
 
-  etas = measureRuntimes(*clustering, etas, timing_mode);
+  auto [ms_exact, ms_cluster] = measureRuntimes(1000);
 
   std::cout << std::endl << "Errors(eta): ";
   std::stringstream ss;
