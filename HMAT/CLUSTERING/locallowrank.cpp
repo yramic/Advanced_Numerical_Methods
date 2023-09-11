@@ -11,4 +11,30 @@
 
 #include "locallowrank.h"
 
-namespace HMAT {}  // namespace HMAT
+namespace HMAT {
+/* SAM_LISTING_BEGIN_1 */
+bool validateLLR(unsigned int q) {
+  // **********************************************************************
+  // TODO
+  // **********************************************************************
+}
+/* SAM_LISTING_END_1 */
+
+/* SAM_LISTING_BEGIN_2 */
+void tabulateConvergenceLLR(std::vector<unsigned int> &&n,
+                            std::vector<unsigned int> &&q) {
+  // **********************************************************************
+  // TODO
+  // **********************************************************************
+}
+/* SAM_LISTING_END_2 */
+
+/* SAM_LISTING_BEGIN_3 */
+void runtimeMatVec(std::vector<unsigned int> &&n) {
+  // **********************************************************************
+  // TODO
+  // **********************************************************************
+}
+/* SAM_LISTING_END_3 */
+
+}  // namespace HMAT

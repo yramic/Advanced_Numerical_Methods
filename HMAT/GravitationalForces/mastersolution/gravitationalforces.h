@@ -51,9 +51,10 @@ class StarQuadTree {
  protected:
   struct StarQuadTreeNode {
     // Constructor: does the recursive construction of the quadtree
-    StarQuadTreeNode(std::vector<unsigned int> star_idx,
+    StarQuadTreeNode(std::vector<unsigned int> star_idx, Eigen::Matrix2d bbox,
                      const StarQuadTree &tree);
     virtual ~StarQuadTreeNode() = default;
+    inline bool isLeaf() const { return this->star_idx_.size() == 1; }
     std::vector<unsigned int> star_idx_;  // Indices of stars in sub-cluster
     Eigen::Matrix2d bbox_;                // Bounding box of sub-cluster
     Eigen::Vector2d center;               // Center of gravity of sub-cluster
@@ -61,9 +62,10 @@ class StarQuadTree {
     // Pointers to children nodes
     std::array<std::unique_ptr<StarQuadTreeNode>, 4> sons_{nullptr};
   };
-  const int n;                              // Total number of stars
-  std::unique_ptr<StarQuadTreeNode> root_;  // Root node
+
  public:
+  const int n;                                  // Total number of stars
+  std::unique_ptr<StarQuadTreeNode> root_;      // Root node
   const std::vector<Eigen::Vector2d> starpos_;  // "Point star" positions
   const std::vector<double> starmasses_;        // Star masses
 };
@@ -93,6 +95,11 @@ class StarQuadTreeClustering : public StarQuadTree {
 
 std::vector<double> forceError(const StarQuadTreeClustering &qt,
                                const std::vector<double> &etas);
+
+// Runtime measurements
+std::vector<double> measureRuntimes(const StarQuadTreeClustering &qt,
+                                    const std::vector<double> &etas,
+                                    unsigned int n);
 
 }  // namespace GravitationalForces
 
