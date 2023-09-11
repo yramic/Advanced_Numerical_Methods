@@ -1,2 +1,1 @@
-add_subdirectory(mastersolution)
-add_subdirectory(test)
+include(../build.cmake)

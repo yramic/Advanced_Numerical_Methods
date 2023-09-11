@@ -7,6 +7,6 @@
  */
 
 #include <gtest/gtest.h>
-#include "../mastersolution/kernmatllrapprox.h"
+#include "../kernmatllrapprox.h"
 
 namespace KernMatLLRApprox::test {}  // namespace KernMatLLRApprox::test
