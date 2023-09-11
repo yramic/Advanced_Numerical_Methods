@@ -1,1 +1,1 @@
-add_subdirectory(mastersolution)
+include(../build.cmake)

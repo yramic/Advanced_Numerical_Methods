@@ -6,7 +6,7 @@
  * @copyright Developed at SAM, ETH Zurich
  */
 
-#include <Eigen/Dense>
+#include  <Eigen/Dense>
 #include <iomanip>
 #include <iostream>
 
