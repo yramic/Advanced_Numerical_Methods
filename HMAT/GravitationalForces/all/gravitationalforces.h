@@ -97,9 +97,7 @@ std::vector<double> forceError(const StarQuadTreeClustering &qt,
                                const std::vector<double> &etas);
 
 // Runtime measurements
-std::vector<double> measureRuntimes(const StarQuadTreeClustering &qt,
-                                    const std::vector<double> &etas,
-                                    unsigned int n);
+  std::pair<double, double> measureRuntimes(unsigned int n);
 
 }  // namespace GravitationalForces
 
