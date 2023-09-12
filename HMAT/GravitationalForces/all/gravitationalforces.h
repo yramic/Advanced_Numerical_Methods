@@ -14,6 +14,7 @@
 #include <iomanip>
 #include <iostream>
 #include <memory>
+#include <ostream>
 #include <utility>
 #include <vector>
 
@@ -31,10 +32,19 @@ namespace GravitationalForces {
 std::vector<Eigen::Vector2d> initStarPositions(unsigned int n,
                                                double mindist = 1.0);
 
+/** @brief Exact computation of forces on all stars
+ *
+ * @param masspositions sequence of coordinate vectors of stars treated as mass
+ * points
+ * @param masses sequence of masses of stars
+ */
 std::vector<Eigen::Vector2d> computeForces_direct(
     const std::vector<Eigen::Vector2d> &masspositions,
     const std::vector<double> &masses);
 
+/** @brief Class representing a quadtree of "equivalent stars"
+ *
+ */
 /* SAM_LISTING_BEGIN_1 */
 class StarQuadTree {
  public:
@@ -52,9 +62,12 @@ class StarQuadTree {
   struct StarQuadTreeNode {
     // Constructor: does the recursive construction of the quadtree
     StarQuadTreeNode(std::vector<unsigned int> star_idx, Eigen::Matrix2d bbox,
-                     const StarQuadTree &tree);
+                     StarQuadTree &tree);
     virtual ~StarQuadTreeNode() = default;
-    inline bool isLeaf() const { return this->star_idx_.size() == 1; }
+    // In this code: leaf nodes hold only a single star!
+    [[nodiscard]] inline bool isLeaf() const {
+      return this->star_idx_.size() == 1;
+    }
     std::vector<unsigned int> star_idx_;  // Indices of stars in sub-cluster
     Eigen::Matrix2d bbox_;                // Bounding box of sub-cluster
     Eigen::Vector2d center;               // Center of gravity of sub-cluster
@@ -68,6 +81,11 @@ class StarQuadTree {
   std::unique_ptr<StarQuadTreeNode> root_;      // Root node
   const std::vector<Eigen::Vector2d> starpos_;  // "Point star" positions
   const std::vector<double> starmasses_;        // Star masses
+  unsigned int no_leaves_{0};                   // number of leaves
+  unsigned int no_clusters_{0};  // number of genuine star clusters
+
+  // Printing the tree (useful only for small trees)
+  void outputQuadTree(std::ostream &o) const;
 };
 /* SAM_LISTING_END_1 */
 
@@ -97,7 +115,8 @@ std::vector<double> forceError(const StarQuadTreeClustering &qt,
                                const std::vector<double> &etas);
 
 // Runtime measurements
-  std::pair<double, double> measureRuntimes(unsigned int n);
+std::pair<double, double> measureRuntimes(unsigned int n,
+                                          unsigned int n_runs = 5);
 
 }  // namespace GravitationalForces
 
