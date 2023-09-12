@@ -73,11 +73,8 @@ if(LECTURECODES)
   find_package(Boost CONFIG REQUIRED program_options)
 endif()
 
-
-
 # Add subdirectories
 if(LEHRFEM)
   add_subdirectory(DUMMYCHAPTER)
 endif()
-
 add_subdirectory(HMAT)
