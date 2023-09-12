@@ -9,12 +9,16 @@
  * as this header is left intact.                                      *
  ***********************************************************************/
 
+#ifndef MATPART_H_
+#define MATPART_H_
+
 #include <cstddef>
 #include <memory>
-#ifndef MATPART_H_
+
 #include <cassert>
-3
+
 #include "clustertree.h"
+
 #define assertm(exp, msg) assert(((void)msg, exp))
 
 namespace HMAT {

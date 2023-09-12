@@ -8,6 +8,8 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
+#ifndef CLUSTERTREE_H_
+#define CLUSTERTREE_H_
 
 // General includes
 #include <Eigen/Dense>
@@ -18,6 +20,7 @@
 #include <limits>
 #include <utility>
 #include <vector>
+#include <array>
 
 namespace HMAT {
 /** @brief Data structure for a collocation point
@@ -257,3 +260,5 @@ void ClusterTree<NODE>::buildRec(NODE *nptr, std::size_t minpts) {
 /* SAM_LISTING_END_7 */
 
 }  // end namespace HMAT
+
+#endif
