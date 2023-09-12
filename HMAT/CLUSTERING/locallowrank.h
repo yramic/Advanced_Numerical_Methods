@@ -236,6 +236,14 @@ void tabulateConvergenceLLR(std::vector<unsigned int> &&n,
 // Measure runtimes
 void runtimeMatVec(std::vector<unsigned int> &&n);
 
+/* SAM_LISTING_BEGIN_R */
+template <int d>  // dimension \cob{$d$} as template argument
+struct BasisFn {
+  std::size_t idx;                         // Index of basis function
+  Eigen::Matrix<double, d, 1> xmin, xmax;  // Corners of bounding box
+};
+/* SAM_LISTING_END_R */
+  
 }  // namespace HMAT
 
 #endif
