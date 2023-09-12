@@ -10,6 +10,6 @@
 #include <gtest/gtest.h>
 #include "../gravitationalforces.h"
 
-namespace GravitationalForces{
+namespace GravitationalForces::test {
 
-} // namespace GravitationalForces
+} // namespace GravitationalForces::test
