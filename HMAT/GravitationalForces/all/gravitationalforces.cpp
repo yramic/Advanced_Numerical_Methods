@@ -23,6 +23,7 @@ std::vector<Eigen::Vector2d> initStarPositions(unsigned int n, double mindist) {
   }
   // Vector for returning positions
   std::vector<Eigen::Vector2d> pos;
+#if SOLUTION
   // Fill position vector with random positions taking into account minimal
   // distance requirement
   do {
@@ -45,6 +46,11 @@ std::vector<Eigen::Vector2d> initStarPositions(unsigned int n, double mindist) {
       // more.
     }
   } while (pos.size() < n);
+#else
+// **********************************************************************
+// Code to be supplemented
+// **********************************************************************
+#endif
   return pos;
 }
 /* SAM_LISTING_END_1 */

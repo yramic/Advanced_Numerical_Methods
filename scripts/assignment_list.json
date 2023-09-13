@@ -4,7 +4,6 @@
 
   "Problems" :
   [
-    "DUMMYCHAPTER/UpwindQuadrature",
     "HMAT/GravitationalForces" ,
     "HMAT/KernMatLLRApprox",
     "HMAT/LowRankMerge",

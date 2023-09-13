@@ -27,7 +27,7 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd> low_rank_merge(
     // About QR  decomposition with Eigen:
     // If $\VB_1: m \times n$, then $\VQ_1: m \times m$ and $\VR_1: m \times n$.
     // If $m > n$, however, the extra columns of $\VQ_1$ and extra rows of $\VR_1$ are not needed.
-    // Matlab returns this ''economy-size´´ format calling ''qr(A,0)´´,
+    // Matlab returns this "economy-size" format calling "qr(A,0)",
     // which does not compute these extra entries.
     // With the code above, Eigen is smart enough not to compute the discarded vectors.
 

@@ -1,5 +1,5 @@
 set(SOURCES
-        ${DIR}/test/LowRankMerge_test.cpp
+        ${DIR}/test/lowrankmerge_test.cpp
         )
 
 set(LIBRARIES
