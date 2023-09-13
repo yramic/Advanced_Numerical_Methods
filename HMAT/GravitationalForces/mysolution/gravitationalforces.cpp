@@ -37,23 +37,11 @@ std::vector<Eigen::Vector2d> computeForces_direct(
   const unsigned int n = masspositions.size();
   assertm(n == masses.size(),
           "Mismatch of sizes of masspositions and masses vectors");
-
+  // Forces will be stored in this array
   std::vector<Eigen::Vector2d> forces(n);
-
-  Eigen::Vector2d acc;
-  for (unsigned int j = 0; j < n; j++) {
-    // Compute force on $\cob{j}$-th star
-    acc.setZero();
-    for (unsigned int i = 0; i < n; i++) {
-      if (i != j) {
-        const Eigen::Vector2d diff_masspositions =
-            masspositions[i] - masspositions[j];
-        acc += diff_masspositions * masses[i] /
-               std::pow(diff_masspositions.norm(), 3);
-      }
-    }
-    forces[j] = acc * masses[j] / (4 * M_PI);
-  }
+// **********************************************************************
+// Code to be supplemented
+// **********************************************************************
   return forces;
 }
 /* SAM_LISTING_END_2 */
@@ -86,59 +74,9 @@ StarQuadTree::StarQuadTreeNode::StarQuadTreeNode(
     StarQuadTree &tree)
     : star_idx_(star_idx), bbox_(bbox), mass(0.0), center({0, 0}) {
   assertm(star_idx_.size() > 0, "Can't create a node without stars...");
-
-  // Total mass
-  for (unsigned int i = 0; i < star_idx_.size(); i++) {
-    const Eigen::Vector2d starpos(tree.starpos_[star_idx_[i]]);
-    mass += tree.starmasses_[star_idx_[i]];
-    center += tree.starmasses_[star_idx_[i]] * starpos;
-    assertm(((starpos[0] >= bbox(0, 0)) and (starpos[0] <= bbox(0, 1)) and
-             (starpos[1] >= bbox(1, 0)) and (starpos[1] <= bbox(1, 1))),
-            "Star out of bounding box!");
-  }
-  // Center of gravity for cluster of star associated with current node
-  center = center / mass;
-
-  // In this implementation leaf nodes contain a single star, whose position
-  // also agrees with the center of the node cluster.
-  if (star_idx_.size() == 1) {
-    tree.no_leaves_++;
-    return;
-  }
-  tree.no_clusters_++;
-  // Sub-boxes obtained by halfing bounding box in each direction
-  const double m1 = 0.5 * (bbox_(0, 0) + bbox_(0, 1));
-  const double m2 = 0.5 * (bbox_(1, 0) + bbox_(1, 1));
-  std::array<Eigen::Matrix2d, 4> sub_boxes;
-  sub_boxes[0] << bbox_(0, 0), m1, bbox_(1, 0), m2;
-  sub_boxes[1] << bbox_(0, 0), m1, m2, bbox_(1, 1);
-  sub_boxes[2] << m1, bbox_(0, 1), bbox_(1, 0), m2;
-  sub_boxes[3] << m1, bbox_(0, 1), m2, bbox_(1, 1);
-  // Index sets for son clusters
-  std::array<std::vector<unsigned int>, 4> sub_indices;
-
-  // Check, which son box the stars lie in, cf. \lref{pc:geoclust}
-  for (unsigned int i = 0; i < star_idx_.size(); i++) {
-    if (tree.starpos_[star_idx_[i]][0] < m1) {    // left part
-      if (tree.starpos_[star_idx_[i]][1] < m2) {  // left bottom
-        sub_indices[0].push_back(star_idx_[i]);
-      } else {  // left top
-        sub_indices[1].push_back(star_idx_[i]);
-      }
-    } else {                                      // right part
-      if (tree.starpos_[star_idx_[i]][1] < m2) {  // right bottom
-        sub_indices[2].push_back(star_idx_[i]);
-      } else {  // right top
-        sub_indices[3].push_back(star_idx_[i]);
-      }
-    }
-  }
-  // Recursion: son nodes are created, if non-empty
-  for (int i : {0, 1, 2, 3}) {
-    if (!sub_indices[i].empty())
-      sons_[i] = std::move(std::make_unique<StarQuadTree::StarQuadTreeNode>(
-          sub_indices[i], sub_boxes[i], tree));
-  }
+// **********************************************************************
+// Code to be supplemented
+// **********************************************************************
 }
 
 /* SAM_LISTING_END_X */
@@ -178,21 +116,11 @@ StarQuadTreeClustering::StarQuadTreeClustering(
 bool StarQuadTreeClustering::isAdmissible(const StarQuadTreeNode &node,
                                           Eigen::Vector2d p, double eta) const {
   // Implements admissibility condition \lref{eq:admstar}
-  // Diameter of bounding box is the distance of its opposite corners
-  const double diam = (node.bbox_.col(0) - node.bbox_.col(1)).norm();
-  // To compute the distance of a point from an axis-aligned box we have to
-  // distinguish nine different cases, which can conveniently be done by first
-  // introducing a function computing distances in 1D.
-  auto intvdist = [](double a, double b, double x) -> double {
-    if (b < a) std::swap(a, b);
-    if (x < a) return (a - x);
-    if (x > b) return (x - b);
-    return 0.0;
-  };
-  const double dx = intvdist(node.bbox_(0, 0), node.bbox_(0, 1), p[0]);
-  const double dy = intvdist(node.bbox_(1, 0), node.bbox_(1, 1), p[1]);
-  const double dist = Eigen::Vector2d(dx, dy).norm();
-  return (dist > eta * diam);  // Admissibility condition \lref{eq:admstar}
+  bool admissible;
+// **********************************************************************
+// Code to be supplemented
+// **********************************************************************
+  return admissible;
 }
 /* SAM_LISTING_END_5 */
 
@@ -201,32 +129,10 @@ Eigen::Vector2d StarQuadTreeClustering::forceOnStar(unsigned int j,
                                                     double eta) const {
   Eigen::Vector2d acc;  // For summation of force
   acc.setZero();
-
-  // Trick: Recursive lambda function capturing the whole object
-  std::function<void(const StarQuadTreeNode *)> traverse =
-      [&](const StarQuadTreeNode *node) {
-        if (node == nullptr)
-          return;  // In case if the cluster has no stars in it
-        // Since leaf clusters contain only a single star we can treat them in
-        // the same way as admissible clusters.
-        if (isAdmissible(*node, starpos_[j], eta) or (node->isLeaf())) {
-          const Eigen::Vector2d diff_masspositions = node->center - starpos_[j];
-          const double dist = diff_masspositions.norm();
-          if (dist > 1.0E-10) {
-            acc += diff_masspositions * node->mass / pow(dist, 3);
-          }
-        } else {  // traverse further, if current sub-cluster is not
-                  // admissible
-          traverse(node->sons_[0].get());
-          traverse(node->sons_[1].get());
-          traverse(node->sons_[2].get());
-          traverse(node->sons_[3].get());
-        }
-      };
-  // Start of recursion
-  traverse(this->root_.get());
-  // Multiply with forefactor in \prbeqref{eq:fjs}
-  return (acc * starmasses_[j] / (4 * M_PI));
+// **********************************************************************
+// Code to be supplemented
+// **********************************************************************
+  return acc;
 }
 /* SAM_LISTING_END_6 */
 
@@ -234,19 +140,9 @@ Eigen::Vector2d StarQuadTreeClustering::forceOnStar(unsigned int j,
 std::vector<double> forceError(const StarQuadTreeClustering &qt,
                                const std::vector<double> &etas) {
   std::vector<double> error(etas.size());  // For returning errors
-  std::vector<Eigen::Vector2d> exact_forces{
-      computeForces_direct(qt.starpos_, qt.starmasses_)};
-
-  std::vector<double> normed_errors(qt.n);
-  // Compute errors for different values of the admissibility parameter
-  for (int eta_i = 0; eta_i < etas.size(); eta_i++) {
-    for (unsigned int j = 0; j < qt.n; j++) {
-      const Eigen::Vector2d force_j = qt.forceOnStar(j, etas[eta_i]);
-      normed_errors[j] = (exact_forces[j] - force_j).norm();
-    }
-    error[eta_i] =
-        *std::max_element(normed_errors.begin(), normed_errors.end());
-  }
+// **********************************************************************
+// Code to be supplemented
+// **********************************************************************
   return error;
 }
 /* SAM_LISTING_END_7 */
@@ -258,40 +154,11 @@ std::pair<double, double> measureRuntimes(unsigned int n, unsigned int n_runs) {
   std::vector<Eigen::Vector2d> pos = GravitationalForces::initStarPositions(n);
   // All stars have equal (unit) mass
   std::vector<double> mass(n, 1.0);
-  // Build quad tree of stars
-  StarQuadTreeClustering qt(pos, mass);
-  // Admissibility parameter
-  const double eta = 1.5;
-
-  // Runtime for exact computation of forces with effort $O(n^2)$
-  std::vector<Eigen::Vector2d> forces(n);
-  double ms_exact = 0.0;
-  for (int r = 0; r < n_runs; ++r) {
-    auto t1_exact = std::chrono::high_resolution_clock::now();
-    forces = computeForces_direct(qt.starpos_, qt.starmasses_);
-    auto t2_exact = std::chrono::high_resolution_clock::now();
-    /* Getting number of milliseconds as a double. */
-    std::chrono::duration<double, std::milli> ms_double = (t2_exact - t1_exact);
-    ms_exact = std::max(ms_exact, ms_double.count());
-  }
-  std::cout << "n = " << n << " : runtime computeForces_direct= " << ms_exact
-            << "ms\n";
-
-  // Runtime for cluster-based approximate evaluation, cost $O(n\log n)$
-  double ms_cluster = 0.0;
-  for (int r = 0; r < n_runs; ++r) {
-    auto t1_cluster = std::chrono::high_resolution_clock::now();
-    for (unsigned int j = 0; j < qt.n; j++) {
-      forces[j] = qt.forceOnStar(j, eta);
-    }
-    auto t2_cluster = std::chrono::high_resolution_clock::now();
-    /* Getting number of milliseconds as a double. */
-    std::chrono::duration<double, std::milli> ms_double =
-        (t2_cluster - t1_cluster);
-    ms_cluster = std::max(ms_cluster, ms_double.count());
-  }
-  std::cout << "n = " << n << " : runtime forceOnStar[eta=" << eta
-            << "]= " << ms_cluster << "ms\n";
+  double ms_exact = 0.0;    // Time measured for exact evaluation
+  double ms_cluster = 0.0;  // Time taken for clustering-based evaluatiion
+// **********************************************************************
+// Code to be supplemented
+// **********************************************************************
   return {ms_exact, ms_cluster};
 }
 /* SAM_LISTING_END_8 */

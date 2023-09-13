@@ -56,9 +56,8 @@ std::vector<Eigen::Vector2d> computeForces_direct(
   const unsigned int n = masspositions.size();
   assertm(n == masses.size(),
           "Mismatch of sizes of masspositions and masses vectors");
-
+  // Forces will be stored in this array
   std::vector<Eigen::Vector2d> forces(n);
-
   Eigen::Vector2d acc;
   for (unsigned int j = 0; j < n; j++) {
     // Compute force on $\cob{j}$-th star
@@ -105,7 +104,6 @@ StarQuadTree::StarQuadTreeNode::StarQuadTreeNode(
     StarQuadTree &tree)
     : star_idx_(star_idx), bbox_(bbox), mass(0.0), center({0, 0}) {
   assertm(star_idx_.size() > 0, "Can't create a node without stars...");
-
   // Total mass
   for (unsigned int i = 0; i < star_idx_.size(); i++) {
     const Eigen::Vector2d starpos(tree.starpos_[star_idx_[i]]);
@@ -197,6 +195,7 @@ StarQuadTreeClustering::StarQuadTreeClustering(
 bool StarQuadTreeClustering::isAdmissible(const StarQuadTreeNode &node,
                                           Eigen::Vector2d p, double eta) const {
   // Implements admissibility condition \lref{eq:admstar}
+  bool admissible;
   // Diameter of bounding box is the distance of its opposite corners
   const double diam = (node.bbox_.col(0) - node.bbox_.col(1)).norm();
   // To compute the distance of a point from an axis-aligned box we have to
@@ -211,7 +210,9 @@ bool StarQuadTreeClustering::isAdmissible(const StarQuadTreeNode &node,
   const double dx = intvdist(node.bbox_(0, 0), node.bbox_(0, 1), p[0]);
   const double dy = intvdist(node.bbox_(1, 0), node.bbox_(1, 1), p[1]);
   const double dist = Eigen::Vector2d(dx, dy).norm();
-  return (dist > eta * diam);  // Admissibility condition \lref{eq:admstar}
+  admissible =
+      (dist > eta * diam);  // Admissibility condition \lref{eq:admstar}
+  return admissible;
 }
 /* SAM_LISTING_END_5 */
 
@@ -220,7 +221,6 @@ Eigen::Vector2d StarQuadTreeClustering::forceOnStar(unsigned int j,
                                                     double eta) const {
   Eigen::Vector2d acc;  // For summation of force
   acc.setZero();
-
   // Trick: Recursive lambda function capturing the whole object
   std::function<void(const StarQuadTreeNode *)> traverse =
       [&](const StarQuadTreeNode *node) {
@@ -245,7 +245,8 @@ Eigen::Vector2d StarQuadTreeClustering::forceOnStar(unsigned int j,
   // Start of recursion
   traverse(this->root_.get());
   // Multiply with forefactor in \prbeqref{eq:fjs}
-  return (acc * starmasses_[j] / (4 * M_PI));
+  acc = (acc * starmasses_[j] / (4 * M_PI));
+  return acc;
 }
 /* SAM_LISTING_END_6 */
 
@@ -277,6 +278,8 @@ std::pair<double, double> measureRuntimes(unsigned int n, unsigned int n_runs) {
   std::vector<Eigen::Vector2d> pos = GravitationalForces::initStarPositions(n);
   // All stars have equal (unit) mass
   std::vector<double> mass(n, 1.0);
+  double ms_exact = 0.0;    // Time measured for exact evaluation
+  double ms_cluster = 0.0;  // Time taken for clustering-based evaluatiion
   // Build quad tree of stars
   StarQuadTreeClustering qt(pos, mass);
   // Admissibility parameter
@@ -284,7 +287,6 @@ std::pair<double, double> measureRuntimes(unsigned int n, unsigned int n_runs) {
 
   // Runtime for exact computation of forces with effort $O(n^2)$
   std::vector<Eigen::Vector2d> forces(n);
-  double ms_exact = 0.0;
   for (int r = 0; r < n_runs; ++r) {
     auto t1_exact = std::chrono::high_resolution_clock::now();
     forces = computeForces_direct(qt.starpos_, qt.starmasses_);
@@ -297,7 +299,6 @@ std::pair<double, double> measureRuntimes(unsigned int n, unsigned int n_runs) {
             << "ms\n";
 
   // Runtime for cluster-based approximate evaluation, cost $O(n\log n)$
-  double ms_cluster = 0.0;
   for (int r = 0; r < n_runs; ++r) {
     auto t1_cluster = std::chrono::high_resolution_clock::now();
     for (unsigned int j = 0; j < qt.n; j++) {
