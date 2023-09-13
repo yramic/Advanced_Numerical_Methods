@@ -1,19 +1,24 @@
-# RW/CSE MSc Course "Advanced Numerical Methods for CSE" -- Code Repository
+# RW/CSE MSc Course "Advanced Numerical Methods for CSE" (R. Hiptmair) -- Code Repository
 
 This repository will host all the codes used in the lecture notes and assignments.
 
-The [lecture homepage](https://moodle-app2.let.ethz.ch/course/view.php?id=3643) contains more information regarding the course, 
-and will be used to distribute lecture notes and assignment handouts.
+The [lecture homepage](https://metaphor.ethz.ch/x/2023/hs/401-4671-00L/) and the
+introduction to the [lecture
+document](https://people.math.ethz.ch/~grsam/ADVNCSE/ADVNCSE.pdf) provide more information
+regarding the course. 
 
-__Note:__ For submitting your code solutions, please use the online submission interface in the [lecture homepage](https://moodle-app2.let.ethz.ch/course/view.php?id=3643).
+In particular, descriptions for all homework projects are contained in the [AdvNumCSE
+Homework
+Collection](https://people.math.ethz.ch/~grsam/ADVNCSE/HOMEWORK/ADVNCSEProblems.pdf). The
+weekly homework assignments will be published on the [lecture homepage](https://metaphor.ethz.ch/x/2023/hs/401-4671-00L/).
 
 If you are new to gitLab, you can use [this tutorial](https://gitlab.math.ethz.ch/tille/gitlab-introduction) on Git and GitLab 
 to make yourself familiar with the interface.
 
 **Additional links**
 
-- [Lecture homepage](https://moodle-app2.let.ethz.ch/course/view.php?id=4245)
-- [Course VVZ](http://www.vvz.ethz.ch/Vorlesungsverzeichnis/lerneinheit.view?lerneinheitId=117918&semkez=2017W&ansicht=KATALOGDATEN&lang=en)
+- [Lecture homepage]()https://metaphor.ethz.ch/x/2023/hs/401-4671-00L/
+- [Course VVZ entry](https://www.vorlesungen.ethz.ch/Vorlesungsverzeichnis/lerneinheit.view?semkez=2023W&ansicht=ALLE&lerneinheitId=174538&lang=de)
 - [Git tutorial](https://gitlab.math.ethz.ch/tille/gitlab-introduction/blob/master/git/README.md)
 - [Eigen documentation](http://eigen.tuxfamily.org/dox/)
 - [Debugger tutorial](https://gitlab.math.ethz.ch/tille/debugging-cpp-code-with-lldb)
@@ -26,9 +31,9 @@ to make yourself familiar with the interface.
         $ cmake ..
         $ make
 
-All binaries can be found at the `build/bin` path.
+All binaries can be found inside the `build` directory in respective subdirectories. 
 
-## Download and Compile One Code
+## Download and Compile a Single Code
 
 The path for each problem / lecture code is:
 
@@ -61,6 +66,26 @@ Using:
         $ make -j<number_of_processes>
     
 may (or may not) speed up the compilation time.
+
+
+## Homework Projects Code Upload
+
+After cloning the AdvNumCSE code repository you are supposed to set up _your own working
+branch_ named after **your NETHZ login ID**
+
+	$ cd <repository root directory>
+	$ git branch <NETHZ ID>
+	$ git checkout <NETHZ ID>
+
+After you have edited files, created new ones (tell Git aboout them with `git add`), have
+written and tested your codes, `git push` your project codes to the server. 
+
+Your solution codes must reside in `<Chapter>/<ProblemName>/mysolution` and it should be
+possble to generate an executable from them through issuing a suitable `make` command. 
+
+Upload of your homework is important, because the **code review** will be based on it:
+during the code review you will be shown some of your C++ source codes and you will be asked to
+explain them. 
 
 ## Extra
 
