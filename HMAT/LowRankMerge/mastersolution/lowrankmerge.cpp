@@ -1,13 +1,18 @@
-#include <Eigen/Dense>
+/**
+ * @file lowrankmerge.cpp
+ * @brief NPDE homework LowRankMerge code
+ * @author
+ * @date
+ * @copyright Developed at SAM, ETH Zurich
+ */
+
+#include "lowrankmerge.h"
+
 #include <Eigen/QR>
 #include <Eigen/SVD>
-#include <cmath>
-#include <iomanip>
-#include <iostream>
 
+namespace LowRankMerge {
 
-/* @brief Compute the rank-q best approximation of [A1*B1 A2*B2]
- */
 /* SAM_LISTING_BEGIN_0 */
 std::pair<Eigen::MatrixXd,Eigen::MatrixXd> low_rank_merge(
         const Eigen::MatrixXd &A1, const Eigen::MatrixXd &B1,
@@ -65,10 +70,6 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd> low_rank_merge(
 }
 /* SAM_LISTING_END_0 */
 
-
-/* @brief Compute errors between $\VZ$ and $\tilde{\VZ}$ in scaled Frobenius and max norms.
- * \param[in] n Number of rows/columns of matrices $VX_1$ and $VX_2$ defined as in Subproblem (2.1.a)
- */
 /* SAM_LISTING_BEGIN_1 */
 std::pair<double,double> test_low_rank_merge(size_t n)
 {
@@ -81,21 +82,22 @@ std::pair<double,double> test_low_rank_merge(size_t n)
             X2(i,j) = std::cos((i-j-0.5)/n);
         }
     }
+
+    // Build A1, B1, A2, B2 using HINT 1 (2-6.c)
+    Eigen::MatrixXd A1(n,2), B1(n,2), A2(n,2), B2(n,2);
+    for(double i=0.; i<n; ++i) {
+        A1(i,0) = std::sin(i/n);
+        A1(i,1) = std::cos(i/n);
+        B1(i,0) = std::cos(i/n);
+        B1(i,1) = -std::sin(i/n);
+        A2(i,0) = std::cos(i/n);
+        A2(i,1) = std::sin(i/n);
+        B2(i,0) = std::cos((i+0.5)/n);
+        B2(i,1) = std::sin((i+0.5)/n);
+    }
+
     Eigen::MatrixXd Z(n,2*n);
     Z << X1, X2;
-
-    Eigen::JacobiSVD<Eigen::MatrixXd> SVD1(X1, Eigen::ComputeThinU | Eigen::ComputeThinV); // Compute an SVD decomposition of X1 and X2, that is U, S1, V
-    Eigen::VectorXd s1 = SVD1.singularValues();
-    Eigen::MatrixXd S1; S1.setZero(SVD1.rank(), SVD1.rank());
-    S1.diagonal() = s1.head(SVD1.rank()); // Keep a number of singular values up to the rank
-    Eigen::MatrixXd A1 = SVD1.matrixU().leftCols(SVD1.rank()) * S1;
-    Eigen::MatrixXd B1 = SVD1.matrixV().leftCols(SVD1.rank()); // Build matrices A1 and A2 out of the SVD decomposition
-    Eigen::JacobiSVD<Eigen::MatrixXd> SVD2(X2, Eigen::ComputeThinU | Eigen::ComputeThinV);
-    Eigen::VectorXd s2 = SVD2.singularValues();
-    Eigen::MatrixXd S2; S2.setZero(SVD2.rank(), SVD2.rank());
-    S2.diagonal() = s2.head(SVD2.rank());
-    Eigen::MatrixXd A2 = SVD2.matrixU().leftCols(SVD2.rank()) * S2;
-    Eigen::MatrixXd B2 = SVD2.matrixV().leftCols(SVD2.rank());
 
     std::pair<Eigen::MatrixXd,Eigen::MatrixXd> AB = low_rank_merge(A1, B1, A2, B2); // Call the function implemented in sub-problem (2.4.b)
     Eigen::MatrixXd Ztilde = AB.first * AB.second.transpose();
@@ -108,10 +110,6 @@ std::pair<double,double> test_low_rank_merge(size_t n)
 }
 /* SAM_LISTING_END_1 */
 
-
-/* @brief Compute the rank-q best approximation of [A1*B1 A2*B2]
- * by setting all singular values <= rtol * s_1 to 0.
- */
 /* SAM_LISTING_BEGIN_2 */
 std::pair<Eigen::MatrixXd,Eigen::MatrixXd> adap_rank_merge(
         const Eigen::MatrixXd &A1, const Eigen::MatrixXd &B1,
@@ -167,12 +165,6 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd> adap_rank_merge(
 }
 /* SAM_LISTING_END_2 */
 
-
-/* @brief Compute the error between $\VZ$ and $\tilde{\VZ}$ in scaled Frobenius norm
- * and the number of singular values different from 0, given rtol.
- * \param[in] n Number of rows/columns of matrices $VX_1$ and $VX_2$ defined as in Subproblem (2.1.a)
- * \param[in] rtol Relative tolerance such that all singular values <= s_1 * rtol are set to 0.
- */
 /* SAM_LISTING_BEGIN_3 */
 std::pair<double,size_t> test_adap_rank_merge(size_t n, double rtol) {
 
@@ -186,18 +178,18 @@ std::pair<double,size_t> test_adap_rank_merge(size_t n, double rtol) {
     Eigen::MatrixXd Z(n,2*n);
     Z << X1, X2;
 
-    Eigen::JacobiSVD<Eigen::MatrixXd> SVD1(X1, Eigen::ComputeThinU | Eigen::ComputeThinV); // Compute an SVD decomposition of X1 and X2, that is U, S1, V
-    Eigen::VectorXd s1 = SVD1.singularValues();
-    Eigen::MatrixXd S1; S1.setZero(SVD1.rank(), SVD1.rank());
-    S1.diagonal() = s1.head(SVD1.rank()); // Keep a number of singular values up to the rank
-    Eigen::MatrixXd A1 = SVD1.matrixU().leftCols(SVD1.rank()) * S1;
-    Eigen::MatrixXd B1 = SVD1.matrixV().leftCols(SVD1.rank());
-    Eigen::JacobiSVD<Eigen::MatrixXd> SVD2(X2, Eigen::ComputeThinU | Eigen::ComputeThinV);
-    Eigen::VectorXd s2 = SVD2.singularValues();
-    Eigen::MatrixXd S2; S2.setZero(SVD2.rank(), SVD2.rank());
-    S2.diagonal() = s2.head(SVD2.rank());
-    Eigen::MatrixXd A2 = SVD2.matrixU().leftCols(SVD2.rank()) * S2;
-    Eigen::MatrixXd B2 = SVD2.matrixV().leftCols(SVD2.rank()); // Build matrices A1 and A2 out of the SVD decomposition
+    // Build A1, B1, A2, B2 using HINT 1 (2-6.c)
+    Eigen::MatrixXd A1(n,2), B1(n,2), A2(n,2), B2(n,2);
+    for(double i=0.; i<n; ++i) {
+        A1(i,0) = std::sin(i/n);
+        A1(i,1) = std::cos(i/n);
+        B1(i,0) = std::cos(i/n);
+        B1(i,1) = -std::sin(i/n);
+        A2(i,0) = std::cos(i/n);
+        A2(i,1) = std::sin(i/n);
+        B2(i,0) = std::cos((i+0.5)/n);
+        B2(i,1) = std::sin((i+0.5)/n);
+    }
 
     std::pair<Eigen::MatrixXd,Eigen::MatrixXd> AB = adap_rank_merge(A1, B1, A2, B2, rtol); // Call the function from sub-problem (2.4.d)
     Eigen::MatrixXd Ztilde = AB.first * AB.second.transpose();
@@ -210,46 +202,4 @@ std::pair<double,size_t> test_adap_rank_merge(size_t n, double rtol) {
 }
 /* SAM_LISTING_END_3 */
 
-
-int main() {
-
-    std::cout << "Problem 2.3.c" << std::endl;
-    for(int p=3; p<=12; ++p) {
-        unsigned n = std::pow(2,p);
-        std::pair<double,double> errs = test_low_rank_merge(n);
-        std::cout << "n = " << n << std::setw(15)
-                  << "Frobenius = "
-                  << std::scientific << std::setprecision(3)
-                  << errs.first  << std::setw(10)
-                  << "Max = "
-                  << std::scientific << std::setprecision(3)
-                  << errs.second << std::endl;
-    }
-
-    std::cout << "Problem 2.3.e"       << std::endl;
-    std::cout << "Fixed rtol = 0.0001" << std::endl;
-    double rtol = 0.0001;
-    for(int p=3; p<=12; ++p) {
-        unsigned n = std::pow(2,p);
-        std::pair<double,size_t> errs = test_adap_rank_merge(n, rtol);
-        std::cout << "n = " << n << std::setw(15)
-                  << "Frobenius = "
-                  << std::scientific << std::setprecision(3)
-                  << errs.first  << std::setw(10)
-                  << "Rank = "
-                  << errs.second << std::endl;
-    }
-    std::cout << "Problem 2.3.e" << std::endl;
-    std::cout << "Fixed n = 500" << std::endl;
-    unsigned n = 500;
-    for(int p=1; p<=8; ++p) {
-        double rtol = std::pow(10,-p);
-        std::pair<double,size_t> errs = test_adap_rank_merge(n, rtol);
-        std::cout << "rtol = " << rtol << std::setw(15)
-                  << "Frobenius = "
-                  << std::scientific << std::setprecision(3)
-                  << errs.first  << std::setw(10)
-                  << "Rank = "
-                  << errs.second << std::endl;
-    }
-}
+}  // namespace LowRankMerge
