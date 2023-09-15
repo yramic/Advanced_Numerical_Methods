@@ -1,9 +1,9 @@
 /**
- * @ file lowrankmerge_main.cpp
- * @ brief NPDE homework XXX MAIN FILE
- * @ author
- * @ date
- * @ copyright Developed at SAM, ETH Zurich
+ * @file lowrankmerge_main.cpp
+ * @brief NPDE homework XXX MAIN FILE
+ * @author
+ * @date
+ * @copyright Developed at SAM, ETH Zurich
  */
 
 #include "lowrankmerge.h"
@@ -14,7 +14,8 @@
 
 int main(int argc, char **argv) {
 
-    std::cout << "Problem 2.3.c" << std::endl;
+    // Tabulate approximation errors of low_rank_merge()
+    std::cout << "Problem 2-6.c" << std::endl;
     for(int p=3; p<=12; ++p) {
         unsigned n = std::pow(2,p);
         std::pair<double,double> errs = LowRankMerge::test_low_rank_merge(n);
@@ -27,7 +28,8 @@ int main(int argc, char **argv) {
                   << errs.second << std::endl;
     }
 
-    std::cout << "Problem 2.3.e"       << std::endl;
+    // Tabulate approximation errors and resulting ranks of adap_rank_merge()
+    std::cout << "Problem 2-6.e"       << std::endl;
     std::cout << "Fixed rtol = 0.0001" << std::endl;
     double rtol = 0.0001;
     for(int p=3; p<=12; ++p) {
@@ -40,7 +42,7 @@ int main(int argc, char **argv) {
                   << "Rank = "
                   << errs.second << std::endl;
     }
-    std::cout << "Problem 2.3.e" << std::endl;
+    std::cout << "Problem 2-6.e" << std::endl;
     std::cout << "Fixed n = 500" << std::endl;
     unsigned n = 500;
     for(int p=1; p<=8; ++p) {

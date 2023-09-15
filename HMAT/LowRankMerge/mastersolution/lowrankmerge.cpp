@@ -23,26 +23,29 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd> low_rank_merge(
            A1.cols() == A2.cols() &&
            "All no.s of cols should be equal to q");
 
+    // Find low-rank factors of B1 and B2 using QR decomposition as in (2.4.2.25)
     size_t m = B1.rows();
     size_t n = B1.cols();
     Eigen::HouseholderQR<Eigen::MatrixXd> QR1 = B1.householderQr();
     Eigen::MatrixXd Q1 = QR1.householderQ() * Eigen::MatrixXd::Identity(m, std::min(m, n));
     Eigen::MatrixXd R1 = Eigen::MatrixXd::Identity(std::min(m, n), m) * QR1.matrixQR().triangularView<Eigen::Upper>();
-    // About QR  decomposition with Eigen:
-    // If $\VB_1: m \times n$, then $\VQ_1: m \times m$ and $\VR_1: m \times n$.
-    // If $m > n$, however, the extra columns of $\VQ_1$ and extra rows of $\VR_1$ are not needed.
-    // Matlab returns this "economy-size" format calling "qr(A,0)",
-    // which does not compute these extra entries.
-    // With the code above, Eigen is smart enough not to compute the discarded vectors.
 
     m = B2.rows();
     n = B2.cols();
     Eigen::HouseholderQR<Eigen::MatrixXd> QR2 = B2.householderQr();
     Eigen::MatrixXd Q2 = QR2.householderQ() * Eigen::MatrixXd::Identity(m, std::min(m, n));
     Eigen::MatrixXd R2 = Eigen::MatrixXd::Identity(std::min(m, n), m) * QR2.matrixQR().triangularView<Eigen::Upper>();
+    // About QR decomposition with Eigen:
+    // If $\VB_1: m \times n$, then $\VQ_1: m \times m$ and $\VR_1: m \times n$.
+    // If $m > n$, however, the extra columns of $\VQ_1$ and extra rows of $\VR_1$ are not needed.
+    // Matlab returns this "economy-size" format calling "qr(A,0)",
+    // which does not compute these extra entries.
+    // With the code above, Eigen is smart enough not to compute the discarded vectors.
 
+    // Construct $\hat Z$ and compute SVD as in (2.4.2.25)
     Eigen::MatrixXd Z(A1.rows(), R1.rows()+R2.rows());
     Z << A1 * R1.transpose(), A2 * R2.transpose();
+
     Eigen::JacobiSVD<Eigen::MatrixXd> SVD(Z, Eigen::ComputeThinU | Eigen::ComputeThinV);
     Eigen::VectorXd s = SVD.singularValues();
     Eigen::MatrixXd S; S.setZero(A1.cols(), A1.cols());    // only consider first q singular values
@@ -57,14 +60,14 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd> low_rank_merge(
     // The remaining columns of $\VU$ and $\VV$ do not correspond
     // to actual singular vectors and are not computed in thin format.
 
-    Eigen::MatrixXd Q = Eigen::MatrixXd::Zero(Q1.rows()+Q2.rows(), Q1.cols()+Q2.cols());
+    Eigen::MatrixXd Q = Eigen::MatrixXd::Zero(Q1.rows()+Q2.rows(), Q1.cols()+Q2.cols()); // (2.4.2.26)
     Q.block(0,0,
             Q1.rows(),Q1.cols()) = Q1;
     Q.block(Q1.rows(),Q1.cols(),
             Q2.rows(),Q2.cols()) = Q2;
 
-    Eigen::MatrixXd Atilde =  U * S; // (2.4.38a)
-    Eigen::MatrixXd Btilde = (Q * V).leftCols(A1.cols()); // (2.4.38b)
+    Eigen::MatrixXd Atilde =  U * S; // (2.4.2.27a)
+    Eigen::MatrixXd Btilde = (Q * V).leftCols(A1.cols()); // (2.4.2.27b)
 
     return {Atilde,Btilde};
 }
@@ -74,7 +77,7 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd> low_rank_merge(
 std::pair<double,double> test_low_rank_merge(size_t n)
 {
 
-    // Build X1, X2 defined in sub-problem (2.4.a)
+    // Build X1, X2 defined in sub-problem (2-6.a)
     Eigen::MatrixXd X1(n,n), X2(n,n);
     for(double i=0.; i<n; ++i) {
         for(double j=0.; j<n; ++j) {
@@ -82,6 +85,8 @@ std::pair<double,double> test_low_rank_merge(size_t n)
             X2(i,j) = std::cos((i-j-0.5)/n);
         }
     }
+    Eigen::MatrixXd Z(n,2*n);
+    Z << X1, X2;
 
     // Build A1, B1, A2, B2 using HINT 1 (2-6.c)
     Eigen::MatrixXd A1(n,2), B1(n,2), A2(n,2), B2(n,2);
@@ -96,15 +101,12 @@ std::pair<double,double> test_low_rank_merge(size_t n)
         B2(i,1) = std::sin((i+0.5)/n);
     }
 
-    Eigen::MatrixXd Z(n,2*n);
-    Z << X1, X2;
-
-    std::pair<Eigen::MatrixXd,Eigen::MatrixXd> AB = low_rank_merge(A1, B1, A2, B2); // Call the function implemented in sub-problem (2.4.b)
+    std::pair<Eigen::MatrixXd,Eigen::MatrixXd> AB = low_rank_merge(A1, B1, A2, B2); // Call the function implemented in sub-problem (2-6.b)
     Eigen::MatrixXd Ztilde = AB.first * AB.second.transpose();
 
     Eigen::MatrixXd diff = Z - Ztilde;
-    double err_Frob = diff.norm()/n; // $n^{-1} \| Z - \widetilde{Z} \|_F$
-    double err_max  = diff.cwiseAbs().maxCoeff();
+    double err_Frob = diff.norm()/n; // scaled Frobenius norm
+    double err_max  = diff.cwiseAbs().maxCoeff(); // maximum norm
 
     return {err_Frob,err_max};
 }
@@ -120,6 +122,7 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd> adap_rank_merge(
            A1.cols() == A2.cols() &&
            "All no.s of cols should be equal to q");
 
+    // Find low-rank factors of B1 and B2 using QR decomposition
     size_t m = B1.rows();
     size_t n = B1.cols();
     Eigen::HouseholderQR<Eigen::MatrixXd> QR1 = B1.householderQr();
@@ -137,9 +140,10 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd> adap_rank_merge(
     Eigen::JacobiSVD<Eigen::MatrixXd> SVD(Z, Eigen::ComputeThinU | Eigen::ComputeThinV);
     Eigen::VectorXd s = SVD.singularValues();
 
+    // Only consider singular values larger than rtol * largest singular value as in (2.4.2.20)
     unsigned p = s.size();
     for(unsigned q=1; q<s.size(); ++q) {
-    // $q \in \{0 , ..., p-1\}$ : $\sigma_{q} \le \text{rtol} \cdot \sigma_0$
+    // $q \in \{1 , ..., p-1\}$ : $\sigma_{q} \le \text{rtol} \cdot \sigma_0$
         if(s(q) <= s(0) * rtol) { 
             p = q;
             break;
@@ -191,7 +195,7 @@ std::pair<double,size_t> test_adap_rank_merge(size_t n, double rtol) {
         B2(i,1) = std::sin((i+0.5)/n);
     }
 
-    std::pair<Eigen::MatrixXd,Eigen::MatrixXd> AB = adap_rank_merge(A1, B1, A2, B2, rtol); // Call the function from sub-problem (2.4.d)
+    std::pair<Eigen::MatrixXd,Eigen::MatrixXd> AB = adap_rank_merge(A1, B1, A2, B2, rtol); // Call the function from sub-problem (2-6.d)
     Eigen::MatrixXd Ztilde = AB.first * AB.second.transpose();
 
     Eigen::MatrixXd diff = Z - Ztilde;
