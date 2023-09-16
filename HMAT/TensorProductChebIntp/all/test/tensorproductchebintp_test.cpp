@@ -1,7 +1,7 @@
 /**
  * @file tensorproductchebintp_test.cc
- * @brief NPDE homework TensorProductChebIntp test code
- * @author R. Hiptmair
+ * @brief ADVNCSE homework TensorProductChebIntp test code
+ * @author Bob Schreiner
  * @date August 2023
  * @copyright Developed at SAM, ETH Zurich
  */

@@ -1,0 +1,12 @@
+# This is a generated file and its contents are an internal implementation detail.
+# The download step will be re-executed if anything in this file changes.
+# No other meaning or use of this file is supported.
+
+method=url
+command=/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake;-P;/Users/bobschreiner/ETH/AdvNumCse/Code/cmake-build-debug/Eigen-prefix/src/Eigen-stamp/download-Eigen.cmake;COMMAND;/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake;-P;/Users/bobschreiner/ETH/AdvNumCse/Code/cmake-build-debug/Eigen-prefix/src/Eigen-stamp/verify-Eigen.cmake;COMMAND;/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake;-P;/Users/bobschreiner/ETH/AdvNumCse/Code/cmake-build-debug/Eigen-prefix/src/Eigen-stamp/extract-Eigen.cmake
+source_dir=/Users/bobschreiner/ETH/AdvNumCse/Code/cmake-build-debug/Eigen
+work_dir=/Users/bobschreiner/ETH/AdvNumCse/Code/cmake-build-debug
+url(s)=https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.zip
+hash=
+no_extract=
+

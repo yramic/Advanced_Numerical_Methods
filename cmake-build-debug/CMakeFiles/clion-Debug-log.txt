@@ -1,0 +1,18 @@
+/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/Applications/CLion.app/Contents/bin/ninja/mac/ninja -G Ninja -S /Users/bobschreiner/ETH/AdvNumCse/Code -B /Users/bobschreiner/ETH/AdvNumCse/Code/cmake-build-debug
+Project source dir =/Users/bobschreiner/ETH/AdvNumCse/Code
+Project binary dir =/Users/bobschreiner/ETH/AdvNumCse/Code/cmake-build-debug
+-- LEHRFEM OFF
+-- LECTURECODES ON
+-- MASTERSOLUTION ON
+-- MYSOLUTION ON
+-- [hunter] Calculating Toolchain-SHA1
+-- [hunter] Calculating Config-SHA1
+-- [hunter] HUNTER_ROOT: /Users/bobschreiner/.hunter
+-- [hunter] [ Hunter-ID: 5e53cbb | Toolchain-ID: 91d456d | Config-ID: 791e238 ]
+-- [hunter] EIGEN_ROOT: /Users/bobschreiner/.hunter/_Base/5e53cbb/91d456d/791e238/Install (ver.: 3.3.9)
+-- [hunter] GTEST_ROOT: /Users/bobschreiner/.hunter/_Base/5e53cbb/91d456d/791e238/Install (ver.: 1.11.0)
+-- [hunter] BOOST_ROOT: /Users/bobschreiner/.hunter/_Base/5e53cbb/91d456d/791e238/Install (ver.: 1.78.0)
+-- [hunter] BOOST_ROOT: /Users/bobschreiner/.hunter/_Base/5e53cbb/91d456d/791e238/Install (ver.: 1.78.0)
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/bobschreiner/ETH/AdvNumCse/Code/cmake-build-debug

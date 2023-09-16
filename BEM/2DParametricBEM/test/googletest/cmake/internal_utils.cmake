@@ -282,7 +282,7 @@ function(py_test name)
       endif (CMAKE_CONFIGURATION_TYPES)
     else (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 3.1)
       # ${CMAKE_CURRENT_BINARY_DIR} is known at configuration time, so we can
-      # directly bind it from cmake. ${CTEST_CONFIGURATION_TYPE} is known
+      # directly bind it from cmake_old. ${CTEST_CONFIGURATION_TYPE} is known
       # only at ctest runtime (by calling ctest -c <Configuration>), so
       # we have to escape $ to delay variable substitution here.
       add_test(
@@ -309,7 +309,7 @@ function(install_project)
     # Configure and install pkgconfig files.
     foreach(t ${ARGN})
       set(configured_pc "${generated_dir}/${t}.pc")
-      configure_file("${PROJECT_SOURCE_DIR}/cmake/${t}.pc.in"
+      configure_file("${PROJECT_SOURCE_DIR}/cmake_old/${t}.pc.in"
         "${configured_pc}" @ONLY)
       install(FILES "${configured_pc}"
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
