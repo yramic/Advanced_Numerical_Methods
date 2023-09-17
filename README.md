@@ -23,50 +23,27 @@ to make yourself familiar with the interface.
 - [Eigen documentation](http://eigen.tuxfamily.org/dox/)
 - [Debugger tutorial](https://gitlab.math.ethz.ch/tille/debugging-cpp-code-with-lldb)
 
-## Download and Compile Everything
+## Download and Compile
 
-        $ git clone --recurse-submodules https://gitlab.math.ethz.ch/AdvNumCSE/Code
+        $ git clone https://gitlab.math.ethz.ch/AdvNumCSE/Code
         $ cd Code
         $ mkdir build && cd build
         $ cmake ..
-        $ make
 
-All binaries can be found inside the `build` directory in respective subdirectories. 
+To compile the desired Assignment you should change to the corresponding path and compile it.
 
-## Download and Compile a Single Code
+    $ cd <Chapter>/<ProblemName>
+    $ make
 
-The path for each problem / lecture code is:
-
- - `<Chapter>/<ProblemName>/templates_nolabels` or `<Chapter>/<LectureCode>/templates_nolabels` for templates.
- - `<Chapter>/<ProblemName>/solutions_nolabels` or `<Chapter>/<LectureCode>/solutions_nolabels` for solutions.
-
-Each of these codes correspond to a `target`, which is a `make` command that can be used to compile only that one code and the related dependencies.
-Targets are in the format `a<assignment_number>problem<problem_number>` (e.g., `a1problem1`) or `a<assignment_number>problem<problem_number>_sol`, depending on whether the code is a template or a solution.
-
-After running `cmake ..` in the `build` folder, you can recover the list of all possible targets by typing:
-
-        $ cmake --build . --target help
-
-or
-
-        $ make help
-
-Then you can choose a target and run:
-
-        $ make <target>
-
-The corresponding executable will be located in:
-
-        $ ./build/bin/
-
-**TIP**
-
-Using:
-
-        $ make -j<number_of_processes>
+Will create multiple executables.
     
-may (or may not) speed up the compilation time.
+    $ ./<ProblemName>_mysolution 
+Will execute the `main()` function found inside `ProblemName_main.cpp`
 
+    $ ./<ProblemName>_test_mysolution 
+Will run a series of tests found inside `mysolution/test/ProblemName_test.cpp`
+
+By replacing `mysolution` with `mastersolution` in the later steps you can execute the provided mastersolution.
 
 ## Homework Projects Code Upload
 
