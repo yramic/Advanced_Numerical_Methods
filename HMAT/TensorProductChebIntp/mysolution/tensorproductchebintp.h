@@ -1,7 +1,7 @@
 /**
  * @file tensorproductchebintp.h
  * @brief ADVNCSE homework TensorProductChebIntp code
- * @author Bob Schreiner
+ * @author R. Hiptmair , Bob Schreiner
  * @date August 2023
  * @copyright Developed at SAM, ETH Zurich
  */
@@ -12,8 +12,8 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
-#include <vector>
 #include <random>
+#include <vector>
 
 namespace TensorProductChebIntp {
 
@@ -71,7 +71,7 @@ std::vector<double> chebInterpEval2D(unsigned int q, FUNCTOR f,
   for (int k = 0; k < q; ++k) {
     for (int l = 0; l <= k; ++l) {
       y(k, l) = f(t[k], t[l]);
-      y(l , k) = f(t[l] , t[k]);
+      y(l, k) = f(t[l], t[k]);
     }
   }
   // Loop over all evaluation points
@@ -79,17 +79,17 @@ std::vector<double> chebInterpEval2D(unsigned int q, FUNCTOR f,
   std::vector<double> res(N, 0.0);  // Result vector
   std::vector<double> wx(q);        // Weights $\cob{w_x^i}$
   std::vector<double> wy(q);        // Weights $\cob{w_y^i}$
-  int nodex;                        // Store index of tx in case of division by zero
-  int nodey;                        // Store index of ty in case of division by zero
+  int nodex;  // Store index of tx in case of division by zero
+  int nodey;  // Store index of ty in case of division by zero
   for (int k = 0; k < N; ++k) {
     double sx = 0;
     double sy = 0;
     bool nonodex = true;
     bool nonodey = true;
 
-  // **********************************************************************
-  // Your Solution here
-  // **********************************************************************
+    // **********************************************************************
+    // Your Solution here
+    // **********************************************************************
   }
   return res;
 }
@@ -99,9 +99,8 @@ template <typename FUNCTOR>
 std::vector<double> genChebInterpEval2D(unsigned int q, FUNCTOR f,
                                         Eigen::Vector2d a, Eigen::Vector2d b,
                                         const std::vector<Eigen::Vector2d> &x) {
-
   const std::vector<double>::size_type N = x.size();
-  std::vector<double> res = std::vector<double>(N, 0.0); // Result vector
+  std::vector<double> res = std::vector<double>(N, 0.0);  // Result vector
 
   // **********************************************************************
   // Your Solution here
@@ -109,17 +108,28 @@ std::vector<double> genChebInterpEval2D(unsigned int q, FUNCTOR f,
   return res;
 }
 
-template<typename FUNCTOR>
-double errorestimate(unsigned int q, FUNCTOR f, const std::vector<Eigen::Vector2d> &x , const std::vector<double> &res) {
-
+template <typename FUNCTOR>
+double errorestimate(unsigned int q, FUNCTOR f,
+                     const std::vector<Eigen::Vector2d> &x,
+                     const std::vector<double> &res) {
   const std::vector<double>::size_type N = x.size();
   double error = 0.0;
-  for (int i = 0 ; i<N; ++i) {
+  for (int i = 0; i < N; ++i) {
     Eigen::Vector2d xi = x[i];
-    error += std::pow(f(xi[0] , xi[1]) - res[i],2);
+    error += std::pow(f(xi[0], xi[1]) - res[i], 2);
   }
-  return error;
+  return error / N;
+}
+template <typename FUNCTOR>
+double errorestimate(unsigned int q, FUNCTOR f, const std::vector<double> &x,
+                     const std::vector<double> &res) {
+  const std::vector<double>::size_type N = x.size();
+  double error = 0.0;
+  for (int i = 0; i < N; ++i) {
+    error += std::pow(f(x[i]) - res[i], 2);
+  }
+  return error / N;
 }
 }  // namespace TensorProductChebIntp
 
-#endif // TENSORPRODCHEB_H_
+#endif  // TENSORPRODCHEB_H_

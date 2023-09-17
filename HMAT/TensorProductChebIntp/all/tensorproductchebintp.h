@@ -1,7 +1,7 @@
 /**
  * @file tensorproductchebintp.h
  * @brief ADVNCSE homework TensorProductChebIntp code
- * @author Bob Schreiner
+ * @author R. Hiptmair , Bob Schreiner
  * @date August 2023
  * @copyright Developed at SAM, ETH Zurich
  */
@@ -12,8 +12,8 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
-#include <vector>
 #include <random>
+#include <vector>
 
 namespace TensorProductChebIntp {
 
@@ -91,7 +91,7 @@ std::vector<double> chebInterpEval2D(unsigned int q, FUNCTOR f,
   for (int k = 0; k < q; ++k) {
     for (int l = 0; l <= k; ++l) {
       y(k, l) = f(t[k], t[l]);
-      y(l , k) = f(t[l] , t[k]);
+      y(l, k) = f(t[l], t[k]);
     }
   }
   // Loop over all evaluation points
@@ -99,8 +99,8 @@ std::vector<double> chebInterpEval2D(unsigned int q, FUNCTOR f,
   std::vector<double> res(N, 0.0);  // Result vector
   std::vector<double> wx(q);        // Weights $\cob{w_x^i}$
   std::vector<double> wy(q);        // Weights $\cob{w_y^i}$
-  int nodex;                        // Store index of tx in case of division by zero
-  int nodey;                        // Store index of ty in case of division by zero
+  int nodex;  // Store index of tx in case of division by zero
+  int nodey;  // Store index of ty in case of division by zero
   for (int k = 0; k < N; ++k) {
     double sx = 0;
     double sy = 0;
@@ -108,13 +108,14 @@ std::vector<double> chebInterpEval2D(unsigned int q, FUNCTOR f,
     bool nonodey = true;
 
 #if SOLUTION
-    for (int j = 0; j <q ; ++j) {
+    for (int j = 0; j < q; ++j) {
       if (nonodex) {
         // In the case of division by zero
         if (std::abs(x[k][0] - t[j]) < 1e-9) {
           nonodex = false;
-          nodex = j; // Keep track of the index
-          if(!nonodey){ // Early termination in the case of second division by zero
+          nodex = j;       // Keep track of the index
+          if (!nonodey) {  // Early termination in the case of second division
+                           // by zero
             break;
           }
         } else {
@@ -123,12 +124,13 @@ std::vector<double> chebInterpEval2D(unsigned int q, FUNCTOR f,
         }
       }
       // Only enter if no division by zero occured
-      if(nonodey){
+      if (nonodey) {
         // In the case of division by zero
         if (std::abs(x[k][0] - t[j]) < 1e-9) {
           nonodey = false;
-          nodey = j; // Keep track of the index
-          if(!nonodex){ // Early termination in the case of second division by zero
+          nodey = j;       // Keep track of the index
+          if (!nonodex) {  // Early termination in the case of second division
+                           // by zero
             break;
           }
         } else {
@@ -138,36 +140,36 @@ std::vector<double> chebInterpEval2D(unsigned int q, FUNCTOR f,
       }
     }
     // The case of 2 division by zero
-    if(!nonodex && !nonodey){
-      res[k] = y(nodex , nodey);
+    if (!nonodex && !nonodey) {
+      res[k] = y(nodex, nodey);
     }
     // The case of a division by zero along the x Axis
-    else if (!nonodex){
-      for(int j = 0; j<q; ++j){
-        res[k] += y(nodex , j) * wy[j];
+    else if (!nonodex) {
+      for (int j = 0; j < q; ++j) {
+        res[k] += y(nodex, j) * wy[j];
       }
       res[k] /= sy;
     }
     // The case of a division by zero along the y Axis
-    else if (!nonodey){
-      for (int j = 0; j<q; ++j){
-        res[k] += y(j , nodey) * wx[j];
+    else if (!nonodey) {
+      for (int j = 0; j < q; ++j) {
+        res[k] += y(j, nodey) * wx[j];
       }
       res[k] /= sx;
     }
     // No division by zero occurred
-    else{
-      for (int j = 0; j<q; ++j){
-        for (int i = 0; i<q; ++i) {
+    else {
+      for (int j = 0; j < q; ++j) {
+        for (int i = 0; i < q; ++i) {
           res[k] += y(j, i) * wx[j] * wy[i];
         }
       }
-      res[k] /= sy*sx;
+      res[k] /= sy * sx;
     }
 #else
-  // **********************************************************************
-  // Your Solution here
-  // **********************************************************************
+    // **********************************************************************
+    // Your Solution here
+    // **********************************************************************
 #endif
   }
   return res;
@@ -178,26 +180,27 @@ template <typename FUNCTOR>
 std::vector<double> genChebInterpEval2D(unsigned int q, FUNCTOR f,
                                         Eigen::Vector2d a, Eigen::Vector2d b,
                                         const std::vector<Eigen::Vector2d> &x) {
-
   const std::vector<double>::size_type N = x.size();
-  std::vector<double> res = std::vector<double>(N, 0.0); // Result vector
+  std::vector<double> res = std::vector<double>(N, 0.0);  // Result vector
 
 #if SOLUTION
-  auto phif = [f , a , b](double x1 , double x2){
-    const double tmp1 = 0.5 *((b[0] - a[0])*x1 + a[0] + b[0]);
-    const double tmp2 = 0.5 *((b[1] - a[1])*x2 + a[1] + b[1]);
-    return f(tmp1,tmp2);};
+  auto phif = [f, a, b](double x1, double x2) {
+    const double tmp1 = 0.5 * ((b[0] - a[0]) * x1 + a[0] + b[0]);
+    const double tmp2 = 0.5 * ((b[1] - a[1]) * x2 + a[1] + b[1]);
+    return f(tmp1, tmp2);
+  };
 
-  auto phiinv = [a , b](const Eigen::Vector2d &x){
-    const double x1 = 2./(b[0] - a[0])*(x[0] -0.5* (a[0] + b[0]));
-    const double x2 = 2./(b[1] - a[1])*(x[1] -0.5* (a[1] + b[1]));
-    return (Eigen::Vector2d() << x1 , x2).finished();};
+  auto phiinv = [a, b](const Eigen::Vector2d &x) {
+    const double x1 = 2. / (b[0] - a[0]) * (x[0] - 0.5 * (a[0] + b[0]));
+    const double x2 = 2. / (b[1] - a[1]) * (x[1] - 0.5 * (a[1] + b[1]));
+    return (Eigen::Vector2d() << x1, x2).finished();
+  };
 
   std::vector<Eigen::Vector2d> phiinvx(N);
-  for (unsigned int k=0 ; k<N; ++k){
+  for (unsigned int k = 0; k < N; ++k) {
     phiinvx[k] = phiinv(x[k]);
   }
-  res = chebInterpEval2D(q, phif,phiinvx);
+  res = chebInterpEval2D(q, phif, phiinvx);
 #else
   // **********************************************************************
   // Your Solution here
@@ -206,17 +209,28 @@ std::vector<double> genChebInterpEval2D(unsigned int q, FUNCTOR f,
   return res;
 }
 
-template<typename FUNCTOR>
-double errorestimate(unsigned int q, FUNCTOR f, const std::vector<Eigen::Vector2d> &x , const std::vector<double> &res) {
-
+template <typename FUNCTOR>
+double errorestimate(unsigned int q, FUNCTOR f,
+                     const std::vector<Eigen::Vector2d> &x,
+                     const std::vector<double> &res) {
   const std::vector<double>::size_type N = x.size();
   double error = 0.0;
-  for (int i = 0 ; i<N; ++i) {
+  for (int i = 0; i < N; ++i) {
     Eigen::Vector2d xi = x[i];
-    error += std::pow(f(xi[0] , xi[1]) - res[i],2);
+    error += std::pow(f(xi[0], xi[1]) - res[i], 2);
   }
-  return error;
+  return error / N;
+}
+template <typename FUNCTOR>
+double errorestimate(unsigned int q, FUNCTOR f, const std::vector<double> &x,
+                     const std::vector<double> &res) {
+  const std::vector<double>::size_type N = x.size();
+  double error = 0.0;
+  for (int i = 0; i < N; ++i) {
+    error += std::pow(f(x[i]) - res[i], 2);
+  }
+  return error / N;
 }
 }  // namespace TensorProductChebIntp
 
-#endif // TENSORPRODCHEB_H_
+#endif  // TENSORPRODCHEB_H_
