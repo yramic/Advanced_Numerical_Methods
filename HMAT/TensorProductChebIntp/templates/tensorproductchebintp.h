@@ -38,11 +38,11 @@ std::vector<double> chebInterpEval1D(unsigned int q, FUNCTOR f,
   std::vector<double> y(q);       // Sampled function values
   int sgn = 1;
   for (int k = 0; k < q; ++k, sgn *= -1) {
-    t[k] = std::cos((2.0 * k - 1.0) / (2 * q) * M_PI);
-    lambda[k] = sgn * std::sin((2.0 * k - 1.0) / (2 * q) * M_PI);
-    y[k] = f(t[k]);
+    t[k] = std::cos((2.0 * k - 1.0) / (2 * q) * M_PI);  // \prbeqref{eq:chn}
+    lambda[k] = sgn * std::sin((2.0 * k - 1.0) / (2 * q) * M_PI);  // \prbeqref{eq:bwf}
+    y[k] = f(t[k]);                                        // $\cob{y_k}$
   }
-  // Loop over all evaluation points
+  // Loop over all evaluation points $\cob{x_i}$
   const std::vector<double>::size_type N = x.size();
   std::vector<double> res(N, 0.0);  // Result vector
   for (int k = 0; k < N; ++k) {
@@ -95,6 +95,7 @@ std::vector<double> chebInterpEval2D(unsigned int q, FUNCTOR f,
 }
 /* SAM_LISTING_END_2 */
 
+/* SAM_LISTING_BEGIN_3 */
 template <typename FUNCTOR>
 std::vector<double> genChebInterpEval2D(unsigned int q, FUNCTOR f,
                                         Eigen::Vector2d a, Eigen::Vector2d b,
@@ -107,7 +108,9 @@ std::vector<double> genChebInterpEval2D(unsigned int q, FUNCTOR f,
   // **********************************************************************
   return res;
 }
+/* SAM_LISTING_END_3 */
 
+// Some functions for debugging   
 template <typename FUNCTOR>
 double errorestimate(unsigned int q, FUNCTOR f,
                      const std::vector<Eigen::Vector2d> &x,

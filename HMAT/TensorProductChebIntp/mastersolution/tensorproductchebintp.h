@@ -38,11 +38,11 @@ std::vector<double> chebInterpEval1D(unsigned int q, FUNCTOR f,
   std::vector<double> y(q);       // Sampled function values
   int sgn = 1;
   for (int k = 0; k < q; ++k, sgn *= -1) {
-    t[k] = std::cos((2.0 * k - 1.0) / (2 * q) * M_PI);
-    lambda[k] = sgn * std::sin((2.0 * k - 1.0) / (2 * q) * M_PI);
-    y[k] = f(t[k]);
+    t[k] = std::cos((2.0 * k - 1.0) / (2 * q) * M_PI);  // \prbeqref{eq:chn}
+    lambda[k] = sgn * std::sin((2.0 * k - 1.0) / (2 * q) * M_PI);  // \prbeqref{eq:bwf}
+    y[k] = f(t[k]);                                        // $\cob{y_k}$
   }
-  // Loop over all evaluation points
+  // Loop over all evaluation points $\cob{x_i}$
   const std::vector<double>::size_type N = x.size();
   std::vector<double> res(N, 0.0);  // Result vector
   for (int k = 0; k < N; ++k) {
@@ -51,7 +51,10 @@ std::vector<double> chebInterpEval1D(unsigned int q, FUNCTOR f,
     bool nonode = true;
     for (int j = 0; j < q; ++j) {
       if (x[k] == t[j]) {
-        // Avoid division by zero
+        // Avoid division by zero. In this case testing exact equality of
+        // floating point numbers is safe, because the point of this test is not
+        // to avoid amplification of roundoff errors, but really preventing a
+        // division by zero exception.
         res[k] = y[j];
         nonode = false;
         break;
@@ -164,6 +167,7 @@ std::vector<double> chebInterpEval2D(unsigned int q, FUNCTOR f,
 }
 /* SAM_LISTING_END_2 */
 
+/* SAM_LISTING_BEGIN_3 */
 template <typename FUNCTOR>
 std::vector<double> genChebInterpEval2D(unsigned int q, FUNCTOR f,
                                         Eigen::Vector2d a, Eigen::Vector2d b,
@@ -171,26 +175,30 @@ std::vector<double> genChebInterpEval2D(unsigned int q, FUNCTOR f,
   const std::vector<double>::size_type N = x.size();
   std::vector<double> res = std::vector<double>(N, 0.0);  // Result vector
 
+  // Transformation from $\cob{\cintv{-1,1}^2}$ to $\cob{\cintv{a_1,b_1}\times\cintv{a_2,b_2}}$
   auto phif = [f, a, b](double x1, double x2) {
     const double tmp1 = 0.5 * ((b[0] - a[0]) * x1 + a[0] + b[0]);
     const double tmp2 = 0.5 * ((b[1] - a[1]) * x2 + a[1] + b[1]);
     return f(tmp1, tmp2);
   };
-
+  // Inverse transformation $\cob{\Phibf^-1}$
   auto phiinv = [a, b](const Eigen::Vector2d &x) {
     const double x1 = 2. / (b[0] - a[0]) * (x[0] - 0.5 * (a[0] + b[0]));
     const double x2 = 2. / (b[1] - a[1]) * (x[1] - 0.5 * (a[1] + b[1]));
     return (Eigen::Vector2d() << x1, x2).finished();
   };
-
+  // Vector of transformed evaluation points
   std::vector<Eigen::Vector2d> phiinvx(N);
   for (unsigned int k = 0; k < N; ++k) {
-    phiinvx[k] = phiinv(x[k]);
+    phiinvx[k] = phiinv(x[k]); // Affine transformation
   }
+  // Interpolation on $\cob{\cintv{-1,1}^2}$
   res = chebInterpEval2D(q, phif, phiinvx);
   return res;
 }
+/* SAM_LISTING_END_3 */
 
+// Some functions for debugging   
 template <typename FUNCTOR>
 double errorestimate(unsigned int q, FUNCTOR f,
                      const std::vector<Eigen::Vector2d> &x,
