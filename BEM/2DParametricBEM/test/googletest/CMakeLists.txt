@@ -83,7 +83,7 @@ endif()
 # Define helper functions and macros used by Google Test.
 include(cmake/internal_utils.cmake)
 
-config_compiler_and_linker()  # Defined in internal_utils.cmake.
+config_compiler_and_linker()  # Defined in internal_utils.cmake_old.
 
 # Create the CMake package file descriptors.
 if (INSTALL_GTEST)
@@ -111,7 +111,7 @@ set(gtest_build_include_dirs
 include_directories(${gtest_build_include_dirs})
 
 # Summary of tuple support for Microsoft Visual Studio:
-# Compiler    version(MS)  version(cmake)  Support
+# Compiler    version(MS)  version(cmake_old)  Support
 # ----------  -----------  --------------  -----------------------------
 # <= VS 2010  <= 10        <= 1600         Use Google Tests's own tuple.
 # VS 2012     11           1700            std::tr1::tuple + _VARIADIC_MAX=10
@@ -156,7 +156,7 @@ install_project(gtest gtest_main)
 #
 # They are not built by default.  To build them, set the
 # gtest_build_samples option to ON.  You can do it by running ccmake
-# or specifying the -Dgtest_build_samples=ON flag when running cmake.
+# or specifying the -Dgtest_build_samples=ON flag when running cmake_old.
 
 if (gtest_build_samples)
   cxx_executable(sample1_unittest samples gtest_main samples/sample1.cc)
@@ -180,7 +180,7 @@ endif()
 #
 # The tests are not built by default.  To build them, set the
 # gtest_build_tests option to ON.  You can do it by running ccmake
-# or specifying the -Dgtest_build_tests=ON flag when running cmake.
+# or specifying the -Dgtest_build_tests=ON flag when running cmake_old.
 
 if (gtest_build_tests)
   # This must be set in the root directory for the tests to be run by
