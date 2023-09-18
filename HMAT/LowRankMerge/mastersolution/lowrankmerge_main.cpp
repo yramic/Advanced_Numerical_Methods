@@ -11,9 +11,11 @@
 #include <iostream>
 #include <cmath>
 #include <iomanip>
+#include <chrono>
 
 int main(int argc, char **argv) {
 
+    auto start = std::chrono::high_resolution_clock::now();
     // Tabulate approximation errors of low_rank_merge()
     std::cout << "Problem 2-6.c" << std::endl;
     for(int p=3; p<=12; ++p) {
@@ -55,5 +57,8 @@ int main(int argc, char **argv) {
                   << "Rank = "
                   << errs.second << std::endl;
     }
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    std::cout<<"Runtime: "<<duration.count()<<" ms"<<std::endl;
     return 0;
 }
