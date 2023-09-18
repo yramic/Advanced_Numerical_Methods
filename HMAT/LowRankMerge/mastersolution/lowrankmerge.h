@@ -33,10 +33,11 @@ std::pair<double,double> test_low_rank_merge(size_t n);
  *
  * @param Ai, Bi the factorized form of Xi: $X_i = A_i B_i^T$
  * @param rtol Relative tolerance such that all singular values <= s_1 * rtol are set to 0.
+ * @param atol Absolute tolerance such that all singular values <= atol are set to 0.
  */
 std::pair<Eigen::MatrixXd,Eigen::MatrixXd> adap_rank_merge(
         const Eigen::MatrixXd &A1, const Eigen::MatrixXd &B1,
-        const Eigen::MatrixXd &A2, const Eigen::MatrixXd &B2, double rtol);
+        const Eigen::MatrixXd &A2, const Eigen::MatrixXd &B2, double rtol, double atol);
 
 /** @brief Compute the error between $\VZ$ and $\tilde{\VZ}$ in scaled Frobenius norm
  *  and the number of singular values different from 0, given rtol.
