@@ -64,8 +64,7 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> low_rank_merge(
   S.diagonal() = s.head(A1.cols());
 
   // Only consider first q columns of U and V
-  Eigen::MatrixXd U =
-      SVD.matrixU().leftCols(A1.cols());  
+  Eigen::MatrixXd U = SVD.matrixU().leftCols(A1.cols());  
   Eigen::MatrixXd V = SVD.matrixV().leftCols(A1.cols());
 
 #ifndef isDense
@@ -123,31 +122,32 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> low_rank_merge(
 std::pair<double, double> test_low_rank_merge(size_t n) {
 
 #if SOLUTION
-  // Build $K_1$, $K_2$ and $Z$ defined in sub-problem (2-6.a)
+  double nf = static_cast<double>(n); // convert data type
+  // Build $K_1$, $K_2$ and $Z$ defined in \prbcref<prb:lrm:subprb:1>
   Eigen::MatrixXd X1(n, n), X2(n, n);
-  for (double i = 0.; i < n; ++i) {
-    for (double j = 0.; j < n; ++j) {
-      X1(i, j) = std::sin((i - j) / n);
-      X2(i, j) = std::cos((i - j - 0.5) / n);
+  for (int i = 0.; i < n; ++i) {
+    for (int j = 0.; j < n; ++j) {
+      X1(i, j) = std::sin((i - j) / nf);
+      X2(i, j) = std::cos((i - j - 0.5) / nf);
     }
   }
   Eigen::MatrixXd Z(n, 2 * n);
   Z << X1, X2;
 
-  // Build A1, B1, A2, B2 using HINT 1 (2-6.c)
+  // Build A1, B1, A2, B2 using \prbcref<prb:lrm:1h>
   Eigen::MatrixXd A1(n, 2), B1(n, 2), A2(n, 2), B2(n, 2);
-  for (double i = 0.; i < n; ++i) {
-    A1(i, 0) = std::sin(i / n);
-    A1(i, 1) = std::cos(i / n);
-    B1(i, 0) = std::cos(i / n);
-    B1(i, 1) = -std::sin(i / n);
-    A2(i, 0) = std::cos(i / n);
-    A2(i, 1) = std::sin(i / n);
-    B2(i, 0) = std::cos((i + 0.5) / n);
-    B2(i, 1) = std::sin((i + 0.5) / n);
+  for (int i = 0.; i < n; ++i) {
+    A1(i, 0) = std::sin(i / nf);
+    A1(i, 1) = std::cos(i / nf);
+    B1(i, 0) = std::cos(i / nf);
+    B1(i, 1) = -std::sin(i / nf);
+    A2(i, 0) = std::cos(i / nf);
+    A2(i, 1) = std::sin(i / nf);
+    B2(i, 0) = std::cos((i + 0.5) / nf);
+    B2(i, 1) = std::sin((i + 0.5) / nf);
   }
 
-  // Call the function implemented in sub-problem (2-6.b)
+  // Call the function implemented in \prbcref<prb:lrm:subprb:2>
   std::pair<Eigen::MatrixXd, Eigen::MatrixXd> AB = low_rank_merge(
       A1, B1, A2, B2);
 
@@ -274,31 +274,32 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> adap_rank_merge(
 std::pair<double, size_t> test_adap_rank_merge(size_t n, double rtol) {
 
 #if SOLUTION
-  // Build $K_1$, $K_2$ and $Z$ defined in sub-problem (2-6.a)
+  double nf = static_cast<double>(n); // convert data type
+  // Build $K_1$, $K_2$ and $Z$ defined in \prbcref<prb:lrm:subprb:1>
   Eigen::MatrixXd X1(n, n), X2(n, n);
-  for (double i = 0.; i < n; ++i) {
-    for (double j = 0.; j < n; ++j) {
-      X1(i, j) = std::sin((i - j) / n);
-      X2(i, j) = std::cos((i - j - 0.5) / n);
+  for (int i = 0.; i < n; ++i) {
+    for (int j = 0.; j < n; ++j) {
+      X1(i, j) = std::sin((i - j) / nf);
+      X2(i, j) = std::cos((i - j - 0.5) / nf);
     }
   }
   Eigen::MatrixXd Z(n, 2 * n);
   Z << X1, X2;
 
-  // Build A1, B1, A2, B2 using HINT 1 (2-6.c)
+  // Build A1, B1, A2, B2 using \prbcref<prb:lrm:1h>
   Eigen::MatrixXd A1(n, 2), B1(n, 2), A2(n, 2), B2(n, 2);
-  for (double i = 0.; i < n; ++i) {
-    A1(i, 0) = std::sin(i / n);
-    A1(i, 1) = std::cos(i / n);
-    B1(i, 0) = std::cos(i / n);
-    B1(i, 1) = -std::sin(i / n);
-    A2(i, 0) = std::cos(i / n);
-    A2(i, 1) = std::sin(i / n);
-    B2(i, 0) = std::cos((i + 0.5) / n);
-    B2(i, 1) = std::sin((i + 0.5) / n);
+  for (int i = 0.; i < n; ++i) {
+    A1(i, 0) = std::sin(i / nf);
+    A1(i, 1) = std::cos(i / nf);
+    B1(i, 0) = std::cos(i / nf);
+    B1(i, 1) = -std::sin(i / nf);
+    A2(i, 0) = std::cos(i / nf);
+    A2(i, 1) = std::sin(i / nf);
+    B2(i, 0) = std::cos((i + 0.5) / nf);
+    B2(i, 1) = std::sin((i + 0.5) / nf);
   }
 
-  // Call the function from sub-problem (2-6.d)
+  // Call the function from \prbcref<prb:lrm:subprb:4>
   std::pair<Eigen::MatrixXd, Eigen::MatrixXd> AB = adap_rank_merge(
       A1, B1, A2, B2, rtol, __DBL_MIN__);  
 

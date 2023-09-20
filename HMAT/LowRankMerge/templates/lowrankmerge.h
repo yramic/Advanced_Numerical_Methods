@@ -24,7 +24,7 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd> low_rank_merge(
 
 /** @brief Compute errors between $\VZ$ and $\tilde{\VZ}$ in scaled Frobenius and max norms.
  *
- * @param n Number of rows/columns of matrices $VK_1$ and $VK_2$ defined as in Subproblem (2-6.a)
+ * @param n Number of rows/columns of matrices $VK_1$ and $VK_2$ defined as in \prbcref<prb:lrm:subprb:1>
  */
 std::pair<double,double> test_low_rank_merge(size_t n);
 
@@ -42,7 +42,7 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd> adap_rank_merge(
 /** @brief Compute the error between $\VZ$ and $\tilde{\VZ}$ in scaled Frobenius norm
  *  and the number of singular values different from 0, given rtol.
  * 
- * @param n Number of rows/columns of matrices $VK_1$ and $VK_2$ defined as in Subproblem (2-6.a)
+ * @param n Number of rows/columns of matrices $VK_1$ and $VK_2$ defined as in \prbcref<prb:lrm:subprb:1>
  * @param rtol Relative tolerance such that all singular values <= s_1 * rtol are set to 0.
  */
 std::pair<double,size_t> test_adap_rank_merge(size_t n, double rtol);
