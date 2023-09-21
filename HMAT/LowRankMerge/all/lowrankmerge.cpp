@@ -23,7 +23,7 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> low_rank_merge(
 #if SOLUTION
   size_t m = B1.rows();
   size_t n = B1.cols();
-  // Find low-rank factors of B1 and B2 using QR decomposition as in (2.4.2.25)
+  // Find low-rank factors of B1 and B2 using QR decomposition as in (2.4.2.25) \cref{par:mergetrunc}
   Eigen::HouseholderQR<Eigen::MatrixXd> QR1 = B1.householderQr();
   Eigen::HouseholderQR<Eigen::MatrixXd> QR2 = B2.householderQr();
 
@@ -44,7 +44,7 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> low_rank_merge(
   Eigen::MatrixXd Z(A1.rows(), R1.rows() + R2.rows());
   Z << A1 * R1.transpose(), A2 * R2.transpose();
 
-  // Compute SVD of $\hat Z$ as in (2.4.2.25)
+  // Compute SVD of $\hat Z$ as in (2.4.2.25) \cref{par:mergetrunc}
   Eigen::JacobiSVD<Eigen::MatrixXd> SVD(
       Z, Eigen::ComputeThinU | Eigen::ComputeThinV);
   Eigen::VectorXd s = SVD.singularValues();
@@ -72,7 +72,7 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> low_rank_merge(
   // The remaining columns of $\VU$ and $\VV$ do not correspond
   // to actual singular vectors and are not computed in thin format.
 
-  // Compute $\tilde A$ as in (2.4.2.27a)
+  // Compute $\tilde A$ as in \eqref{eq:lrfac1}
   Eigen::MatrixXd Atilde = U * S;
 
   // Compute $\tilde B$ while avoiding recovering Q as a dense matrix
@@ -85,7 +85,7 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> low_rank_merge(
   return {Atilde, Btilde};
 
 #else
-  // TODO: Compute {Atilde,Btilde} as in (2.4.2.27a)/(2.4.2.27b)
+  // TODO: Compute {Atilde,Btilde} as in \eqref{eq:lrfac1}/\eqref{eq:lrfac2}
 
   // Dummy solution
   return {Eigen::MatrixXd::Zero(3,3), Eigen::MatrixXd::Zero(3,3)};
@@ -157,7 +157,7 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> adap_rank_merge(
 #if SOLUTION
   size_t m = B1.rows();
   size_t n = B1.cols();
-  // Find low-rank factors of B1 and B2 using QR decomposition
+  // Find low-rank factors of B1 and B2 using QR decomposition as in (2.4.2.25) \cref{par:mergetrunc}
   Eigen::HouseholderQR<Eigen::MatrixXd> QR1 = B1.householderQr();
   Eigen::HouseholderQR<Eigen::MatrixXd> QR2 = B2.householderQr();
 
@@ -171,12 +171,12 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> adap_rank_merge(
   Eigen::MatrixXd Z(A1.rows(), R1.rows() + R2.rows());
   Z << A1 * R1.transpose(), A2 * R2.transpose();
 
-  // Compute SVD of $\hat Z$ as in (2.4.2.25)
+  // Compute SVD of $\hat Z$
   Eigen::JacobiSVD<Eigen::MatrixXd> SVD(
       Z, Eigen::ComputeThinU | Eigen::ComputeThinV);
   Eigen::VectorXd s = SVD.singularValues();
 
-  // Find singular values larger than atol and rtol as in (2.4.2.20)
+  // Find singular values larger than atol and rtol as in \eqref{eq:adaptrunc}
   unsigned p = s.size();
   for (unsigned q = 1; q < s.size(); ++q) {
     // $q \in \{1 , ..., p-1\}$ : $\sigma_{q} \le \text{rtol} \cdot \sigma_0$
@@ -201,7 +201,7 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> adap_rank_merge(
   Eigen::MatrixXd V2 = Eigen::MatrixXd::Identity(m, std::min(m, n)) * 
                         V.bottomRows(std::min(m, n));
 
-  // Compute $\tilde A$ as in (2.4.2.27a)
+  // Compute $\tilde A$ as in \eqref{eq:lrfac1}
   Eigen::MatrixXd Atilde = U * S;
 
   // Compute $\tilde B$ while avoiding recovering Q as a dense matrix
@@ -214,7 +214,7 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> adap_rank_merge(
   return {Atilde, Btilde};
 
 #else
-  // TODO: Compute {Atilde,Btilde} as in (2.4.2.27a)/(2.4.2.27b), given (2.4.2.21)
+  // TODO: Compute {Atilde,Btilde} as in \eqref{eq:lrfac1}/\eqref{eq:lrfac2}, given \eqref{eq:adaptrunc}
   
   // Dummy solution, to be replaced
   return {Eigen::MatrixXd::Zero(3,3), Eigen::MatrixXd::Zero(3,3)};

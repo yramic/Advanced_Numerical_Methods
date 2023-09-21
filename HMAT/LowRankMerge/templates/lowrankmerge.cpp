@@ -20,7 +20,7 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> low_rank_merge(
   assert(A1.cols() == B1.cols() && A2.cols() == B2.cols() &&
          A1.cols() == A2.cols() && "All no.s of cols should be equal to q");
 
-  // TODO: Compute {Atilde,Btilde} as in (2.4.2.27a)/(2.4.2.27b)
+  // TODO: Compute {Atilde,Btilde} as in \eqref{eq:lrfac1}/\eqref{eq:lrfac2}
 
   // Dummy solution
   return {Eigen::MatrixXd::Zero(3,3), Eigen::MatrixXd::Zero(3,3)};
@@ -46,7 +46,7 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> adap_rank_merge(
   assert(A1.cols() == B1.cols() && A2.cols() == B2.cols() &&
          A1.cols() == A2.cols() && "All no.s of cols should be equal to q");
 
-  // TODO: Compute {Atilde,Btilde} as in (2.4.2.27a)/(2.4.2.27b), given (2.4.2.21)
+  // TODO: Compute {Atilde,Btilde} as in \eqref{eq:lrfac1}/\eqref{eq:lrfac2}, given \eqref{eq:adaptrunc}
   
   // Dummy solution, to be replaced
   return {Eigen::MatrixXd::Zero(3,3), Eigen::MatrixXd::Zero(3,3)};
