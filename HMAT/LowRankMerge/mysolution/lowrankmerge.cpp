@@ -47,8 +47,8 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> adap_rank_merge(
          A1.cols() == A2.cols() && "All no.s of cols should be equal to q");
 
   // TODO: Compute {Atilde,Btilde} as in (2.4.2.27a)/(2.4.2.27b), given (2.4.2.21)
-
-  // Dummy solution
+  
+  // Dummy solution, to be replaced
   return {Eigen::MatrixXd::Zero(3,3), Eigen::MatrixXd::Zero(3,3)};
 }
 /* SAM_LISTING_END_2 */
@@ -58,7 +58,7 @@ std::pair<double, size_t> test_adap_rank_merge(size_t n, double rtol) {
 
   // TODO: Compute {err_Frob,p}, with p := no. of singular values larger than tolerance
 
-  // Dummy solution
+  // Dummy solution, to be replaced
   return {0, 0};
 }
 /* SAM_LISTING_END_3 */

@@ -216,7 +216,7 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> adap_rank_merge(
 #else
   // TODO: Compute {Atilde,Btilde} as in (2.4.2.27a)/(2.4.2.27b), given (2.4.2.21)
   
-  // Dummy solution
+  // Dummy solution, to be replaced
   return {Eigen::MatrixXd::Zero(3,3), Eigen::MatrixXd::Zero(3,3)};
 #endif
 }
@@ -226,7 +226,9 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> adap_rank_merge(
 std::pair<double, size_t> test_adap_rank_merge(size_t n, double rtol) {
 
 #if SOLUTION
-  double nf = static_cast<double>(n); // convert data type
+  // Make  sure that trigonometric functions receive float arguments
+  // "Hidden integer arithmetic" is a trap of C/C++
+  const double nf = static_cast<double>(n); 
   // Build $K_1$, $K_2$ and $Z$ defined in \prbcref<prb:lrm:subprb:1>
   Eigen::MatrixXd X1(n, n), X2(n, n);
   for (int i = 0.; i < n; ++i) {
@@ -268,7 +270,7 @@ std::pair<double, size_t> test_adap_rank_merge(size_t n, double rtol) {
 #else
   // TODO: Compute {err_Frob,p}, with p := no. of singular values larger than tolerance
 
-  // Dummy solution
+  // Dummy solution, to be replaced
   return {0, 0};
 #endif
 }

@@ -10,8 +10,7 @@
 
 #include <Eigen/QR>
 #include <Eigen/SVD>
-// #undef SOLUTION
-// #define isDense 
+
 namespace LowRankMerge {
 
 /* SAM_LISTING_BEGIN_0 */
@@ -21,20 +20,11 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> low_rank_merge(
   assert(A1.cols() == B1.cols() && A2.cols() == B2.cols() &&
          A1.cols() == A2.cols() && "All no.s of cols should be equal to q");
 
-#if SOLUTION
   size_t m = B1.rows();
   size_t n = B1.cols();
   // Find low-rank factors of B1 and B2 using QR decomposition as in (2.4.2.25)
   Eigen::HouseholderQR<Eigen::MatrixXd> QR1 = B1.householderQr();
   Eigen::HouseholderQR<Eigen::MatrixXd> QR2 = B2.householderQr();
-
-#ifdef isDense
-  // Recover the thin matrix Q in a dense format
-  Eigen::MatrixXd Q1 =
-      QR1.householderQ() * Eigen::MatrixXd::Identity(m, std::min(m, n));
-  Eigen::MatrixXd Q2 =
-      QR2.householderQ() * Eigen::MatrixXd::Identity(m, std::min(m, n));
-#endif
 
   // Build the thin matrix R
   Eigen::MatrixXd R1 = Eigen::MatrixXd::Identity(std::min(m, n), m) *
@@ -67,13 +57,11 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> low_rank_merge(
   Eigen::MatrixXd U = SVD.matrixU().leftCols(A1.cols());  
   Eigen::MatrixXd V = SVD.matrixV().leftCols(A1.cols());
 
-#ifndef isDense
   // Split V to be compatible with Q1 and Q2 in compressed format
   Eigen::MatrixXd V1 = Eigen::MatrixXd::Identity(m, std::min(m, n)) * 
                         V.topRows(std::min(m, n));
   Eigen::MatrixXd V2 = Eigen::MatrixXd::Identity(m, std::min(m, n)) * 
                         V.bottomRows(std::min(m, n));
-#endif
 
   // About SVD decomposition with Eigen:
   // With Eigen::JacobiSVD you can ask for thin $\VU$ or $\VV$ to be computed.
@@ -83,45 +71,24 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> low_rank_merge(
   // The remaining columns of $\VU$ and $\VV$ do not correspond
   // to actual singular vectors and are not computed in thin format.
 
-#ifdef isDense
-  // Assemble Q from Q1 and Q2 as in (2.4.2.26)
-  Eigen::MatrixXd Q = Eigen::MatrixXd::Zero(
-      Q1.rows() + Q2.rows(), Q1.cols() + Q2.cols()); 
-  Q.block(0, 0, Q1.rows(), Q1.cols()) = Q1;
-  Q.block(Q1.rows(), Q1.cols(), Q2.rows(), Q2.cols()) = Q2;
-#endif
-
   // Compute $\tilde A$ as in (2.4.2.27a)
   Eigen::MatrixXd Atilde = U * S;
 
-#ifdef isDense
-  // Compute $\tilde B$ as in (2.4.2.27b)
-  Eigen::MatrixXd Btilde = (Q * V).leftCols(A1.cols());  
-#endif
-
-#ifndef isDense
   // Compute $\tilde B$ while avoiding recovering Q as a dense matrix
   Eigen::MatrixXd Btilde1 = QR1.householderQ() * V1;
   Eigen::MatrixXd Btilde2 = QR2.householderQ() * V2;
   Eigen::MatrixXd Btilde(Btilde1.rows()+Btilde2.rows(), Btilde1.cols());
   Btilde << Btilde1, Btilde2;
-#endif
 
   // Return factors of $\tilde Z$
   return {Atilde, Btilde};
 
-#else
-  // Dummy solution
-  return {Eigen::MatrixXd::Zero(3,3), Eigen::MatrixXd::Zero(3,3)};
-  // TODO: Compute {Atilde,Btilde} as in (2.4.2.27a)/(2.4.2.27b)
-#endif
 }
 /* SAM_LISTING_END_0 */
 
 /* SAM_LISTING_BEGIN_1 */
 std::pair<double, double> test_low_rank_merge(size_t n) {
 
-#if SOLUTION
   double nf = static_cast<double>(n); // convert data type
   // Build $K_1$, $K_2$ and $Z$ defined in \prbcref<prb:lrm:subprb:1>
   Eigen::MatrixXd X1(n, n), X2(n, n);
@@ -161,12 +128,6 @@ std::pair<double, double> test_low_rank_merge(size_t n) {
   // Return scaled Frobunius norm and maximum norm of approximation error
   return {err_Frob, err_max};
 
-#else
-  // Dummy solution
-  return {0, 0};
-  // TODO: Compute {err_Frob,err_max}, approximation error in 
-  // scaled Frobunius norm and maximum norm
-#endif
 }
 /* SAM_LISTING_END_1 */
 
@@ -178,20 +139,11 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> adap_rank_merge(
   assert(A1.cols() == B1.cols() && A2.cols() == B2.cols() &&
          A1.cols() == A2.cols() && "All no.s of cols should be equal to q");
 
-#if SOLUTION
   size_t m = B1.rows();
   size_t n = B1.cols();
   // Find low-rank factors of B1 and B2 using QR decomposition
   Eigen::HouseholderQR<Eigen::MatrixXd> QR1 = B1.householderQr();
   Eigen::HouseholderQR<Eigen::MatrixXd> QR2 = B2.householderQr();
-
-#ifdef isDense
-  // Recover the thin matrix Q in a dense format
-  Eigen::MatrixXd Q1 =
-      QR1.householderQ() * Eigen::MatrixXd::Identity(m, std::min(m, n));
-  Eigen::MatrixXd Q2 =
-      QR2.householderQ() * Eigen::MatrixXd::Identity(m, std::min(m, n));
-#endif
 
   // Build the thin matrix R
   Eigen::MatrixXd R1 = Eigen::MatrixXd::Identity(std::min(m, n), m) *
@@ -227,54 +179,33 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> adap_rank_merge(
   Eigen::MatrixXd U = SVD.matrixU().leftCols(p);
   Eigen::MatrixXd V = SVD.matrixV().leftCols(p);
 
-#ifndef isDense
   // Split V to be compatible with Q1 and Q2 in compressed format
   Eigen::MatrixXd V1 = Eigen::MatrixXd::Identity(m, std::min(m, n)) *
                         V.topRows(std::min(m, n));
   Eigen::MatrixXd V2 = Eigen::MatrixXd::Identity(m, std::min(m, n)) * 
                         V.bottomRows(std::min(m, n));
-#endif
-
-#ifdef isDense
-  // Assemble Q from Q1 and Q2 as in (2.4.2.26)
-  Eigen::MatrixXd Q = Eigen::MatrixXd::Zero(
-      Q1.rows() + Q2.rows(), Q1.cols() + Q2.cols());  
-  Q.block(0, 0, Q1.rows(), Q1.cols()) = Q1;
-  Q.block(Q1.rows(), Q1.cols(), Q2.rows(), Q2.cols()) = Q2;
-#endif
 
   // Compute $\tilde A$ as in (2.4.2.27a)
   Eigen::MatrixXd Atilde = U * S;
 
-#ifdef isDense
-  // Compute $\tilde B$ as in (2.4.2.27b)
-  Eigen::MatrixXd Btilde = (Q * V).leftCols(A1.cols());  
-#endif
-
-#ifndef isDense
   // Compute $\tilde B$ while avoiding recovering Q as a dense matrix
   Eigen::MatrixXd Btilde1 = QR1.householderQ() * V1;
   Eigen::MatrixXd Btilde2 = QR2.householderQ() * V2;
   Eigen::MatrixXd Btilde(Btilde1.rows()+Btilde2.rows(), Btilde1.cols());
   Btilde << Btilde1, Btilde2;
-#endif
 
   // Return factors of $\tilde Z$
   return {Atilde, Btilde};
 
-#else
-  // Dummy solution
-  return {Eigen::MatrixXd::Zero(3,3), Eigen::MatrixXd::Zero(3,3)};
-  // Compute {Atilde,Btilde} as in (2.4.2.27a)/(2.4.2.27b), given (2.4.2.21)
-#endif
 }
 /* SAM_LISTING_END_2 */
 
 /* SAM_LISTING_BEGIN_3 */
 std::pair<double, size_t> test_adap_rank_merge(size_t n, double rtol) {
 
-#if SOLUTION
-  double nf = static_cast<double>(n); // convert data type
+  // Make  sure that trigonometric functions receive float arguments
+  // "Hidden integer arithmetic" is a trap of C/C++
+  const double nf = static_cast<double>(n); 
   // Build $K_1$, $K_2$ and $Z$ defined in \prbcref<prb:lrm:subprb:1>
   Eigen::MatrixXd X1(n, n), X2(n, n);
   for (int i = 0.; i < n; ++i) {
@@ -313,11 +244,6 @@ std::pair<double, size_t> test_adap_rank_merge(size_t n, double rtol) {
   // the rank required to achieve the relative tolerance rtol
   return {err_Frob, AB.first.cols()};
 
-#else
-  // Dummy solution
-  return {0, 0};
-  // Compute {err_Frob,p}, with p := no. of singular values larger than tolerance
-#endif
 }
 /* SAM_LISTING_END_3 */
 
