@@ -1,5 +1,0 @@
-if(EXISTS "/Users/bobschreiner/ETH/AdvNumCse/Code/cmake-build-debug/HMAT/KernMatLLRApprox/KernMatLLRApprox_test_all[1]_tests.cmake")
-  include("/Users/bobschreiner/ETH/AdvNumCse/Code/cmake-build-debug/HMAT/KernMatLLRApprox/KernMatLLRApprox_test_all[1]_tests.cmake")
-else()
-  add_test(KernMatLLRApprox_test_all_NOT_BUILT KernMatLLRApprox_test_all_NOT_BUILT)
-endif()

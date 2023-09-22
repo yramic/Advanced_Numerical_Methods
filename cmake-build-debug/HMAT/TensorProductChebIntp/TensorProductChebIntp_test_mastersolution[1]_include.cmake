@@ -1,5 +1,0 @@
-if(EXISTS "/Users/bobschreiner/ETH/AdvNumCse/Code/cmake-build-debug/HMAT/TensorProductChebIntp/TensorProductChebIntp_test_mastersolution[1]_tests.cmake")
-  include("/Users/bobschreiner/ETH/AdvNumCse/Code/cmake-build-debug/HMAT/TensorProductChebIntp/TensorProductChebIntp_test_mastersolution[1]_tests.cmake")
-else()
-  add_test(TensorProductChebIntp_test_mastersolution_NOT_BUILT TensorProductChebIntp_test_mastersolution_NOT_BUILT)
-endif()
