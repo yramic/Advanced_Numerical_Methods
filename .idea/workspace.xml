@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="CMakePresetLoader">{
+  &quot;useNewFormat&quot;: true
+}</component>
+  <component name="CMakeReloadState">
+    <option name="reloaded" value="true" />
+  </component>
+  <component name="CMakeRunConfigurationManager">
+    <generated>
+      <config projectName="ADVNUMCSE" targetName="LowRankMerge_test_mysolution" />
+      <config projectName="ADVNUMCSE" targetName="test_HMAT_mastersolution" />
+      <config projectName="ADVNUMCSE" targetName="KernMatLLRApprox_mastersolution.static" />
+      <config projectName="ADVNUMCSE" targetName="test_HMAT_mysolution" />
+      <config projectName="ADVNUMCSE" targetName="LowRankMerge_mysolution.static" />
+      <config projectName="ADVNUMCSE" targetName="KernMatLLRApprox_test_mysolution" />
+      <config projectName="ADVNUMCSE" targetName="LowRankMerge_all.static" />
+      <config projectName="ADVNUMCSE" targetName="GravitationalForces_mysolution.static" />
+      <config projectName="ADVNUMCSE" targetName="KernMatLLRApprox_all.static" />
+      <config projectName="ADVNUMCSE" targetName="KernMatLLRApprox_test_mastersolution" />
+      <config projectName="ADVNUMCSE" targetName="TensorProductChebIntp_mastersolution" />
+      <config projectName="ADVNUMCSE" targetName="GravitationalForces_test_mastersolution" />
+      <config projectName="ADVNUMCSE" targetName="GravitationalForces_mysolution" />
+      <config projectName="ADVNUMCSE" targetName="GravitationalForces_test_mysolution" />
+      <config projectName="ADVNUMCSE" targetName="GravitationalForces_mastersolution.static" />
+      <config projectName="ADVNUMCSE" targetName="TensorProductChebIntp_mysolution.static" />
+      <config projectName="ADVNUMCSE" targetName="TensorProductChebIntp_test_mysolution" />
+      <config projectName="ADVNUMCSE" targetName="LowRankMerge_test_mastersolution" />
+      <config projectName="ADVNUMCSE" targetName="LowRankMerge_mastersolution.static" />
+      <config projectName="ADVNUMCSE" targetName="clustertree" />
+      <config projectName="ADVNUMCSE" targetName="TensorProductChebIntp_mastersolution.static" />
+      <config projectName="ADVNUMCSE" targetName="LowRankMerge_test_all" />
+      <config projectName="ADVNUMCSE" targetName="GravitationalForces_all.static" />
+      <config projectName="ADVNUMCSE" targetName="TensorProductChebIntp_mysolution" />
+      <config projectName="ADVNUMCSE" targetName="KernMatLLRApprox_mysolution" />
+      <config projectName="ADVNUMCSE" targetName="TensorProductChebIntp_test_mastersolution" />
+      <config projectName="ADVNUMCSE" targetName="KernMatLLRApprox_test_all" />
+      <config projectName="ADVNUMCSE" targetName="LowRankMerge_mastersolution" />
+      <config projectName="ADVNUMCSE" targetName="KernMatLLRApprox_mastersolution" />
+      <config projectName="ADVNUMCSE" targetName="Clustering" />
+      <config projectName="ADVNUMCSE" targetName="matrixpartition" />
+      <config projectName="ADVNUMCSE" targetName="GravitationalForces_mastersolution" />
+      <config projectName="ADVNUMCSE" targetName="KernMatLLRApprox_all" />
+      <config projectName="ADVNUMCSE" targetName="GravitationalForces_test_all" />
+      <config projectName="ADVNUMCSE" targetName="LowRankMerge_all" />
+      <config projectName="ADVNUMCSE" targetName="GravitationalForces_all" />
+      <config projectName="ADVNUMCSE" targetName="LowRankMerge_mysolution" />
+      <config projectName="ADVNUMCSE" targetName="TensorProductChebIntp_test_all" />
+      <config projectName="ADVNUMCSE" targetName="KernMatLLRApprox_mysolution.static" />
+      <config projectName="ADVNUMCSE" targetName="TensorProductChebIntp_all" />
+      <config projectName="ADVNUMCSE" targetName="TensorProductChebIntp_all.static" />
+    </generated>
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="9a30968c-e16e-4fd7-ad26-c59b832ddfc4" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitlab-ci.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.gitlab-ci.yml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="clangTidyViaClangd" value="false" />
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="CMakeLists.txt" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectApplicationVersion">
+    <option name="ide" value="CLion" />
+    <option name="majorVersion" value="2022" />
+    <option name="minorVersion" value="3.2" />
+  </component>
+  <component name="ProjectId" id="2UjwuJNJx4OD3bMayY6Wu76jU1L" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;cf.advertisement.text.has.clang-format&quot;: &quot;true&quot;,
+    &quot;cf.advertisement.text.overridden&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/bobschreiner/ETH/AdvNumCse/Code&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/HMAT/TensorProductChebIntp/all" />
+      <recent name="$PROJECT_DIR$/DUMMYCHAPTER/BlendedParametrization" />
+    </key>
+  </component>
+  <component name="RunManager" selected="CMake Application.clustertree">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GravitationalForces_test_all" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="GravitationalForces_test_all" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="GravitationalForces_test_all" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GravitationalForces_test_mastersolution" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="GravitationalForces_test_mastersolution" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="GravitationalForces_test_mastersolution" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GravitationalForces_test_mysolution" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="GravitationalForces_test_mysolution" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="GravitationalForces_test_mysolution" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Clustering" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="Clustering" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GravitationalForces_all" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="GravitationalForces_all" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="GravitationalForces_all">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GravitationalForces_all.static" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="GravitationalForces_all.static" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GravitationalForces_mastersolution" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="GravitationalForces_mastersolution" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="GravitationalForces_mastersolution">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GravitationalForces_mastersolution.static" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="GravitationalForces_mastersolution.static" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GravitationalForces_mysolution" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="GravitationalForces_mysolution" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="GravitationalForces_mysolution">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GravitationalForces_mysolution.static" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="GravitationalForces_mysolution.static" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="KernMatLLRApprox_all" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="KernMatLLRApprox_all" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="KernMatLLRApprox_all">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="KernMatLLRApprox_all.static" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="KernMatLLRApprox_all.static" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="KernMatLLRApprox_mastersolution" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="KernMatLLRApprox_mastersolution" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="KernMatLLRApprox_mastersolution">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="KernMatLLRApprox_mastersolution.static" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="KernMatLLRApprox_mastersolution.static" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="KernMatLLRApprox_mysolution" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="KernMatLLRApprox_mysolution" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="KernMatLLRApprox_mysolution">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="KernMatLLRApprox_mysolution.static" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="KernMatLLRApprox_mysolution.static" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="KernMatLLRApprox_test_all" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="KernMatLLRApprox_test_all" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="KernMatLLRApprox_test_all">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="KernMatLLRApprox_test_mastersolution" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="KernMatLLRApprox_test_mastersolution" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="KernMatLLRApprox_test_mastersolution">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="KernMatLLRApprox_test_mysolution" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="KernMatLLRApprox_test_mysolution" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="KernMatLLRApprox_test_mysolution">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LowRankMerge_all" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="LowRankMerge_all" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="LowRankMerge_all">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LowRankMerge_all.static" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="LowRankMerge_all.static" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LowRankMerge_mastersolution" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="LowRankMerge_mastersolution" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="LowRankMerge_mastersolution">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LowRankMerge_mastersolution.static" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="LowRankMerge_mastersolution.static" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LowRankMerge_mysolution" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="LowRankMerge_mysolution" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="LowRankMerge_mysolution">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LowRankMerge_mysolution.static" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="LowRankMerge_mysolution.static" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LowRankMerge_test_all" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="LowRankMerge_test_all" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="LowRankMerge_test_all">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LowRankMerge_test_mastersolution" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="LowRankMerge_test_mastersolution" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="LowRankMerge_test_mastersolution">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LowRankMerge_test_mysolution" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="LowRankMerge_test_mysolution" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="LowRankMerge_test_mysolution">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TensorProductChebIntp_all" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="TensorProductChebIntp_all" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="TensorProductChebIntp_all">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TensorProductChebIntp_all.static" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="TensorProductChebIntp_all.static" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TensorProductChebIntp_mastersolution" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="TensorProductChebIntp_mastersolution" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="TensorProductChebIntp_mastersolution">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TensorProductChebIntp_mastersolution.static" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="TensorProductChebIntp_mastersolution.static" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TensorProductChebIntp_mysolution" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="TensorProductChebIntp_mysolution" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="TensorProductChebIntp_mysolution">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TensorProductChebIntp_mysolution.static" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="TensorProductChebIntp_mysolution.static" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TensorProductChebIntp_test_all" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="TensorProductChebIntp_test_all" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="TensorProductChebIntp_test_all">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TensorProductChebIntp_test_mastersolution" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="TensorProductChebIntp_test_mastersolution" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="TensorProductChebIntp_test_mastersolution">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TensorProductChebIntp_test_mysolution" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="TensorProductChebIntp_test_mysolution" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="TensorProductChebIntp_test_mysolution">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="clustertree" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="clustertree" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="clustertree">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="matrixpartition" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="matrixpartition" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ADVNUMCSE" RUN_TARGET_NAME="matrixpartition">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_HMAT_mastersolution" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="test_HMAT_mastersolution" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_HMAT_mysolution" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ADVNUMCSE" TARGET_NAME="test_HMAT_mysolution" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="CMake Application.test_HMAT_mastersolution" />
+      <item itemvalue="CMake Application.test_HMAT_mysolution" />
+      <item itemvalue="CMake Application.Clustering" />
+      <item itemvalue="CMake Application.clustertree" />
+      <item itemvalue="CMake Application.matrixpartition" />
+      <item itemvalue="CMake Application.GravitationalForces_all" />
+      <item itemvalue="CMake Application.GravitationalForces_all.static" />
+      <item itemvalue="CMake Application.GravitationalForces_mastersolution" />
+      <item itemvalue="CMake Application.GravitationalForces_mastersolution.static" />
+      <item itemvalue="CMake Application.GravitationalForces_mysolution" />
+      <item itemvalue="CMake Application.GravitationalForces_mysolution.static" />
+      <item itemvalue="CMake Application.KernMatLLRApprox_all" />
+      <item itemvalue="CMake Application.KernMatLLRApprox_all.static" />
+      <item itemvalue="CMake Application.KernMatLLRApprox_mastersolution" />
+      <item itemvalue="CMake Application.KernMatLLRApprox_mastersolution.static" />
+      <item itemvalue="CMake Application.KernMatLLRApprox_mysolution" />
+      <item itemvalue="CMake Application.KernMatLLRApprox_mysolution.static" />
+      <item itemvalue="CMake Application.KernMatLLRApprox_test_all" />
+      <item itemvalue="CMake Application.KernMatLLRApprox_test_mastersolution" />
+      <item itemvalue="CMake Application.KernMatLLRApprox_test_mysolution" />
+      <item itemvalue="CMake Application.LowRankMerge_all" />
+      <item itemvalue="CMake Application.LowRankMerge_all.static" />
+      <item itemvalue="CMake Application.LowRankMerge_mastersolution" />
+      <item itemvalue="CMake Application.LowRankMerge_mastersolution.static" />
+      <item itemvalue="CMake Application.LowRankMerge_mysolution" />
+      <item itemvalue="CMake Application.LowRankMerge_mysolution.static" />
+      <item itemvalue="CMake Application.LowRankMerge_test_all" />
+      <item itemvalue="CMake Application.LowRankMerge_test_mastersolution" />
+      <item itemvalue="CMake Application.LowRankMerge_test_mysolution" />
+      <item itemvalue="CMake Application.TensorProductChebIntp_all" />
+      <item itemvalue="CMake Application.TensorProductChebIntp_all.static" />
+      <item itemvalue="CMake Application.TensorProductChebIntp_mastersolution" />
+      <item itemvalue="CMake Application.TensorProductChebIntp_mastersolution.static" />
+      <item itemvalue="CMake Application.TensorProductChebIntp_mysolution" />
+      <item itemvalue="CMake Application.TensorProductChebIntp_mysolution.static" />
+      <item itemvalue="CMake Application.TensorProductChebIntp_test_all" />
+      <item itemvalue="CMake Application.TensorProductChebIntp_test_mastersolution" />
+      <item itemvalue="CMake Application.TensorProductChebIntp_test_mysolution" />
+      <item itemvalue="Google Test.GravitationalForces_test_all" />
+      <item itemvalue="Google Test.GravitationalForces_test_mastersolution" />
+      <item itemvalue="Google Test.GravitationalForces_test_mysolution" />
+    </list>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="9a30968c-e16e-4fd7-ad26-c59b832ddfc4" name="Changes" comment="" />
+      <created>1693466518809</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1693466518809</updated>
+      <workItem from="1693466520088" duration="10098000" />
+      <workItem from="1693844308249" duration="1285000" />
+      <workItem from="1693845822608" duration="402000" />
+      <workItem from="1693916647762" duration="1160000" />
+      <workItem from="1694424464687" duration="14497000" />
+      <workItem from="1694531691074" duration="2476000" />
+      <workItem from="1694781158370" duration="13679000" />
+      <workItem from="1694893851118" duration="166000" />
+      <workItem from="1694941389849" duration="3962000" />
+      <workItem from="1695026568331" duration="4587000" />
+      <workItem from="1695052382456" duration="208000" />
+      <workItem from="1695053343266" duration="2016000" />
+      <workItem from="1695216552656" duration="1000" />
+      <workItem from="1695283652639" duration="928000" />
+      <workItem from="1695285868282" duration="3000" />
+      <workItem from="1695286492399" duration="2360000" />
+      <workItem from="1695380437506" duration="2631000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="CMakeLineBreakpoint">
+          <url>file://$PROJECT_DIR$/HMAT/GravitationalForces/all/dependencies.cmake</url>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
