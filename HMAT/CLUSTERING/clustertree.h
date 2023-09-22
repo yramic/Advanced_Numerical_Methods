@@ -14,13 +14,13 @@
 // General includes
 #include <Eigen/Dense>
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <exception>
 #include <iostream>
 #include <limits>
 #include <utility>
 #include <vector>
-#include <array>
 
 namespace HMAT {
 /** @brief Data structure for a collocation point
@@ -179,7 +179,7 @@ std::ostream &operator<<(std::ostream &o, const CtNode<dim> &node) {
 template <class NODE>
 class ClusterTree {
  public:
-  using node_t = NODE; 
+  using node_t = NODE;
   constexpr static std::size_t dim = NODE::dim;  // space dimension d
   // Idle constructor
   ClusterTree() : root(nullptr) {}

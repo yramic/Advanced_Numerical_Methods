@@ -17,7 +17,7 @@ template <typename TRANSFORM = std::function<double(double)>>
 HMAT::BlockPartition<HMAT::CtNode<1>, HMAT::IndexBlock<HMAT::CtNode<1>>,
                      HMAT::IndexBlock<HMAT::CtNode<1>>>
 matrixPartition1d(
-    unsigned int npts, double eta = 0.5,
+    unsigned int npts, double eta = 2.0,
     TRANSFORM trf = [](double x) -> double { return x; }) {
   // Build cluster tree
   std::vector<HMAT::Point<1>> pts;

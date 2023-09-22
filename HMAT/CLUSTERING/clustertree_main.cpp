@@ -66,11 +66,11 @@ int main(int /*argc*/, char ** /*argv*/) {
         p.x = Eigen::Vector2d(pos_x * pos_x, pos_y * pos_y);
         pts.push_back(p);
       }
+    }
       HMAT::ClusterTree<HMAT::CtNode<2>> T;
       T.init(pts);
       std::cout << "2D Cluster tree" << T << std::endl;
       printClusterTree(T, T.root);
-    }
   }
   exit(0);
 }

@@ -45,11 +45,11 @@ class BlockPartition {
   using farfieldblock_t = FFB;
   using nearfieldblock_t = NFB;
   // Idle constructor
-  BlockPartition(std::shared_ptr<const ClusterTree<NODE>> _xT,
-                 std::shared_ptr<const ClusterTree<NODE>> _yT)
-      : xT(_xT), yT(_yT) {
-    assertm((xT != nullptr), "No valid x-tree!");
-    assertm((yT != nullptr), "No valid y-tree!");
+  BlockPartition(std::shared_ptr<const ClusterTree<NODE>> _rowT,
+                 std::shared_ptr<const ClusterTree<NODE>> _colT)
+      : rowT(_rowT), colT(_colT) {
+    assertm((rowT != nullptr), "No valid x-tree!");
+    assertm((colT != nullptr), "No valid y-tree!");
   }
   // Trigger recursive construction of partition
   // (Needed, because polymorphic functions not available in constructor)
@@ -71,7 +71,8 @@ class BlockPartition {
   }
 
  public:
-  std::shared_ptr<const ClusterTree<NODE>> xT, yT;  // underlying cluster trees
+  std::shared_ptr<const ClusterTree<NODE>> rowT; // row cluster tree
+  std::shared_ptr<const ClusterTree<NODE>> colT; // column cluster tree
   std::vector<FFB> farField;   // index blocks in the far field
   std::vector<NFB> nearField;  // index blocks in the near field
   static bool dbg;             // Debugging flag
@@ -84,7 +85,7 @@ bool BlockPartition<NODE, FFB, NFB>::dbg = false;
 /* SAM_LISTING_BEGIN_B */
 template <class NODE, typename FFB, typename NFB>
 void BlockPartition<NODE, FFB, NFB>::init(double eta0) {
-  buildRec(xT->root, yT->root, eta0);
+  buildRec(rowT->root, colT->root, eta0);
 }
 /* SAM_LISTING_END_B */
 
