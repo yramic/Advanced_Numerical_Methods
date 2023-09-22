@@ -151,7 +151,9 @@ Code
 :  ├── assignment_list.json (Add <Chapter/ProblemName> to the Problems list)       
 ```
 
-- Run the command `find . -iname '*.h' -o -iname '*.cpp' | xargs clang-format -style=Google -i` inside `<Chapter/ProblemName/all>`
+- Run the command `find . -iname '*.h' -o -iname '*.cpp' | xargs clang-format -style=Google -i` inside `<Chapter/ProblemName/all>` 
+to reformat the code using the Google style recommendations. To except a line of code from these changes, put the comment `// NOLINT` behind the line or 
+`//NOLINTNEXTLINE` above the line that should not be affected by the reformatting. More information on this topic can be found [here](https://clang.llvm.org/extra/clang-tidy/).
 
 
 - After writing the mastersolution inside `<Chapter/ProblemName/all>` and putting the SOLUTION macros execute:
