@@ -24,7 +24,7 @@ std::vector<Eigen::Vector2d> initStarPositions(unsigned int n, double mindist) {
   // Vector for returning positions
   std::vector<Eigen::Vector2d> pos;
 // **********************************************************************
-// Code to be supplemented
+std::cout << "I have to test my code again!" << std::endl;
 // **********************************************************************
   return pos;
 }
