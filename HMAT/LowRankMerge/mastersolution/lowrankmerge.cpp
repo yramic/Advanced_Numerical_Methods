@@ -90,7 +90,7 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> low_rank_merge(
 std::pair<double, double> test_low_rank_merge(size_t n) {
 
   double nf = static_cast<double>(n); // convert data type
-  // Build $K_1$, $K_2$ and $Z$ defined in \prbcref<prb:lrm:subprb:1>
+  // Build $K_1$, $K_2$ and $Z$ defined in \prbcref{subprb:1}
   Eigen::MatrixXd X1(n, n), X2(n, n);
   for (int i = 0.; i < n; ++i) {
     for (int j = 0.; j < n; ++j) {
@@ -101,7 +101,7 @@ std::pair<double, double> test_low_rank_merge(size_t n) {
   Eigen::MatrixXd Z(n, 2 * n);
   Z << X1, X2;
 
-  // Build A1, B1, A2, B2 using \prbcref<prb:lrm:1h>
+  // Build A1, B1, A2, B2 using \prbcref{subprb:1}
   Eigen::MatrixXd A1(n, 2), B1(n, 2), A2(n, 2), B2(n, 2);
   for (int i = 0.; i < n; ++i) {
     A1(i, 0) = std::sin(i / nf);
@@ -206,7 +206,7 @@ std::pair<double, size_t> test_adap_rank_merge(size_t n, double rtol) {
   // Make  sure that trigonometric functions receive float arguments
   // "Hidden integer arithmetic" is a trap of C/C++
   const double nf = static_cast<double>(n); 
-  // Build $K_1$, $K_2$ and $Z$ defined in \prbcref<prb:lrm:subprb:1>
+  // Build $K_1$, $K_2$ and $Z$ defined in \prbcref{prb:lrm:subprb:1}
   Eigen::MatrixXd X1(n, n), X2(n, n);
   for (int i = 0.; i < n; ++i) {
     for (int j = 0.; j < n; ++j) {
@@ -217,7 +217,7 @@ std::pair<double, size_t> test_adap_rank_merge(size_t n, double rtol) {
   Eigen::MatrixXd Z(n, 2 * n);
   Z << X1, X2;
 
-  // Build A1, B1, A2, B2 using \prbcref<prb:lrm:1h>
+  // Build A1, B1, A2, B2 using \prbcref{subprb:1}
   Eigen::MatrixXd A1(n, 2), B1(n, 2), A2(n, 2), B2(n, 2);
   for (int i = 0.; i < n; ++i) {
     A1(i, 0) = std::sin(i / nf);
@@ -230,7 +230,7 @@ std::pair<double, size_t> test_adap_rank_merge(size_t n, double rtol) {
     B2(i, 1) = std::sin((i + 0.5) / nf);
   }
 
-  // Call the function from \prbcref<prb:lrm:subprb:4>
+  // Call the function from \prbcref{subprb:4}
   std::pair<Eigen::MatrixXd, Eigen::MatrixXd> AB = adap_rank_merge(
       A1, B1, A2, B2, rtol, __DBL_MIN__);  
 
