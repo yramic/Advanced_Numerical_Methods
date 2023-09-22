@@ -23,50 +23,46 @@ to make yourself familiar with the interface.
 - [Eigen documentation](http://eigen.tuxfamily.org/dox/)
 - [Debugger tutorial](https://gitlab.math.ethz.ch/tille/debugging-cpp-code-with-lldb)
 
-## Download and Compile Everything
+## Download and Compile
 
-        $ git clone --recurse-submodules https://gitlab.math.ethz.ch/AdvNumCSE/Code
+        $ git clone https://gitlab.math.ethz.ch/AdvNumCSE/Code
         $ cd Code
         $ mkdir build && cd build
         $ cmake ..
-        $ make
 
-All binaries can be found inside the `build` directory in respective subdirectories. 
+To compile the desired Assignment you should change to the corresponding path and compile it.
 
-## Download and Compile a Single Code
+    $ cd <Chapter>/<ProblemName>
+    $ make
 
-The path for each problem / lecture code is:
-
- - `<Chapter>/<ProblemName>/templates_nolabels` or `<Chapter>/<LectureCode>/templates_nolabels` for templates.
- - `<Chapter>/<ProblemName>/solutions_nolabels` or `<Chapter>/<LectureCode>/solutions_nolabels` for solutions.
-
-Each of these codes correspond to a `target`, which is a `make` command that can be used to compile only that one code and the related dependencies.
-Targets are in the format `a<assignment_number>problem<problem_number>` (e.g., `a1problem1`) or `a<assignment_number>problem<problem_number>_sol`, depending on whether the code is a template or a solution.
-
-After running `cmake ..` in the `build` folder, you can recover the list of all possible targets by typing:
-
-        $ cmake --build . --target help
-
-or
-
-        $ make help
-
-Then you can choose a target and run:
-
-        $ make <target>
-
-The corresponding executable will be located in:
-
-        $ ./build/bin/
-
-**TIP**
-
-Using:
-
-        $ make -j<number_of_processes>
+Will create multiple executables.
+```
+Code
+├── build (was created by you)
+│   ├── <Chapter>
+│   :   ├── <ProblemName>
+│       :   ├── <ProblemName>_mastersolution      (executable)
+│           ├── <ProblemName>_mysolution          (executable)
+│           ├── <ProblemName>_test_mastersolution (executable)
+│           ├── <ProblemName>_test_mysolution     (executable)
+│           :
+│
+├── <Chapter>
+:   ├── <ProblemName>
+    :   ├── all            (developer folder which creates the other folders)
+        ├── mastersolution (folder containing mastersolution)
+        ├── mysolution     (folder containing source files, to be modified by you)
+        ├── templates      (folder containing source files)
+        :
+```
     
-may (or may not) speed up the compilation time.
+    $ ./<ProblemName>_mysolution 
+Will execute the `main()` function found inside `ProblemName_main.cpp`
 
+    $ ./<ProblemName>_test_mysolution 
+Will run a series of tests found inside `mysolution/test/ProblemName_test.cpp`
+
+By replacing `mysolution` with `mastersolution` in the later steps you can execute the provided mastersolution.
 
 ## Homework Projects Code Upload
 
@@ -131,3 +127,45 @@ These branches will be merged into the `master` branch when their contents are r
 
 We kindly ask students to please __ignore the additional branches__ and to only __keep track of the 'master' branch__.
 
+### Explanations for  Developers
+
+When creating a new Problem we recommend that you follow these guidelines.
+-  Create a new Branch for your Problem, do not work on master!
+
+-  In your new branch change the directory tree to the following structure:
+```
+Code
+├── <Chapter>
+    ├── CMakeLists.txt              (add your <ProblemName> to the list)
+    ├── <ProblemName>               
+       ├── CMakeLists.txt           (contains only a few lines)
+        ├── all 
+           ├── problemname.h        (contains the declaration and templated functions)
+           ├── problemname.cpp      (contains the definitions)
+           ├── problemname_main.cpp (contains the main function that will be executed)
+           ├── dependencies.cmake   (contains the path to the source files and libraries you used)         
+           ├── test
+               ├── problemname_test.cpp (contains a set of tests created with the gtest framework)
+               ├── dependencies.cmake   (contains the path to the source files and libraries you used)         
+├── scripts 
+:  ├── assignment_list.json (Add <Chapter/ProblemName> to the Problems list)       
+```
+
+- Run the command `find . -iname '*.h' -o -iname '*.cpp' | xargs clang-format -style=Google -i` inside `<Chapter/ProblemName/all>`
+
+
+- After writing the mastersolution inside `<Chapter/ProblemName/all>` and putting the SOLUTION macros execute:
+`python3 deploy.py`, which will genereate the directories `<Chapter/ProblemName/mastersolution>` , `<Chapter/ProblemName/mysolution>` and `<Chapter/ProblemName/templates>`
+
+#### Troubleshooting
+
+- Your `<ProblemName>` does not appear in the build folder after executing CMake?
+
+  - Did you add `<ProblemName>` to the `<Chapter/CMakeLists.txt>`?
+  - Did you execute `cmake ..` from build?
+
+
+- The folders `<Chapter/ProblemName/mastersolution>` etc. are not being created (correctly) by `python3 deploy.py`?
+
+    - Did you add `<ProblemName>` to the `<scripts/assignment_list.json>`?
+    - Did you put the SOLUTION macro?
