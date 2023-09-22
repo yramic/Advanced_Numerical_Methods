@@ -43,7 +43,7 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> low_rank_merge(
   Eigen::MatrixXd Z(A1.rows(), R1.rows() + R2.rows());
   Z << A1 * R1.transpose(), A2 * R2.transpose();
 
-  // Compute SVD of $\hat Z$
+  // Compute SVD of $\hat Z$ as in (2.4.2.25) \cref{par:mergetrunc}
   Eigen::JacobiSVD<Eigen::MatrixXd> SVD(
       Z, Eigen::ComputeThinU | Eigen::ComputeThinV);
   Eigen::VectorXd s = SVD.singularValues();
