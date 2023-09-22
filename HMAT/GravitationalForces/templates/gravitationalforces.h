@@ -17,7 +17,7 @@
 #include <ostream>
 #include <utility>
 #include <vector>
-
+#include <array>
 #define assertm(exp, msg) assert(((void)msg, exp))
 
 namespace GravitationalForces {
