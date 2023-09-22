@@ -323,25 +323,34 @@ BiDirChebInterpBlock<NODE, KERNEL>::BiDirChebInterpBlock(const NODE &_nx,
                                                          std::size_t _q)
     : HMAT::IndexBlock<NODE>(_nx, _ny), G(std::move(_Gfun)), q(_q) {
   static_assert(NODE::dim == 1, "Only implemented in 1D");
+#if SOLUTION
   // Obtain bounding boxes, here intervals
   std::array<HMAT::BBox<1>, 2> bboxs = {_nx.getBBox(), _nx.getBBox()};
   std::array<Eigen::Vector2d, 2> intv;
   for (int d = 0; d < 2; ++d) {
     intv[d] = Eigen::Vector2d(bboxs[d].minc[0], bboxs[d].maxc[0]);
   }
-  // Compute Chebychev nodes
+  // Compute Chebychev nodes for nodal intervals, \lref{eq:chn}
   Eigen::MatrixXd t(2, q);
   for (int j = 0; j < q; ++j) {
     const double cosval = std::cos((2.0 * j + 1.0) / (2 * q) * M_PI);
     for (int d = 0; d < 2; ++d) {
+      // \prbeqref{eq:tvk} \& \prbeqref{eq:twl}
       t(d, j) = intv[d][0] + 0.5 * (intv[d][1] - intv[d][0]) * (cosval + 1.0);
     }
   }
-  // Fill matrix $\VC$ 
-
-  // **********************************************************************
-  // TODO
-  // **********************************************************************
+  // Fill matrix $\cob{\VC}$: $\cob{(\VC)_{k,\ell} = G(t_k,t_{\ell})}$,
+  // \prbeqref{eq:Cm}
+  for (int k = 0; k < q; ++k) {
+    for (int j = 0; j < q; ++j) {
+      C(k, j) = G(t(0, k), t(1, j));
+    }
+  }
+#else
+// **********************************************************************
+// TODO
+// **********************************************************************
+#endif
 }
 /* SAM_LISTING_END_B */
 
@@ -369,10 +378,22 @@ class NearFieldBlock : public HMAT::IndexBlock<NODE> {
 template <class NODE, typename KERNEL>
 NearFieldBlock<NODE, KERNEL>::NearFieldBlock(const NODE &_nx, const NODE &_ny,
                                              KERNEL _Gfun)
-    : HMAT::IndexBlock<NODE>(_nx, _ny), G(std::move(_Gfun)) {
-  // **********************************************************************
-  // TODO
-  // **********************************************************************
+    : HMAT::IndexBlock<NODE>(_nx, _ny),
+      G(std::move(_Gfun)),
+      Mloc(_nx.pts.size(), _ny.pts.size()) {
+  static_assert(NODE::dim == 1, "Only implemented in 1D");
+// Direct initialization of near field kernel collocation matrix
+#if SOLUTION
+  for (int i = 0; i < _nx.pts.size(); ++i) {
+    for (int j = 0; j < _ny.pts.size(); ++j) {
+      Mloc(i, j) = G((_nx.pts[i]).x[0], (_nx.pts[j]).x[0]);
+    }
+  }
+#else
+// **********************************************************************
+// TODO
+// **********************************************************************
+#endif
 }
 /* SAM_LISTING_END_Q */
 
@@ -384,7 +405,7 @@ class BiDirChebBlockPartition : public HMAT::BlockPartition<NODE, FFB, NFB> {
   using kernel_t = typename NFB::kernel_t;
   BiDirChebBlockPartition(std::shared_ptr<const LLRClusterTree<NODE>> _rowT,
                           std::shared_ptr<const LLRClusterTree<NODE>> _colT,
-                          kernel_t _Gfun, std::size_t _q, double eta0 = 0.5)
+                          kernel_t _Gfun, std::size_t _q, double eta0 = 2.0)
       : HMAT::BlockPartition<NODE, FFB, NFB>(_rowT, _colT), G(_Gfun), q(_q) {
     HMAT::BlockPartition<NODE, FFB, NFB>::init(eta0);
   }
