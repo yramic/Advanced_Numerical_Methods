@@ -8,24 +8,51 @@
 
 #ifndef KERNMATLLRAPPROX_H_
 #define KERNMATLLRAPPROX_H_
-
+#define _USE_MATH_DEFINES
 #include <matrixpartition.h>
 
+#include <algorithm>
+#include <cmath>
+#include <cstddef>
 #include <iomanip>
 #include <iostream>
 #include <stdexcept>
 
 namespace KernMatLLRApprox {
 
+/** @brief verify that a ClusterTree object complies with the definition of a
+cluster tree
+*
+*/
+/* SAM_LISTING_BEGIN_1 */
+// clang-format off
+template <typename NODE>
+bool checkClusterTree(const HMAT::ClusterTree<NODE> &T) {
+  if (T.root == nullptr) return false;
+  bool ok = true;  // Flag to be returned
+  // **********************************************************************
+  // TO BE SUPPLEMENTED
+  // **********************************************************************
+  return ok;
+}
+/* SAM_LISTING_END_1 */
+// clang-format on
+
+// clang-format off
+/** @brief Verify validity of matrix paving into near and far field blocks */
+/* SAM_LISTING_BEGIN_2 */
 template <typename NODE>
 bool checkMatrixPartition(
     const HMAT::BlockPartition<NODE, HMAT::IndexBlock<NODE>,
                                HMAT::IndexBlock<NODE>> &partmat) {
+  assertm((partmat.rowT and partmat.colT), "Missing trees!");
   // **********************************************************************
-  // TO BE SUPPLEMENTED 
+  // TO BE SUPPLEMENTED
   // **********************************************************************
-  return true;
+  return false;
 }
+/* SAM_LISTING_END_2 */
+// clang-format on
 
 // ======================================================================
 // For local low-rank approximation
@@ -37,14 +64,14 @@ template <int DIM>
 class InterpNode : public HMAT::CtNode<DIM> {
  public:
   // Constructor from sequence of points; initializes \cob{$\VV$}
-  InterpNode(const std::vector<HMAT::Point<DIM>> _pts, std::size_t _q, int _dir = 0)
+  InterpNode(const std::vector<HMAT::Point<DIM>> _pts, std::size_t _q,
+             int _dir = 0)
       : HMAT::CtNode<DIM>(_pts, _dir), q(_q), sons{nullptr, nullptr} {
     initV();
   }
   virtual ~InterpNode() = default;
-
- protected:
-  // Initialization of matrix \cob{$\VV$}
+  // protected:
+  // Initialization of the low-rank factor matrix \cob{$\VV_w$}
   void initV();
 
  public:
@@ -58,9 +85,16 @@ class InterpNode : public HMAT::CtNode<DIM> {
 template <int DIM>
 void InterpNode<DIM>::initV() {
   static_assert(DIM == 1, "Implemented only for 1D");
-  // **********************************************************************
-  // TODO
-  // **********************************************************************
+  // Retrieve bounding box,
+  // \href{https://stackoverflow.com/questions/4643074/why-do-i-have-to-access-template-base-class-members-through-the-this-pointer}{eplanation}
+  // for the this pointer
+  const HMAT::BBox<DIM> bbox(this->pts);
+  // Find interval correspoding to the bounding box of the current cluster
+  const double a = bbox.minc[0];
+  const double b = bbox.maxc[0];
+// **********************************************************************
+// TODO
+// **********************************************************************
 }
 /* SAM_LISTING_END_Z */
 
@@ -90,12 +124,14 @@ class LLRClusterTree : public HMAT::ClusterTree<NODE> {
   // Idle constructor just setting rank argument q
   explicit LLRClusterTree(size_t _q) : q(_q) {}
   // Actual constructor taking a sequence of points
-  void init(const std::vector<HMAT::Point<NODE::dim>> pts, std::size_t minpts = 1);
+  void init(const std::vector<HMAT::Point<NODE::dim>> pts,
+            std::size_t minpts = 1);
   virtual ~LLRClusterTree() = default;
 
  protected:
   // factory method for relevant type of node taking rank argument
-  virtual NODE *createNode(const std::vector<HMAT::Point<NODE::dim>> pts, int dir) {
+  virtual NODE *createNode(const std::vector<HMAT::Point<NODE::dim>> pts,
+                           int dir) {
     return new NODE(pts, q, dir);
   }
 
@@ -127,7 +163,7 @@ class BiDirChebInterpBlock : public HMAT::IndexBlock<NODE> {
 
   KERNEL G;           // kernel function \cob{$\krn$}
   const int q;        // No of interpolation nodes
-  Eigen::MatrixXd C;  // \cob{$\VC\in\bbR^{q,q}$}
+  Eigen::MatrixXd C;  // \cob{$\VC\in\bbR^{q,q}$}, see \lref{eq:rqbd}
 };
 /* SAM_LISTING_END_F */
 
@@ -138,6 +174,23 @@ BiDirChebInterpBlock<NODE, KERNEL>::BiDirChebInterpBlock(const NODE &_nx,
                                                          KERNEL _Gfun,
                                                          std::size_t _q)
     : HMAT::IndexBlock<NODE>(_nx, _ny), G(std::move(_Gfun)), q(_q) {
+  static_assert(NODE::dim == 1, "Only implemented in 1D");
+  // Obtain bounding boxes, here intervals
+  std::array<HMAT::BBox<1>, 2> bboxs = {_nx.getBBox(), _nx.getBBox()};
+  std::array<Eigen::Vector2d, 2> intv;
+  for (int d = 0; d < 2; ++d) {
+    intv[d] = Eigen::Vector2d(bboxs[d].minc[0], bboxs[d].maxc[0]);
+  }
+  // Compute Chebychev nodes
+  Eigen::MatrixXd t(2, q);
+  for (int j = 0; j < q; ++j) {
+    const double cosval = std::cos((2.0 * j + 1.0) / (2 * q) * M_PI);
+    for (int d = 0; d < 2; ++d) {
+      t(d, j) = intv[d][0] + 0.5 * (intv[d][1] - intv[d][0]) * (cosval + 1.0);
+    }
+  }
+  // Fill matrix $\VC$ 
+
   // **********************************************************************
   // TODO
   // **********************************************************************
@@ -181,10 +234,10 @@ template <class NODE, typename FFB, typename NFB>
 class BiDirChebBlockPartition : public HMAT::BlockPartition<NODE, FFB, NFB> {
  public:
   using kernel_t = typename NFB::kernel_t;
-  BiDirChebBlockPartition(std::shared_ptr<const LLRClusterTree<NODE>> _xT,
-                          std::shared_ptr<const LLRClusterTree<NODE>> _yT,
+  BiDirChebBlockPartition(std::shared_ptr<const LLRClusterTree<NODE>> _rowT,
+                          std::shared_ptr<const LLRClusterTree<NODE>> _colT,
                           kernel_t _Gfun, std::size_t _q, double eta0 = 0.5)
-      : HMAT::BlockPartition<NODE, FFB, NFB>(_xT, _yT), G(_Gfun), q(_q) {
+      : HMAT::BlockPartition<NODE, FFB, NFB>(_rowT, _colT), G(_Gfun), q(_q) {
     HMAT::BlockPartition<NODE, FFB, NFB>::init(eta0);
   }
   virtual ~BiDirChebBlockPartition() = default;
@@ -210,9 +263,10 @@ class BiDirChebBlockPartition : public HMAT::BlockPartition<NODE, FFB, NFB> {
 // Special data type for local low-rank compression by one-dimensional
 // bi-directional Chebychev interpolation
 template <typename KERNEL>
-using BiDirChebPartMat1D = BiDirChebBlockPartition<
-    InterpNode<1>, BiDirChebInterpBlock<HMAT::CtNode<1>, KERNEL>,
-    NearFieldBlock<HMAT::CtNode<1>, KERNEL>>;
+using BiDirChebPartMat1D =
+    BiDirChebBlockPartition<InterpNode<1>,
+                            BiDirChebInterpBlock<HMAT::CtNode<1>, KERNEL>,
+                            NearFieldBlock<HMAT::CtNode<1>, KERNEL>>;
 
 // Matrix x Vector based on compressed kernel collocation matrix
 /* SAM_LISTING_BEGIN_U */

@@ -56,7 +56,7 @@ StarQuadTree::StarQuadTree(const std::vector<Eigen::Vector2d> &starpos,
     star_idx[i] = i;
     assertm(((starpos_[i][0] >= 0.0) and (starpos_[i][0] <= 1.0) and
              (starpos_[i][1] >= 0.0) and (starpos_[i][1] <= 1.0)),
-            "stars must be located insuided unit square");
+            "stars must be located insided unit square");
   }
 
   // Unit square is the bounding box for the whole group of stars
