@@ -33,7 +33,7 @@ std::vector<double> chebInterpEval1D(unsigned int q, FUNCTOR f,
                                      std::vector<double> &x) {
   // Initialize Chebychev nodes, compute barycentric weights
   // $\cob{\lambda_i}$ (up to q-dependent scaling) and sample the function
-  std::vector<double> lambda(q);  // barycentric weights
+  std::vector<double> lambda(q);  // barycentric weightsw
   std::vector<double> t(q);       // Chebychev nodes
   std::vector<double> y(q);       // Sampled function values
   int sgn = 1;

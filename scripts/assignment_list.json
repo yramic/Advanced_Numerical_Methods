@@ -8,6 +8,7 @@
     "HMAT/KernMatLLRApprox",
     "HMAT/LowRankMerge",
     "HMAT/TensorProductChebIntp",
-    "CONVQUAD/LowTriangToeplitz"
+    "CONVQUAD/LowTriangToeplitz",
+    "CONVQUAD/AbelIntegralEquation"
   ]
 }
