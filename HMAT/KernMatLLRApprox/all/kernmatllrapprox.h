@@ -457,6 +457,14 @@ double approxErrorLLR(const BiDirChebPartMat1D<KERNEL> &Mt) {
 }
 /* SAM_LISTING_END_V */
 
+template <typename NODE, typename FFB, typename NFB>
+  unsigned int computeSparsityMeasure(
+				      const BlockPartition<NODE,FFB,NFB> &blockpart) {
+  
+
+}
+
+  
 // Validation of implementation of local low-rank compression based on
 // bi-directional Chebychev interpolation
 bool validateLLR(unsigned int q);
