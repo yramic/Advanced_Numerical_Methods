@@ -29,9 +29,9 @@ int main(int /*argc*/, char** /*argv*/) {
     std::cout << "Testing k(x,y) = 1./(1. + (x*x))" << std::endl;
     std::cout << "q" << std::setw(20) << "error" << std::endl;
     for (int q = 1; q<10;q++){
-        const std::vector<double> res = TensorProductChebIntp::chebInterpEval1D(std::pow(2,q), kernel1D, y);
-        error = TensorProductChebIntp::errorestimate(std::pow(2,q), kernel1D, y, res);
-        std::cout << std::pow(2,q) << std::setw(20) << error << std::endl;
+        const std::vector<double> res = TensorProductChebIntp::chebInterpEval1D(q, kernel1D, y);
+        error = TensorProductChebIntp::errorestimate(q, kernel1D, y, res);
+        std::cout << q << std::setw(20) << error << std::endl;
     }
 
   // We sample points between [-1 , 1]^2
@@ -42,10 +42,10 @@ int main(int /*argc*/, char** /*argv*/) {
   // We tabulate the error
   std::cout << "\n\nTesting k(x,y) = 1./(1. + (x-y)*(x-y))" << std::endl;
   std::cout << "q" << std::setw(20) << "error" << std::endl;
-  for (int q = 1; q<10;q++){
-    const std::vector<double> res = TensorProductChebIntp::chebInterpEval2D(std::pow(2,q), kernel2D, x);
-    error = TensorProductChebIntp::errorestimate(std::pow(2,q), kernel2D, x, res);
-    std::cout << std::pow(2,q) << std::setw(20) << error << std::endl;
+  for (int q = 3; q<15;q++){
+    const std::vector<double> res = TensorProductChebIntp::chebInterpEval2D(q, kernel2D, x);
+    error = TensorProductChebIntp::errorestimate(q, kernel2D, x, res);
+    std::cout << q << std::setw(20) << error << std::endl;
   }
 
   // We sample points in the real numbers
@@ -63,10 +63,10 @@ int main(int /*argc*/, char** /*argv*/) {
   // We tabulate the error
   std::cout << "\n\nTesting k(x,y) = 1./(1. + (x-y)*(x-y))" << std::endl;
   std::cout << "q" << std::setw(20) << "error" << std::endl;
-  for (int q = 1; q<10;q++){
-    const std::vector<double> res2 = TensorProductChebIntp::genChebInterpEval2D(std::pow(2,q), kernel2D,a,b, x2);
-    error = TensorProductChebIntp::errorestimate(std::pow(2,q), kernel2D, x2 , res2);
-    std::cout << std::pow(2,q) << std::setw(20) << error << std::endl;
+  for (int q = 3; q<15;q++){
+    const std::vector<double> res2 = TensorProductChebIntp::genChebInterpEval2D(q, kernel2D,a,b, x2);
+    error = TensorProductChebIntp::errorestimate(q, kernel2D, x2 , res2);
+    std::cout << q << std::setw(20) << error << std::endl;
   }
   return 0;
 }
