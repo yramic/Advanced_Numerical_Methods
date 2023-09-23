@@ -38,8 +38,8 @@ std::vector<double> chebInterpEval1D(unsigned int q, FUNCTOR f,
   std::vector<double> y(q);       // Sampled function values
   int sgn = 1;
   for (int k = 0; k < q; ++k, sgn *= -1) {
-    t[k] = std::cos((2.0 * k - 1.0) / (2 * q) * M_PI);  // \prbeqref{eq:chn}
-    lambda[k] = sgn * std::sin((2.0 * k - 1.0) / (2 * q) * M_PI);  // \prbeqref{eq:bwf}
+    t[k] = std::cos((2.0 * (k+1) - 1.0) / (2 * q) * M_PI);  // \prbeqref{eq:chn}
+    lambda[k] = sgn * std::sin((2.0 * (k+1) - 1.0) / (2 * q) * M_PI);  // \prbeqref{eq:bwf}
     y[k] = f(t[k]);                                        // $\cob{y_k}$
   }
   // Loop over all evaluation points $\cob{x_i}$
@@ -87,8 +87,8 @@ std::vector<double> chebInterpEval2D(unsigned int q, FUNCTOR f,
   std::vector<double> t(q);       // Chebychev nodes
   int sgn = 1;
   for (int k = 0; k < q; ++k, sgn *= -1) {
-    t[k] = std::cos((2.0 * k - 1.0) / (2 * q) * M_PI);
-    lambda[k] = sgn * std::sin((2.0 * k - 1.0) / (2 * q) * M_PI);
+    t[k] = std::cos((2.0 * (k+1) - 1.0) / (2 * q) * M_PI);
+    lambda[k] = sgn * std::sin((2.0 * (k+1) - 1.0) / (2 * q) * M_PI);
   }
   Eigen::MatrixXd y(q, q);  // Sampled function values
   for (int k = 0; k < q; ++k) {

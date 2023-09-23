@@ -27,9 +27,9 @@ namespace TensorProductChebIntp::test {
 
         // Compute the error for the degree 2^q
         double error;
-        const int q = 8;
-        const std::vector<double> res = TensorProductChebIntp::chebInterpEval1D(std::pow(2,q), kernel, x);
-        error = TensorProductChebIntp::errorestimate(std::pow(2,q), kernel, x, res);
+        const int q = 16;
+        const std::vector<double> res = TensorProductChebIntp::chebInterpEval1D(q, kernel, x);
+        error = TensorProductChebIntp::errorestimate(q, kernel, x, res);
         ASSERT_NEAR(error , 0.0, 1e-8);
     }
 
@@ -49,9 +49,9 @@ namespace TensorProductChebIntp::test {
 
         // Compute the error for the degree 2^q
         double error;
-        const int q = 8;
-        const std::vector<double> res = TensorProductChebIntp::chebInterpEval2D(std::pow(2,q), kernel, x);
-        error = TensorProductChebIntp::errorestimate(std::pow(2,q), kernel, x, res);
+        const int q = 16;
+        const std::vector<double> res = TensorProductChebIntp::chebInterpEval2D(q, kernel, x);
+        error = TensorProductChebIntp::errorestimate(q, kernel, x, res);
         ASSERT_NEAR(error , 0.0, 1e-8);
     }
 
@@ -74,9 +74,9 @@ namespace TensorProductChebIntp::test {
         x2[n] = (Eigen::Vector2d() << distr2(generator), distr3(generator)).finished();
 
         double error;
-        int q = 8;
-        const std::vector<double> res2 = TensorProductChebIntp::genChebInterpEval2D(std::pow(2, q), kernel, a, b, x2);
-        error = TensorProductChebIntp::errorestimate(std::pow(2, q), kernel, x2, res2);
+        int q = 16;
+        const std::vector<double> res2 = TensorProductChebIntp::genChebInterpEval2D(q, kernel, a, b, x2);
+        error = TensorProductChebIntp::errorestimate(q, kernel, x2, res2);
         ASSERT_NEAR(error , 0.0, 1e-8);
     }
 }  // namespace TensorProductChebIntp::test
