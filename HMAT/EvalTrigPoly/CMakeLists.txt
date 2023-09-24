@@ -1,2 +1,2 @@
-add_subdirectory(mastersolution)
-add_subdirectory(test)
+include(../build.cmake)
+include_directories(../CLUSTERING ../KernMatLLRApprox/mastersolution) # Make other homework codes known 
