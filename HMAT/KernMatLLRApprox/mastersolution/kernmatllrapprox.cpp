@@ -80,6 +80,7 @@ bool validateLLR(unsigned int q, double tol, double eta) {
 /* SAM_LISTING_END_1 */
 
 // 1D Logarithmic kernel function
+/* SAM_LISTING_BEGIN_2 */
 struct LogKernel {
   LogKernel() = default;
   double operator()(double x, double y) const {
@@ -90,7 +91,6 @@ struct LogKernel {
   }
 };
 
-/* SAM_LISTING_BEGIN_2 */
 void tabulateConvergenceLLR(std::vector<unsigned int> &&n_vec,
                             std::vector<unsigned int> &&q_vec, double eta) {
   LogKernel G;
@@ -142,9 +142,6 @@ void tabulateConvergenceLLR(std::vector<unsigned int> &&n_vec,
     }
     std::cout << std::endl;
   }
-  // **********************************************************************
-  // TO BE SUPPLEMENTED
-  // **********************************************************************
 }
 /* SAM_LISTING_END_2 */
 
@@ -190,9 +187,6 @@ void runtimeMatVec(std::vector<unsigned int> &&n_vec, unsigned int n_runs,
     std::cout << "n = " << n << ": " << ms_time << " ms, #nfb = " << Mt.nfb_cnt
               << ", #ffb = " << Mt.ffb_cnt << std::endl;
   }
-  // **********************************************************************
-  // TO BE SUPPLEMENTED
-  // **********************************************************************
 }
 /* SAM_LISTING_END_3 */
 

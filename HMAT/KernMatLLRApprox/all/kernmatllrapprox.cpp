@@ -87,6 +87,7 @@ bool validateLLR(unsigned int q, double tol, double eta) {
 /* SAM_LISTING_END_1 */
 
 // 1D Logarithmic kernel function
+/* SAM_LISTING_BEGIN_2 */
 struct LogKernel {
   LogKernel() = default;
   double operator()(double x, double y) const {
@@ -97,7 +98,6 @@ struct LogKernel {
   }
 };
 
-/* SAM_LISTING_BEGIN_2 */
 void tabulateConvergenceLLR(std::vector<unsigned int> &&n_vec,
                             std::vector<unsigned int> &&q_vec, double eta) {
   LogKernel G;
@@ -112,6 +112,7 @@ void tabulateConvergenceLLR(std::vector<unsigned int> &&n_vec,
         p.x[0] = static_cast<double>(pt_idx) / (n_vec[n_idx] - 1);
         pts.push_back(p);
       }
+#if SOLUTION
       // Allocate cluster tree objects (the same for both directions)
       auto T_row = std::make_shared<
           KernMatLLRApprox::LLRClusterTree<KernMatLLRApprox::InterpNode<1>>>(
@@ -132,6 +133,11 @@ void tabulateConvergenceLLR(std::vector<unsigned int> &&n_vec,
       std::cout << "abs err = " << error << ", rel err = " << error / norm
                 << std::endl;
       relerr(n_idx, q_idx) = error / norm;
+#else
+      // **********************************************************************
+      // TO BE SUPPLEMENTED
+      // **********************************************************************
+#endif
     }
   }
 
@@ -149,9 +155,6 @@ void tabulateConvergenceLLR(std::vector<unsigned int> &&n_vec,
     }
     std::cout << std::endl;
   }
-  // **********************************************************************
-  // TO BE SUPPLEMENTED
-  // **********************************************************************
 }
 /* SAM_LISTING_END_2 */
 
@@ -180,6 +183,7 @@ void runtimeMatVec(std::vector<unsigned int> &&n_vec, unsigned int n_runs,
     T_col->init(pts);
     // Build local low-rank compressed matrix
     KernMatLLRApprox::BiDirChebPartMat1D<LogKernel> Mt(T_row, T_col, G, q, eta);
+#if SOLUTION
     const size_t nrows = Mt.rows();
     const size_t ncols = Mt.cols();
     Eigen::VectorXd x = Eigen::VectorXd::Constant(ncols, 1.0);
@@ -196,10 +200,12 @@ void runtimeMatVec(std::vector<unsigned int> &&n_vec, unsigned int n_runs,
     }
     std::cout << "n = " << n << ": " << ms_time << " ms, #nfb = " << Mt.nfb_cnt
               << ", #ffb = " << Mt.ffb_cnt << std::endl;
+#else
+// **********************************************************************
+// TO BE SUPPLEMENTED
+// **********************************************************************
+#endif
   }
-  // **********************************************************************
-  // TO BE SUPPLEMENTED
-  // **********************************************************************
 }
 /* SAM_LISTING_END_3 */
 

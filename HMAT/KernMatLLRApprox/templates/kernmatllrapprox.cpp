@@ -38,6 +38,7 @@ bool validateLLR(unsigned int q, double tol, double eta) {
 /* SAM_LISTING_END_1 */
 
 // 1D Logarithmic kernel function
+/* SAM_LISTING_BEGIN_2 */
 struct LogKernel {
   LogKernel() = default;
   double operator()(double x, double y) const {
@@ -48,7 +49,6 @@ struct LogKernel {
   }
 };
 
-/* SAM_LISTING_BEGIN_2 */
 void tabulateConvergenceLLR(std::vector<unsigned int> &&n_vec,
                             std::vector<unsigned int> &&q_vec, double eta) {
   LogKernel G;
@@ -63,26 +63,9 @@ void tabulateConvergenceLLR(std::vector<unsigned int> &&n_vec,
         p.x[0] = static_cast<double>(pt_idx) / (n_vec[n_idx] - 1);
         pts.push_back(p);
       }
-      // Allocate cluster tree objects (the same for both directions)
-      auto T_row = std::make_shared<
-          KernMatLLRApprox::LLRClusterTree<KernMatLLRApprox::InterpNode<1>>>(
-          q_vec[q_idx]);
-      T_row->init(pts);
-      auto T_col = std::make_shared<
-          KernMatLLRApprox::LLRClusterTree<KernMatLLRApprox::InterpNode<1>>>(
-          q_vec[q_idx]);
-      T_col->init(pts);
-      // Build local low-rank compressed matrix
-      KernMatLLRApprox::BiDirChebPartMat1D<LogKernel> Mt(T_row, T_col, G,
-                                                         q_vec[q_idx], eta);
-      std::cout << "tabulateConvergenceLLR: q=" << q_vec[q_idx]
-                << ", n_pts = " << n_vec[n_idx]
-                << " : BlockPartition: " << Mt.ffb_cnt << " far field blocks, "
-                << Mt.nfb_cnt << " near-field blocks" << std::endl;
-      auto [error, norm] = approxErrorLLR<LogKernel>(Mt);
-      std::cout << "abs err = " << error << ", rel err = " << error / norm
-                << std::endl;
-      relerr(n_idx, q_idx) = error / norm;
+      // **********************************************************************
+      // TO BE SUPPLEMENTED
+      // **********************************************************************
     }
   }
 
@@ -100,9 +83,6 @@ void tabulateConvergenceLLR(std::vector<unsigned int> &&n_vec,
     }
     std::cout << std::endl;
   }
-  // **********************************************************************
-  // TO BE SUPPLEMENTED
-  // **********************************************************************
 }
 /* SAM_LISTING_END_2 */
 
@@ -131,26 +111,10 @@ void runtimeMatVec(std::vector<unsigned int> &&n_vec, unsigned int n_runs,
     T_col->init(pts);
     // Build local low-rank compressed matrix
     KernMatLLRApprox::BiDirChebPartMat1D<LogKernel> Mt(T_row, T_col, G, q, eta);
-    const size_t nrows = Mt.rows();
-    const size_t ncols = Mt.cols();
-    Eigen::VectorXd x = Eigen::VectorXd::Constant(ncols, 1.0);
-    Eigen::VectorXd y(nrows);
-    // Average runtimes over n\_run runs
-    double ms_time = std::numeric_limits<double>::max();
-    for (int r = 0; r < n_runs; ++r) {
-      auto t1 = std::chrono::high_resolution_clock::now();
-      y = mvLLRPartMat(Mt, x);
-      auto t2 = std::chrono::high_resolution_clock::now();
-      /* Getting number of milliseconds as a double. */
-      std::chrono::duration<double, std::milli> ms_double = (t2 - t1);
-      ms_time = std::min(ms_time, ms_double.count());
-    }
-    std::cout << "n = " << n << ": " << ms_time << " ms, #nfb = " << Mt.nfb_cnt
-              << ", #ffb = " << Mt.ffb_cnt << std::endl;
+// **********************************************************************
+// TO BE SUPPLEMENTED
+// **********************************************************************
   }
-  // **********************************************************************
-  // TO BE SUPPLEMENTED
-  // **********************************************************************
 }
 /* SAM_LISTING_END_3 */
 
