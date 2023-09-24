@@ -11,6 +11,7 @@
 #include <Eigen/src/Core/Matrix.h>
 
 #include <chrono>
+#include <limits>
 
 namespace GravitationalForces {
 
@@ -285,8 +286,8 @@ std::pair<double, double> measureRuntimes(unsigned int n, unsigned int n_runs) {
   std::vector<Eigen::Vector2d> pos = GravitationalForces::initStarPositions(n);
   // All stars have equal (unit) mass
   std::vector<double> mass(n, 1.0);
-  double ms_exact = 0.0;    // Time measured for exact evaluation
-  double ms_cluster = 0.0;  // Time taken for clustering-based evaluatiion
+  double ms_exact = std::numeric_limits<double>::max();    // Time measured for exact evaluation
+  double ms_cluster = std::numeric_limits<double>::max();  // Time taken for clustering-based evaluatiion
   // Build quad tree of stars
   StarQuadTreeClustering qt(pos, mass);
   // Admissibility parameter
@@ -300,7 +301,7 @@ std::pair<double, double> measureRuntimes(unsigned int n, unsigned int n_runs) {
     auto t2_exact = std::chrono::high_resolution_clock::now();
     /* Getting number of milliseconds as a double. */
     std::chrono::duration<double, std::milli> ms_double = (t2_exact - t1_exact);
-    ms_exact = std::max(ms_exact, ms_double.count());
+    ms_exact = std::min(ms_exact, ms_double.count());
   }
   std::cout << "n = " << n << " : runtime computeForces_direct= " << ms_exact
             << "ms\n";

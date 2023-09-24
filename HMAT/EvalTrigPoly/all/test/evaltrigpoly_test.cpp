@@ -7,6 +7,6 @@
  */
 
 #include <gtest/gtest.h>
-#include "../mastersolution/evaltrigpoly.h"
+#include "../evaltrigpoly.h"
 
 namespace EvalTrigPoly::test {}  // namespace EvalTrigPoly::test
