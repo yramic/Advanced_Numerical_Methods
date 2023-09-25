@@ -29,5 +29,17 @@ void time_measure_ltpMult();
 void test_accuracy_ltpSolve();
 void time_measure_ltpSolve();
 
+/* @brief Compare the runtime of ltpMult() with EIGEN
+ * \param N Matrix size
+ * \return runtime of matrix multiplication using Eigen and ltpMult()
+ */
+std::tuple<double, double, double> runtimes_ltpMult(unsigned int N);
+
+/* @brief Compare the runtime of ltpSolve() with EIGEN
+ * \param N Matrix size
+ * \return runtime of Solving LSE using Eigen and ltpMult()
+ */
+std::pair<double, double> runtimes_ltpSolve(unsigned int N);
+
 }  // namespace LowTriangToeplitz
 #endif  // LOWTRIANGTOEPLITZ_H_

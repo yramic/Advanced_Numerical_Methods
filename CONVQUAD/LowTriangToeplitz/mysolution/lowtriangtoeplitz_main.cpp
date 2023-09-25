@@ -1,10 +1,14 @@
+#include <iomanip>
+#include <iostream>
+#include <fstream>
+#include <stdlib.h>
 #include "lowtriangtoeplitz.h"
 
 int main() {
-  LowTriangToeplitz::test_accuracy_ltpMult();
-  LowTriangToeplitz::time_measure_ltpMult();
 
-  LowTriangToeplitz::test_accuracy_ltpSolve();
-  LowTriangToeplitz::time_measure_ltpSolve();
+  // **********************************************************************
+  // Code to be supplemented
+  // **********************************************************************
+
   return 0;
 }
