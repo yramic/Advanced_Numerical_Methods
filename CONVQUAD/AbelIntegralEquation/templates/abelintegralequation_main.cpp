@@ -14,7 +14,6 @@ int main() {
       u_ex(i) = u(grid(i));
     }
 
-    #if SOLUTION
     cout << "\nSpectral Galerkin\n" << endl;
     double err_max,err_max_alt;
     for (int p = 2; p <= 10; ++p) {
@@ -32,11 +31,6 @@ int main() {
       }
       err_max_alt = err_max;
     }
-    #else
-    // **********************************************************************
-    // Your Solution here
-    // **********************************************************************/ 
-    #endif 
   }
   /* SAM_LISTING_END_1 */
 
