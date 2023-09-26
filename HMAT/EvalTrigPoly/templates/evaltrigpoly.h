@@ -6,6 +6,8 @@
  * @copyright Developed at SAM, ETH Zurich
  */
 
+#include <kernmatllrapprox.h>
+
 #include <Eigen/Dense>
 #include <iomanip>
 #include <iostream>
