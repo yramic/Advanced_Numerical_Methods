@@ -85,8 +85,5 @@ int main() {
    }
   }
   /* SAM_LISTING_END_4 */
-  std::pair<Eigen::RowVectorXd, Eigen::RowVectorXd> gauss =
-      AbelIntegralEquation::gauleg(-1, 1, 3);
-
-  return 0;
+   return 0;
 }

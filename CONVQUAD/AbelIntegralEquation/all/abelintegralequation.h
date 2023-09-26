@@ -96,7 +96,7 @@ VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau) {
       b(i) += wk * pow(tk, i) * y(tk);
     }
   }
-#else 
+#else
 // **********************************************************************
 // Your Solution here
 // **********************************************************************/
@@ -128,7 +128,6 @@ VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau) {
 /* SAM_LISTING_BEGIN_2 */
 template <typename FUNC>
 VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
-  
   VectorXd w(N + 1);
   w(0) = 1.;
   for (int l = 1; l < N + 1; ++l) {
