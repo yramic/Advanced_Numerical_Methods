@@ -15,12 +15,12 @@ Eigen::MatrixXcd toeplitz(const Eigen::VectorXcd& c,
                           const Eigen::VectorXcd& r) {
   if (c(0) != r(0)) {
     std::cerr << "First entries of c and r are different!" << std::endl
-         << "We assign the first entry of c to the diagonal" << std::endl;
+              << "We assign the first entry of c to the diagonal" << std::endl;
   }
 
   // Initialization
-  std::size_t m = c.size();
-  std::size_t n = r.size();
+  const auto m = c.size();
+  const auto n = r.size();
   Eigen::MatrixXcd T(m, n);
 
   for (int i = 0; i < n; ++i) {
@@ -41,7 +41,7 @@ Eigen::MatrixXcd toeplitz(const Eigen::VectorXcd& c,
 Eigen::VectorXcd pconvfft(const Eigen::VectorXcd& u,
                           const Eigen::VectorXcd& x) {
   Eigen::FFT<double> fft;
-  Eigen::VectorXcd tmp = (fft.fwd(u)).cwiseProduct(fft.fwd(x));
+  const Eigen::VectorXcd tmp = (fft.fwd(u)).cwiseProduct(fft.fwd(x));
   return fft.inv(tmp);
 }
 
@@ -57,11 +57,12 @@ Eigen::VectorXcd toepMatVecMult(const Eigen::VectorXcd& c,
   assert(c.size() == x.size() && r.size() == x.size() &&
          "c, r, x have different lengths!");
 
-  std::size_t n = c.size();
-  Eigen::VectorXcd cr_tmp(2 * n), x_tmp(2 * n);
+  const auto n = c.size();
+  Eigen::VectorXcd cr_tmp(2 * n);
+  Eigen::VectorXcd x_tmp(2 * n);
 
   cr_tmp.head(n) = c;
-  cr_tmp.tail(n) = Eigen::VectorXcd::Zero(n);
+  cr_tmp[n] = 0;
   cr_tmp.tail(n - 1) = r.tail(n - 1).reverse();
 
   x_tmp.head(n) = x;
@@ -72,13 +73,13 @@ Eigen::VectorXcd toepMatVecMult(const Eigen::VectorXcd& c,
   return y.head(n);
 }
 
-Eigen::VectorXcd ltpMultold(const Eigen::VectorXcd& f, const Eigen::VectorXcd& g) {
+Eigen::VectorXcd ltpMultold(const Eigen::VectorXcd& f,
+                            const Eigen::VectorXcd& g) {
   assert(f.size() == g.size() && "f and g vectors must have the same length!");
 
-  std::size_t n = f.size();
+  const auto n = f.size();
   return toepMatVecMult(f, Eigen::VectorXcd::Zero(n), g);
 }
-
 
 /* @brief Multiply two lower triangular Toeplitz matrices
  * \param f Vector of entries of first lower triangular Toeplitz matrix
@@ -88,19 +89,19 @@ Eigen::VectorXcd ltpMultold(const Eigen::VectorXcd& f, const Eigen::VectorXcd& g
 /* SAM_LISTING_BEGIN_0 */
 Eigen::VectorXcd ltpMult(const Eigen::VectorXcd& f, const Eigen::VectorXcd& g) {
   assert(f.size() == g.size() && "f and g vectors must have the same length!");
-  std::size_t n = f.size();
+  const auto n = f.size();
   Eigen::VectorXcd res(n);
-  #if SOLUTION
-  Eigen::VectorXcd f_long = Eigen::VectorXcd::Zero(2*n);
-  Eigen::VectorXcd g_long = Eigen::VectorXcd::Zero(2*n);
+#if SOLUTION
+  Eigen::VectorXcd f_long = Eigen::VectorXcd::Zero(2 * n);
+  Eigen::VectorXcd g_long = Eigen::VectorXcd::Zero(2 * n);
   f_long.head(n) = f;
   g_long.head(n) = g;
-  res = pconvfft(f_long,g_long).head(n);
-  #else
-    // **********************************************************************
-    // Your Solution here
-    // **********************************************************************
-  #endif
+  res = pconvfft(f_long, g_long).head(n);
+#else
+  // **********************************************************************
+  // Your Solution here
+  // **********************************************************************
+#endif
   return res;
 }
 /* SAM_LISTING_END_0 */
@@ -119,18 +120,24 @@ Eigen::VectorXcd ltpSolve(const Eigen::VectorXcd& f,
   assert(log2(f.size()) == floor(log2(f.size())) &&
          "Size of f must be a power of 2!");
 
-  std::size_t n = f.size();
+  const auto n = f.size();
   if (n == 1) {
     return y.cwiseQuotient(f);
   }
-
-  Eigen::VectorXcd u_head = ltpSolve(f.head(n / 2), y.head(n / 2));
-  Eigen::VectorXcd t =
-      y.tail(n / 2) -
-      toepMatVecMult(f.tail(n / 2), f.segment(1, n / 2).reverse(), u_head);
-  Eigen::VectorXcd u_tail = ltpSolve(f.head(n / 2), t);
   Eigen::VectorXcd u(n);
+
+#if SOLUTION
+  // implements the algorithm presented in \lref{par:dcealg}
+  const Eigen::VectorXcd u_head = ltpSolve(f.head(n / 2), y.head(n / 2)); // step 1
+  const Eigen::VectorXcd t = y.tail(n / 2) -
+      toepMatVecMult(f.tail(n / 2), f.segment(1, n / 2).reverse(), u_head); // step 2
+  const Eigen::VectorXcd u_tail = ltpSolve(f.head(n / 2), t); // step 3
   u << u_head, u_tail;
+#else
+  // **********************************************************************
+  // Your Solution here
+  // **********************************************************************
+#endif
   return u;
 }
 /* SAM_LISTING_END_1 */
@@ -183,7 +190,7 @@ void time_measure_ltpMult() {
       start_time = clock();
       T_mult_v = T * v;
       end_time = clock();
-      if (k > 0) et_sum += double(end_time - start_time) / CLOCKS_PER_SEC;
+      if (k > 0) et_sum += static_cast<double>(end_time - start_time) / CLOCKS_PER_SEC;
     }
     et_slow(l) = et_sum / (num_repititions - 1);
 
@@ -193,13 +200,13 @@ void time_measure_ltpMult() {
       start_time = clock();
       c_conv_v = ltpMult(c, v);
       end_time = clock();
-      if (k > 0) et_sum += double(end_time - start_time) / CLOCKS_PER_SEC;
+      if (k > 0) et_sum += static_cast<double>(end_time - start_time) / CLOCKS_PER_SEC;
     }
     et_fast(l) = et_sum / (num_repititions - 1);
 
     error(l) = (c_conv_v - T_mult_v.col(0)).norm();
-    std::cout << l << "\t" << n << "\t" << error(l) << "\t" << et_slow(l) << "\t"
-         << et_fast(l) << std::endl;
+    std::cout << l << "\t" << n << "\t" << error(l) << "\t" << et_slow(l)
+              << "\t" << et_fast(l) << std::endl;
 
     n *= 2;
   }
@@ -270,8 +277,8 @@ void time_measure_ltpSolve() {
     et_fast(l) = et_sum / (num_repititions - 1);
 
     error(l) = (u_sol - u_rec).norm() / (T_mult_v).norm();
-    std::cout << l << "\t" << n << "\t" << error(l) << "\t" << et_slow(l) << "\t"
-         << et_fast(l) << std::endl;
+    std::cout << l << "\t" << n << "\t" << error(l) << "\t" << et_slow(l)
+              << "\t" << et_fast(l) << std::endl;
 
     n *= 2;
   }
