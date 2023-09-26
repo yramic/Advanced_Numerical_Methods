@@ -19,9 +19,9 @@ fix, (ax1, ax2) = plt.subplots(1, 2, figsize=(16,4))
 ax1.loglog(d_m[:, 0], d_m[:, 1], 'b^-', markerfacecolor='none', label='matrix-matrix')
 ax1.loglog(d_m[:, 0], d_m[:, 2], 'kx-', markerfacecolor='none', label='matrix-vector')
 ax1.loglog(d_m[:, 0], d_m[:, 3], 'ro-', markerfacecolor='none', label='vector-vector')
-ax1.loglog(d_m[:, 0], N3, 'b^:', markerfacecolor='none', label='$O(N^1)$')
+ax1.loglog(d_m[:, 0], N3, 'b^:', markerfacecolor='none', label='$O(N^3)$')
 ax1.loglog(d_m[:, 0], N2, 'kx:', markerfacecolor='none', label='$O(N^2)$')
-ax1.loglog(d_m[:, 0], N1, 'ro:', markerfacecolor='none', label='$O(N^3)$')
+ax1.loglog(d_m[:, 0], N1, 'ro:', markerfacecolor='none', label='$O(N^1)$')
 ax1.legend()
 
 # read runtime data of solving LSE from text file

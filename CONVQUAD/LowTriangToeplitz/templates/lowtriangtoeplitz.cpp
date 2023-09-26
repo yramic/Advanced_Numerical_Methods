@@ -1,8 +1,8 @@
 #include <Eigen/Dense>
+#include <chrono>
 #include <cmath>
 #include <iostream>
 #include <unsupported/Eigen/FFT>
-#include <chrono>
 
 namespace LowTriangToeplitz {
 
@@ -15,7 +15,7 @@ Eigen::MatrixXcd toeplitz(const Eigen::VectorXcd& c,
                           const Eigen::VectorXcd& r) {
   if (c(0) != r(0)) {
     std::cerr << "First entries of c and r are different!" << std::endl
-         << "We assign the first entry of c to the diagonal" << std::endl;
+              << "We assign the first entry of c to the diagonal" << std::endl;
   }
 
   // Initialization
@@ -72,13 +72,13 @@ Eigen::VectorXcd toepMatVecMult(const Eigen::VectorXcd& c,
   return y.head(n);
 }
 
-Eigen::VectorXcd ltpMultold(const Eigen::VectorXcd& f, const Eigen::VectorXcd& g) {
+Eigen::VectorXcd ltpMultold(const Eigen::VectorXcd& f,
+                            const Eigen::VectorXcd& g) {
   assert(f.size() == g.size() && "f and g vectors must have the same length!");
 
   std::size_t n = f.size();
   return toepMatVecMult(f, Eigen::VectorXcd::Zero(n), g);
 }
-
 
 /* @brief Multiply two lower triangular Toeplitz matrices
  * \param f Vector of entries of first lower triangular Toeplitz matrix
@@ -90,9 +90,9 @@ Eigen::VectorXcd ltpMult(const Eigen::VectorXcd& f, const Eigen::VectorXcd& g) {
   assert(f.size() == g.size() && "f and g vectors must have the same length!");
   std::size_t n = f.size();
   Eigen::VectorXcd res(n);
-    // **********************************************************************
-    // Your Solution here
-    // **********************************************************************
+  // **********************************************************************
+  // Your Solution here
+  // **********************************************************************
   return res;
 }
 /* SAM_LISTING_END_0 */
@@ -101,7 +101,7 @@ Eigen::VectorXcd ltpMult(const Eigen::VectorXcd& f, const Eigen::VectorXcd& g) {
 std::tuple<double, double, double> runtimes_ltpMult(unsigned int N) {
   // Runtime of matrix-matrix, matrix-vector and vector-vector multiplication
   // in seconds
-  double s_dense, s_mv, s_ltp; 
+  double s_dense, s_mv, s_ltp;
 
   // **********************************************************************
   // Code to be supplemented
@@ -144,7 +144,7 @@ Eigen::VectorXcd ltpSolve(const Eigen::VectorXcd& f,
 /* SAM_LISTING_BEGIN_3 */
 std::pair<double, double> runtimes_ltpSolve(unsigned int N) {
   // Runtime of Eigen's triangular solver and ltpSolve() in seconds
-  double s_tria, s_ltp; 
+  double s_tria, s_ltp;
 
   // **********************************************************************
   // Code to be supplemented

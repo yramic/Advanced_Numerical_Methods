@@ -13,10 +13,10 @@
 namespace LowTriangToeplitz::test {
 
 TEST(LowTriangToeplitz, toeplitz) {
-    Eigen::VectorXcd u(3);
-    u << 1,2,3;
+  Eigen::VectorXcd u(3);
+  u << 1, 2, 3;
 
-
-     ASSERT_NEAR((ltpMultold(u,u)-ltpMult(u,u)).real().norm(),0.0, 1e-8); }
+  ASSERT_NEAR((ltpMultold(u, u) - ltpMult(u, u)).real().norm(), 0.0, 1e-8);
+}
 
 }  // namespace LowTriangToeplitz::test
