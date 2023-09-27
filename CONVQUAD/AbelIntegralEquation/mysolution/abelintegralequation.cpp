@@ -2,6 +2,4 @@
 #include <cmath>
 #include <iostream>
 
-
-namespace AbelIntegralEquation {
-}
+namespace AbelIntegralEquation {}
