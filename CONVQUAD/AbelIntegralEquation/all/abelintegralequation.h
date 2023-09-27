@@ -10,9 +10,6 @@
 #ifndef ABELINTEGRALEQUATION_H_
 #define ABELINTEGRALEQUATION_H_
 
-using namespace Eigen;
-using namespace std;
-
 namespace AbelIntegralEquation {
 /* @brief Compute Gaussian quadrature nodes and weights for n nodes over
  * interval [a,b] \param[in] a,b Interval [a,b] endpoints \param[in] n Number of
