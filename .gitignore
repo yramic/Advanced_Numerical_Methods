@@ -3,4 +3,6 @@ CMakeLists.txt.user
 # Ignore build and lib dirs
 build
 cmake-build-debug
+cmake-build-release
+CMakeFiles
 .idea

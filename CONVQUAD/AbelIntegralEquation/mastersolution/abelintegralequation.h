@@ -122,7 +122,6 @@ VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau) {
 /* SAM_LISTING_BEGIN_2 */
 template <typename FUNC>
 VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
-  
   VectorXd w(N + 1);
   w(0) = 1.;
   for (int l = 1; l < N + 1; ++l) {
@@ -142,8 +141,6 @@ VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
   return u;
 }
 /* SAM_LISTING_END_2 */
-
-
 
 /* @brief Find the unknown function u in the Abel integral equation
  * using convolution quadrature (BDF-2)
