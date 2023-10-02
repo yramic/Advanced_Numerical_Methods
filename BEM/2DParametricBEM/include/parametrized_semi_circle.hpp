@@ -9,11 +9,10 @@
 #ifndef PARAMETRIZEDSEMICIRCLEHPP
 #define PARAMETRIZEDSEMICIRCLEHPP
 
-#include "abstract_parametrized_curve.hpp"
-
+#include <Eigen/Dense>
 #include <utility>
 
-#include <Eigen/Dense>
+#include "abstract_parametrized_curve.hpp"
 
 namespace parametricbem2d {
 /**
@@ -25,7 +24,7 @@ namespace parametricbem2d {
  * @see abstract_parametrized_curve.hpp
  */
 class ParametrizedSemiCircle : public AbstractParametrizedCurve {
-public:
+ public:
   /**
    * Constructor with specified radius; default value = 1.
    *
@@ -53,12 +52,12 @@ public:
    */
   PanelVector split(unsigned int) const;
 
-private:
+ private:
   /**
    * Private const field for storing the radius
    */
   const double radius_;
-}; // class ParametrizedSemiCircle
-} // namespace parametricbem2d
+};  // class ParametrizedSemiCircle
+}  // namespace parametricbem2d
 
-#endif // PARAMETRIZEDSEMICIRCLEHPP
+#endif  // PARAMETRIZEDSEMICIRCLEHPP

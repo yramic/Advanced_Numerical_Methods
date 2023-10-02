@@ -39,9 +39,9 @@
 #include "gtest/gtest.h"
 
 #if GTEST_OS_WINDOWS_MOBILE
-# include <windows.h>
+#include <windows.h>
 #elif GTEST_OS_WINDOWS
-# include <direct.h>
+#include <direct.h>
 #endif  // GTEST_OS_WINDOWS_MOBILE
 
 #include "src/gtest-internal-inl.h"
@@ -82,9 +82,9 @@ TEST(XmlOutputTest, GetOutputFileSingleFile) {
 TEST(XmlOutputTest, GetOutputFileFromDirectoryPath) {
   GTEST_FLAG(output) = "xml:path" GTEST_PATH_SEP_;
   const std::string expected_output_file =
-      GetAbsolutePathOf(
-          FilePath(std::string("path") + GTEST_PATH_SEP_ +
-                   GetCurrentExecutableName().string() + ".xml")).string();
+      GetAbsolutePathOf(FilePath(std::string("path") + GTEST_PATH_SEP_ +
+                                 GetCurrentExecutableName().string() + ".xml"))
+          .string();
   const std::string& output_file =
       UnitTestOptions::GetAbsolutePathToOutputFile();
 #if GTEST_OS_WINDOWS
@@ -107,13 +107,10 @@ TEST(OutputFileHelpersTest, GetCurrentExecutableName) {
 #else
   // FIXME: remove the hard-coded "lt-" prefix when libtool replacement is ready
   const bool success =
-      exe_str == "googletest-options-test" ||
-      exe_str == "gtest_all_test" ||
-      exe_str == "lt-gtest_all_test" ||
-      exe_str == "gtest_dll_test";
+      exe_str == "googletest-options-test" || exe_str == "gtest_all_test" ||
+      exe_str == "lt-gtest_all_test" || exe_str == "gtest_dll_test";
 #endif  // GTEST_OS_WINDOWS
-  if (!success)
-    FAIL() << "GetCurrentExecutableName() returns " << exe_str;
+  if (!success) FAIL() << "GetCurrentExecutableName() returns " << exe_str;
 }
 
 #if !GTEST_OS_FUCHSIA
@@ -137,23 +134,26 @@ class XmlOutputChangeDirTest : public Test {
 
 TEST_F(XmlOutputChangeDirTest, PreserveOriginalWorkingDirWithDefault) {
   GTEST_FLAG(output) = "";
-  EXPECT_EQ(FilePath::ConcatPaths(original_working_dir_,
-                                  FilePath("test_detail.xml")).string(),
-            UnitTestOptions::GetAbsolutePathToOutputFile());
+  EXPECT_EQ(
+      FilePath::ConcatPaths(original_working_dir_, FilePath("test_detail.xml"))
+          .string(),
+      UnitTestOptions::GetAbsolutePathToOutputFile());
 }
 
 TEST_F(XmlOutputChangeDirTest, PreserveOriginalWorkingDirWithDefaultXML) {
   GTEST_FLAG(output) = "xml";
-  EXPECT_EQ(FilePath::ConcatPaths(original_working_dir_,
-                                  FilePath("test_detail.xml")).string(),
-            UnitTestOptions::GetAbsolutePathToOutputFile());
+  EXPECT_EQ(
+      FilePath::ConcatPaths(original_working_dir_, FilePath("test_detail.xml"))
+          .string(),
+      UnitTestOptions::GetAbsolutePathToOutputFile());
 }
 
 TEST_F(XmlOutputChangeDirTest, PreserveOriginalWorkingDirWithRelativeFile) {
   GTEST_FLAG(output) = "xml:filename.abc";
-  EXPECT_EQ(FilePath::ConcatPaths(original_working_dir_,
-                                  FilePath("filename.abc")).string(),
-            UnitTestOptions::GetAbsolutePathToOutputFile());
+  EXPECT_EQ(
+      FilePath::ConcatPaths(original_working_dir_, FilePath("filename.abc"))
+          .string(),
+      UnitTestOptions::GetAbsolutePathToOutputFile());
 }
 
 TEST_F(XmlOutputChangeDirTest, PreserveOriginalWorkingDirWithRelativePath) {
@@ -162,7 +162,8 @@ TEST_F(XmlOutputChangeDirTest, PreserveOriginalWorkingDirWithRelativePath) {
       FilePath::ConcatPaths(
           original_working_dir_,
           FilePath(std::string("path") + GTEST_PATH_SEP_ +
-                   GetCurrentExecutableName().string() + ".xml")).string();
+                   GetCurrentExecutableName().string() + ".xml"))
+          .string();
   const std::string& output_file =
       UnitTestOptions::GetAbsolutePathToOutputFile();
 #if GTEST_OS_WINDOWS
@@ -178,7 +179,7 @@ TEST_F(XmlOutputChangeDirTest, PreserveOriginalWorkingDirWithAbsoluteFile) {
   EXPECT_EQ(FilePath("c:\\tmp\\filename.abc").string(),
             UnitTestOptions::GetAbsolutePathToOutputFile());
 #else
-  GTEST_FLAG(output) ="xml:/tmp/filename.abc";
+  GTEST_FLAG(output) = "xml:/tmp/filename.abc";
   EXPECT_EQ(FilePath("/tmp/filename.abc").string(),
             UnitTestOptions::GetAbsolutePathToOutputFile());
 #endif

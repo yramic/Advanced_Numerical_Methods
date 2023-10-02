@@ -10,13 +10,12 @@
 #ifndef DISCONTSPACEHPP
 #define DISCONTSPACEHPP
 
-#include "abstract_bem_space.hpp"
-
+#include <Eigen/Dense>
 #include <iostream>
 #include <utility>
 #include <vector>
 
-#include <Eigen/Dense>
+#include "abstract_bem_space.hpp"
 #include "abstract_parametrized_curve.hpp"
 #include "parametrized_mesh.hpp"
 
@@ -28,8 +27,9 @@ namespace parametricbem2d {
  *        defined in \f$\eqref{eq:Qp}\f$. The class is implemented through full
  *        template specialization for different values of p.
  */
-template <unsigned int p> class DiscontinuousSpace : public AbstractBEMSpace {
-public:
+template <unsigned int p>
+class DiscontinuousSpace : public AbstractBEMSpace {
+ public:
   DiscontinuousSpace() {
     std::cout << "Error! No specialization defined for p = " << p << std::endl;
   }
@@ -39,8 +39,9 @@ public:
  * \brief This is a specialization of the templated class for p = 0.
  *        This class represents the space \f$S^{-1}_{0}\f$
  */
-template <> class DiscontinuousSpace<0> : public AbstractBEMSpace {
-public:
+template <>
+class DiscontinuousSpace<0> : public AbstractBEMSpace {
+ public:
   // Local to Global Map
   unsigned int LocGlobMap(unsigned int q, unsigned int n,
                           unsigned int N) const {
@@ -90,8 +91,9 @@ public:
  * \brief This is a specialization of the templated class for p = 1.
  *        This class represents the space \f$S^{-1}_{1}\f$
  */
-template <> class DiscontinuousSpace<1> : public AbstractBEMSpace {
-public:
+template <>
+class DiscontinuousSpace<1> : public AbstractBEMSpace {
+ public:
   // Local to Global Map
   unsigned int LocGlobMap(unsigned int q, unsigned int n,
                           unsigned int N) const {
@@ -147,6 +149,6 @@ public:
     referenceshapefunctiondots_.push_back(b2dot);
   }
 };
-} // namespace parametricbem2d
+}  // namespace parametricbem2d
 
-#endif // DISCONTSPACEHPP
+#endif  // DISCONTSPACEHPP

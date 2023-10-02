@@ -11,70 +11,64 @@
 #ifndef BLOCK_CLUSTER_HPP
 #define BLOCK_CLUSTER_HPP
 
-#include "kernel.hpp"
-#include "node.hpp"
 #include <Eigen/Dense>
 #include <fstream>
+
+#include "kernel.hpp"
+#include "node.hpp"
 
 /*!
  * \brief Block cluster class to compute matrix \f$X_{\sigma,\mu}\f$
  */
-class BlockCluster
-{
-public:
+class BlockCluster {
+ public:
+  /*!
+   * \brief Constructor
+   * \param ndx XNode
+   * \param ndy YNode
+   * \param G Kernel Function
+   */
+  BlockCluster(Node* xnode, Node* ynode)
+      : pair_(std::make_pair(xnode, ynode)) {}
 
-    /*!
-     * \brief Constructor
-     * \param ndx XNode
-     * \param ndy YNode
-     * \param G Kernel Function
-     */
-    BlockCluster(Node* xnode, Node* ynode):
-        pair_(std::make_pair(xnode,ynode))
-    { }
+  /*!
+   * \brief return matrix \f$C_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$
+   * denote the clusters
+   */
+  Eigen::MatrixXd getMatrix() const { return C_; }
 
-    /*!
-     * \brief return matrix \f$C_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
-     */
-    Eigen::MatrixXd getMatrix() const {
-        return C_;
-    }
+  /*!
+   * \brief compute matrix \f$C_{\sigma,\mu}\f$
+   * \param G any kind of derived kernel from base class Kernel
+   * \return no. of 'operations' performed
+   */
+  unsigned setMatrix(Kernel* G);
 
-    /*!
-     * \brief compute matrix \f$C_{\sigma,\mu}\f$
-     * \param G any kind of derived kernel from base class Kernel
-     * \return no. of 'operations' performed
-     */
-    unsigned setMatrix(Kernel* G);
+  /*!
+   * \brief compute CVc vector and store it in xnode
+   * \return no. of 'operations' performed
+   */
+  unsigned setCVc();
 
-    /*!
-     * \brief compute CVc vector and store it in xnode
-     * \return no. of 'operations' performed
-     */
-    unsigned setCVc();
+  /*!
+   * \brief return pointer to xnode
+   */
+  Node* getXNode() { return pair_.first; }
 
-    /*!
-     * \brief return pointer to xnode
-     */
-    Node* getXNode() {
-        return pair_.first;
-    }
+  /*!
+   * \brief return pointer to ynode
+   */
+  Node* getYNode() { return pair_.second; }
 
-    /*!
-     * \brief return pointer to ynode
-     */
-    Node* getYNode() {
-        return pair_.second;
-    }
+  /*!
+   * \brief return matrix \f$V_{\sigma}C_{\sigma,\mu}V_{\mu}^\top\f$,
+   * where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
+   */
+  Eigen::MatrixXd getVCV() const;
 
-    /*!
-     * \brief return matrix \f$V_{\sigma}C_{\sigma,\mu}V_{\mu}^\top\f$,
-     * where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
-     */
-    Eigen::MatrixXd getVCV() const;
-
-protected:
-    std::pair<Node*,Node*> pair_;
-    Eigen::MatrixXd C_; //!< matrix \f$C_{\sigma,\mu}\f$, where \f$\sigma\f$ and \f$\mu\f$ denote the clusters
+ protected:
+  std::pair<Node*, Node*> pair_;
+  Eigen::MatrixXd C_;  //!< matrix \f$C_{\sigma,\mu}\f$, where \f$\sigma\f$ and
+                       //!< \f$\mu\f$ denote the clusters
 };
-#endif // BLOCK_CLUSTER_HPP
+#endif  // BLOCK_CLUSTER_HPP

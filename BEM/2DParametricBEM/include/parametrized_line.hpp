@@ -9,11 +9,10 @@
 #ifndef PARAMETRIZEDLINEHPP
 #define PARAMETRIZEDLINEHPP
 
-#include "abstract_parametrized_curve.hpp"
-
+#include <Eigen/Dense>
 #include <utility>
 
-#include <Eigen/Dense>
+#include "abstract_parametrized_curve.hpp"
 
 namespace parametricbem2d {
 /**
@@ -24,7 +23,7 @@ namespace parametricbem2d {
  * @see abstract_parametrized_curve.hpp
  */
 class ParametrizedLine : public AbstractParametrizedCurve {
-public:
+ public:
   /**
    * Defining the type for the points on a line segment
    */
@@ -63,14 +62,14 @@ public:
    */
   double length() const;
 
-private:
+ private:
   /**
    * private const fields for storing the starting and
    * ending point of the line.
    */
   const Point start_;
   const Point end_;
-}; // class ParametrizedLine
-} // namespace parametricbem2d
+};  // class ParametrizedLine
+}  // namespace parametricbem2d
 
-#endif // PARAMETRIZEDLINEHPP
+#endif  // PARAMETRIZEDLINEHPP

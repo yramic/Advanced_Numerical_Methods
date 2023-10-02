@@ -12,12 +12,12 @@
 #define _NEWTONPOTENTIAL_HPP
 
 #include <cmath>
-#include "singleLayerPotential.hpp"
+
 #include "geometry.hpp"
+#include "singleLayerPotential.hpp"
 extern "C" {
 #include "gaussQuadrature.h"
 }
-
 
 /**
  *  The function computeNkj() is called for the computation of the
@@ -38,11 +38,10 @@ extern "C" {
  */
 void computeN(Eigen::MatrixXd& N,
               const Eigen::Matrix<double, Eigen::Dynamic, 2>& coordinates,
-              const Eigen::Matrix<int   , Eigen::Dynamic, 2>& elements,
+              const Eigen::Matrix<int, Eigen::Dynamic, 2>& elements,
               const Eigen::Matrix<double, Eigen::Dynamic, 2>& vertices,
-              const Eigen::Matrix<int   , Eigen::Dynamic, 3>& triangles,
+              const Eigen::Matrix<int, Eigen::Dynamic, 3>& triangles,
               double eta);
-
 
 /**
  *  First, the line segment Ek = [a,b] and the triangle Tj are tested for
@@ -55,9 +54,8 @@ void computeN(Eigen::MatrixXd& N,
  *  @return The function returns the value of the discrete Newton potential,
  *   \f[ -\frac{1}{2\pi} \int_{Ek} \int_{Tj} \log{ \vert x-y \vert} dy ds_x.\f]
  */
-double computeNkj(const Eigen::Vector2d &a, const Eigen::Vector2d& b,
-                  const Eigen::Matrix<double,3,2>& nodes, double eta);
-
+double computeNkj(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
+                  const Eigen::Matrix<double, 3, 2>& nodes, double eta);
 
 /**
  *  The entry N_kj is computed SEMI-ANALYTIC. This means the function uses the
@@ -70,9 +68,9 @@ double computeNkj(const Eigen::Vector2d &a, const Eigen::Vector2d& b,
  *  @return  The function returns the value
  *   \f[ -\frac{1}{2\pi} \int_{Ek} \int_{Tj} \log{ \vert x-y \vert} dy ds_x.\f]
  */
-double computeNkjSemiAnalyticSegment(const Eigen::Vector2d &a,
+double computeNkjSemiAnalyticSegment(const Eigen::Vector2d& a,
                                      const Eigen::Vector2d& b,
-                                     const Eigen::Matrix<double,3,2>& nodes);
+                                     const Eigen::Matrix<double, 3, 2>& nodes);
 
 /**
  *  The entry N_kj is computed "ANALYTIC". This means that the two integrals
@@ -89,10 +87,8 @@ double computeNkjSemiAnalyticSegment(const Eigen::Vector2d &a,
  *  potential \f[ N_{kj} = -\frac{1}{2\pi} \int_{Ek} \int_{Tj} \log{ \vert x-y
  *  \vert} dy ds_x. \f]
  */
-double computeNkjAnalytic(const Eigen::Vector2d &a,
-                          const Eigen::Vector2d& b,
-                          const Eigen::Matrix<double,3,2>& nodes);
-
+double computeNkjAnalytic(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
+                          const Eigen::Matrix<double, 3, 2>& nodes);
 
 /**
  * The result is computed analytically up to a quadrature of a smooth function.
@@ -103,8 +99,8 @@ double computeNkjAnalytic(const Eigen::Vector2d &a,
  *  @return  The function returns the newton-potential \f$ \int_{T} \log{
  *           \vert x-t \vert} dt \f$
  */
-double newtonPotential(const Eigen::Matrix<double,3,2>& nodes, const Eigen::Vector2d& x);
-
+double newtonPotential(const Eigen::Matrix<double, 3, 2>& nodes,
+                       const Eigen::Vector2d& x);
 
 /**
  *  We use a Gauss rule for the outer integral whereas the inner integral is
@@ -121,7 +117,8 @@ double newtonPotential(const Eigen::Matrix<double,3,2>& nodes, const Eigen::Vect
  *  integrateAtanInt(), but it is also used from within the function
  *  newtonPotential().
  */
-double evalAtanInt(const Eigen::Matrix<double,3,2>& nodes, const Eigen::Vector2d &x);
+double evalAtanInt(const Eigen::Matrix<double, 3, 2>& nodes,
+                   const Eigen::Vector2d& x);
 
 /**
  *  Computes the integral and returns its value.
@@ -147,8 +144,6 @@ double innerAtanInt(double a, double b, double c, double xi);
  *  @param[in] nodes  Corner points of the domain mesh element Tk.
  *  @return  The function returns the value of the integral
  */
-double integrateAtanInt(const Eigen::Vector2d &a,
-                        const Eigen::Vector2d& b,
-                        const Eigen::Matrix<double,3,2>& nodes);
+double integrateAtanInt(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
+                        const Eigen::Matrix<double, 3, 2>& nodes);
 #endif
-

@@ -14,10 +14,10 @@
 #include <Eigen/Dense>
 
 struct QuadRule {
-  std::size_t dim;   // dimension of space
-  std::size_t n;     // number of nodes/weights
-  Eigen::MatrixXd x; // quadrature nodes (columns of a matrix with dim rows)
-  Eigen::VectorXd w; // vector of quadrature weights
+  std::size_t dim;    // dimension of space
+  std::size_t n;      // number of nodes/weights
+  Eigen::MatrixXd x;  // quadrature nodes (columns of a matrix with dim rows)
+  Eigen::VectorXd w;  // vector of quadrature weights
 };
 
 /**

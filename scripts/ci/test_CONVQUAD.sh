@@ -2,36 +2,13 @@
 # This is a slightly modified version of compile_test.sh to fit gitlab ci workflow
 
 task() {
-    if [[ $d =~ /AdvectionSUPG/ ]]; then #takes very long to check results
-      return
-    fi
-
-    if [[ $d =~ /SemiLagrangian/ ]]; then #takes very long to check result
-      return
-    fi
-
-    if [[ $d =~ /UnstableBVP/ ]]; then #takes very long to check results
-      return
-    fi
-
-    if [[ $d =~ /TranspSemiLagr/ ]]; then #takes very long to check results
-      return
-    fi
-
-    if [[ $d =~ /StableEvaluationAtAPoint/ ]]; then #takes very long to check results
-      return
-    fi
-
-    if [[ $d =~ /ElectrostaticForce/ ]]; then #takes very long to check results
-      return
-    fi
 
     if [[ $d =~ /CMakeFiles/ ]]; then #should not be checked
       return
     fi
 
         cd "$d"
-        [[ $d =~ ./developers/(.*)/ ]]
+        [[ $d =~ ./CONVQUAD/(.*)/ ]]
         cmd_test="./${BASH_REMATCH[1]}_test_mastersolution";
         cmd_mastersolution="./${BASH_REMATCH[1]}_mastersolution";
 
@@ -44,7 +21,7 @@ task() {
         # Run solution if exists:
         if [[ -f "$cmd_mastersolution" ]]; then
           echo "Executing $cmd_mastersolution";
-          if ! output=$(eval $cmd_mastersolution 2>&1) ; then
+          if ! output=a$(eval $cmd_mastersolution 2>&1) ; then
             echo "ERROR: ";
             printf "$output";
             exit 1;
@@ -55,7 +32,7 @@ task() {
         cd ../..
 }
 set -e
-for d in ./developers/*/ ;
+for d in ./CONVQUAD/*/ ;
 do
   task $d #parallelizing did not work, can be modified at a later stage
 done
