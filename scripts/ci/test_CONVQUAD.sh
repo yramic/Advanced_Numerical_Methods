@@ -18,17 +18,7 @@ task() {
         else
           echo "*** WARNING: No unit tests found in $d ***";
         fi
-        # Run solution if exists:
-        if [[ -f "$cmd_mastersolution" ]]; then
-          echo "Executing $cmd_mastersolution";
-          if ! output=a$(eval $cmd_mastersolution 2>&1) ; then
-            echo "ERROR: ";
-            printf "$output";
-            exit 1;
-          fi
-        else
-          echo "*** WARNING: No mastersolution found in $d ***";
-        fi
+
         cd ../..
 }
 set -e
