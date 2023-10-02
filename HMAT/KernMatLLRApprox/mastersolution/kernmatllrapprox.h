@@ -367,7 +367,7 @@ NearFieldBlock<NODE, KERNEL>::NearFieldBlock(NODE &_nx, NODE &_ny, KERNEL _Gfun)
       G(std::move(_Gfun)),
       Mloc(_nx.pts.size(), _ny.pts.size()) {
   static_assert(NODE::dim == 1, "Only implemented in 1D");
-// Direct initialization of near field kernel collocation matrix
+  // Direct initialization of near field kernel collocation matrix
   for (int i = 0; i < _nx.pts.size(); ++i) {
     for (int j = 0; j < _ny.pts.size(); ++j) {
       Mloc(i, j) = G((_nx.pts[i]).x[0], (_ny.pts[j]).x[0]);

@@ -549,8 +549,8 @@ int main() {
     std::cout << "Error on level " << j << ": " << error(j) << std::endl;
   }
 #else   // TEMPLATE
-                           // TODO: Solve BIE for different Ns and compute error
-                           // of the solution.
+        // TODO: Solve BIE for different Ns and compute error
+        // of the solution.
 #endif  // TEMPLATE
 
   // Output error and discretization parameters N
