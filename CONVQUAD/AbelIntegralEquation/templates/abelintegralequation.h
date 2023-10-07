@@ -83,24 +83,9 @@ VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau) {
 
   // set-up the Galerkin matrix and rhs vector
 
-#if SOLUTION
-  for (int i = 0; i <= p; i++) {
-    for (int j = 0; j <= p; j++)
-      A(i, j) = 2. * sqrt(M_PI) * tgamma(1 + j) /
-                ((3. + 2. * i + 2. * j) *
-                 tgamma(3. / 2. + j));  // tgamma(1+j) == j! if j is integer
-
-    for (int k = 0; k < p; k++) {
-      double tk = gauss_pts_p(k);
-      double wk = gauss_wht_p(k);
-      b(i) += wk * pow(tk, i) * y(tk);
-    }
-  }
-#else
 // **********************************************************************
 // Your Solution here
 // **********************************************************************/
-#endif
 
   // linear system solve using QR decomposition
   VectorXd x = A.colPivHouseholderQr().solve(b);
