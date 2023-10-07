@@ -10,13 +10,12 @@
  ***********************************************************************/
 
 #include <memory>
+
 #include "matrixpartition.h"
 
 // Auxiliary function for building a matrix partitioning
 template <typename TRANSFORM = std::function<double(double)>>
-HMAT::BlockPartition<HMAT::CtNode<1>, HMAT::IndexBlock<HMAT::CtNode<1>>,
-                     HMAT::IndexBlock<HMAT::CtNode<1>>>
-matrixPartition1d(
+HMAT::BlockPartition<HMAT::ClusterTree<HMAT::CtNode<1>>> matrixPartition1d(
     unsigned int npts, double eta = 2.0,
     TRANSFORM trf = [](double x) -> double { return x; }) {
   // Build cluster tree
@@ -30,13 +29,10 @@ matrixPartition1d(
   auto T = std::make_shared<HMAT::ClusterTree<HMAT::CtNode<1>>>();
   T->init(pts);
 
-  HMAT::BlockPartition<HMAT::CtNode<1>, HMAT::IndexBlock<HMAT::CtNode<1>>,
-                       HMAT::IndexBlock<HMAT::CtNode<1>>>
-      bP(T, T);
+  HMAT::BlockPartition<HMAT::ClusterTree<HMAT::CtNode<1>>> bP(T, T);
   bP.init(eta);  // Admissibility parameter eta = 0.5
   return bP;
 }
-
 
 /** Main program */
 int main(int /*argc*/, char** /*argv*/) {
@@ -44,7 +40,6 @@ int main(int /*argc*/, char** /*argv*/) {
   // Construct 1D cluster tree based on equidistant points
   auto matpart = matrixPartition1d(16);
   // Output cluster tree
-  // std::cout << "CLUSTER TREE" << std::endl << *(matpart.rowT->root) << std::endl;
   std::cout << matpart << "Part I: Normal termination" << std::endl;
   (void)HMAT::printGeometricPartition(matpart);
   exit(0);
