@@ -24,13 +24,13 @@ int main(int /*argc*/, char** /*argv*/) {
     pts.push_back(p);
   }
   // Allocate cluster tree object (the same for both directions)
-  auto T_row = std::make_shared<
-      KernMatLLRApprox::LLRClusterTree<KernMatLLRApprox::InterpNode<1>>>(q);
+  auto T_row =
+      std::make_shared<KernMatLLRApprox::LLRClusterTree<HMAT::CtNode<1>>>(q);
   T_row->init(pts);
-  auto T_col = std::make_shared<
-      KernMatLLRApprox::LLRClusterTree<KernMatLLRApprox::InterpNode<1>>>(q);
+  auto T_col =
+      std::make_shared<KernMatLLRApprox::LLRClusterTree<HMAT::CtNode<1>>>(q);
   T_col->init(pts);
-  // Kernel for 1D collocation 
+  // Kernel for 1D collocation
   struct Kernel {
     Kernel() = default;
     double operator()(double x, double y) const {
@@ -38,26 +38,26 @@ int main(int /*argc*/, char** /*argv*/) {
     }
   } G;
   //  KernMatLLRApprox::BiDirChebPartMat1D<Kernel> Mt(T_row, T_col, G, q, 2.0);
-  // /* SAM_LISTING_END_1 */
+  /* SAM_LISTING_END_1 */
 
-  // // Output row cluster tree (the column tree is the same)
-  // std::cout << "CLUSTER TREE" << std::endl << *(Mt.rowT->root) << std::endl;
-  // // Output block partition
+  // Output row cluster tree (the column tree is the same)
+  // std::cout << *(Mt.rowT) << std::endl;
+  // Output block partition
   // std::cout << Mt;
 
   // std::cout << "Computing sparsity measure" << std::endl;
-  // unsigned int spm = KernMatLLRApprox::computeSparsityMeasure(Mt, &std::cout);
-  // std::cout << "Sparsity measure = " << spm << std::endl;
+  // unsigned int spm = KernMatLLRApprox::computeSparsityMeasure(Mt,
+  // &std::cout); std::cout << "Sparsity measure = " << spm << std::endl;
 
   // std::cout << "Matrix x vector" << std::endl;
   // Eigen::VectorXd x = Eigen::VectorXd::Constant(16, 1.0);
   // Eigen::VectorXd y = KernMatLLRApprox::mvLLRPartMat(Mt, x);
 
-  // KernMatLLRApprox::tabulateConvergenceLLR(
-  //     {10, 20, 40, 60, 80, 160}, {3, 4, 5, 6});
+  KernMatLLRApprox::tabulateConvergenceLLR({10, 20, 40, 60, 80, 160},
+                                           {3, 4, 5, 6});
 
-  KernMatLLRApprox::runtimeMatVec(
-      {1024, 2048, 4096, 8192});
-      // , 16384, 32768, 65536, 131072, 262144});
+  // KernMatLLRApprox::runtimeMatVec(
+  //     {1024, 2048, 4096, 8192});
+  // , 16384, 32768, 65536, 131072, 262144}); // take too long
   return 0;
 }
