@@ -8,6 +8,7 @@
 
 #include "fractionalheatequation.h"
 
+#include <cassert>
 #include <memory>
 
 namespace FractionalHeatEquation {
@@ -39,5 +40,40 @@ Eigen::VectorXd cqWeights(unsigned int M, double tau) {
   return w;
 }
 /* SAM_LISTING_END_1 */
+
+unsigned int ToeplitzOp::eval_cnt{0};
+unsigned int ToeplitzOp::init_cnt{0};
+
+/* SAM_LISTING_BEGIN_3 */
+ToeplitzOp::ToeplitzOp(const Eigen::VectorXd &v)
+    : u_(Eigen::VectorXcd::Zero(v.size() + 1)),
+      tmp_(Eigen::VectorXcd::Zero(v.size() + 1)) {
+  const unsigned int n = v.size() + 1;
+  assertm(n > 1, "Vector v missing");
+  assertm((n % 2) == 0,
+          "Only odd-length vectors can define square Toeplitz matrices");
+  // Initialize vector defining circulant extension of Toeplitz matrix
+  tmp_.head(n / 2) =
+      (v.segment((n - 2) / 2, n / 2)).template cast<std::complex<double>>();
+  tmp_[n / 2] = std::complex<double>(0.0, 0.0);
+  tmp_.tail((n - 2) / 2) =
+      (v.head((n - 2) / 2)).template cast<std::complex<double>>();
+  // Store DFT of circulant-defining vector
+  u_ = fft_.fwd(tmp_);
+  init_cnt++;
+}
+/* SAM_LISTING_END_3 */
+
+/* SAM_LISTING_BEGIN_2 */
+Eigen::VectorXd ToeplitzOp::eval(const Eigen::VectorXd &x) {
+  const unsigned int d = x.size();
+  const unsigned int m = u_.size();
+  assertm(d == m / 2, "Vector length mismatch");
+  eval_cnt++;
+  tmp_.head(d) = x.template cast<std::complex<double>>();
+  tmp_.tail(d) = Eigen::VectorXcd::Zero(d);
+  return (fft_.inv(u_.cwiseProduct(fft_.fwd(tmp_)).eval()).real()).head(d);
+}
+/* SAM_LISTING_END_2 */
 
 }  // namespace FractionalHeatEquation

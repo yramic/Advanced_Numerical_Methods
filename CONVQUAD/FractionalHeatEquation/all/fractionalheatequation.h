@@ -6,15 +6,19 @@
  * @copyright Developed at SAM, ETH Zurich
  */
 
+#ifndef FHE_H_
+#define FHE_H_
+
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 #include <cassert>
 #include <complex>
-#include <exception>
 #include <iomanip>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
+#include <unsupported/Eigen/FFT>
+#define assertm(exp, msg) assert(((void)msg, exp))
 
 namespace FractionalHeatEquation {
 
@@ -32,11 +36,12 @@ class SqrtsMplusA {
 
   // Matrix x vector
   template <typename SCALAR>
-  Eigen::VectorXcd eval(
+  [[nodiscard]] Eigen::VectorXcd eval(
       const Eigen::Matrix<SCALAR, Eigen::Dynamic, 1> &v) const;
   // Solve sparse linear system, LU decomposition on demand!
   template <typename SCALAR>
-  Eigen::VectorXcd solve(const Eigen::Matrix<SCALAR, Eigen::Dynamic, 1> &y);
+  [[nodiscard]] Eigen::VectorXcd solve(
+      const Eigen::Matrix<SCALAR, Eigen::Dynamic, 1> &y);
 
  private:
   std::unique_ptr<Eigen::SparseMatrix<std::complex<double>>> p_matrix_;
@@ -96,6 +101,24 @@ Eigen::VectorXd evlMOT(
 }
 /* SAM_LISTING_END_2 */
 
+/** @brief Real square Toeplitz matrix operator */
+/* SAM_LISTING_BEGIN_4 */
+class ToeplitzOp {
+ public:
+  explicit ToeplitzOp(const Eigen::VectorXd &);
+  [[nodiscard]] Eigen::VectorXd eval(const Eigen::VectorXd &);
+
+ private:
+  Eigen::VectorXcd u_;
+  Eigen::VectorXcd tmp_;
+  Eigen::FFT<double> fft_;
+
+ public:
+  static unsigned int init_cnt;
+  static unsigned int eval_cnt;
+};
+/* SAM_LISTING_END_4 */
+
 /** @brief Solve fully discrete evolution my recursive algorithm for triangular
    Toeplitz system */
 /* SAM_LISTING_BEGIN_3 */
@@ -110,9 +133,30 @@ Eigen::VectorXd evlTriangToeplitz(
   Eigen::VectorXd cq_weights(M + 1);
   // ************************************************************
   // TO BE SUPPLEMENTED
+  // Use recursive lambda function, see
+  // https://gitlab.math.ethz.ch/NumCSE/NumCSE/-/blob/master/CppTutorial/lambdarecurse.cpp?ref_type=heads
   // ************************************************************
   return mu_vecs.col(M);
 }
 /* SAM_LISTING_END_3 */
+  
+/** @brief Solve fully discrete evolution my all-steps-in-one forward CQ */
+/* SAM_LISTING_BEGIN_X */
+template <typename SOURCEFN,
+          typename RECORDER = std::function<void(const Eigen::VectorXd &)>>
+Eigen::VectorXd evlASAOCQ(
+    SOURCEFN &&f, unsigned int n, double T, unsigned int L,
+    RECORDER rec = [](const Eigen::Vector2d &mu_n) {}) {
+  const unsigned int N = n * n;
+  const unsigned int M = std::pow(2, L) - 1;
+  Eigen::MatrixXd mu_vecs(N, M + 1);
+  // ************************************************************
+  // TO BE SUPPLEMENTED
+  // ************************************************************
+  return mu_vecs.col(M);
+}
+/* SAM_LISTING_END_X */
 
 }  // namespace FractionalHeatEquation
+
+#endif
