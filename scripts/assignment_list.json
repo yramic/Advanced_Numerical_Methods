@@ -11,6 +11,7 @@
     "HMAT/TensorProductChebIntp",
     "HMAT/EvalTrigPoly",
     "CONVQUAD/LowTriangToeplitz",
-    "CONVQUAD/AbelIntegralEquation"
+    "CONVQUAD/AbelIntegralEquation",
+    "CONVQUAD/FractionalHeatEquation"
   ]
 }
