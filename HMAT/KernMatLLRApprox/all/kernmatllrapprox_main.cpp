@@ -37,9 +37,9 @@ int main(int /*argc*/, char** /*argv*/) {
       return ((x != y) ? -std::log(std::abs(x - y)) : 0.0);
     }
   } G;
-  //  KernMatLLRApprox::BiDirChebPartMat1D<Kernel> Mt(T_row, T_col, G, q, 2.0);
-  // /* SAM_LISTING_END_1 */
+  /* SAM_LISTING_END_1 */
 
+  //  KernMatLLRApprox::BiDirChebPartMat1D<Kernel> Mt(T_row, T_col, G, q, 2.0);
   // // Output row cluster tree (the column tree is the same)
   // std::cout << "CLUSTER TREE" << std::endl << *(Mt.rowT->root) << std::endl;
   // // Output block partition
