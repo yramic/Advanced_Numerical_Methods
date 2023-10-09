@@ -36,16 +36,16 @@ TEST(FractionalHeatEquation, SqrtsMPlusA) {
             << " lu decompositions" << std::endl;
 }
 
-  TEST(FHE,Toeplitzop) {
-    Eigen::VectorXd v = (Eigen::VectorXd(7) << 1,2,3,4,5,6,7).finished();
-    ToeplitzOp T(v);
-    Eigen::MatrixXd T_mat(4,4);
-    T_mat << 4,3,2,1,5,4,3,2,6,5,4,3,7,6,5,4;
-    Eigen::VectorXd x = (Eigen::VectorXd(4) << 0.5, 2.5, 3.5, 7.5).finished();
-    std::cout << "Teoplitz matrix = " << std::endl << T_mat << std::endl;
-    std::cout << "T_mat * x = " << (T_mat*x).transpose() << std::endl;
-    std::cout << "T.eval(x) = " << T.eval(x).transpose() << std::endl;
-    EXPECT_NEAR((T_mat*x - T.eval(x)).norm(),0.0,10E-10);
-  }
-  
+TEST(FHE, Toeplitzop) {
+  Eigen::VectorXd v = (Eigen::VectorXd(7) << 1, 2, 3, 4, 5, 6, 7).finished();
+  ToeplitzOp T(v);
+  Eigen::MatrixXd T_mat(4, 4);
+  T_mat << 4, 3, 2, 1, 5, 4, 3, 2, 6, 5, 4, 3, 7, 6, 5, 4;
+  Eigen::VectorXd x = (Eigen::VectorXd(4) << 0.5, 2.5, 3.5, 7.5).finished();
+  std::cout << "Teoplitz matrix = " << std::endl << T_mat << std::endl;
+  std::cout << "T_mat * x = " << (T_mat * x).transpose() << std::endl;
+  std::cout << "T.eval(x) = " << T.eval(x).transpose() << std::endl;
+  EXPECT_NEAR((T_mat * x - T.eval(x)).norm(), 0.0, 10E-10);
+}
+
 }  // namespace FractionalHeatEquation::test

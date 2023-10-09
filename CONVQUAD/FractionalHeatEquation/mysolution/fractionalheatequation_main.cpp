@@ -9,6 +9,7 @@
 #include "fractionalheatequation.h"
 
 int main(int /*argc*/, char** /*argv*/) {
-  std::cout << "Running code for ADVNCSE HW FractionalHeatEquation" << std::endl;
+  std::cout << "Running code for ADVNCSE HW FractionalHeatEquation"
+            << std::endl;
   return 0;
 }
