@@ -139,7 +139,7 @@ Eigen::VectorXd evlTriangToeplitz(
   return mu_vecs.col(M);
 }
 /* SAM_LISTING_END_3 */
-  
+
 /** @brief Solve fully discrete evolution my all-steps-in-one forward CQ */
 /* SAM_LISTING_BEGIN_X */
 template <typename SOURCEFN,

@@ -32,10 +32,11 @@
 // This file contains tests verifying correctness of data provided via
 // UnitTest's public methods.
 
-#include "gtest/gtest.h"
-
 #include <string.h>  // For strcmp.
+
 #include <algorithm>
+
+#include "gtest/gtest.h"
 
 using ::testing::InitGoogleTest;
 
@@ -61,8 +62,7 @@ class UnitTestHelper {
     for (int i = 0; i < unit_test.total_test_case_count(); ++i)
       test_cases[i] = unit_test.GetTestCase(i);
 
-    std::sort(test_cases,
-              test_cases + unit_test.total_test_case_count(),
+    std::sort(test_cases, test_cases + unit_test.total_test_case_count(),
               LessByName<TestCase>());
     return test_cases;
   }
@@ -73,8 +73,7 @@ class UnitTestHelper {
     UnitTest& unit_test = *UnitTest::GetInstance();
     for (int i = 0; i < unit_test.total_test_case_count(); ++i) {
       const TestCase* test_case = unit_test.GetTestCase(i);
-      if (0 == strcmp(test_case->name(), name))
-        return test_case;
+      if (0 == strcmp(test_case->name(), name)) return test_case;
     }
     return NULL;
   }
@@ -96,7 +95,8 @@ class UnitTestHelper {
 };
 
 #if GTEST_HAS_TYPED_TEST
-template <typename T> class TestCaseWithCommentTest : public Test {};
+template <typename T>
+class TestCaseWithCommentTest : public Test {};
 TYPED_TEST_CASE(TestCaseWithCommentTest, Types<int>);
 TYPED_TEST(TestCaseWithCommentTest, Dummy) {}
 
@@ -331,7 +331,7 @@ class FinalSuccessChecker : public Environment {
 }  // namespace internal
 }  // namespace testing
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   InitGoogleTest(&argc, argv);
 
   AddGlobalTestEnvironment(new testing::internal::FinalSuccessChecker());

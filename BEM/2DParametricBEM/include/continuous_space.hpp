@@ -10,12 +10,11 @@
 #ifndef CONTSPACEHPP
 #define CONTSPACEHPP
 
-#include "abstract_bem_space.hpp"
-
+#include <Eigen/Dense>
 #include <utility>
 #include <vector>
 
-#include <Eigen/Dense>
+#include "abstract_bem_space.hpp"
 #include "abstract_parametrized_curve.hpp"
 #include "parametrized_mesh.hpp"
 
@@ -27,8 +26,9 @@ namespace parametricbem2d {
  *        defined in \f$\eqref{eq:Sp}\f$. The class is implemented through full
  * template specialization for different values of p.
  */
-template <unsigned int p> class ContinuousSpace : public AbstractBEMSpace {
-public:
+template <unsigned int p>
+class ContinuousSpace : public AbstractBEMSpace {
+ public:
   ContinuousSpace() {
     std::cout << "Error! No specialization defined for p = " << p << std::endl;
   }
@@ -38,8 +38,9 @@ public:
  * \brief This is a specialization of the templated class for p = 1.
  *        This class represents the space \f$S^{0}_{1}\f$
  */
-template <> class ContinuousSpace<1> : public AbstractBEMSpace {
-public:
+template <>
+class ContinuousSpace<1> : public AbstractBEMSpace {
+ public:
   // Local to Global Map
   unsigned int LocGlobMap(unsigned int q, unsigned int n,
                           unsigned int N) const {
@@ -98,8 +99,9 @@ public:
  * \brief This is a specialization of the templated class for p = 2.
  *        This class represents the space \f$S^{0}_{2}\f$
  */
-template <> class ContinuousSpace<2> : public AbstractBEMSpace {
-public:
+template <>
+class ContinuousSpace<2> : public AbstractBEMSpace {
+ public:
   unsigned int LocGlobMap(unsigned int q, unsigned int n,
                           unsigned int N) const {
     // Asserting the index of local shape function and the panel number are
@@ -160,6 +162,6 @@ public:
     referenceshapefunctiondots_.push_back(b3dot);
   }
 };
-} // namespace parametricbem2d
+}  // namespace parametricbem2d
 
-#endif // CONTSPACEHPP
+#endif  // CONTSPACEHPP

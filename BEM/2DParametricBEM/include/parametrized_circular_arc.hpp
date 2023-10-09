@@ -9,11 +9,10 @@
 #ifndef PARAMETRIZEDCIRCULARARCHPP
 #define PARAMETRIZEDCIRCULARARCHPP
 
-#include "abstract_parametrized_curve.hpp"
-
+#include <Eigen/Dense>
 #include <utility>
 
-#include <Eigen/Dense>
+#include "abstract_parametrized_curve.hpp"
 
 namespace parametricbem2d {
 /**
@@ -24,7 +23,7 @@ namespace parametricbem2d {
  * @see abstract_parametrized_curve.hpp
  */
 class ParametrizedCircularArc : public AbstractParametrizedCurve {
-public:
+ public:
   /**
    * Constructor with specified center,radius and the starting and ending
    * polar angles
@@ -62,7 +61,7 @@ public:
    */
   double length() const;
 
-private:
+ private:
   /**
    * Private const field for storing the center
    */
@@ -79,7 +78,7 @@ private:
    * Private const field for storing the phi_end
    */
   const double phi_end_;
-}; // class ParametrizedCircularArc
-} // namespace parametricbem2d
+};  // class ParametrizedCircularArc
+}  // namespace parametricbem2d
 
-#endif // PARAMETRIZEDCIRCULARARCHPP
+#endif  // PARAMETRIZEDCIRCULARARCHPP

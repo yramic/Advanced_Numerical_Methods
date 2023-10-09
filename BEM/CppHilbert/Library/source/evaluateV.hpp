@@ -13,13 +13,12 @@
 #ifndef _EVALUATEV_HPP
 #define _EVALUATEV_HPP
 
-#include "singleLayerPotential.hpp"
 #include "geometry.hpp"
+#include "singleLayerPotential.hpp"
 extern "C" {
 #include "gaussQuadrature.h"
 }
 #include "BoundaryMesh.hpp"
-
 
 /**
  *  evaluateV evaluates the single layer potential operator V tilde on a number
@@ -31,8 +30,8 @@ extern "C" {
  *  @param[in] x  (nX x 2) matrix that contains the evaluation points.
  *  @param[in] eta  Admissibility constant. It is greater or equal than 0.
  */
-void evaluateV(Eigen::VectorXd& Vphi_x, const BoundaryMesh& mesh, const Eigen::VectorXd& phi,
-               const Eigen::MatrixXd& x, double eta);
+void evaluateV(Eigen::VectorXd& Vphi_x, const BoundaryMesh& mesh,
+               const Eigen::VectorXd& phi, const Eigen::MatrixXd& x,
+               double eta);
 
 #endif
-

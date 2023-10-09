@@ -8,12 +8,12 @@
 #ifndef ABSTRACTBEMSPACEHPP
 #define ABSTRACTBEMSPACEHPP
 
+#include <Eigen/Dense>
 #include <cassert>
 #include <functional>
 #include <utility>
 #include <vector>
 
-#include <Eigen/Dense>
 #include "parametrized_mesh.hpp"
 
 namespace parametricbem2d {
@@ -22,7 +22,7 @@ namespace parametricbem2d {
  * \brief This abstract class declares the interface for a BEM Space
  */
 class AbstractBEMSpace {
-public:
+ public:
   /**
    * This function maps a local shape function to the corresponding global shape
    * function for a BEM space on the given number of panels, defined in
@@ -134,11 +134,11 @@ public:
    * @param mesh Parametrized mesh object on which interpolation is done
    * @return An Eigen::VectorXd type containing the interpolation coefficients
    */
-  virtual Eigen::VectorXd
-  Interpolate(const std::function<double(double, double)> &func,
-              const ParametrizedMesh &mesh) const = 0;
+  virtual Eigen::VectorXd Interpolate(
+      const std::function<double(double, double)> &func,
+      const ParametrizedMesh &mesh) const = 0;
 
-protected:
+ protected:
   /**
    * This typedef defines the basis function type. This is helpful in
    * storing the reference shape functions for a BEM space in a vector.
@@ -161,7 +161,7 @@ protected:
    * functions in the derived concrete classes
    */
   int q_;
-}; // class AbstractBEMSpace
-} // namespace parametricbem2d
+};  // class AbstractBEMSpace
+}  // namespace parametricbem2d
 
-#endif // ABSTRACTBEMSPACEHPP
+#endif  // ABSTRACTBEMSPACEHPP

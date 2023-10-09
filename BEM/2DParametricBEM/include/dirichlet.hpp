@@ -9,6 +9,8 @@
 #ifndef DIRICHLETHPP
 #define DIRICHLETHPP
 
+#include <Eigen/Dense>
+
 #include "abstract_bem_space.hpp"
 #include "abstract_parametrized_curve.hpp"
 #include "adj_double_layer.hpp"
@@ -19,7 +21,6 @@
 #include "integral_gauss.hpp"
 #include "parametrized_mesh.hpp"
 #include "single_layer.hpp"
-#include <Eigen/Dense>
 
 namespace parametricbem2d {
 /**
@@ -127,7 +128,7 @@ Eigen::VectorXd solve(const ParametrizedMesh &mesh,
   Eigen::VectorXd sol = V.lu().solve(rhs);
   return sol;
 }
-} // namespace direct_first_kind
+}  // namespace direct_first_kind
 
 /**
  * This namespace contains the solver using the direct second kind method which
@@ -173,7 +174,7 @@ Eigen::VectorXd solve(const ParametrizedMesh &mesh,
   Eigen::VectorXd sol = lhs.lu().solve(rhs);
   return sol;
 }
-} // namespace direct_second_kind
+}  // namespace direct_second_kind
 
 /**
  * This namespace contains the solver using the indirect first kind method which
@@ -213,7 +214,7 @@ Eigen::VectorXd solve(const ParametrizedMesh &mesh,
   Eigen::VectorXd sol = V.lu().solve(rhs);
   return sol;
 }
-} // namespace indirect_first_kind
+}  // namespace indirect_first_kind
 
 /**
  * This namespace contains the solver using the indirect second kind method. The
@@ -257,8 +258,8 @@ Eigen::VectorXd solve(const ParametrizedMesh &mesh,
   Eigen::VectorXd sol = lhs.lu().solve(rhs);
   return sol;
 }
-} // namespace indirect_second_kind
-} // namespace dirichlet_bvp
-} // namespace parametricbem2d
+}  // namespace indirect_second_kind
+}  // namespace dirichlet_bvp
+}  // namespace parametricbem2d
 
-#endif // DIRICHLETHPP
+#endif  // DIRICHLETHPP
