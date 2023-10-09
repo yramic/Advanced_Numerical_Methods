@@ -13,6 +13,7 @@
 #define DOUBLELAYERHPP
 
 #include <Eigen/Dense>
+
 #include "abstract_bem_space.hpp"
 #include "abstract_parametrized_curve.hpp"
 #include "logweight_quadrature.hpp"
@@ -170,7 +171,7 @@ double Potential(const Eigen::Vector2d &x, const Eigen::VectorXd &coeffs,
                  const ParametrizedMesh &mesh, const AbstractBEMSpace &space,
                  const unsigned int &N);
 
-} // namespace double_layer
-} // namespace parametricbem2d
+}  // namespace double_layer
+}  // namespace parametricbem2d
 
-#endif // DOUBLELAYERHPP
+#endif  // DOUBLELAYERHPP

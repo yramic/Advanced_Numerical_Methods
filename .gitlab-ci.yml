@@ -1,0 +1,110 @@
+# Run this workflow every time a new commit pushed to your repository
+stages:
+  - format       # List of stages for jobs, and their order of execution
+  - build
+  - test
+  - deploy
+
+variables:
+  DEPS_DIR: $CI_PROJECT_DIR/deps
+  HUNTER_ROOT: $CI_PROJECT_DIR/hunter
+
+
+clang-format-job:
+  stage: format
+  variables:
+    GIT_CHECKOUT: "true"
+  tags:
+    - linux
+  script:
+    - echo "Checking if the code is well formated"
+    - clang-format --version
+    - $CI_PROJECT_DIR/scripts/ci/run-clang-format.py -r --clang-format-executable clang-format --color always $CI_PROJECT_DIR/HMAT
+    - $CI_PROJECT_DIR/scripts/ci/run-clang-format.py -r --clang-format-executable clang-format --color always $CI_PROJECT_DIR/CONVQUAD
+
+# compilation with clang++
+compile-developers-job-clang:
+  stage: build
+  variables:
+    COMPILER: "clang++"
+    BUILD_TYPE: "Release"
+    CXXFLAGS: "-Werror=#warnings"
+    GIT_CHECKOUT: "true"
+  tags:
+    - linux
+  script:
+    - mkdir -p $CI_PROJECT_DIR/build_clang #-p builds if not there and does nothing otherwise
+
+    - cd $CI_PROJECT_DIR/build_clang
+    - export CXX=$COMPILER
+    - echo $CXX
+    - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_CXX_FLAGS_DEBUG="-g0" -DHUNTER_CONFIGURATION_TYPES=$BUILD_TYPE -Wdev
+
+    - echo "Building executables folder"
+    - make -j 4
+
+  cache:
+    key : developers-clang
+    paths :
+      - $CI_PROJECT_DIR/build_clang/
+
+
+compile-developers-job-gpp:
+  stage: build
+  variables:
+    COMPILER: "g++"
+    BUILD_TYPE: "Release"
+    CXXFLAGS: "-Werror=cpp"
+    GIT_CHECKOUT: "true"
+
+  tags:
+    - linux
+  script:
+    - mkdir -p $CI_PROJECT_DIR/build_gpp #-p builds if not there and does nothing otherwise
+
+    - cd $CI_PROJECT_DIR/build_gpp
+    - export CXX=$COMPILER
+    - echo $CXX
+
+    - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_CXX_FLAGS_DEBUG="-g0" -DHUNTER_CONFIGURATION_TYPES=$BUILD_TYPE -Wdev
+    - echo "Building executablese folder"
+    - make -j 4
+  cache:
+    key : developers-gpp
+    paths :
+      - $CI_PROJECT_DIR/build_gpp/
+
+test-developer-job-clang:
+  stage: test
+  tags:
+    - linux
+  script:
+    - echo "Testing executables master solutions"
+    - cd $CI_PROJECT_DIR/build_clang
+
+    - chmod +x $CI_PROJECT_DIR/scripts/ci/test_HMAT.sh
+    - chmod +x $CI_PROJECT_DIR/scripts/ci/test_CONVQUAD.sh
+    - $CI_PROJECT_DIR/scripts/ci/test_HMAT.sh
+    - $CI_PROJECT_DIR/scripts/ci/test_CONVQUAD.sh
+  cache:
+    key : developers-clang
+    paths :
+      - $CI_PROJECT_DIR/build_clang
+
+test-developer-job-gpp:
+  stage: test
+  tags:
+    - linux
+  script:
+    - echo "Testing executables master solutions"
+    - cd $CI_PROJECT_DIR/build_gpp
+
+    - chmod +x $CI_PROJECT_DIR/scripts/ci/test_HMAT.sh
+    - chmod +x $CI_PROJECT_DIR/scripts/ci/test_CONVQUAD.sh
+    - $CI_PROJECT_DIR/scripts/ci/test_HMAT.sh
+    - $CI_PROJECT_DIR/scripts/ci/test_CONVQUAD.sh
+  cache:
+    key : developers-gpp
+    paths :
+      - $CI_PROJECT_DIR/build_gpp
+

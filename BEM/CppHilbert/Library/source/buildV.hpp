@@ -18,8 +18,8 @@
 #define _BUILDV_HPP
 
 #include <Eigen/Dense>
-#include "BoundaryMesh.hpp"
 
+#include "BoundaryMesh.hpp"
 
 /**
  *  This function assembles the matrix V by calling computeVij() for each pair
@@ -34,4 +34,3 @@
 void computeV(Eigen::MatrixXd& V, const BoundaryMesh& mesh, double eta);
 
 #endif
-

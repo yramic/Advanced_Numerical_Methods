@@ -15,7 +15,6 @@
 
 #include "BoundaryMesh.hpp"
 
-
 /**
  *  evaluateK evaluates the adjoint double layer potential  operator K* on a
  *  number of evaluation points.
@@ -27,8 +26,8 @@
  *  @param[in] n_x (nX x 2) matrix that contains the normal vectors.
  *  @param[in] eta  Admissibility constant. It is greater or equal than 0.
  */
-void evaluateKadj(Eigen::VectorXd& Kx, const BoundaryMesh& mesh, const Eigen::VectorXd& gh,
-                  const Eigen::MatrixXd& x, const Eigen::MatrixXd& n_x, double eta);
+void evaluateKadj(Eigen::VectorXd& Kx, const BoundaryMesh& mesh,
+                  const Eigen::VectorXd& gh, const Eigen::MatrixXd& x,
+                  const Eigen::MatrixXd& n_x, double eta);
 
 #endif
-

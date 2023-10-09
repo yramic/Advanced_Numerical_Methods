@@ -119,10 +119,10 @@ int main() {
   // output data
   vtk_writer.WritePointData("upwind_quadrature_solution_unstable", mf_sol);
 
-//============================================================================
-// SOLVE LAPLACIAN WITH NON-HOMOGENEOUS DIRICHLET BC (UPWIND: STABLE)
-//============================================================================
-/* SAM_LISTING_BEGIN_7 */
+  //============================================================================
+  // SOLVE LAPLACIAN WITH NON-HOMOGENEOUS DIRICHLET BC (UPWIND: STABLE)
+  //============================================================================
+  /* SAM_LISTING_BEGIN_7 */
   //====================
   // Your code goes here
   //====================

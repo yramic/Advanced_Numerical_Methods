@@ -12,6 +12,7 @@
 #define ADJDOUBLELAYERHPP
 
 #include <Eigen/Dense>
+
 #include "abstract_bem_space.hpp"
 #include "abstract_parametrized_curve.hpp"
 #include "parametrized_mesh.hpp"
@@ -42,7 +43,7 @@ Eigen::MatrixXd GalerkinMatrix(const ParametrizedMesh mesh,
                                const AbstractBEMSpace &test_space,
                                const unsigned int &N);
 
-} // namespace adj_double_layer
-} // namespace parametricbem2d
+}  // namespace adj_double_layer
+}  // namespace parametricbem2d
 
-#endif // ADJDOUBLELAYERHPP
+#endif  // ADJDOUBLELAYERHPP

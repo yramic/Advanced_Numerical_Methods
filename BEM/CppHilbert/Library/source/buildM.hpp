@@ -13,42 +13,41 @@
 #define _BUILDM_HPP
 
 #include <Eigen/Sparse>
+
 #include "BoundaryMesh.hpp"
 
 /**
  *  Assembles a mass-type matrix M for P0 x S1.
  *
- *  The entries of the (nE x nC)-matrix M for P0 x S1 read \f$ M_{ij} = \int_{Ei}
- *  \phi_j ds, \f$, where \f$ \phi_j \f$ is the S1-hat function associated with
- *  the node zj. The output M is a sparse matrix.
+ *  The entries of the (nE x nC)-matrix M for P0 x S1 read \f$ M_{ij} =
+ * \int_{Ei} \phi_j ds, \f$, where \f$ \phi_j \f$ is the S1-hat function
+ * associated with the node zj. The output M is a sparse matrix.
  *
  * @param[out] M
  *  @param[in] mesh 2D BoundaryMesh (initialized with vertices and elements).
  */
-void computeM01(Eigen::SparseMatrix<double>& M, const BoundaryMesh& mesh)
-{
+void computeM01(Eigen::SparseMatrix<double>& M, const BoundaryMesh& mesh) {
+  int nE = mesh.numElements();
+  // Define triplets vector
+  typedef Eigen::Triplet<double> triplet_t;
+  std::vector<triplet_t> triplets;
+  triplets.reserve(2 * nE);
 
-    int nE = mesh.numElements();
-    // Define triplets vector
-    typedef Eigen::Triplet<double> triplet_t;
-    std::vector<triplet_t> triplets;
-    triplets.reserve(2*nE);
+  // traverse elements
+  for (int i = 0; i < nE; i++) {
+    // identify element's vertices
+    int aidx = mesh.getElementVertex(i, 0);
+    int bidx = mesh.getElementVertex(i, 1);
+    const Eigen::Vector2d& a = mesh.getVertex(aidx);
+    const Eigen::Vector2d& b = mesh.getVertex(bidx);
 
-    // traverse elements
-    for(int i=0; i<nE; i++){
-        // identify element's vertices
-        int aidx = mesh.getElementVertex(i,0);
-        int bidx = mesh.getElementVertex(i,1);
-        const Eigen::Vector2d& a = mesh.getVertex(aidx);
-        const Eigen::Vector2d& b = mesh.getVertex(bidx);
-
-        // Fill triplets with the contribution corresponding to their associated
-        // basis functions
-        double h = (b-a).norm();
-        triplets.push_back(triplet_t(i, aidx, h/2.));
-        triplets.push_back(triplet_t(i, bidx, h/2.));
-    }
-    M.setFromTriplets(triplets.begin(), triplets.end());
+    // Fill triplets with the contribution corresponding to their associated
+    // basis functions
+    double h = (b - a).norm();
+    triplets.push_back(triplet_t(i, aidx, h / 2.));
+    triplets.push_back(triplet_t(i, bidx, h / 2.));
+  }
+  M.setFromTriplets(triplets.begin(), triplets.end());
 }
 
 /**
@@ -56,39 +55,38 @@ void computeM01(Eigen::SparseMatrix<double>& M, const BoundaryMesh& mesh)
  *
  *  The entries of the (nC x nC)-matrix M for S1 x S1 read \f$ M_{ij} = \int_{
  *  supp \phi_i} \int_{supp \phi_j} \phi_i \phi_j ds, \f$, where \f$ \phi_i \f$
- *  is the S1-hat function associated with the node zi. The output M is a sparse matrix.
+ *  is the S1-hat function associated with the node zi. The output M is a sparse
+ * matrix.
  *
  *  @param[out] M
  *  @param[in] mesh 2D BoundaryMesh (initialized with vertices and elements).
  */
-void computeM11(Eigen::SparseMatrix<double>& M, const BoundaryMesh& mesh)
-{
+void computeM11(Eigen::SparseMatrix<double>& M, const BoundaryMesh& mesh) {
+  int nE = mesh.numElements();
+  int nC = mesh.numVertices();
+  // Define triplets vector
+  typedef Eigen::Triplet<double> triplet_t;
+  std::vector<triplet_t> triplets;
+  triplets.reserve(3 * nE);
 
-    int nE = mesh.numElements();
-    int nC = mesh.numVertices();
-    // Define triplets vector
-    typedef Eigen::Triplet<double> triplet_t;
-    std::vector<triplet_t> triplets;
-    triplets.reserve(3*nE);
+  // traverse elements
+  for (int i = 0; i < nE; i++) {
+    // identify element's vertices
+    int aidx = mesh.getElementVertex(i, 0);
+    int bidx = mesh.getElementVertex(i, 1);
+    const Eigen::Vector2d& a = mesh.getVertex(aidx);
+    const Eigen::Vector2d& b = mesh.getVertex(bidx);
 
-    // traverse elements
-    for(int i=0; i<nE; i++){
-        // identify element's vertices
-        int aidx = mesh.getElementVertex(i,0);
-        int bidx = mesh.getElementVertex(i,1);
-        const Eigen::Vector2d& a = mesh.getVertex(aidx);
-        const Eigen::Vector2d& b = mesh.getVertex(bidx);
+    // Fill triplets with the contribution corresponding to their associated
+    // basis functions
+    double h = (b - a).norm();
+    triplets.push_back(triplet_t(aidx, aidx, h / 3.));
+    triplets.push_back(triplet_t(aidx, bidx, h / 6.));
+    triplets.push_back(triplet_t(bidx, aidx, h / 6.));
+    triplets.push_back(triplet_t(bidx, bidx, h / 3.));
+  }
 
-        // Fill triplets with the contribution corresponding to their associated
-        // basis functions
-        double h = (b-a).norm();
-        triplets.push_back(triplet_t(aidx, aidx, h/3.));
-        triplets.push_back(triplet_t(aidx, bidx, h/6.));
-        triplets.push_back(triplet_t(bidx, aidx, h/6.));
-        triplets.push_back(triplet_t(bidx, bidx, h/3.));
-    }
-
-    M.setFromTriplets(triplets.begin(), triplets.end());
+  M.setFromTriplets(triplets.begin(), triplets.end());
 }
 
 /**
@@ -100,28 +98,26 @@ void computeM11(Eigen::SparseMatrix<double>& M, const BoundaryMesh& mesh)
  *  @param[out] M
  *  @param[in] mesh 2D BoundaryMesh (initialized with vertices and elements).
  */
-void computeM00(Eigen::SparseMatrix<double>& M, const BoundaryMesh& mesh)
-{
+void computeM00(Eigen::SparseMatrix<double>& M, const BoundaryMesh& mesh) {
+  int nE = mesh.numElements();
+  // Define triplets vector
+  typedef Eigen::Triplet<double> triplet_t;
+  std::vector<triplet_t> triplets;
+  triplets.reserve(1 * nE);
 
-    int nE = mesh.numElements();
-    // Define triplets vector
-    typedef Eigen::Triplet<double> triplet_t;
-    std::vector<triplet_t> triplets;
-    triplets.reserve(1*nE);
+  // traverse elements
+  for (int i = 0; i < nE; i++) {
+    // identify element's vertices
+    int aidx = mesh.getElementVertex(i, 0);
+    int bidx = mesh.getElementVertex(i, 1);
+    const Eigen::Vector2d& a = mesh.getVertex(aidx);
+    const Eigen::Vector2d& b = mesh.getVertex(bidx);
+    // Fill triplets with the contribution corresponding to their associated
+    // basis functions
+    triplets.push_back(triplet_t(i, i, (b - a).norm()));
+  }
 
-    // traverse elements
-    for(int i=0; i<nE; i++){
-      // identify element's vertices
-      int aidx = mesh.getElementVertex(i,0);
-      int bidx = mesh.getElementVertex(i,1);
-      const Eigen::Vector2d& a = mesh.getVertex(aidx);
-      const Eigen::Vector2d& b = mesh.getVertex(bidx);
-      // Fill triplets with the contribution corresponding to their associated
-      // basis functions
-      triplets.push_back(triplet_t(i, i, (b-a).norm()));
-    }
-
-    M.setFromTriplets(triplets.begin(), triplets.end());
+  M.setFromTriplets(triplets.begin(), triplets.end());
 }
 
 #endif

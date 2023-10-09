@@ -17,9 +17,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "buildK.hpp"
+
+#include <cmath>
+
 #include "constants.hpp"
 #include "doubleLayerPotential.hpp"
-#include <cmath>
 
 /* SAM_LISTING_BEGIN_1 */
 void computeK(Eigen::MatrixXd &K, const BoundaryMesh &mesh, double eta) {
@@ -40,7 +42,8 @@ void computeK(Eigen::MatrixXd &K, const BoundaryMesh &mesh, double eta) {
 
     // \com{inner loop}: traverse the panels
     for (int i = 0; i < nE; ++i) {
-      // get vertices indices and coordinates for panel \cob{$\pan_i = [\Bc,\Bd]$}
+      // get vertices indices and coordinates for panel \cob{$\pan_i =
+      // [\Bc,\Bd]$}
       int cidx = mesh.getElementVertex(i, 0);
       int didx = mesh.getElementVertex(i, 1);
       const Eigen::Vector2d &c = mesh.getVertex(cidx);
@@ -50,17 +53,17 @@ void computeK(Eigen::MatrixXd &K, const BoundaryMesh &mesh, double eta) {
       double lindep2 = fabs((a - d)[0] * (b - a)[1] - (a - d)[1] * (b - a)[0]);
 
       if (lindep1 > EPS * (a - c).norm() ||
-          lindep2 > EPS * (a - d).norm()) // \Label[line]{K:1}
+          lindep2 > EPS * (a - d).norm())  // \Label[line]{K:1}
       {
         // compute entries of $1\times2$ interaction matrix
         // double I0=0.0, I1=0.0;
         computeKij(&I0, &I1, eta, a, b, c, d);
         // distribute values to matrix entries
-        K(j, cidx) += I0 - I1; // \Label[line]{K:2}
-        K(j, didx) += I0 + I1; // \Label[line]{K:3}
-      }                        // endif
-    }                          // endfor
-  }                            // endfor
+        K(j, cidx) += I0 - I1;  // \Label[line]{K:2}
+        K(j, didx) += I0 + I1;  // \Label[line]{K:3}
+      }                         // endif
+    }                           // endfor
+  }                             // endfor
 }
 /* SAM_LISTING_END_1 */
 
@@ -79,7 +82,8 @@ void computeK00(Eigen::MatrixXd &K, const BoundaryMesh &mesh, double eta) {
 
     // \com{inner loop}: traverse the panels
     for (int i = 0; i < nE; ++i) {
-      // get vertices indices and coordinates for panel \cob{$\pan_i = [\Bc,\Bd]$}
+      // get vertices indices and coordinates for panel \cob{$\pan_i =
+      // [\Bc,\Bd]$}
       Eigen::Vector2d c, d;
       std::tie(c, d) = mesh.getElementVertices(i);
       // Zero contribution for parallel panels !
@@ -92,8 +96,8 @@ void computeK00(Eigen::MatrixXd &K, const BoundaryMesh &mesh, double eta) {
         computeKij(&I0, &I1, eta, a, b, c, d);
         // distribute values to matrix entries
         K(j, i) += 2 * I0;
-      } // endif
+      }  // endif
 
-    } // endfor
-  }   // endfor
+    }  // endfor
+  }    // endfor
 }

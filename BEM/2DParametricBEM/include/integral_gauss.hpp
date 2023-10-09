@@ -5,9 +5,10 @@
 #ifndef INTEGRALGAUSSHPP
 #define INTEGRALGAUSSHPP
 
+#include <limits>
+
 #include "gauleg.hpp"
 #include "logweight_quadrature.hpp"
-#include <limits>
 
 namespace parametricbem2d {
 template <typename T>
@@ -47,6 +48,6 @@ double ComputeLogIntegral(T integrand, double a, unsigned int N) {
   }
   return integral;
 }
-} // namespace parametricbem2d
+}  // namespace parametricbem2d
 
-#endif // INTEGRALGAUSSHPP
+#endif  // INTEGRALGAUSSHPP

@@ -8,11 +8,11 @@
 #ifndef GAULEGHPP
 #define GAULEGHPP
 
-#include "logweight_quadrature.hpp"
 #include <Eigen/Dense>
 #include <cmath>
 #include <iostream>
-#include <cmath>
+
+#include "logweight_quadrature.hpp"
 #define _USE_MATH_DEFINES
 
 /* @brief Compute Gaussian quadrature nodes and weights for n nodes over
@@ -20,8 +20,8 @@
  * quadrature points \param[out] xq,wq Pair of Gauss-Legendre quadrature points
  * and weights
  */
-inline std::pair<Eigen::RowVectorXd, Eigen::RowVectorXd>
-gauleg(double a, double b, int n, double eps = 1.e-13) {
+inline std::pair<Eigen::RowVectorXd, Eigen::RowVectorXd> gauleg(
+    double a, double b, int n, double eps = 1.e-13) {
   int i, j, m;
   double xmid, xlen, p1, p2, p3, dp1, z, z1, wqi;
   Eigen::RowVectorXd xq(n), wq(n);
@@ -32,7 +32,6 @@ gauleg(double a, double b, int n, double eps = 1.e-13) {
 
   // get roots
   for (i = 0; i < m; i++) {
-
     // i-th root guess
     z = std::cos(M_PI * (i + 1 - 0.25) / (n + 0.5));
 
