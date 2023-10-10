@@ -292,59 +292,6 @@ void test_accuracy_ltpMult() {
   std::cout << "Error = " << (c1c2 - T1T2.col(0)).norm() << std::endl;
 }
 
-// measure time ltpMult
-void time_measure_ltpMult() {
-  std::size_t nl = 12;
-  std::size_t n_start = 4;
-  std::size_t n_end = n_start * pow(2, nl - 1);
-  int num_repititions = 6;
-
-  Eigen::VectorXd error(nl), et_slow(nl), et_fast(nl);
-  std::clock_t start_time, end_time;
-  double et_sum;
-
-  std::cout << "\nMatrix size, start: " << n_start << std::endl;
-  std::cout << "Matrix size, end: " << n_end << std::endl;
-  std::cout << "Number of matrices: " << nl << "\n" << std::endl;
-
-  std::size_t n = n_start;
-  for (int l = 0; l < nl; l++) {
-    Eigen::VectorXcd c(n), r(n), v(n);
-    c = Eigen::VectorXcd::Random(n);
-    v = Eigen::VectorXcd::Constant(n, 1.0);
-    r.setZero();
-    r(0) = c(0);
-
-    Eigen::MatrixXcd T = toeplitz(c, r);
-
-    et_sum = 0;
-    Eigen::VectorXcd T_mult_v;
-    for (int k = 0; k < num_repititions; k++) {
-      start_time = clock();
-      T_mult_v = T * v;
-      end_time = clock();
-      if (k > 0) et_sum += double(end_time - start_time) / CLOCKS_PER_SEC;
-    }
-    et_slow(l) = et_sum / (num_repititions - 1);
-
-    et_sum = 0;
-    Eigen::VectorXcd c_conv_v;
-    for (int k = 0; k < num_repititions; k++) {
-      start_time = clock();
-      c_conv_v = ltpMult(c, v);
-      end_time = clock();
-      if (k > 0) et_sum += double(end_time - start_time) / CLOCKS_PER_SEC;
-    }
-    et_fast(l) = et_sum / (num_repititions - 1);
-
-    error(l) = (c_conv_v - T_mult_v.col(0)).norm();
-    std::cout << l << "\t" << n << "\t" << error(l) << "\t" << et_slow(l)
-              << "\t" << et_fast(l) << std::endl;
-
-    n *= 2;
-  }
-}
-
 // check accuracy ltpSolve
 void test_accuracy_ltpSolve() {
   std::size_t n = 4;
@@ -361,61 +308,6 @@ void test_accuracy_ltpSolve() {
   std::cout << "Error = " << (u_rec - u_sol).norm() << std::endl;
 }
 
-// measure time ltpSolve
-void time_measure_ltpSolve() {
-  std::size_t nl = 13;
-  std::size_t n_start = 4;
-  std::size_t n_end = n_start * std::pow(2, nl - 1);
-  int num_repititions = 6;
-
-  Eigen::VectorXd error(nl), et_slow(nl), et_fast(nl);
-  std::clock_t start_time, end_time;
-  double et_sum;
-
-  std::cout << "\nMatrix size, start: " << n_start << std::endl;
-  std::cout << "Matrix size, end: " << n_end << std::endl;
-  std::cout << "Number of matrices: " << nl << "\n" << std::endl;
-
-  std::size_t n = n_start;
-  for (int l = 0; l < nl; l++) {
-    Eigen::VectorXcd c(n), r(n), v(n);
-    for (int i = 0; i < n; i++) {
-      c(i) = i + 1;
-    }
-    v = Eigen::VectorXcd::Constant(n, 1.0);
-    r.setZero();
-    r(0) = c(0);
-
-    Eigen::MatrixXcd T = toeplitz(c, r);
-    Eigen::VectorXcd T_mult_v = ltpMult(c, v);
-
-    et_sum = 0;
-    Eigen::VectorXcd u_sol;
-    for (int k = 0; k < num_repititions; k++) {
-      start_time = clock();
-      u_sol = T.triangularView<Eigen::Lower>().solve(T_mult_v);
-      end_time = clock();
-      if (k > 0) et_sum += double(end_time - start_time) / CLOCKS_PER_SEC;
-    }
-    et_slow(l) = et_sum / (num_repititions - 1);
-
-    et_sum = 0;
-    Eigen::VectorXcd u_rec;
-    for (int k = 0; k < num_repititions; k++) {
-      start_time = clock();
-      u_rec = ltpSolve(c, T_mult_v);
-      end_time = clock();
-      if (k > 0) et_sum += double(end_time - start_time) / CLOCKS_PER_SEC;
-    }
-    et_fast(l) = et_sum / (num_repititions - 1);
-
-    error(l) = (u_sol - u_rec).norm() / (T_mult_v).norm();
-    std::cout << l << "\t" << n << "\t" << error(l) << "\t" << et_slow(l)
-              << "\t" << et_fast(l) << std::endl;
-
-    n *= 2;
-  }
-}
 }  // namespace LowTriangToeplitz
 
 // End of file

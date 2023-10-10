@@ -13,12 +13,13 @@
 #ifndef _EVALUATEK_HPP
 #define _EVALUATEK_HPP
 
-#include "doubleLayerPotential.hpp"
 #include "geometry.hpp"
+#include "doubleLayerPotential.hpp"
 extern "C" {
 #include "gaussQuadrature.h"
 }
 #include "BoundaryMesh.hpp"
+
 
 /**
  *  evaluateK evaluates the double layer potential operator K tilde on a number
@@ -30,7 +31,7 @@ extern "C" {
  *  @param[in] x  (nX x 2) matrix that contains the evaluation points.
  *  @param[in] eta  Admissibility constant. It is greater or equal than 0.
  */
-void evaluateK(Eigen::VectorXd& Kfx, const BoundaryMesh& mesh,
-               const Eigen::VectorXd& fh, const Eigen::MatrixXd& x, double eta);
+void evaluateK(Eigen::VectorXd& Kfx, const BoundaryMesh& mesh, const Eigen::VectorXd& fh,
+               const Eigen::MatrixXd& x, double eta);
 
 #endif

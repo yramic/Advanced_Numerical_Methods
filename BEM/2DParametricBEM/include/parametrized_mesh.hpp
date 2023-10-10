@@ -9,11 +9,12 @@
 #ifndef PARAMETRIZEDMESHHPP
 #define PARAMETRIZEDMESHHPP
 
-#include <Eigen/Dense>
+#include "abstract_parametrized_curve.hpp"
+
 #include <iterator>
 #include <utility>
 
-#include "abstract_parametrized_curve.hpp"
+#include <Eigen/Dense>
 
 namespace parametricbem2d {
 /**
@@ -26,7 +27,7 @@ namespace parametricbem2d {
  *        next, such that the panels form a curved polygon.
  */
 class ParametrizedMesh {
- public:
+public:
   /**
    * Constructor using a PanelVector object which contains the component
    * panels of the mesh in the form of parametrized curves.
@@ -56,12 +57,12 @@ class ParametrizedMesh {
    */
   Eigen::Vector2d getVertex(unsigned int i) const;
 
- private:
+private:
   /**
    * Private const field for the PanelVector of the mesh
    */
   const PanelVector panels_;
-};  // class ParametrizedMesh
-}  // namespace parametricbem2d
+}; // class ParametrizedMesh
+} // namespace parametricbem2d
 
-#endif  // PARAMETRIZEDMESHHPP
+#endif // PARAMETRIZEDMESHHPP
