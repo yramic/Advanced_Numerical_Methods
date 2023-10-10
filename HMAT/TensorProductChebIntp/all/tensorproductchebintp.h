@@ -131,7 +131,7 @@ std::vector<double> chebInterpEval2D(unsigned int q, FUNCTOR f,
       // Only enter if no division by zero occured
       if (nonodey) {
         // In the case of division by zero
-        if (std::abs(x[k][0] - t[j]) < 1e-9) {
+        if (std::abs(x[k][1] - t[j]) < 1e-9) {
           nonodey = false;
           nodey = j;       // Keep track of the index
           if (!nonodex) {  // Early termination in the case of second division
