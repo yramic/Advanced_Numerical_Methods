@@ -12,7 +12,7 @@
 #include "clustertree.h"
 
 namespace HMAT {
-// distance of 1D intervals \cob{$\cintv{a,b}$} and \cob{$\cintv{c,d}$}
+  // distance of 1D intervals \cob{$\cintv{a,b}$} and \cob{$\cintv{c,d}$}
 double dist(double a, double b, double c, double d) {
   if (b < a) {
     std::swap(a, b);
@@ -27,7 +27,7 @@ double dist(double a, double b, double c, double d) {
   return (c < b) ? 0.0 : c - b;
 }
 
-// Non-recursive output operator for 1D cluster, for debugging
+  // Non-recursive output operator for 1D cluster, for debugging
 void outCTNode(const CtNode<1> &ctnode, std::ostream &o) {
   o << "CTNode: ";
   for (const HMAT::Point<1> pt : ctnode.pts) {
@@ -35,5 +35,6 @@ void outCTNode(const CtNode<1> &ctnode, std::ostream &o) {
   }
   o << std::endl;
 }
-
-}  // namespace HMAT
+  
+  
+} // end namespacce HMAT 

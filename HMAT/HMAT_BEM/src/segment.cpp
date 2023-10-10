@@ -11,10 +11,19 @@
 #include "../include/segment.hpp"
 
 // set X coordinate of the point
-void Segment::setA(const Eigen::Vector2d& a) { a_ = a; }
+void Segment::setA(const Eigen::Vector2d& a)
+{
+    a_ = a;
+}
 
 // set Y coordinate of the point
-void Segment::setB(const Eigen::Vector2d& b) { b_ = b; }
+void Segment::setB(const Eigen::Vector2d& b)
+{
+    b_ = b;
+}
 
 // set ID of the point
-void Segment::setId(unsigned id) { id_ = id; }
+void Segment::setId(unsigned id)
+{
+    id_ = id;
+}

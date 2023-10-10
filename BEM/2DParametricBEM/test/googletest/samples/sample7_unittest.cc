@@ -27,6 +27,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
 // This sample shows how to test common properties of multiple
 // implementations of an interface (aka interface tests) using
 // value-parameterized tests. Each test in the test case has
@@ -34,8 +35,9 @@
 // tested.
 
 // The interface and its implementations are in this header.
-#include "gtest/gtest.h"
 #include "prime_tables.h"
+
+#include "gtest/gtest.h"
 namespace {
 
 using ::testing::TestWithParam;
@@ -48,7 +50,9 @@ using ::testing::Values;
 // SetUp() method and delete them in TearDown() method.
 typedef PrimeTable* CreatePrimeTableFunc();
 
-PrimeTable* CreateOnTheFlyPrimeTable() { return new OnTheFlyPrimeTable(); }
+PrimeTable* CreateOnTheFlyPrimeTable() {
+  return new OnTheFlyPrimeTable();
+}
 
 template <size_t max_precalculated>
 PrimeTable* CreatePreCalculatedPrimeTable() {

@@ -16,8 +16,8 @@
 #define _BUILDK_HPP
 
 #include <Eigen/Dense>
-
 #include "BoundaryMesh.hpp"
+
 
 /**
  *  This function generates the panels Ei and Ej. In case of Ej and Ei being
@@ -33,7 +33,7 @@
 void computeK(Eigen::MatrixXd& K, const BoundaryMesh& mesh, double eta);
 
 /**
- *  Compute the double layer operator K for piecewise constant test and trial
+ *  Compute the double layer operator K for piecewise constant test and trial 
  *  basis functions.
  *
  *  @param[out] K  (nE x nE) matrix. nE is the number of elements.
@@ -43,3 +43,4 @@ void computeK(Eigen::MatrixXd& K, const BoundaryMesh& mesh, double eta);
 void computeK00(Eigen::MatrixXd& K, const BoundaryMesh& mesh, double eta);
 
 #endif
+

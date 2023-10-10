@@ -207,7 +207,8 @@ using BiDirChebPartMat1D = HMAT::BiDirChebBlockPartition<
 // Matrix x Vector based on compressed kernel collocation matrix
 /* SAM_LISTING_BEGIN_U */
 template <typename PARTMAT1D>
-Eigen::VectorXd mvLLRPartMat(const PARTMAT1D &Mt, const Eigen::VectorXd &x) {
+Eigen::VectorXd mvLLRPartMat(const PARTMAT1D &Mt,
+                             const Eigen::VectorXd &x) {
   // **********************************************************************
   // TODO
   // **********************************************************************
@@ -242,7 +243,7 @@ struct BasisFn {
   Eigen::Matrix<double, d, 1> xmin, xmax;  // Corners of bounding box
 };
 /* SAM_LISTING_END_R */
-
+  
 }  // namespace HMAT
 
 #endif

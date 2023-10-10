@@ -2,11 +2,12 @@
 #include <cassert>
 #include <cmath>
 #include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <istream>
+#include <iomanip>
 
 using namespace Eigen;
+
 
 /* @brief Compute matrix M using analytic expression.
  *
@@ -51,6 +52,7 @@ VectorXd solveBIE(const FUNC &g, int N) {
   // TODO: Build BIE system and solve it
 }
 
+ 
 /* SAM_LISTING_END_3a */
 
 /* @brief Compute L2 norm of UN from its coefficients using Gauss Legendre
