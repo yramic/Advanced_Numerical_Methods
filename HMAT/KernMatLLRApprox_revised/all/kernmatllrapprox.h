@@ -192,6 +192,11 @@ class LLRClusterTree : public HMAT::ClusterTree<NODE> {
   void initVRec(NODE *node);
 
  public:
+  // For the conciseness of access
+  Eigen::VectorXd &getSectVec(const NODE *node) { return clust_sect_vec[node->nodeNumber]; }
+  Eigen::VectorXd &getOmega(const NODE *node) { return clust_omega[node->nodeNumber]; }
+  Eigen::MatrixXd &getV(const NODE *node) { return Vs[node->nodeNumber]; }
+
   const std::size_t q;  // rank of separable approximation on cluster boxes
   std::vector<Eigen::MatrixXd>
       Vs;  // global vector of low-rank factors, each \cob{$\VV\in\bbR^{k,q}$}
@@ -226,7 +231,7 @@ void LLRClusterTree<NODE>::initVRec(NODE *node) {
   const double a = bbox.minc[0];
   const double b = bbox.maxc[0];
   // Resize Matrix V of this node
-  Vs[node->nodeNumber].resize(node->I.size(), q);
+  Vs[node->nodeNumber].resize(node->noIdx(), q);
 #if SOLUTION
   // Compute Chebychev nodes $t_i$ and
   // baryccentric weights $\lambda_i$ for interval $\cintv{a,b}$
@@ -240,7 +245,7 @@ void LLRClusterTree<NODE>::initVRec(NODE *node) {
     lambda[i] = fac * sgn * std::sin(arg); // \prbeqref{eq:bwf}
   }
   // Number of collocation points in cluster
-  const unsigned int nIw = (node->I).size();
+  const unsigned int nIw = node->noIdx();
   // Traverse collocation points (in the interval $\cintv{a,b}$)
   Eigen::VectorXd tx_diff(q);  // $t_i - \xi$
   for (int j = 0; j < nIw; ++j) {
@@ -403,11 +408,11 @@ Eigen::VectorXd mvLLRPartMat(BiDirChebBlockPartition<TREE, KERNEL> &llrcmat,
       // Obtain indices held by the cluster
       const std::vector<size_t> idxs = col_node->I;
       // Restriction of argument vector to column cluster, assuming contiguous indices in idxs
-      llrcmat.colT->clust_sect_vec[col_node->nodeNumber] = x.segment(idxs.front(), idxs.size());
+      llrcmat.colT->getSectVec(col_node) = x.segment(idxs.front(), idxs.size());
       // Compute $\cob{\vec{\omegabf}_{w}}$
-      Eigen::MatrixXd VT = llrcmat.colT->Vs[col_node->nodeNumber].transpose();
-      Eigen::VectorXd Rmu = llrcmat.colT->clust_sect_vec[col_node->nodeNumber];
-      llrcmat.colT->clust_omega[col_node->nodeNumber] = VT * Rmu;;
+      Eigen::MatrixXd VT = llrcmat.colT->getV(col_node).transpose();
+      Eigen::VectorXd Rmu = llrcmat.colT->getSectVec(col_node);
+      llrcmat.colT->getOmega(col_node) = VT * Rmu;;
       // Recursion: visit entire cluster tree
       comp_omega_rec(col_node->sons[0]);
       comp_omega_rec(col_node->sons[1]);
@@ -417,8 +422,8 @@ Eigen::VectorXd mvLLRPartMat(BiDirChebBlockPartition<TREE, KERNEL> &llrcmat,
   // Final sentence in \lref{par:3p}: Clear local storage of row tree
   std::function<void(NODE * row_node)> clear_vec_rec = [&](NODE *row_node) -> void {
     if (row_node) {
-      llrcmat.rowT->clust_sect_vec[row_node->nodeNumber].setZero(row_node->noIdx());
-      llrcmat.rowT->clust_omega[row_node->nodeNumber].setZero(llrcmat.q);
+      llrcmat.rowT->getSectVec(row_node).setZero(row_node->noIdx());
+      llrcmat.rowT->getOmega(row_node).setZero(llrcmat.q);
       clear_vec_rec(row_node->sons[0]);
       clear_vec_rec(row_node->sons[1]);
     }
@@ -431,13 +436,13 @@ Eigen::VectorXd mvLLRPartMat(BiDirChebBlockPartition<TREE, KERNEL> &llrcmat,
     // Far-field block: accumulate $\cob{\VC_{v\times w}\vec{\omegabf}_w}$
     NODE &row_node = llrcmat.farField[n].nx;
     const NODE &col_node = llrcmat.farField[n].ny;
-    llrcmat.rowT->clust_omega[row_node.nodeNumber] += llrcmat.Cs[n] * llrcmat.colT->clust_omega[col_node.nodeNumber];
+    llrcmat.rowT->getOmega(&row_node) += llrcmat.Cs[n] * llrcmat.colT->getOmega(&col_node);
   }
   for (int n=0; n < llrcmat.nearField.size(); n++) {
     // Near-field block: use retricted kernel collocatin matrix $\cob{\rst{\VM}{v\times w}}$
     NODE &row_node = llrcmat.nearField[n].nx;
     const NODE &col_node = llrcmat.nearField[n].ny;
-    llrcmat.rowT->clust_sect_vec[row_node.nodeNumber] += llrcmat.Mlocs[n] * llrcmat.colT->clust_sect_vec[col_node.nodeNumber];
+    llrcmat.rowT->getSectVec(&row_node) += llrcmat.Mlocs[n] * llrcmat.colT->getSectVec(&col_node);
   }
 
   // Pass (III) of \lref{par:3p}: Traverse row tree and assemble return vector
@@ -445,9 +450,9 @@ Eigen::VectorXd mvLLRPartMat(BiDirChebBlockPartition<TREE, KERNEL> &llrcmat,
     if (row_node) {
       const std::vector<size_t> idxs = row_node->I;
       // $\cob{\rst{\Vx}{v} += \VU_{v}\vec{\zetabf}_{v}+\vec{\phibf}_{v}}$
-      llrcmat.rowT->clust_sect_vec[row_node->nodeNumber] += llrcmat.rowT->Vs[row_node->nodeNumber] * llrcmat.rowT->clust_omega[row_node->nodeNumber];
+      llrcmat.rowT->getSectVec(row_node) += llrcmat.rowT->getV(row_node) * llrcmat.rowT->getOmega(row_node);
       // Expand from cluster $\cob{v}$, assuming contiguous indices in idxs
-      y.segment(idxs.front(), idxs.size()) += llrcmat.rowT->clust_sect_vec[row_node->nodeNumber];
+      y.segment(idxs.front(), idxs.size()) += llrcmat.rowT->getSectVec(row_node);
       // Recursion through row cluster tree
       ass_y_rec(row_node->sons[0]);
       ass_y_rec(row_node->sons[1]);
