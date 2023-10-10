@@ -13,24 +13,26 @@
 
 #include <cmath>
 
+
 #ifndef EPS
-#define EPS 1e-12
+#  define EPS 1e-12
 #endif
 
 #ifndef DEFAULT_ETA
-#define DEFAULT_ETA 0.5
+#  define DEFAULT_ETA 0.5
 #endif
 
 #ifndef GAUSS_ORDER
-#define GAUSS_ORDER 16
+#  define GAUSS_ORDER 16
 #endif
 
 #ifndef INFINITY
-#define INFINITY (HUGE_VAL + HUGE_VAL)
+#   define INFINITY (HUGE_VAL + HUGE_VAL)
 #endif
 
 #ifndef NAN
-#define NAN (INFINITY - INFINITY)
+#   define NAN (INFINITY - INFINITY)
 #endif
 
 #endif
+

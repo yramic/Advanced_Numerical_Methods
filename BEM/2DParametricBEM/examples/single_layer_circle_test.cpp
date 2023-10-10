@@ -1,5 +1,3 @@
-#include <Eigen/Dense>
-#include <Eigen/Eigenvalues>
 #include <algorithm>
 #include <cassert>
 #include <cmath>
@@ -8,12 +6,14 @@
 #include <string>
 #include <vector>
 
+#include <Eigen/Dense>
+#include <Eigen/Eigenvalues>
 #include "discontinuous_space.hpp"
 #include "parametrized_circular_arc.hpp"
 #include "parametrized_mesh.hpp"
 #include "single_layer.hpp"
 
-#define _USE_MATH_DEFINES  // for Pi
+#define _USE_MATH_DEFINES // for Pi
 
 int main() {
   std::string filename = "sl_circle_test_eigs.txt";
@@ -49,10 +49,12 @@ int main() {
       es.eigenvalues();
   Eigen::VectorXd eigs_r(N);
   // Extracting the real part of eigenvalues (imaginary zero in this case)
-  for (unsigned int i = 0; i < N; ++i) eigs_r(i) = eigs(i).real();
+  for (unsigned int i = 0; i < N; ++i)
+    eigs_r(i) = eigs(i).real();
   // Sorting the real parts of eigenvalues
   std::sort(eigs_r.data(), eigs_r.data() + eigs_r.size());
   // Saving the real parts to a file
-  for (unsigned int i = 0; i < N; ++i) output << eigs_r(i) << std::endl;
+  for (unsigned int i = 0; i < N; ++i)
+    output << eigs_r(i) << std::endl;
   return 0;
 }

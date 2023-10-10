@@ -30,14 +30,14 @@ int main(int /*argc*/, char** /*argv*/) {
   auto T_col = std::make_shared<
       KernMatLLRApprox::LLRClusterTree<KernMatLLRApprox::InterpNode<1>>>(q);
   T_col->init(pts);
-  // Kernel for 1D collocation
+  // Kernel for 1D collocation 
   struct Kernel {
     Kernel() = default;
     double operator()(double x, double y) const {
       return ((x != y) ? -std::log(std::abs(x - y)) : 0.0);
     }
   } G;
-  KernMatLLRApprox::BiDirChebPartMat1D<Kernel> Mt(T_row, T_col, G, q, 2.0);
+   KernMatLLRApprox::BiDirChebPartMat1D<Kernel> Mt(T_row, T_col, G, q, 2.0);
   /* SAM_LISTING_END_1 */
 
   // // Output row cluster tree (the column tree is the same)

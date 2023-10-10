@@ -42,4 +42,4 @@ double get_min(double xl, double xr, double yl, double yr);
  */
 bool is_admissible(double xl, double xr, double yl, double yr, double eta);
 
-#endif  // IS_ADMISSIBLE_HPP
+#endif // IS_ADMISSIBLE_HPP

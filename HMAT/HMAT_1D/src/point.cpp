@@ -11,7 +11,13 @@
 #include "../include/point.hpp"
 
 // set x coordinate
-void Point::setX(double x) { x_ = x; }
+void Point::setX(double x)
+{
+    x_ = x;
+}
 
 // set id
-void Point::setId(double id) { id_ = id; }
+void Point::setId(double id)
+{
+    id_ = id;
+}

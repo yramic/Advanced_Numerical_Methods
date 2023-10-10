@@ -9,30 +9,29 @@
  * as this header is left intact.                                      *
  ***********************************************************************/
 #include "../include/block_nearf.hpp"
-
-#include <Eigen/Dense>
-
 #include "../include/kernel.hpp"
 #include "../include/node.hpp"
+#include <Eigen/Dense>
 
 // Constructor
-BlockNearF::BlockNearF(Node* xnode, Node* ynode)
-    : pair_(std::make_pair(xnode, ynode)) {}
+BlockNearF::BlockNearF(Node* xnode, Node* ynode):
+    pair_(std::make_pair(xnode,ynode))
+{ }
 
 // Constructor
-BlockNearF::BlockNearF(Node* xnode, Node* ynode, Kernel* G)
-    : pair_(std::make_pair(xnode, ynode)) {}
+BlockNearF::BlockNearF(Node* xnode, Node* ynode, Kernel* G):
+    pair_(std::make_pair(xnode,ynode))
+{ }
 
 // compute near field block matrix
-unsigned BlockNearF::setMatrix(Kernel* G) {
-  C_.resize(pair_.first->getSegments().size(),
-            pair_.second->getSegments().size());
-  // Compute collocation matrix for near field points
-  for (unsigned i = 0; i < pair_.first->getSegments().size(); ++i)
-    for (unsigned j = 0; j < pair_.second->getSegments().size(); ++j)
-      C_(i, j) = (*G)(pair_.first->getSegments()[i].getA(),
-                      pair_.first->getSegments()[i].getB(),
-                      pair_.second->getSegments()[j].getA(),
-                      pair_.second->getSegments()[j].getB());
-  return C_.rows() * C_.cols();  // return no. of 'operations' performed
+unsigned BlockNearF::setMatrix(Kernel* G)
+{
+    C_.resize(pair_.first->getSegments().size(),
+              pair_.second->getSegments().size());
+    // Compute collocation matrix for near field points
+    for(unsigned i=0; i<pair_.first->getSegments().size(); ++i)
+        for(unsigned j=0; j<pair_.second->getSegments().size(); ++j)
+            C_(i,j) = (*G)(pair_.first->getSegments()[i].getA(), pair_.first->getSegments()[i].getB(),
+                           pair_.second->getSegments()[j].getA(),pair_.second->getSegments()[j].getB());
+    return C_.rows()*C_.cols(); // return no. of 'operations' performed
 }

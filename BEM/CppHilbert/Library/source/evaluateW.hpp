@@ -15,6 +15,7 @@
 
 #include "BoundaryMesh.hpp"
 
+
 /**
  *  evaluateW evaluates the hypersingular integral operator W on a number of
  *  evaluation points.
@@ -26,8 +27,9 @@
  *  @param[in] n_x (nX x 2) matrix that contains the normal vectors.
  *  @param[in] eta  Admissibility constant. It is greater or equal than 0.
  */
-void evaluateW(Eigen::VectorXd& Wx, const BoundaryMesh& mesh,
-               const Eigen::VectorXd& gh, const Eigen::MatrixXd& x,
-               const Eigen::MatrixXd& n_x, double eta);
+void evaluateW(Eigen::VectorXd& Wx, const BoundaryMesh& mesh, const Eigen::VectorXd& gh,
+               const Eigen::MatrixXd& x, const Eigen::MatrixXd& n_x, double eta);
 
 #endif
+
+

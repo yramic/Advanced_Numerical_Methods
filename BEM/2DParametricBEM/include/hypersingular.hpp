@@ -13,7 +13,6 @@
 #define HYPERSINGULARHPP
 
 #include <Eigen/Dense>
-
 #include "abstract_bem_space.hpp"
 #include "abstract_parametrized_curve.hpp"
 #include "logweight_quadrature.hpp"
@@ -135,7 +134,7 @@ Eigen::MatrixXd GalerkinMatrix(const ParametrizedMesh mesh,
                                const AbstractBEMSpace &space,
                                const unsigned int &N);
 
-}  // namespace hypersingular
-}  // namespace parametricbem2d
+} // namespace hypersingular
+} // namespace parametricbem2d
 
-#endif  // HYPERSINGULARHPP
+#endif // HYPERSINGULARHPP
