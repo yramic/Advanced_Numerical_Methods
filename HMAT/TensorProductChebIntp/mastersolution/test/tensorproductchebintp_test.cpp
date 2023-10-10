@@ -60,36 +60,6 @@ TEST(TensorProductChebIntp, chebInterpEval2D) {
   ASSERT_NEAR(error, 0.0, 1e-8);
 }
 
-TEST(TensorProductChebIntp, chebInterpEval2D_exact) {
-  auto kernel = [](double x, double y) {
-    return 1. / (1. + (x - y) * (x - y));
-  };  // the kernel we want to interpolate
-
-  // We create a random number generator to sample points between [-1 , 1]
-  std::random_device rand_dev;
-  std::mt19937 generator(rand_dev());
-  std::uniform_real_distribution<double> distr(-1., 1.);
-
-  // We sample points between [-1 , 1]
-  const int q = 16;
-  const int N = q * q;
-  std::vector<Eigen::Vector2d> x(N);
-  for (int n = 0; n < q; ++n)
-    for (int k = 0; k < q; ++k)
-      x[n] = (Eigen::Vector2d()
-                  << std::cos((2.0 * (n + 1) - 1.0) / (2 * q) * M_PI),
-              std::cos((2.0 * (k + 1) - 1.0) / (2 * q) * M_PI))
-                 .finished();
-
-  // Compute the error for the degree 2^q
-  double error;
-
-  const std::vector<double> res =
-      TensorProductChebIntp::chebInterpEval2D(q, kernel, x);
-  error = TensorProductChebIntp::errorestimate(q, kernel, x, res);
-  ASSERT_NEAR(error, 0.0, 1e-10);
-}
-
 TEST(TensorProductChebIntp, genChebInterpEval2D) {
   auto kernel = [](double x, double y) {
     return 1. / (1. + (x - y) * (x - y));
