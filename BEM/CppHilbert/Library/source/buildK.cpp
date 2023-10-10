@@ -42,8 +42,7 @@ void computeK(Eigen::MatrixXd &K, const BoundaryMesh &mesh, double eta) {
 
     // \com{inner loop}: traverse the panels
     for (int i = 0; i < nE; ++i) {
-      // get vertices indices and coordinates for panel \cob{$\pan_i =
-      // [\Bc,\Bd]$}
+      // get vertices indices and coordinates for panel \cob{$\pan_i = [\Bc,\Bd]$}
       int cidx = mesh.getElementVertex(i, 0);
       int didx = mesh.getElementVertex(i, 1);
       const Eigen::Vector2d &c = mesh.getVertex(cidx);
@@ -82,8 +81,7 @@ void computeK00(Eigen::MatrixXd &K, const BoundaryMesh &mesh, double eta) {
 
     // \com{inner loop}: traverse the panels
     for (int i = 0; i < nE; ++i) {
-      // get vertices indices and coordinates for panel \cob{$\pan_i =
-      // [\Bc,\Bd]$}
+      // get vertices indices and coordinates for panel \cob{$\pan_i = [\Bc,\Bd]$}
       Eigen::Vector2d c, d;
       std::tie(c, d) = mesh.getElementVertices(i);
       // Zero contribution for parallel panels !
