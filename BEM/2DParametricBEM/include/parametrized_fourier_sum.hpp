@@ -21,7 +21,7 @@ namespace parametricbem2d {
  * @see abstract_parametrized_curve.hpp
  */
 class ParametrizedFourierSum : public AbstractParametrizedCurve {
- public:
+public:
   /**
    * Defining the type for coefficient list of sine and cosine terms for 2D
    * Fourier Sum based parametrizations.
@@ -59,7 +59,7 @@ class ParametrizedFourierSum : public AbstractParametrizedCurve {
    */
   PanelVector split(unsigned int) const;
 
- private:
+private:
   /**
    * List of coefficients for the cosine terms in Fourier Sum based
    * parametrization
@@ -77,7 +77,7 @@ class ParametrizedFourierSum : public AbstractParametrizedCurve {
    * for the split functionality to make part Fourier Sum parameterizations.
    */
   const double tmin_, tmax_;
-};  // class ParametrizedFourierSum
-}  // namespace parametricbem2d
+}; // class ParametrizedFourierSum
+} // namespace parametricbem2d
 
-#endif  // PARAMETRIZEDFOURIERSUMHPP
+#endif // PARAMETRIZEDFOURIERSUMHPP

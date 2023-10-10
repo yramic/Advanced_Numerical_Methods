@@ -22,15 +22,15 @@
 ///
 ///  C++ adaptation for ANCSE17 of HILBERT V3.1 TUWien 2009-2013
 ///////////////////////////////////////////////////////////////////////////////
-#include "buildW.hpp"
-
 #include <cmath>
-
+#include "buildW.hpp"
 #include "constants.hpp"
 #include "singleLayerPotential.hpp"
 
+
 //------------------------------------------------------------------------------
-void computeW(Eigen::MatrixXd& W, const BoundaryMesh& mesh, double eta) {
+void computeW(Eigen::MatrixXd& W, const BoundaryMesh& mesh, double eta)
+{
   // resize and initialize matrix
   int nE = mesh.numElements();
   int nC = mesh.numVertices();
@@ -38,17 +38,19 @@ void computeW(Eigen::MatrixXd& W, const BoundaryMesh& mesh, double eta) {
   W.setZero();
 
   // traverse the elements
-  for (int i = 0; i < nE; ++i) {
+  for (int i = 0; i < nE; ++i)
+  {
     // get vertices indices and coordinates for Ei=[a,b]
-    int aidx = mesh.getElementVertex(i, 0);
-    int bidx = mesh.getElementVertex(i, 1);
+    int aidx = mesh.getElementVertex(i,0);
+    int bidx = mesh.getElementVertex(i,1);
     const Eigen::Vector2d& a = mesh.getVertex(aidx);
     const Eigen::Vector2d& b = mesh.getVertex(bidx);
     // traverse the elements
-    for (int j = 0; j < nE; ++j) {
+    for (int j = 0; j < nE; ++j)
+    {      
       // get vertices indices and coordinates for Ej=[c,d]
-      int cidx = mesh.getElementVertex(j, 0);
-      int didx = mesh.getElementVertex(j, 1);
+      int cidx = mesh.getElementVertex(j,0);
+      int didx = mesh.getElementVertex(j,1);
       const Eigen::Vector2d& c = mesh.getVertex(cidx);
       const Eigen::Vector2d& d = mesh.getVertex(didx);
       // compute elements' contribution
@@ -58,6 +60,7 @@ void computeW(Eigen::MatrixXd& W, const BoundaryMesh& mesh, double eta) {
       W(aidx, didx) -= tmp;
       W(bidx, cidx) -= tmp;
       W(bidx, didx) += tmp;
+
     }
   }
 }

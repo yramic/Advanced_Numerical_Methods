@@ -12,12 +12,13 @@
 #ifndef _GEOMETRY_HPP_GUARD_
 #define _GEOMETRY_HPP_GUARD_
 
-#include <Eigen/Dense>
-#include <cassert>
 #include <cmath>
 #include <cstdio>
+#include <cassert>
 
+#include <Eigen/Dense>
 #include "constants.hpp"
+
 
 /**
  *  This function treats the segment as a parametrized vector where the
@@ -31,8 +32,8 @@
  *  @return  Distance between the point p and the segment [a,b].
  */
 double distancePointToSegment(const Eigen::Vector2d& p,
-                              const Eigen::Vector2d& a,
-                              const Eigen::Vector2d& b);
+			      const Eigen::Vector2d& a,
+			      const Eigen::Vector2d& b);
 
 /**
  *  This function returns 1, in case the angle ABX is in (0,pi),i.e. the
@@ -51,9 +52,9 @@ double distancePointToSegment(const Eigen::Vector2d& p,
  *
  *  @param[in] a,b,x  2d vectors containing the coordinates of these points.
  *  @return  An integer being either -1, 0 or 1.
- */
+*/
 int ccw(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
-        const Eigen::Vector2d& x);
+	const Eigen::Vector2d& x);
 
 /**
  *  The distance between two segments is either zero if they intersect or the
@@ -66,10 +67,8 @@ int ccw(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
  *  @param[in] a,b,c,d  2d vectors containing the coordinates of these points.
  *  @return  Distance between the segments [a,b] and [c,d].
  */
-double distanceSegmentToSegment(const Eigen::Vector2d& a,
-                                const Eigen::Vector2d& b,
-                                const Eigen::Vector2d& c,
-                                const Eigen::Vector2d& d);
+double distanceSegmentToSegment(const Eigen::Vector2d& a, const Eigen::Vector2d& b,
+				const Eigen::Vector2d& c, const Eigen::Vector2d& d);
 
 /**
  *  Computes the unit normal of [a,b]
@@ -78,6 +77,7 @@ double distanceSegmentToSegment(const Eigen::Vector2d& a,
  *  @return  Normal vector.
  */
 Eigen::Vector2d unitNormal(const Eigen::Vector2d& a, const Eigen::Vector2d& b);
+
 
 /**
  *  Computes the 2D cross product of the vectors a and b

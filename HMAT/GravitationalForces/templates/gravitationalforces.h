@@ -10,7 +10,6 @@
 #define GF_H_
 
 #include <Eigen/Dense>
-#include <array>
 #include <cassert>
 #include <iomanip>
 #include <iostream>
@@ -18,6 +17,7 @@
 #include <ostream>
 #include <utility>
 #include <vector>
+#include <array>
 #define assertm(exp, msg) assert(((void)msg, exp))
 
 namespace GravitationalForces {

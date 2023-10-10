@@ -23,8 +23,8 @@
 #define _BUILDW_HPP
 
 #include <Eigen/Dense>
-
 #include "BoundaryMesh.hpp"
+
 
 /**
  *  This function assembles the matrix W by calling computeWij() for each pair
@@ -39,3 +39,4 @@
 void computeW(Eigen::MatrixXd& W, const BoundaryMesh& mesh, double eta);
 
 #endif
+

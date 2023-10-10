@@ -1,101 +1,101 @@
-#include <Eigen/Dense>
-#include <cmath>
-#include <fstream>
 #include <iostream>
+#include <fstream>
 #include <istream>
-#include <string>
+#include <string> 
+#include <cmath>
+#include <Eigen/Dense>
 // CppHilbert includes
 #include "source/buildM.hpp"
 #include "source/geometry.hpp"
 // Own includes
+#include "MeshGen.hpp"
 #include "DirectBEM.hpp"
 #include "IndirectBEM.hpp"
-#include "MeshGen.hpp"
+
 
 //------------------------------------------------------------------------------
 // DATA FOR SQUARE AND "KITE-SHAPED DOMAIN"
 /*
- * @brief Dirichlet data for the Laplace Dirichlet problem over these two
- * domains
+ * @brief Dirichlet data for the Laplace Dirichlet problem over these two domains
  */
-double g(const Eigen::Vector2d& X) {
-  return sin(X(0) - X(1)) * sinh(X(0) + X(1));
+double g(const Eigen::Vector2d& X){
+  return sin(X(0)-X(1))*sinh(X(0)+X(1));
 }
 
+
 /*
- * @brief Evaluate on the point X in the element [a,b] the Neumann trace of the
- *        exact solution for the Laplace Dirichlet problem over these two
- * domains (for the dirichlet data given above).
+ * @brief Evaluate on the point X in the element [a,b] the Neumann trace of the 
+ *        exact solution for the Laplace Dirichlet problem over these two domains 
+ *        (for the dirichlet data given above).
  */
 /* SAM_LISTING_BEGIN_0 */
-double TNu(const Eigen::Vector2d& X, const Eigen::Vector2d& a,
-           const Eigen::Vector2d& b) {
-  Eigen::Vector2d n = unitNormal(a, b);
-  Eigen::Vector2d grad;
-  grad << cos(X(0) - X(1)) * sinh(X(0) + X(1)) +
-              sin(X(0) - X(1)) * cosh(X(0) + X(1)),
-      -cos(X(0) - X(1)) * sinh(X(0) + X(1)) +
-          sin(X(0) - X(1)) * cosh(X(0) + X(1));
+double TNu(const Eigen::Vector2d & X, const Eigen::Vector2d & a,
+	   const Eigen::Vector2d & b){
+  Eigen::Vector2d n = unitNormal(a,b);
+  Eigen::Vector2d grad;  
+  grad<< cos(X(0)-X(1))*sinh(X(0)+X(1)) + sin(X(0)-X(1))*cosh(X(0)+X(1)),
+    -cos(X(0)-X(1))*sinh(X(0)+X(1)) + sin(X(0)-X(1))*cosh(X(0)+X(1));
 
   return grad.dot(n);
 }
 /* SAM_LISTING_END_0 */
 
+
 //------------------------------------------------------------------------------
 /*
- * @brief Compute coefficient vector of \f$\mathcal{S}^{-1}_0(\mathcal{G}\f$
- *        corresponding to the Neumann trace of the exact solution for the
- * Laplace Dirichlet problem over the corresponding domain (given through the
- * mesh)
+ * @brief Compute coefficient vector of \f$\mathcal{S}^{-1}_0(\mathcal{G}\f$ 
+ *        corresponding to the Neumann trace of the exact solution for the Laplace 
+ *        Dirichlet problem over the corresponding domain (given through the mesh)
  *
- * \tparam TNFUNC Function taking a point X and the end-points of the segment
- *                [a,b] and returning the evaluation of the Neumann trace of the
+ * \tparam TNFUNC Function taking a point X and the end-points of the segment 
+ *                [a,b] and returning the evaluation of the Neumann trace of the 
  *                exact solution on the domain of interest.
- * \param[in] mesh BoundaryMesh object corresponding to the boundary of the
- * domain of interest.
+ * \param[in] mesh BoundaryMesh object corresponding to the boundary of the domain 
+ *                 of interest.
  */
 /* SAM_LISTING_BEGIN_1 */
 template <typename TNFUNC>
-Eigen::VectorXd ComputeTNu(const TNFUNC& tnu, const BoundaryMesh& mesh) {
+Eigen::VectorXd ComputeTNu(const TNFUNC& tnu, const BoundaryMesh& mesh){
   Eigen::MatrixXi elems = mesh.getMeshElements();
   Eigen::VectorXd tnuval(mesh.numElements());
-  for (int k = 0; k < mesh.numElements(); k++) {
-    int aidx = mesh.getElementVertex(k, 0);
-    int bidx = mesh.getElementVertex(k, 1);
+  for(int k=0; k<mesh.numElements(); k++){
+    int aidx = mesh.getElementVertex(k,0);
+    int bidx = mesh.getElementVertex(k,1);
     const Eigen::Vector2d& a = mesh.getVertex(aidx);
     const Eigen::Vector2d& b = mesh.getVertex(bidx);
-    tnuval(k) = tnu((a + b).eval() / 2., a, b);
+    tnuval(k) = tnu((a+b).eval()/2.,a,b);
   }
   return tnuval;
 }
 /* SAM_LISTING_END_1 */
 
+
 //------------------------------------------------------------------------------
 /* SAM_LISTING_BEGIN_1b */
-void testMassMatrixSVD(const BoundaryMesh& mesh) {
+void testMassMatrixSVD(const BoundaryMesh& mesh){
   Eigen::SparseMatrix<double> M01aux(mesh.numElements(), mesh.numVertices());
   computeM01(M01aux, mesh);
   Eigen::MatrixXd M10 = Eigen::MatrixXd(M01aux.transpose());
-  Eigen::JacobiSVD<Eigen::MatrixXd> svd(
-      M10, Eigen::ComputeThinU | Eigen::ComputeThinV);
+  Eigen::JacobiSVD<Eigen::MatrixXd> svd(M10,
+					Eigen::ComputeThinU | Eigen::ComputeThinV);
   Eigen::VectorXd singvals = svd.singularValues();
-  // Since M10 scales with h, we consider the relative size of the smallest
+  // Since M10 scales with h, we consider the relative size of the smallest 
   // singular value with respect to the second smallest.
-  if (singvals.array().minCoeff() <
-      1e-12 * singvals.head(mesh.numElements() - 1).array().minCoeff()) {
-    std::cout << "M is singular!" << std::endl;
+  if(singvals.array().minCoeff()
+     <1e-12* singvals.head(mesh.numElements()-1).array().minCoeff()){
+    std::cout << "M is singular!"  <<std::endl;
   }
 }
 /* SAM_LISTING_END_1b */
 
 //------------------------------------------------------------------------------
 int main() {
-  auto squareMesh = createMiniSquareMesh(16);
 
-  std::function<Eigen::Vector2d(const double&)> gamma = [](const double& t) {
+  auto squareMesh = createMiniSquareMesh(16);
+  
+  std::function<Eigen::Vector2d(const double&)> gamma = [](const double& t){
     Eigen::Vector2d res;
-    res << 0.25 * cos(M_PI * t) + 0.1625 * cos(2 * M_PI * t),
-        0.375 * sin(M_PI * t);
+    res << 0.25*cos(M_PI*t) + 0.1625*cos(2*M_PI*t), 0.375*sin(M_PI*t);
     return res;
   };
   auto gammaMesh = createMeshwithGamma(gamma, 8);
@@ -108,92 +108,93 @@ int main() {
   //--------------------------------------------------------
   std::cout << "RESULTS FOR KITE DOMAIN" << std::endl;
   /* SAM_LISTING_BEGIN_2 */
-  int Nl = 7;  // Number of levels
+  int Nl = 7; //Number of levels
   Eigen::VectorXd errorD1(Nl), errorD2(Nl), errorD1L2(Nl), errorD2L2(Nl);
   Eigen::VectorXd errorI1(Nl), errorI2(Nl);
-  Eigen::VectorXi Nall(7);
-  Nall << 50, 100, 200, 400, 800, 1600, 3200;
-  Eigen::Vector2d X({0., 0.3});
-  for (int k = 0; k < Nl; k++) {
+  Eigen::VectorXi Nall(7); Nall<< 50,100,200,400,800,1600,3200;
+  Eigen::Vector2d X({0.,0.3});
+  for(int k=0; k<Nl; k++){
     int N = Nall(k);
     std::cout << "Using N = " << N << " elements" << std::endl;
     auto mesh = createMeshwithGamma(gamma, N);
 
-    Eigen::MatrixXd V;
-    computeV(V, mesh, 1e-05);
+    Eigen::MatrixXd V; computeV(V, mesh, 1e-05);
     Eigen::SparseMatrix<double> M00(mesh.numElements(), mesh.numElements());
     computeM00(M00, mesh);
     Eigen::VectorXd solex = ComputeTNu(TNu, mesh);
-
+    
     std::cout << "Solving 1st kind Direct. ";
     Eigen::VectorXd sol1 = DirectFirstKind::solveDirichlet(mesh, g);
-    errorD1(k) = sqrt((sol1 - solex).transpose() * V * (sol1 - solex));
-    errorD1L2(k) = sqrt((sol1 - solex).transpose() * M00 * (sol1 - solex));
+    errorD1(k) = sqrt((sol1-solex).transpose()*V*(sol1-solex));
+    errorD1L2(k) = sqrt((sol1-solex).transpose()*M00*(sol1-solex)); 
     std::cout << "Obtained error " << errorD1(k) << " and " << errorD1L2(k)
-              << std::endl;
-
-    std::cout << "Solving 2nd kind Direct. ";
+	      << std::endl;    
+    
+    std::cout << "Solving 2nd kind Direct. " ;
     Eigen::VectorXd sol2 = DirectSecondKind::solveDirichlet(mesh, g);
-    errorD2(k) = sqrt((sol2 - solex).transpose() * V * (sol2 - solex));
-    errorD2L2(k) = sqrt((sol2 - solex).transpose() * M00 * (sol2 - solex));
+    errorD2(k) = sqrt((sol2-solex).transpose()*V*(sol2-solex));
+    errorD2L2(k) = sqrt((sol2-solex).transpose()*M00*(sol2-solex));
     std::cout << "Obtained error " << errorD2(k) << " and " << errorD2L2(k)
-              << std::endl;
+	      << std::endl;
 
     std::cout << "Solving 1st kind Indirect : ";
     Eigen::VectorXd sol1i = IndirectFirstKind::solveDirichlet(mesh, g);
     double solEval1i = IndirectFirstKind::reconstructSolution(X, sol1i, mesh);
-    errorI1(k) = fabs(solEval1i - g(X));
+    errorI1(k) = fabs(solEval1i - g(X) );
     std::cout << "Obtained error " << errorI1(k) << std::endl;
-
-    std::cout << "Solving 2nd kind Indirect : ";
+    
+    std::cout << "Solving 2nd kind Indirect : " ;
     Eigen::VectorXd sol2i = IndirectSecondKind::solveDirichlet(mesh, g);
     double solEval2i = IndirectSecondKind::reconstructSolution(X, sol2i, mesh);
-    errorI2(k) = fabs(solEval2i - g(X));
+    errorI2(k) = fabs(solEval2i - g(X) );
     std::cout << "Obtained error " << errorI2(k) << std::endl;
+    
   }
   /* SAM_LISTING_END_2 */
-
+  
   /* SAM_LISTING_BEGIN_2b */
-  for (int k = 0; k < 4; k++) {
+  for(int k=0; k<4; k++){
     auto mesh = createMeshwithGamma(gamma, Nall(k));
     testMassMatrixSVD(mesh);
   }
-  /* SAM_LISTING_END_2b */
+  /* SAM_LISTING_END_2b */  
+
 
   // OUTPUT ERRORS
   {
-    std::ofstream out_error("DBEM1stK_errors.txt");
-    out_error << std::setprecision(18) << errorD1;
-    out_error.close();
+  std::ofstream out_error("DBEM1stK_errors.txt");
+  out_error << std::setprecision(18) << errorD1; 
+  out_error.close( );
   }
   {
-    std::ofstream out_error("DBEM2ndK_errors.txt");
-    out_error << std::setprecision(18) << errorD2;
-    out_error.close();
+  std::ofstream out_error("DBEM2ndK_errors.txt");
+  out_error << std::setprecision(18) << errorD2; 
+  out_error.close( );
+  }
+    {
+  std::ofstream out_error("DBEM1stK_L2errors.txt");
+  out_error << std::setprecision(18) << errorD1L2; 
+  out_error.close( );
   }
   {
-    std::ofstream out_error("DBEM1stK_L2errors.txt");
-    out_error << std::setprecision(18) << errorD1L2;
-    out_error.close();
+  std::ofstream out_error("DBEM2ndK_L2errors.txt");
+  out_error << std::setprecision(18) << errorD2L2; 
+  out_error.close( );
   }
   {
-    std::ofstream out_error("DBEM2ndK_L2errors.txt");
-    out_error << std::setprecision(18) << errorD2L2;
-    out_error.close();
+  std::ofstream out_error("IBEM1stK_errors.txt");
+  out_error << std::setprecision(18) << errorI1; 
+  out_error.close( );
   }
   {
-    std::ofstream out_error("IBEM1stK_errors.txt");
-    out_error << std::setprecision(18) << errorI1;
-    out_error.close();
-  }
-  {
-    std::ofstream out_error("IBEM2ndK_errors.txt");
-    out_error << std::setprecision(18) << errorI2;
-    out_error.close();
+  std::ofstream out_error("IBEM2ndK_errors.txt");
+  out_error << std::setprecision(18) << errorI2; 
+  out_error.close( );
   }
   std::ofstream out_N("BEM_N.txt");
-  out_N << Nall.segment(0, Nl);
-  out_N.close();
-
+  out_N << Nall.segment(0,Nl); 
+  out_N.close( );
+  
   return 0;
+
 }
