@@ -32,6 +32,16 @@ int main(int argc, char **argv) {
     const GravitationalForces::StarQuadTreeClustering clustering(pos, mass);
     // clustering.outputQuadTree(std::cout);
 
+    //--------------------------------------------------------------------------
+    // This was implemented to Test my Solution on the forces for 9 Iterations:
+    // std::vector<Eigen::Vector2d> forces =
+    //     GravitationalForces::computeForces_direct(pos, mass);
+    
+    // for(unsigned int i {0}; i < 10; ++i) {
+    //   std::cout << "Force from " << i << ": " << forces[i] << std::endl;
+    // }
+    //--------------------------------------------------------------------------
+
     // Admissibility parameters to be investigated
     const std::vector<double> etas = {1.0,  1.25, 1.5,  1.75, 2.0,
                                       2.25, 2.5,  2.75, 3.0};

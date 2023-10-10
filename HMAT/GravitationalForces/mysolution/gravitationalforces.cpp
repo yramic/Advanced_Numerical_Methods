@@ -24,7 +24,36 @@ std::vector<Eigen::Vector2d> initStarPositions(unsigned int n, double mindist) {
   // Vector for returning positions
   std::vector<Eigen::Vector2d> pos;
 // **********************************************************************
-std::cout << "I have to test my code again!" << std::endl;
+
+// int counter {1}; // I want to count how many Iterations the code takes to reach a solution
+
+do {
+  // First I want to generate a 2xn Matrix with random values in between [0, 1]:
+  Eigen::Matrix<double, 2, Eigen::Dynamic> rand_pos {
+    0.5* (Eigen::Matrix<double, 2, Eigen::Dynamic>::Random(2,n) +
+          Eigen::Matrix<double, 2, Eigen::Dynamic>::Constant(2, n, 1.0))
+    };
+    for (int i {0}; (i < n) && (pos.size() < n); ++i) {
+      int j {0};
+      bool test {true};
+      while ((j < pos.size()) and (test = (pos[j] - rand_pos.col(i)).norm() > mindist)) {
+        ++j;
+      }
+      if (test) {
+        pos.emplace_back(rand_pos.col(i));
+      }
+    }
+  } while(pos.size() < n);
+
+  // The following code snipped was implemented just for testing!
+  // for (int i {0}; i < 10; ++i) {
+  //   std::cout<< "Element " << i << " :\n" << pos[i] << std::endl; 
+  // }
+
+  // This gives back the number of Iterations necessary to reach a solution:
+  // std::cout<< "Iteration: " << counter << std::endl;
+  // counter++;
+
 // **********************************************************************
   return pos;
 }
@@ -40,10 +69,24 @@ std::vector<Eigen::Vector2d> computeForces_direct(
   // Forces will be stored in this array
   std::vector<Eigen::Vector2d> forces(n);
 // **********************************************************************
-// Code to be supplemented
+  Eigen::Vector2d acc;
+  for (unsigned int j = 0; j < n; j++) {
+    // Compute force on $\cob{j}$-th star
+    acc.setZero();
+    for (unsigned int i = 0; i < n; i++) {
+      if (i != j) {
+        const Eigen::Vector2d diff_masspositions =
+            masspositions[i] - masspositions[j];
+        acc += diff_masspositions * masses[i] /
+               std::pow(diff_masspositions.norm(), 3);
+      }
+    }
+    forces[j] = acc * masses[j] / (4 * M_PI);
+  }
 // **********************************************************************
   return forces;
 }
+
 /* SAM_LISTING_END_2 */
 
 /* SAM_LISTING_BEGIN_3 */
@@ -76,6 +119,54 @@ StarQuadTree::StarQuadTreeNode::StarQuadTreeNode(
   assertm(star_idx_.size() > 0, "Can't create a node without stars...");
 // **********************************************************************
 // Code to be supplemented
+for (unsigned int i{0}; i < star_idx_.size(); i++) {
+  const Eigen::Vector2d starpos (tree.starpos_[star_idx_[i]]); // Initializes the pos for each star in each cluster
+  mass += tree.starmasses_[star_idx_[i]];
+  center += tree.starmasses_[star_idx_[i]] * starpos;
+}
+// Center of gravity for cluster of star associated with current node
+center = center /mass;
+
+if (star_idx_.size() == 1) {
+  tree.no_leaves_++;
+  return;
+}
+tree.no_clusters_++;
+
+const double m1 = 0.5 * (bbox_(0, 0) + bbox_(0, 1));
+const double m2 = 0.5 * (bbox_(1, 0) + bbox_(1, 1));
+
+std::array<Eigen::Matrix2d, 4> sub_boxes;
+sub_boxes[0] << bbox_(0, 0), m1, bbox(1, 0), m2;
+sub_boxes[1] << bbox_(0, 0), m1, m2, bbox_(1, 1);
+sub_boxes[2] << m1, bbox_(0, 1), bbox_(1, 0), m2;
+sub_boxes[3] << m1, bbox_(0, 1), m2, bbox_(1, 1);
+// Indes sets for son clusters:
+std::array<std::vector<unsigned int>, 4> sub_indices;
+
+// Check, which son box the stars lie in, cf.
+for (unsigned int i {0}; i < star_idx_.size(); ++i) {
+  if (tree.starpos_[star_idx_[i]][0] < m1) {   // left part
+    if (tree.starpos_[star_idx_[i]][1] < m2) { // left bottom
+      sub_indices[0].push_back(star_idx_[i]);
+    } else {
+      sub_indices[1].push_back(star_idx_[i]);  // left top
+    }
+  } else {                                     // right part
+    if (tree.starpos_[star_idx_[i]][1] < m2) {
+      sub_indices[2].push_back(star_idx_[i]);  // right bottom
+    } else {
+      sub_indices[3].push_back(star_idx_[i]);  // right top
+    }
+  }
+}
+
+// Recursion: son nodes are created if non-empty!
+for (int i : {0, 1, 2, 3}) {
+  if (!sub_indices[i].empty()) {
+    sons_[i] = std::move(std::make_unique<StarQuadTree::StarQuadTreeNode>(sub_indices[i], sub_boxes[i], tree));
+  }
+}
 // **********************************************************************
 }
 
@@ -118,7 +209,21 @@ bool StarQuadTreeClustering::isAdmissible(const StarQuadTreeNode &node,
   // Implements admissibility condition \lref{eq:admstar}
   bool admissible;
 // **********************************************************************
-// Code to be supplemented
+// Code to be supplemented for 2-1d:
+// Diameter:
+  const double diam = (node.bbox_.col(0) - node.bbox_.col(1)).norm();
+
+  auto intvdist = [](double a, double b, double x) -> double {
+    if (b < a) std::swap(a, b);
+    if (x < a) return (a - x);
+    if (x > b) return (x - b);
+    return 0.0;
+  };
+  const double dx = intvdist(node.bbox_(0, 0), node.bbox_(0, 1), p[0]);
+  const double dy = intvdist(node.bbox_(1, 0), node.bbox_(1, 1), p[1]);
+  const double dist = Eigen::Vector2d(dx, dy).norm();
+
+  admissible = (dist > eta * diam);
 // **********************************************************************
   return admissible;
 }
@@ -130,7 +235,7 @@ Eigen::Vector2d StarQuadTreeClustering::forceOnStar(unsigned int j,
   Eigen::Vector2d acc;  // For summation of force
   acc.setZero();
 // **********************************************************************
-// Code to be supplemented
+// Code to be supplemented for 2-1e:
 // **********************************************************************
   return acc;
 }
@@ -141,7 +246,7 @@ std::vector<double> forceError(const StarQuadTreeClustering &qt,
                                const std::vector<double> &etas) {
   std::vector<double> error(etas.size());  // For returning errors
 // **********************************************************************
-// Code to be supplemented
+// Code to be supplemented for 2-1f:
 // **********************************************************************
   return error;
 }
