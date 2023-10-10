@@ -9,11 +9,11 @@
  * as this header is left intact.                                      *
  ***********************************************************************/
 #include "../../../include/uni-direct/block_cluster_Y.hpp"
+
 #include <Eigen/Dense>
 
 // compute matrix $C_{\sigma,\mu}$ for uni-directional interpolation
-unsigned BlockCluster_Y::setMatrix(Kernel* G)
-{
-    // TODO
-    return 0; // return no. of 'operations' performed
+unsigned BlockCluster_Y::setMatrix(Kernel* G) {
+  // TODO
+  return 0;  // return no. of 'operations' performed
 }

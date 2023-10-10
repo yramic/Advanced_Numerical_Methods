@@ -17,35 +17,41 @@ namespace LowRankMerge {
  *
  * @param Ai, Bi the factorized form of Xi: $X_i = A_i B_i^T$
  */
-std::pair<Eigen::MatrixXd,Eigen::MatrixXd> low_rank_merge(
-        const Eigen::MatrixXd &A1, const Eigen::MatrixXd &B1,
-        const Eigen::MatrixXd &A2, const Eigen::MatrixXd &B2);
+std::pair<Eigen::MatrixXd, Eigen::MatrixXd> low_rank_merge(
+    const Eigen::MatrixXd &A1, const Eigen::MatrixXd &B1,
+    const Eigen::MatrixXd &A2, const Eigen::MatrixXd &B2);
 
-
-/** @brief Compute errors between $\VZ$ and $\tilde{\VZ}$ in scaled Frobenius and max norms.
+/** @brief Compute errors between $\VZ$ and $\tilde{\VZ}$ in scaled Frobenius
+ * and max norms.
  *
- * @param n Number of rows/columns of matrices $VK_1$ and $VK_2$ defined as in \prbcref<prb:lrm:subprb:1>
+ * @param n Number of rows/columns of matrices $VK_1$ and $VK_2$ defined as in
+ * \prbcref<prb:lrm:subprb:1>
  */
-std::pair<double,double> test_low_rank_merge(size_t n);
+std::pair<double, double> test_low_rank_merge(size_t n);
 
-/** @brief Compute the rank-q best approximation of Z = [X1 X2] 
+/** @brief Compute the rank-q best approximation of Z = [X1 X2]
  *  by setting all singular values <= rtol * s_1 (largest singular value) to 0.
  *
  * @param Ai, Bi the factorized form of Xi: $X_i = A_i B_i^T$
- * @param rtol Relative tolerance such that all singular values <= s_1 * rtol are set to 0.
- * @param atol Absolute tolerance such that all singular values <= atol are set to 0.
+ * @param rtol Relative tolerance such that all singular values <= s_1 * rtol
+ * are set to 0.
+ * @param atol Absolute tolerance such that all singular values <= atol are set
+ * to 0.
  */
-std::pair<Eigen::MatrixXd,Eigen::MatrixXd> adap_rank_merge(
-        const Eigen::MatrixXd &A1, const Eigen::MatrixXd &B1,
-        const Eigen::MatrixXd &A2, const Eigen::MatrixXd &B2, double rtol, double atol);
+std::pair<Eigen::MatrixXd, Eigen::MatrixXd> adap_rank_merge(
+    const Eigen::MatrixXd &A1, const Eigen::MatrixXd &B1,
+    const Eigen::MatrixXd &A2, const Eigen::MatrixXd &B2, double rtol,
+    double atol);
 
-/** @brief Compute the error between $\VZ$ and $\tilde{\VZ}$ in scaled Frobenius norm
- *  and the number of singular values different from 0, given rtol.
- * 
- * @param n Number of rows/columns of matrices $VK_1$ and $VK_2$ defined as in \prbcref<prb:lrm:subprb:1>
- * @param rtol Relative tolerance such that all singular values <= s_1 * rtol are set to 0.
+/** @brief Compute the error between $\VZ$ and $\tilde{\VZ}$ in scaled Frobenius
+ * norm and the number of singular values different from 0, given rtol.
+ *
+ * @param n Number of rows/columns of matrices $VK_1$ and $VK_2$ defined as in
+ * \prbcref<prb:lrm:subprb:1>
+ * @param rtol Relative tolerance such that all singular values <= s_1 * rtol
+ * are set to 0.
  */
-std::pair<double,size_t> test_adap_rank_merge(size_t n, double rtol);
+std::pair<double, size_t> test_adap_rank_merge(size_t n, double rtol);
 
 }  // namespace LowRankMerge
 

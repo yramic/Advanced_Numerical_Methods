@@ -8,9 +8,8 @@
 
 #include "parametrized_mesh.hpp"
 
-#include <utility>
-
 #include <Eigen/Dense>
+#include <utility>
 
 namespace parametricbem2d {
 
@@ -35,8 +34,8 @@ unsigned int ParametrizedMesh::getNumPanels() const {
 }
 
 Eigen::Vector2d ParametrizedMesh::getVertex(unsigned int i) const {
-  assert(i < getNumPanels()); // Asserting requested index is within limits
+  assert(i < getNumPanels());  // Asserting requested index is within limits
   return panels_[i]->operator()(-1);
 }
 
-} // namespace parametricbem2d
+}  // namespace parametricbem2d
