@@ -1,6 +1,6 @@
 /**
  * @ file gravitationalforces_main.cpp
- * @ brief NPDE homework XXX MAIN FILE
+ * @ brief NPDE homework GravitationalForces MAIN FILE
  * @ author
  * @ date
  * @ copyright Developed at SAM, ETH Zurich

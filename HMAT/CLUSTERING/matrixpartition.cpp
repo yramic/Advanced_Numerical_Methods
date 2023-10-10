@@ -12,5 +12,26 @@
 #include "matrixpartition.h"
 
 namespace HMAT {
-  
-} // namespace HMAT
+// Auxiliary function for 1D case:
+// output of geometric partition of unit square
+void printGeometricPartition(
+    const BlockPartition<CtNode<1>, IndexBlock<CtNode<1>>,
+                         IndexBlock<CtNode<1>>> &partmat) {
+  std::cout << "NF = [";
+  for (const IndexBlock<CtNode<1>> &b : partmat.nearField) {
+    const BBox<1> bbx{b.nx.getBBox()};
+    const BBox<1> bby{b.ny.getBBox()};
+    std::cout << bbx.minc << " , " << bbx.maxc << " ," << bby.minc << " , "
+              << bby.maxc << "; ";
+  }
+  std::cout << "]" << std::endl;
+  std::cout << "FF = [";
+  for (const IndexBlock<CtNode<1>> &b : partmat.farField) {
+    const BBox<1> bbx{b.nx.getBBox()};
+    const BBox<1> bby{b.ny.getBBox()};
+    std::cout << bbx.minc << " , " << bbx.maxc << " , " << bby.minc << " , "
+              << bby.maxc << "; ";
+  }
+  std::cout << "]" << std::endl;
+}
+}  // namespace HMAT

@@ -7,6 +7,10 @@
     "HMAT/GravitationalForces" ,
     "HMAT/KernMatLLRApprox",
     "HMAT/LowRankMerge",
-    "HMAT/TensorProductChebIntp"
+    "HMAT/TensorProductChebIntp",
+    "HMAT/EvalTrigPoly",
+    "CONVQUAD/LowTriangToeplitz",
+    "CONVQUAD/AbelIntegralEquation",
+    "CONVQUAD/FractionalHeatEquation"
   ]
 }

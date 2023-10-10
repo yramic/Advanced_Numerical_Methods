@@ -14,13 +14,13 @@
 // General includes
 #include <Eigen/Dense>
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <exception>
 #include <iostream>
 #include <limits>
 #include <utility>
 #include <vector>
-#include <array>
 
 namespace HMAT {
 /** @brief Data structure for a collocation point
@@ -109,7 +109,8 @@ class CtNode {
   constexpr static std::size_t dim = DIM;
   // Constructors taking a sequence of points
   explicit CtNode(const std::vector<Point<DIM>> _pts, int _dir = 0)
-      : pts(_pts), sons{nullptr, nullptr}, dir(_dir) {}
+    : pts(std::move(_pts)), sons{nullptr, nullptr}, dir(_dir),
+      clust_sect_vec(_pts.size()) {}
   // Destructor (also attempts to destroy sons!)
   virtual ~CtNode() {
     if (sons[0]) {
@@ -126,8 +127,8 @@ class CtNode {
   // Access to bounding box (computed on the fly)
   [[nodiscard]] BBox<DIM> getBBox() const { return BBox<DIM>(pts); }
   // Is the node a leaf node ?
-  [[nodiscard]] inline bool isLeaf() const {
-    return ((sons[0] == nullptr) and (sons[1] == nullptr));
+  [[nodiscard]] virtual bool isLeaf() const {
+    return (!(sons[0]) and !(sons[1]));
   }
   // Output operator or recursive output
   template <int dim>
@@ -136,6 +137,8 @@ class CtNode {
   std::array<CtNode *, 2> sons;
   // Public data member: Points contained in the cluster
   std::vector<Point<DIM>> pts;
+  // Temporary storage for cluster-associated vector sections
+  Eigen::VectorXd clust_sect_vec;  
   // Direction for sorting, passed by the constructor
   int dir;
 };
@@ -150,9 +153,14 @@ std::vector<size_t> CtNode<DIM>::I() const {
 }
 /* SAM_LISTING_END_8 */
 
+  // Output operator for a plain cluster
 template <int dim>
 std::ostream &operator<<(std::ostream &o, const CtNode<dim> &node) {
-  o << "Node: " << node.pts.size() << " points, " << node.getBBox() << ": ";
+  o << "Node: " << node.pts.size() << " points, ";
+  if (node.isLeaf()) {
+    o << "LEAF ";
+  }
+  o << node.getBBox() << ": ";
   for (const Point<dim> &pt : node.pts) {
     o << "[";
     for (int l = 0; l < dim; l++) {
@@ -170,6 +178,10 @@ std::ostream &operator<<(std::ostream &o, const CtNode<dim> &node) {
   return o;
 }
 
+// For debugging purposes: non-recursive output for 1D
+void outCTNode(const CtNode<1> &ipnode, std::ostream &o = std::cout);
+
+  
 /** @brief Data structure for a cluster tree.
     A cluster tree builds and describes a multilevel partitioning of a set of
    points
@@ -179,7 +191,7 @@ std::ostream &operator<<(std::ostream &o, const CtNode<dim> &node) {
 template <class NODE>
 class ClusterTree {
  public:
-  using node_t = NODE; 
+  using node_t = NODE;
   constexpr static std::size_t dim = NODE::dim;  // space dimension d
   // Idle constructor
   ClusterTree() : root(nullptr) {}

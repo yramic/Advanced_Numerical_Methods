@@ -11,6 +11,7 @@
 #include <Eigen/src/Core/Matrix.h>
 
 #include <chrono>
+#include <limits>
 
 namespace GravitationalForces {
 
@@ -99,7 +100,7 @@ StarQuadTree::StarQuadTree(const std::vector<Eigen::Vector2d> &starpos,
     star_idx[i] = i;
     assertm(((starpos_[i][0] >= 0.0) and (starpos_[i][0] <= 1.0) and
              (starpos_[i][1] >= 0.0) and (starpos_[i][1] <= 1.0)),
-            "stars must be located insuided unit square");
+            "stars must be located insided unit square");
   }
 
   // Unit square is the bounding box for the whole group of stars
@@ -259,8 +260,8 @@ std::pair<double, double> measureRuntimes(unsigned int n, unsigned int n_runs) {
   std::vector<Eigen::Vector2d> pos = GravitationalForces::initStarPositions(n);
   // All stars have equal (unit) mass
   std::vector<double> mass(n, 1.0);
-  double ms_exact = 0.0;    // Time measured for exact evaluation
-  double ms_cluster = 0.0;  // Time taken for clustering-based evaluatiion
+  double ms_exact = std::numeric_limits<double>::max();    // Time measured for exact evaluation
+  double ms_cluster = std::numeric_limits<double>::max();  // Time taken for clustering-based evaluatiion
 // **********************************************************************
 // Code to be supplemented
 // **********************************************************************

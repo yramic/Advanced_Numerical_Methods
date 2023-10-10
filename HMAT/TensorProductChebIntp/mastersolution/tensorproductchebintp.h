@@ -33,13 +33,16 @@ std::vector<double> chebInterpEval1D(unsigned int q, FUNCTOR f,
                                      std::vector<double> &x) {
   // Initialize Chebychev nodes, compute barycentric weights
   // $\cob{\lambda_i}$ (up to q-dependent scaling) and sample the function
-  std::vector<double> lambda(q);  // barycentric weights
+  std::vector<double> lambda(q);  // barycentric weightsw
   std::vector<double> t(q);       // Chebychev nodes
   std::vector<double> y(q);       // Sampled function values
   int sgn = 1;
   for (int k = 0; k < q; ++k, sgn *= -1) {
-    t[k] = std::cos((2.0 * k - 1.0) / (2 * q) * M_PI);  // \prbeqref{eq:chn}
-    lambda[k] = sgn * std::sin((2.0 * k - 1.0) / (2 * q) * M_PI);  // \prbeqref{eq:bwf}
+    t[k] =
+        std::cos((2.0 * (k + 1) - 1.0) / (2 * q) * M_PI);  // \prbeqref{eq:chn}
+    lambda[k] =
+        std::pow(2, q - 1) / q * sgn *
+        std::sin((2.0 * (k + 1) - 1.0) / (2 * q) * M_PI);  // \prbeqref{eq:bwf}
     y[k] = f(t[k]);                                        // $\cob{y_k}$
   }
   // Loop over all evaluation points $\cob{x_i}$
@@ -81,8 +84,9 @@ std::vector<double> chebInterpEval2D(unsigned int q, FUNCTOR f,
   std::vector<double> t(q);       // Chebychev nodes
   int sgn = 1;
   for (int k = 0; k < q; ++k, sgn *= -1) {
-    t[k] = std::cos((2.0 * k - 1.0) / (2 * q) * M_PI);
-    lambda[k] = sgn * std::sin((2.0 * k - 1.0) / (2 * q) * M_PI);
+    t[k] = std::cos((2.0 * (k + 1) - 1.0) / (2 * q) * M_PI);
+    lambda[k] = std::pow(2, q - 1) / q * sgn *
+                std::sin((2.0 * (k + 1) - 1.0) / (2 * q) * M_PI);
   }
   Eigen::MatrixXd y(q, q);  // Sampled function values
   for (int k = 0; k < q; ++k) {
@@ -122,7 +126,7 @@ std::vector<double> chebInterpEval2D(unsigned int q, FUNCTOR f,
       // Only enter if no division by zero occured
       if (nonodey) {
         // In the case of division by zero
-        if (std::abs(x[k][0] - t[j]) < 1e-9) {
+        if (std::abs(x[k][1] - t[j]) < 1e-9) {
           nonodey = false;
           nodey = j;       // Keep track of the index
           if (!nonodex) {  // Early termination in the case of second division
@@ -175,7 +179,8 @@ std::vector<double> genChebInterpEval2D(unsigned int q, FUNCTOR f,
   const std::vector<double>::size_type N = x.size();
   std::vector<double> res = std::vector<double>(N, 0.0);  // Result vector
 
-  // Transformation from $\cob{\cintv{-1,1}^2}$ to $\cob{\cintv{a_1,b_1}\times\cintv{a_2,b_2}}$
+  // Transformation from $\cob{\cintv{-1,1}^2}$ to
+  // $\cob{\cintv{a_1,b_1}\times\cintv{a_2,b_2}}$
   auto phif = [f, a, b](double x1, double x2) {
     const double tmp1 = 0.5 * ((b[0] - a[0]) * x1 + a[0] + b[0]);
     const double tmp2 = 0.5 * ((b[1] - a[1]) * x2 + a[1] + b[1]);
@@ -190,7 +195,7 @@ std::vector<double> genChebInterpEval2D(unsigned int q, FUNCTOR f,
   // Vector of transformed evaluation points
   std::vector<Eigen::Vector2d> phiinvx(N);
   for (unsigned int k = 0; k < N; ++k) {
-    phiinvx[k] = phiinv(x[k]); // Affine transformation
+    phiinvx[k] = phiinv(x[k]);  // Affine transformation
   }
   // Interpolation on $\cob{\cintv{-1,1}^2}$
   res = chebInterpEval2D(q, phif, phiinvx);
@@ -198,7 +203,7 @@ std::vector<double> genChebInterpEval2D(unsigned int q, FUNCTOR f,
 }
 /* SAM_LISTING_END_3 */
 
-// Some functions for debugging   
+// Some functions for debugging
 template <typename FUNCTOR>
 double errorestimate(unsigned int q, FUNCTOR f,
                      const std::vector<Eigen::Vector2d> &x,

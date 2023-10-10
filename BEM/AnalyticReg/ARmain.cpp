@@ -547,9 +547,10 @@ int main() {
     error(j) = fabs(solEval - g(T) );
     std::cout << "Error on level " << j << ": " << error(j) << std::endl;
   }
-#else // TEMPLATE
-    // TODO: Solve BIE for different Ns and compute error of the solution.
-#endif // TEMPLATE
+#else   // TEMPLATE
+        // TODO: Solve BIE for different Ns and compute error
+        // of the solution.
+#endif  // TEMPLATE
 
   // Output error and discretization parameters N
   std::ofstream out_error("AR_errors.txt");

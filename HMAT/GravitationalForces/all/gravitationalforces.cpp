@@ -11,6 +11,7 @@
 #include <Eigen/src/Core/Matrix.h>
 
 #include <chrono>
+#include <limits>
 
 namespace GravitationalForces {
 
@@ -98,7 +99,7 @@ StarQuadTree::StarQuadTree(const std::vector<Eigen::Vector2d> &starpos,
     star_idx[i] = i;
     assertm(((starpos_[i][0] >= 0.0) and (starpos_[i][0] <= 1.0) and
              (starpos_[i][1] >= 0.0) and (starpos_[i][1] <= 1.0)),
-            "stars must be located insuided unit square");
+            "stars must be located insided unit square");
   }
 
   // Unit square is the bounding box for the whole group of stars
@@ -117,7 +118,14 @@ StarQuadTree::StarQuadTreeNode::StarQuadTreeNode(
     : star_idx_(star_idx), bbox_(bbox), mass(0.0), center({0, 0}) {
   assertm(star_idx_.size() > 0, "Can't create a node without stars...");
 #if SOLUTION
-  // Total mass
+  // This is a \cor{sub-optimal implementation}!
+  // A better algorithm initializes the total masses
+  // and center of gravity of son cluster first and then computes those
+  // quantities for the parent cluster from this information. This saves
+  // looping through the stars of a cluster and summing up their masses and
+  // (weighted) position vectors.
+
+  // Total mass by summation
   for (unsigned int i = 0; i < star_idx_.size(); i++) {
     const Eigen::Vector2d starpos(tree.starpos_[star_idx_[i]]);
     mass += tree.starmasses_[star_idx_[i]];
@@ -314,8 +322,8 @@ std::pair<double, double> measureRuntimes(unsigned int n, unsigned int n_runs) {
   std::vector<Eigen::Vector2d> pos = GravitationalForces::initStarPositions(n);
   // All stars have equal (unit) mass
   std::vector<double> mass(n, 1.0);
-  double ms_exact = 0.0;    // Time measured for exact evaluation
-  double ms_cluster = 0.0;  // Time taken for clustering-based evaluatiion
+  double ms_exact = std::numeric_limits<double>::max();    // Time measured for exact evaluation
+  double ms_cluster = std::numeric_limits<double>::max();  // Time taken for clustering-based evaluatiion
 #if SOLUTION
   // Build quad tree of stars
   StarQuadTreeClustering qt(pos, mass);
@@ -330,7 +338,7 @@ std::pair<double, double> measureRuntimes(unsigned int n, unsigned int n_runs) {
     auto t2_exact = std::chrono::high_resolution_clock::now();
     /* Getting number of milliseconds as a double. */
     std::chrono::duration<double, std::milli> ms_double = (t2_exact - t1_exact);
-    ms_exact = std::max(ms_exact, ms_double.count());
+    ms_exact = std::min(ms_exact, ms_double.count());
   }
   std::cout << "n = " << n << " : runtime computeForces_direct= " << ms_exact
             << "ms\n";

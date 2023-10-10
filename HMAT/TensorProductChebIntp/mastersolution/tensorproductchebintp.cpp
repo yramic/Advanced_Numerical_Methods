@@ -8,5 +8,4 @@
 
 #include "tensorproductchebintp.h"
 
-namespace TensorProductChebIntp {
-}  // namespace TensorProductChebIntp
+namespace TensorProductChebIntp {}  // namespace TensorProductChebIntp
