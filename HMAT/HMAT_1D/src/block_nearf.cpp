@@ -9,14 +9,15 @@
  * as this header is left intact.                                      *
  ***********************************************************************/
 #include "../include/block_nearf.hpp"
-#include "../include/kernel.hpp"
-#include "../include/node.hpp"
+
 #include <Eigen/Dense>
 
+#include "../include/kernel.hpp"
+#include "../include/node.hpp"
+
 // Constructor
-BlockNearF::BlockNearF(Node* xnode, Node* ynode):
-    pair_(std::make_pair(xnode,ynode))
-{ }
+BlockNearF::BlockNearF(Node* xnode, Node* ynode)
+    : pair_(std::make_pair(xnode, ynode)) {}
 
 //// Constructor
 //BlockNearF::BlockNearF(Node* xnode, Node* ynode, Kernel G):
@@ -26,14 +27,12 @@ BlockNearF::BlockNearF(Node* xnode, Node* ynode):
 //}
 
 // compute near field block matrix
-unsigned BlockNearF::setMatrix(Kernel* G)
-{
-    C_.resize(pair_.first->getPoints().size(),
-              pair_.second->getPoints().size());
-    // Compute collocation matrix for near field points
-    for(unsigned i=0; i<pair_.first->getPoints().size(); ++i)
-        for(unsigned j=0; j<pair_.second->getPoints().size(); ++j)
-            C_(i,j) = (*G)(pair_.first->getPoints()[i].getX(),
-                           pair_.second->getPoints()[j].getX());
-    return C_.rows()*C_.cols(); // return no. of 'operations' performed
+unsigned BlockNearF::setMatrix(Kernel* G) {
+  C_.resize(pair_.first->getPoints().size(), pair_.second->getPoints().size());
+  // Compute collocation matrix for near field points
+  for (unsigned i = 0; i < pair_.first->getPoints().size(); ++i)
+    for (unsigned j = 0; j < pair_.second->getPoints().size(); ++j)
+      C_(i, j) = (*G)(pair_.first->getPoints()[i].getX(),
+                      pair_.second->getPoints()[j].getX());
+  return C_.rows() * C_.cols();  // return no. of 'operations' performed
 }

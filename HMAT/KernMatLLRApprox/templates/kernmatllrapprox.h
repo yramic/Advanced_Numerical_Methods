@@ -222,10 +222,10 @@ NearFieldBlock<NODE, KERNEL>::NearFieldBlock(NODE &_nx, NODE &_ny, KERNEL _Gfun)
       G(std::move(_Gfun)),
       Mloc(_nx.pts.size(), _ny.pts.size()) {
   static_assert(NODE::dim == 1, "Only implemented in 1D");
-// Direct initialization of near field kernel collocation matrix
-// **********************************************************************
-// TODO
-// **********************************************************************
+  // Direct initialization of near field kernel collocation matrix
+  // **********************************************************************
+  // TODO
+  // **********************************************************************
 }
 /* SAM_LISTING_END_Q */
 
@@ -309,9 +309,9 @@ std::pair<double, double> approxErrorLLR(BiDirChebPartMat1D<KERNEL> &llrcM) {
   const size_t m = llrcM.cols();
   Eigen::MatrixXd M(n, m);   // Exact kernel collocation matrix
   Eigen::MatrixXd Mt(n, m);  // Compressed matrix as dense matrix
-// **********************************************************************
-// TODO
-// *********************************************************************
+  // **********************************************************************
+  // TODO
+  // *********************************************************************
   return {std::sqrt((M - Mt).squaredNorm() / (n * m)),
           std::sqrt(M.squaredNorm() / (n * m))};
 }
@@ -332,9 +332,9 @@ unsigned int computeSparsityMeasure(
   // Maximal node counts for row adn column clusters
   int xnode_maxcnt = 0;
   int ynode_maxcnt = 0;
-// **********************************************************************
-// YOUR CODE HERE
-// **********************************************************************
+  // **********************************************************************
+  // YOUR CODE HERE
+  // **********************************************************************
   return std::max(xnode_maxcnt, ynode_maxcnt);
 }
 /* SAM_LISTING_END_S */
