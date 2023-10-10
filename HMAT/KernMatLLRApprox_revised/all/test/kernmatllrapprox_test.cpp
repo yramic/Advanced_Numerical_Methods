@@ -99,11 +99,11 @@ TEST(KernMatLLRApprox, check_V) {
         ;
         return false;
       }
-      return (rec_check(node->sons[0]) and rec_check(node->sons[1]));
+      return (rec_check(node->sons[0].get()) and rec_check(node->sons[1].get()));
     }
     return true;
   };
-  ASSERT_TRUE(rec_check(T->root));
+  ASSERT_TRUE(rec_check(T->root.get()));
 }
 
 TEST(KernMatLLRApprox, validateLLR) {

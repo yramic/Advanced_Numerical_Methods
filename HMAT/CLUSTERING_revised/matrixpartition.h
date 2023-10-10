@@ -85,7 +85,7 @@ bool BlockPartition<Tree>::dbg = false;
 /* SAM_LISTING_BEGIN_B */
 template <class Tree>
 void BlockPartition<Tree>::init(double eta0) {
-  buildRec(rowT->root, colT->root, eta0);
+  buildRec(rowT->root.get(), colT->root.get(), eta0);
 }
 /* SAM_LISTING_END_B */
 
@@ -118,7 +118,7 @@ void BlockPartition<Tree>::buildRec(node_t *nx, node_t *ny, double eta0) {
           if (nx->sons[isx] && ny->sons[isy]) {
             // Next level of recursion for non-leaves
             rec = true;
-            buildRec(nx->sons[isx], ny->sons[isy], eta0);
+            buildRec(nx->sons[isx].get(), ny->sons[isy].get(), eta0);
           }
         }
       }

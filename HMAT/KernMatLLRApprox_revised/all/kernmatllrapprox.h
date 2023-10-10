@@ -60,7 +60,7 @@ bool checkClusterTree(const HMAT::ClusterTree<NODE> &T) {
     }
     // Visit all sons
     bool has_sons = false; // no sons at all ? 
-    for (const NODE *son : node->sons) {
+    for (auto &son : node->sons) {
       if (son != nullptr) {
         has_sons = true;
         const std::vector<std::size_t> idxset_son{son->I}; // son's index set 
@@ -79,13 +79,13 @@ bool checkClusterTree(const HMAT::ClusterTree<NODE> &T) {
       }
       // Recursive call
       if (ok and has_sons) {
-        for (const NODE *son : node->sons) {
-	  ctcheck_rec(son);
+        for (auto &son : node->sons) {
+	  ctcheck_rec(son.get());
 	  if (!ok) return;
 	} } }
   };
   // Lanch recursion
-  ctcheck_rec(T.root);
+  ctcheck_rec(T.root.get());
 #else
   // **********************************************************************
   // TO BE SUPPLEMENTED
@@ -216,7 +216,7 @@ void LLRClusterTree<NODE>::init(const std::vector<HMAT::Point<NODE::dim>> pts,
   clust_omega.resize(this->numNodes);
   clust_sect_vec.resize(this->numNodes);
   // Recursive initialization of the low-rank factor matrices \cob{$\VV_w$}
-  initVRec(this->root);
+  initVRec(this->root.get());
 }
 /* SAM_LISTING_END_E */
 
@@ -270,9 +270,9 @@ void LLRClusterTree<NODE>::initVRec(NODE *node) {
     if (!on_node) Vs[node->nodeNumber].row(j) /= tau;
   }
   if (node->sons[0])
-    initVRec(node->sons[0]);
+    initVRec(node->sons[0].get());
   if (node->sons[1])
-    initVRec(node->sons[1]);
+    initVRec(node->sons[1].get());
 #else
 // **********************************************************************
 // TODO
@@ -414,21 +414,21 @@ Eigen::VectorXd mvLLRPartMat(BiDirChebBlockPartition<TREE, KERNEL> &llrcmat,
       Eigen::VectorXd Rmu = llrcmat.colT->getSectVec(col_node);
       llrcmat.colT->getOmega(col_node) = VT * Rmu;;
       // Recursion: visit entire cluster tree
-      comp_omega_rec(col_node->sons[0]);
-      comp_omega_rec(col_node->sons[1]);
+      comp_omega_rec(col_node->sons[0].get());
+      comp_omega_rec(col_node->sons[1].get());
     }
   };
-  comp_omega_rec(llrcmat.colT->root);
+  comp_omega_rec(llrcmat.colT->root.get());
   // Final sentence in \lref{par:3p}: Clear local storage of row tree
   std::function<void(NODE * row_node)> clear_vec_rec = [&](NODE *row_node) -> void {
     if (row_node) {
       llrcmat.rowT->getSectVec(row_node).setZero(row_node->noIdx());
       llrcmat.rowT->getOmega(row_node).setZero(llrcmat.q);
-      clear_vec_rec(row_node->sons[0]);
-      clear_vec_rec(row_node->sons[1]);
+      clear_vec_rec(row_node->sons[0].get());
+      clear_vec_rec(row_node->sons[1].get());
     }
   };
-  clear_vec_rec(llrcmat.rowT->root);
+  clear_vec_rec(llrcmat.rowT->root.get());
 
   // Pass (II) in \lref{par:3p}: Do block-based computations
   // Visit far-field blocks:
@@ -454,11 +454,11 @@ Eigen::VectorXd mvLLRPartMat(BiDirChebBlockPartition<TREE, KERNEL> &llrcmat,
       // Expand from cluster $\cob{v}$, assuming contiguous indices in idxs
       y.segment(idxs.front(), idxs.size()) += llrcmat.rowT->getSectVec(row_node);
       // Recursion through row cluster tree
-      ass_y_rec(row_node->sons[0]);
-      ass_y_rec(row_node->sons[1]);
+      ass_y_rec(row_node->sons[0].get());
+      ass_y_rec(row_node->sons[1].get());
     }
   };
-  ass_y_rec(llrcmat.rowT->root);
+  ass_y_rec(llrcmat.rowT->root.get());
 #else
 // **********************************************************************
 // TODO

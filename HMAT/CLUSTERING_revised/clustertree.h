@@ -117,15 +117,7 @@ class CtNode {
         dir(_dir),
         offset(_offset),
         nodeNumber(_nodeNumer) {}
-  // Destructor (also attempts to destroy sons!)
-  virtual ~CtNode() {
-    if (sons[0]) {
-      delete sons[0];
-    }
-    if (sons[1]) {
-      delete sons[1];
-    }
-  }
+
   // Number of indices owned by the cluster
   [[nodiscard]] std::size_t noIdx() const { return I.size(); }
   // Is the node a leaf node ?
@@ -133,7 +125,7 @@ class CtNode {
     return (!(sons[0]) and !(sons[1]));
   }
   // Public data member: Pointers to two (binary tree!) sons
-  std::array<CtNode *, 2> sons;
+  std::array<std::unique_ptr<CtNode>, 2> sons; // smart pointer, no need for destructor
   // Public data member: Index set of the cluster
   std::vector<size_t> I;
   // Public data member: Offset indicating where local points are stored in
@@ -169,10 +161,7 @@ class ClusterTree {
         std::vector<Point<dim>>(ptsT.begin() + nptr->offset,
                                 ptsT.begin() + nptr->offset + nptr->noIdx()));
   }
-  // Recursive destruction
-  virtual ~ClusterTree() {
-    if (root) delete root;
-  }
+
   // Output of tree
   template <class Nd>
   friend std::ostream &operator<<(std::ostream &o, const ClusterTree<Nd> &T);
@@ -192,7 +181,7 @@ class ClusterTree {
   }
 
  public:
-  NODE *root;                    // pointer to root node
+  std::unique_ptr<NODE> root;    // pointer to root node
   std::vector<Point<dim>> ptsT;  // vector containing points for each node
   int numNodes;                  // total number of nodes in the tree
 };
@@ -203,13 +192,14 @@ template <class NODE>
 void ClusterTree<NODE>::init(const std::vector<Point<dim>> &pts,
                              std::size_t minpts) {
   numNodes = 0;
-  if (!(root = createNode(pts, 0, 0, 0))) {
+  root.reset(createNode(pts, 0, 0, 0));
+  if (!root) {
     throw(std::runtime_error("Cannot allocate root"));
   }
   if (minpts < 1) {
     throw(std::runtime_error("minpts must be at least 1"));
   }
-  buildRec(root, minpts);
+  buildRec(root.get(), minpts);
 }
 /* SAM_LISTING_END_6 */
 
@@ -219,7 +209,7 @@ std::ostream &operator<<(std::ostream &o, const ClusterTree<NODE> &T) {
   // o << "ROOT: ";
   o << "CLUSTER TREE" << std::endl;
   std::stack<NODE *> nodes;
-  nodes.push(T.root);
+  nodes.push(T.root.get());
   while (!nodes.empty()) {
     NODE *node = nodes.top();
     nodes.pop();
@@ -237,10 +227,10 @@ std::ostream &operator<<(std::ostream &o, const ClusterTree<NODE> &T) {
     }
     o << std::endl;
     if (node->sons[1]) {
-      nodes.push(node->sons[1]);
+      nodes.push(node->sons[1].get());
     }
     if (node->sons[0]) {
-      nodes.push(node->sons[0]);
+      nodes.push(node->sons[0].get());
     }
   }
   // o << "END CLUSTER TREE" << std::endl;
@@ -268,18 +258,20 @@ std::pair<int, int> ClusterTree<NODE>::buildRec(NODE *nptr,
     const std::size_t m = n / 2;  // integer arithmeric, m>0 ensured
     const std::vector<Point<dim>> low_pts(tpts.cbegin(), tpts.cbegin() + m);
     // First son gets ``lower half'' of sorted points
-    if (!(nptr->sons[0] = createNode(low_pts, nptr->offset + nptr->noIdx(),
-                                     nptr->nodeNumber + 1, dir))) {
+    nptr->sons[0].reset(createNode(low_pts, nptr->offset + nptr->noIdx(),
+                                     nptr->nodeNumber + 1, dir));
+    if (!nptr->sons[0]) {
       throw(std::runtime_error("Cannot allocate first son"));
     }
     auto [offset, nodeNum] =
-        buildRec(nptr->sons[0], minpts);  // recurse into first son
+        buildRec(nptr->sons[0].get(), minpts);  // recurse into first son
     // Second son get ``upper half'' of sorted points
     const std::vector<Point<dim>> up_pts(tpts.cbegin() + m, tpts.cend());
-    if (!(nptr->sons[1] = createNode(up_pts, offset, nodeNum, dir))) {
+    nptr->sons[1].reset(createNode(up_pts, offset, nodeNum, dir));
+    if (!nptr->sons[1]) {
       throw(std::runtime_error("Cannot allocate second son"));
     }
-    return buildRec(nptr->sons[1], minpts);  // recurse into 2nd son
+    return buildRec(nptr->sons[1].get(), minpts);  // recurse into 2nd son
   } else {
     numNodes = nptr->nodeNumber +
                1;  // node number of last leaf indicates total number of nodes

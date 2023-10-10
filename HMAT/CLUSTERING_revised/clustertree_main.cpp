@@ -14,10 +14,10 @@
 // Auxiliary function for outputting a cluster tree
 template <int DIM>
 void printClusterTree(const HMAT::ClusterTree<HMAT::CtNode<DIM>> &T,
-                      const HMAT::CtNode<DIM> *node_ptr, int level = 0) {
+                      const std::unique_ptr<HMAT::CtNode<DIM>> &node_ptr, int level = 0) {
   if (node_ptr != nullptr) {
     std::cout << "Node level " << level << ": " << node_ptr->noIdx()
-              << " points, " << T.getBBox(node_ptr) << ", idx = [";
+              << " points, " << T.getBBox(node_ptr.get()) << ", idx = [";
     const int n_sons = ((node_ptr->sons[0] != nullptr) ? 1 : 0) +
                        ((node_ptr->sons[1] != nullptr) ? 1 : 0);
     const std::vector<std::size_t> node_idxs{node_ptr->I};
