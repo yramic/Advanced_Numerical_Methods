@@ -27,10 +27,10 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <utility>
 
-#include "gtest/gtest.h"
 #include "gtest/internal/gtest-tuple.h"
+#include <utility>
+#include "gtest/gtest.h"
 
 namespace {
 
@@ -259,8 +259,9 @@ class BigTupleTest : public testing::Test {
  protected:
   typedef tuple<int, int, int, int, int, int, int, int, int, int> BigTuple;
 
-  BigTupleTest()
-      : a_(1, 0, 0, 0, 0, 0, 0, 0, 0, 2), b_(1, 0, 0, 0, 0, 0, 0, 0, 0, 3) {}
+  BigTupleTest() :
+      a_(1, 0, 0, 0, 0, 0, 0, 0, 0, 2),
+      b_(1, 0, 0, 0, 0, 0, 0, 0, 0, 3) {}
 
   BigTuple a_, b_;
 };
@@ -305,7 +306,7 @@ TEST(MakeTupleTest, WorksForScalarTypes) {
 }
 
 TEST(MakeTupleTest, WorksForPointers) {
-  int a[] = {1, 2, 3, 4};
+  int a[] = { 1, 2, 3, 4 };
   const char* const str = "hi";
   int* const p = a;
 

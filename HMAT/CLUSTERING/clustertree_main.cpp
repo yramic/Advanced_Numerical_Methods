@@ -67,10 +67,10 @@ int main(int /*argc*/, char ** /*argv*/) {
         pts.push_back(p);
       }
     }
-    HMAT::ClusterTree<HMAT::CtNode<2>> T;
-    T.init(pts);
-    std::cout << "2D Cluster tree" << T << std::endl;
-    printClusterTree(T, T.root);
+      HMAT::ClusterTree<HMAT::CtNode<2>> T;
+      T.init(pts);
+      std::cout << "2D Cluster tree" << T << std::endl;
+      printClusterTree(T, T.root);
   }
   exit(0);
 }

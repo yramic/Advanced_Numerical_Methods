@@ -10,12 +10,12 @@
 #include "parametrized_fourier_sum.hpp"
 
 #include <assert.h>
-#include <math.h>
-
-#include <Eigen/Dense>
 #include <iostream>
+#include <math.h>
 #include <utility>
 #include <vector>
+
+#include <Eigen/Dense>
 
 namespace parametricbem2d {
 using CoefficientsList = typename ParametrizedFourierSum::CoefficientsList;
@@ -31,7 +31,7 @@ ParametrizedFourierSum::ParametrizedFourierSum(CoefficientsList cos_list,
 Eigen::Vector2d ParametrizedFourierSum::operator()(double t) const {
   assert(IsWithinParameterRange(t));
   t = t * (tmax_ - tmin_) / 2 +
-      (tmax_ + tmin_) / 2;  // converting to the range [tmin,tmax]
+      (tmax_ + tmin_) / 2; // converting to the range [tmin,tmax]
   // Number of cosine/sine terms in the sum
   int N = cosine_.cols();
   // Vectors for storing the cosine and sine values
@@ -52,7 +52,7 @@ Eigen::Vector2d ParametrizedFourierSum::operator()(double t) const {
 Eigen::Vector2d ParametrizedFourierSum::Derivative(double t) const {
   assert(IsWithinParameterRange(t));
   t = t * (tmax_ - tmin_) / 2 +
-      (tmax_ + tmin_) / 2;  // converting to the range [tmin,tmax]
+      (tmax_ + tmin_) / 2; // converting to the range [tmin,tmax]
   // Number of cosine/sine terms in the sum
   int N = cosine_.cols();
   // Vectors for storing the cosine and sine derivatives
@@ -73,7 +73,7 @@ Eigen::Vector2d ParametrizedFourierSum::Derivative(double t) const {
 Eigen::Vector2d ParametrizedFourierSum::DoubleDerivative(double t) const {
   assert(IsWithinParameterRange(t));
   t = t * (tmax_ - tmin_) / 2 +
-      (tmax_ + tmin_) / 2;  // converting to the range [tmin,tmax]
+      (tmax_ + tmin_) / 2; // converting to the range [tmin,tmax]
   // Number of cosine/sine terms in the sum
   int N = cosine_.cols();
   // Vectors for storing the cosine and sine double derivatives
@@ -108,4 +108,4 @@ PanelVector ParametrizedFourierSum::split(unsigned int N) const {
   }
   return parametrization_parts;
 }
-}  // namespace parametricbem2d
+} // namespace parametricbem2d

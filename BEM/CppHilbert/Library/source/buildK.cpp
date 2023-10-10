@@ -17,11 +17,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "buildK.hpp"
-
-#include <cmath>
-
 #include "constants.hpp"
 #include "doubleLayerPotential.hpp"
+#include <cmath>
 
 /* SAM_LISTING_BEGIN_1 */
 void computeK(Eigen::MatrixXd &K, const BoundaryMesh &mesh, double eta) {
@@ -52,17 +50,17 @@ void computeK(Eigen::MatrixXd &K, const BoundaryMesh &mesh, double eta) {
       double lindep2 = fabs((a - d)[0] * (b - a)[1] - (a - d)[1] * (b - a)[0]);
 
       if (lindep1 > EPS * (a - c).norm() ||
-          lindep2 > EPS * (a - d).norm())  // \Label[line]{K:1}
+          lindep2 > EPS * (a - d).norm()) // \Label[line]{K:1}
       {
         // compute entries of $1\times2$ interaction matrix
         // double I0=0.0, I1=0.0;
         computeKij(&I0, &I1, eta, a, b, c, d);
         // distribute values to matrix entries
-        K(j, cidx) += I0 - I1;  // \Label[line]{K:2}
-        K(j, didx) += I0 + I1;  // \Label[line]{K:3}
-      }                         // endif
-    }                           // endfor
-  }                             // endfor
+        K(j, cidx) += I0 - I1; // \Label[line]{K:2}
+        K(j, didx) += I0 + I1; // \Label[line]{K:3}
+      }                        // endif
+    }                          // endfor
+  }                            // endfor
 }
 /* SAM_LISTING_END_1 */
 
@@ -94,8 +92,8 @@ void computeK00(Eigen::MatrixXd &K, const BoundaryMesh &mesh, double eta) {
         computeKij(&I0, &I1, eta, a, b, c, d);
         // distribute values to matrix entries
         K(j, i) += 2 * I0;
-      }  // endif
+      } // endif
 
-    }  // endfor
-  }    // endfor
+    } // endfor
+  }   // endfor
 }

@@ -14,6 +14,7 @@
 
 #include "newtonPotential.hpp"
 
+
 /**
  *  evaluateN evaluates the Newton potential N on a number of evaluation points.
  *
@@ -27,7 +28,8 @@
  */
 void evaluateN(Eigen::VectorXd& s,
                const Eigen::Matrix<double, Eigen::Dynamic, 2>& vertices,
-               const Eigen::Matrix<int, Eigen::Dynamic, 3>& triangles,
-               const Eigen::VectorXd& f, const Eigen::MatrixXd& x);
+               const Eigen::Matrix<int   , Eigen::Dynamic, 3>& triangles,
+               const Eigen::VectorXd& f,
+               const Eigen::MatrixXd& x);
 
 #endif

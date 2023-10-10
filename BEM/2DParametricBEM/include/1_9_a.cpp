@@ -1,10 +1,4 @@
 #define _USE_MATH_DEFINES
-#include <Eigen/Dense>
-#include <Eigen/Sparse>
-#include <cassert>
-#include <cmath>
-#include <iostream>
-
 #include "BoundaryMesh.hpp"
 #include "buildK.hpp"
 #include "buildM.hpp"
@@ -12,6 +6,11 @@
 #include "buildW.hpp"
 #include "evaluateK.hpp"
 #include "evaluateV.hpp"
+#include <Eigen/Dense>
+#include <Eigen/Sparse>
+#include <cassert>
+#include <cmath>
+#include <iostream>
 using namespace Eigen;
 
 namespace IndirectSecondKind {
@@ -36,7 +35,8 @@ Eigen::VectorXd solveDirichlet(const BoundaryMesh &mesh, const FUNC &g) {
 
   int N = mesh.numVertices();
   VectorXd gNcoeff(N);
-  for (int i = 0; i < N; ++i) gNcoeff(i) = (g(mesh.getVertex(i)));
+  for (int i = 0; i < N; ++i)
+    gNcoeff(i) = (g(mesh.getVertex(i)));
 
   VectorXd sol;
   VectorXd rhs = M1 * gNcoeff;
@@ -54,7 +54,7 @@ double reconstructSolution(const Vector2d &X, const VectorXd &f,
 
   return DLf_x(0);
 }
-}  // namespace IndirectSecondKind
+} // namespace IndirectSecondKind
 
 namespace IndirectFirstKind {
 
@@ -73,7 +73,8 @@ Eigen::VectorXd solveDirichlet(const BoundaryMesh &mesh, const FUNC &g) {
 
   int N = mesh.numVertices();
   VectorXd gNcoeff(N);
-  for (int i = 0; i < N; ++i) gNcoeff(i) = g(mesh.getVertex(i));
+  for (int i = 0; i < N; ++i)
+    gNcoeff(i) = g(mesh.getVertex(i));
 
   VectorXd sol;
   VectorXd rhs = M * gNcoeff;
@@ -90,7 +91,7 @@ double reconstructSolution(const Vector2d &X, const VectorXd &phi,
 
   return SLphi_x(0);
 }
-}  // namespace IndirectFirstKind
+} // namespace IndirectFirstKind
 
 namespace DirectSecondKind {
 
@@ -112,7 +113,8 @@ Eigen::VectorXd solveDirichlet(const BoundaryMesh &mesh, const FUNC &g) {
 
   int N = mesh.numVertices();
   VectorXd gNcoeff(N);
-  for (int i = 0; i < N; ++i) gNcoeff(i) = g(mesh.getVertex(i));
+  for (int i = 0; i < N; ++i)
+    gNcoeff(i) = g(mesh.getVertex(i));
 
   MatrixXd MT = M.transpose();
   MatrixXd KT = K.transpose();
@@ -124,10 +126,10 @@ Eigen::VectorXd solveDirichlet(const BoundaryMesh &mesh, const FUNC &g) {
   sol = MT.lu().solve(rhs);
   return sol;
 }
-}  // namespace DirectSecondKind
+} // namespace DirectSecondKind
 
 // definition of the function gamma
-struct Kite {  // kite function for a scalar input
+struct Kite { // kite function for a scalar input
   VectorXd operator()(double &t) const {
     assert(t <= 1 && t >= -1);
     VectorXd value(2);
@@ -139,7 +141,8 @@ struct Kite {  // kite function for a scalar input
   MatrixXd operator()(VectorXd &input) const {
     int N = input.size();
     MatrixXd output(N, 2);
-    for (int i = 0; i < N; ++i) output.row(i) = this->operator()(input(i));
+    for (int i = 0; i < N; ++i)
+      output.row(i) = this->operator()(input(i));
     return output;
   }
 };
@@ -206,7 +209,8 @@ BoundaryMesh createMeshwithGamma(const PARAM &gamma, const int &N) {
   VectorXd t = VectorXd::LinSpaced(N + 1, -1., 1.);
   VectorXd t1 = t.segment(0, N);
   MatrixXd temp(N, 2);
-  for (unsigned i = 0; i < N; ++i) temp.row(i) = gamma(t1(i));
+  for (unsigned i = 0; i < N; ++i)
+    temp.row(i) = gamma(t1(i));
 
   MatrixXi temp1(N, 2);
   // std::cout << "Test" <<std::endl;
@@ -235,7 +239,8 @@ Eigen::VectorXd solveDirichlet(const BoundaryMesh &mesh, const FUNC &g) {
 
   int N = mesh.numVertices();
   VectorXd gNcoeff(N);
-  for (int i = 0; i < N; ++i) gNcoeff(i) = g(mesh.getVertex(i));
+  for (int i = 0; i < N; ++i)
+    gNcoeff(i) = g(mesh.getVertex(i));
 
   VectorXd sol;
   M = 0.5 * M;
@@ -247,13 +252,13 @@ Eigen::VectorXd solveDirichlet(const BoundaryMesh &mesh, const FUNC &g) {
 
 double TNu_pt(VectorXd &point, VectorXd &a, VectorXd &b) {
   // assert(point.size()==2);
-  VectorXd grad_u(2);  // gradient of u
+  VectorXd grad_u(2); // gradient of u
   double X1 = point(0), X2 = point(1);
   grad_u << std::sin(X1 - X2) * std::cosh(X1 + X2) +
                 std::cos(X1 - X2) * std::sinh(X1 + X2),
       std::sin(X1 - X2) * std::cosh(X1 + X2) -
           std::cos(X1 - X2) * std::sinh(X1 + X2);
-  VectorXd n(2);  // normal vector
+  VectorXd n(2); // normal vector
   VectorXd temp = VectorXd(b - a);
   n(0) = temp(1);
   n(1) = -temp(0);
@@ -267,7 +272,7 @@ double TNu_pt(VectorXd &point, VectorXd &a, VectorXd &b) {
 // 1.9.d -> error calculation
 void error_calc(int &N, Kite &gamma, double (*fun)(VectorXd)) {
   BoundaryMesh mesh = createMeshwithGamma(gamma, N);
-  VectorXd solcoeffs = solveDirichlet(mesh, fun);  // the MU vector
+  VectorXd solcoeffs = solveDirichlet(mesh, fun); // the MU vector
   // build a vector for the coefficients of neumann trace of given solution.
   // Using the trace value at the midpoint of each panel int
   // N=mesh.numVertices();
@@ -310,7 +315,8 @@ void testMassMatrixSVD(const BoundaryMesh &mesh) {
   Eigen::JacobiSVD<MatrixXd> svd(MT, ComputeThinU | ComputeThinV);
   VectorXd sv = svd.singularValues();
   int N = mesh.numVertices();
-  if (sv(N - 1) < 1e-5) std::cout << "Singular Matrix!" << std::endl;
+  if (sv(N - 1) < 1e-5)
+    std::cout << "Singular Matrix!" << std::endl;
 }
 
 // 1.9.d -> error calculation

@@ -9,12 +9,13 @@
 #ifndef PARAMETRIZEDCURVEHPP
 #define PARAMETRIZEDCURVEHPP
 
-#include <Eigen/Dense>
 #include <iostream>
 #include <iterator>
 #include <memory>
 #include <utility>
 #include <vector>
+
+#include <Eigen/Dense>
 /**
  * \namespace parametricbem2d
  * \brief This namespace contains all the classes and functions for
@@ -41,7 +42,7 @@ using PanelVector = std::vector<std::shared_ptr<AbstractParametrizedCurve>>;
  *        Advanced Numerical Methods for CSE.
  */
 class AbstractParametrizedCurve {
- public:
+public:
   /**
    * This function is used for querying the parameter interval.
    * The standard parameter interval [-1,1] is used and it can't
@@ -183,7 +184,7 @@ class AbstractParametrizedCurve {
     }
     return length;
   }
-};  // class AbstractParametrizedCurve
+}; // class AbstractParametrizedCurve
 
 /**
  * This function is used for calculating the admissibility of two disjoint
@@ -204,6 +205,6 @@ inline double rho(const AbstractParametrizedCurve &pi,
   return num / denom;
 }
 
-}  // namespace parametricbem2d
+} // namespace parametricbem2d
 
-#endif  // PARAMETRIZEDCURVEHPP
+#endif // PARAMETRIZEDCURVEHPP

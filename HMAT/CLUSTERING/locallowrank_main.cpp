@@ -39,6 +39,7 @@ int main(int /*argc*/, char** /*argv*/) {
   HMAT::BiDirChebPartMat1D<LogKernel> Mt(T, T, G, q);
   /* SAM_LISTING_END_1 */
 
+  
   HMAT::tabulateConvergenceLLR({10, 20, 40, 60, 80, 160, 320, 640, 1280},
                                {3, 4, 5, 6, 7});
   HMAT::runtimeMatVec(
