@@ -1,26 +1,26 @@
 #include <stdlib.h>
+
+#include <Eigen/Dense>
+#include <Eigen/Sparse>
 #include <cassert>
+#include <chrono>
 #include <cmath>
 #include <iostream>
 #include <stdexcept>
 #include <utility>
-#include <chrono>
 
-#include "gtest/gtest.h"
-#include <Eigen/Sparse>
-#include <Eigen/Dense>
+#include "BoundaryMesh.hpp"
+#include "abstract_bem_space.hpp"
 #include "buildK.hpp"
 #include "buildM.hpp"
 #include "buildV.hpp"
 #include "buildW.hpp"
-#include "doubleLayerPotential.hpp"
-#include "singleLayerPotential.hpp"
-#include "BoundaryMesh.hpp"
-#include "abstract_bem_space.hpp"
 #include "continuous_space.hpp"
 #include "dirichlet.hpp"
 #include "discontinuous_space.hpp"
+#include "doubleLayerPotential.hpp"
 #include "double_layer.hpp"
+#include "gtest/gtest.h"
 #include "hypersingular.hpp"
 #include "integral_gauss.hpp"
 #include "neumann.hpp"
@@ -29,20 +29,21 @@
 #include "parametrized_line.hpp"
 #include "parametrized_mesh.hpp"
 #include "parametrized_semi_circle.hpp"
+#include "singleLayerPotential.hpp"
 #include "single_layer.hpp"
 
-#define _USE_MATH_DEFINES // for pi
+#define _USE_MATH_DEFINES  // for pi
 
-double eps = 1e-5; // A global threshold for error
+double eps = 1e-5;  // A global threshold for error
 
 // LineParametrizationTest is hieararcy name, Parametrization is a test in this
 // hierarchy
 TEST(LineParametrizationTest, Parametrization) {
   using Point = std::pair<double, double>;
   Eigen::Vector2d x1;
-  x1 << 0, 1; // Point (0,1)
+  x1 << 0, 1;  // Point (0,1)
   Eigen::Vector2d x2;
-  x2 << 1, 0; // Point (1,0)
+  x2 << 1, 0;  // Point (1,0)
   parametricbem2d::ParametrizedLine parametrization(x1, x2);
   // Test point (0.5,0.5) corresponding to t = 0.0
   Eigen::Vector2d testpoint;
@@ -54,9 +55,9 @@ TEST(LineParametrizationTest, Parametrization) {
 TEST(LineParametrizationTest, Derivative) {
   using Point = std::pair<double, double>;
   Eigen::Vector2d x1;
-  x1 << 0, 1; // Point (0,1)
+  x1 << 0, 1;  // Point (0,1)
   Eigen::Vector2d x2;
-  x2 << 1, 0; // Point (1,0)
+  x2 << 1, 0;  // Point (1,0)
   parametricbem2d::ParametrizedLine parametrization(x1, x2);
   // Test point (0.5,0.5) corresponding to t = 0.0
   Eigen::Vector2d testpoint;
@@ -79,12 +80,13 @@ TEST(SemiCircleParametrizationTest, Parametrization) {
   // to get an approximation of Pi
   int Nbins = 1000;
   for (int i = 0; i < Nbins - 1; ++i) {
-    t1 = tmin + i * (tmax - tmin) / (Nbins - 1);       // Current Point
-    t2 = tmin + (i + 1) * (tmax - tmin) / (Nbins - 1); // Next Point
+    t1 = tmin + i * (tmax - tmin) / (Nbins - 1);        // Current Point
+    t2 = tmin + (i + 1) * (tmax - tmin) / (Nbins - 1);  // Next Point
     Eigen::Vector2d start, end;
     start = parametrization(t1);
     end = parametrization(t2);
-    length += (end - start).norm(); // Adding the length of current line segment
+    length +=
+        (end - start).norm();  // Adding the length of current line segment
   }
   EXPECT_NEAR(M_PI, length, eps);
 }
@@ -106,19 +108,20 @@ TEST(ParametrizedCircularArcTest, Parametrization) {
   // to get an approximation of Pi
   int Nbins = 1000;
   for (int i = 0; i < Nbins - 1; ++i) {
-    t1 = tmin + i * (tmax - tmin) / (Nbins - 1);       // Current Point
-    t2 = tmin + (i + 1) * (tmax - tmin) / (Nbins - 1); // Next Point
+    t1 = tmin + i * (tmax - tmin) / (Nbins - 1);        // Current Point
+    t2 = tmin + (i + 1) * (tmax - tmin) / (Nbins - 1);  // Next Point
     Eigen::Vector2d start, end;
     start = parametrization(t1);
     end = parametrization(t2);
-    length += (end - start).norm(); // Adding the length of current line segment
+    length +=
+        (end - start).norm();  // Adding the length of current line segment
   }
   EXPECT_NEAR(M_PI, length * 2 / r, eps);
 }
 
 TEST(FourierSumParametrizationTest, Parametrization) {
-  Eigen::MatrixXd a(2, 1); // cosine coefficients ; N = 1
-  Eigen::MatrixXd b(2, 1); // sine coefficients ; N = 1
+  Eigen::MatrixXd a(2, 1);  // cosine coefficients ; N = 1
+  Eigen::MatrixXd b(2, 1);  // sine coefficients ; N = 1
   a << 1., 0.;
   b << 0., 1.;
   // The fourier sum parametrization using these coefficients reduces to
@@ -126,7 +129,7 @@ TEST(FourierSumParametrizationTest, Parametrization) {
   parametricbem2d::ParametrizedFourierSum parametrization(a, b);
   // Random point in [0,1]
   double t = rand() / RAND_MAX;
-  t = 2 * t - 1; // Transforming to the range [-1,1]
+  t = 2 * t - 1;  // Transforming to the range [-1,1]
   Eigen::Vector2d randompoint = parametrization(t);
   EXPECT_NEAR(1, randompoint.norm(), eps);
 }
@@ -176,7 +179,7 @@ TEST(BemSpace, DiscontinuousSpace0) {
   EXPECT_EQ(Q, 1);
   // Random point between [0,1]
   double t = rand() / RAND_MAX;
-  t = 2 * t - 1; // Transformation to the range [-1,1]
+  t = 2 * t - 1;  // Transformation to the range [-1,1]
   // Checking evaluationShapeFunction
   EXPECT_EQ(space->evaluateShapeFunction(0, t), 1);
   // Dynamically allocated, freeing memory
@@ -192,7 +195,7 @@ TEST(BemSpace, DiscontinuousSpace1) {
   EXPECT_EQ(Q, 2);
   // Random point between [0,1]
   double t = rand() / RAND_MAX;
-  t = 2 * t - 1; // Transformation to the range [-1,1]
+  t = 2 * t - 1;  // Transformation to the range [-1,1]
   // Checking evaluationShapeFunction
   EXPECT_EQ(space->evaluateShapeFunction(0, t), 0.5);
   EXPECT_EQ(space->evaluateShapeFunction(1, t), 0.5 * t);
@@ -209,7 +212,7 @@ TEST(BemSpace, ContinuousSpace1) {
   EXPECT_EQ(Q, 2);
   // Random point between [0,1]
   double t = rand() / RAND_MAX;
-  t = 2 * t - 1; // Transformation to the range [-1,1]
+  t = 2 * t - 1;  // Transformation to the range [-1,1]
   // Checking evaluationShapeFunction
   EXPECT_EQ(space->evaluateShapeFunction(0, t), 0.5 * (1 + t));
   EXPECT_EQ(space->evaluateShapeFunction(1, t), 0.5 * (1 - t));
@@ -227,7 +230,7 @@ TEST(BemSpace, ContinuousSpace2) {
   EXPECT_EQ(Q, 3);
   // Random point between [0,1]
   double t = rand() / RAND_MAX;
-  t = 2 * t - 1; // Transformation to the range [-1,1]
+  t = 2 * t - 1;  // Transformation to the range [-1,1]
   // Checking evaluationShapeFunction
   EXPECT_EQ(space->evaluateShapeFunction(0, t), 0.5 * (1 + t));
   EXPECT_EQ(space->evaluateShapeFunction(1, t), 0.5 * (1 - t));
@@ -275,9 +278,9 @@ TEST(Split, ParametrizedLine) {
   using Point = std::pair<double, double>;
   using PanelVector = parametricbem2d::PanelVector;
   Eigen::Vector2d x1;
-  x1 << 0, 1; // Point (0,1)
+  x1 << 0, 1;  // Point (0,1)
   Eigen::Vector2d x2;
-  x2 << 1, 0; // Point (1,0)
+  x2 << 1, 0;  // Point (1,0)
   parametricbem2d::ParametrizedLine parametrization(x1, x2);
   // Number of split components
   unsigned int N = 10;
@@ -315,8 +318,8 @@ TEST(Split, ParametrizedCircularArc) {
 
 TEST(Split, ParametrizedFourierSum) {
   // Testing the Split functionality for a parametrized line
-  Eigen::MatrixXd a(2, 1); // cosine coefficients ; N = 1
-  Eigen::MatrixXd b(2, 1); // sine coefficients ; N = 1
+  Eigen::MatrixXd a(2, 1);  // cosine coefficients ; N = 1
+  Eigen::MatrixXd b(2, 1);  // sine coefficients ; N = 1
   a << 1., 0.;
   b << 0., 1.;
   parametricbem2d::ParametrizedFourierSum parametrization(a, b);
@@ -336,13 +339,13 @@ TEST(ParametrizedMeshTest, DISABLED_MemberFunctions) {
   using PanelVector = parametricbem2d::PanelVector;
   // Definition of corner points for the polygon
   Eigen::RowVectorXd x1(2);
-  x1 << 0, 0; // Point (0,0)
+  x1 << 0, 0;  // Point (0,0)
   Eigen::RowVectorXd x2(2);
-  x2 << 1, 0; // Point (1,0)
+  x2 << 1, 0;  // Point (1,0)
   Eigen::RowVectorXd x3(2);
-  x3 << 1, .5; // Point (1,0.5)
+  x3 << 1, .5;  // Point (1,0.5)
   Eigen::RowVectorXd x4(2);
-  x4 << 0, 1.5; // Point (0,1.5)
+  x4 << 0, 1.5;  // Point (0,1.5)
   // Parametrized line segments forming the edges of the polygon
   parametricbem2d::ParametrizedLine line1(x1, x2);
   parametricbem2d::ParametrizedLine line2(x2, x3);
@@ -373,13 +376,13 @@ TEST(SingleLayer_0, DISABLED_PanelOrientedAssembly) {
   using PanelVector = parametricbem2d::PanelVector;
   // Corner points for the polygon
   Eigen::RowVectorXd x1(2);
-  x1 << 0, 0; // Point (0,0)
+  x1 << 0, 0;  // Point (0,0)
   Eigen::RowVectorXd x2(2);
-  x2 << 1, 0; // Point (1,0)
+  x2 << 1, 0;  // Point (1,0)
   Eigen::RowVectorXd x3(2);
-  x3 << 1, .5; // Point (1,0.5)
+  x3 << 1, .5;  // Point (1,0.5)
   Eigen::RowVectorXd x4(2);
-  x4 << 0, 1.5; // Point (0,1.5)
+  x4 << 0, 1.5;  // Point (0,1.5)
   // Parametrized line segments forming the edges of the polygon
   parametricbem2d::ParametrizedLine line1(x1, x2);
   parametricbem2d::ParametrizedLine line2(x2, x3);
@@ -413,13 +416,13 @@ TEST(SingleLayer_1, DISABLED_PanelOrientedAssembly) {
   using PanelVector = parametricbem2d::PanelVector;
   // Corner points for the polygon
   Eigen::RowVectorXd x1(2);
-  x1 << 0, 0; // Point (0,0)
+  x1 << 0, 0;  // Point (0,0)
   Eigen::RowVectorXd x2(2);
-  x2 << 1, 0; // Point (1,0)
+  x2 << 1, 0;  // Point (1,0)
   Eigen::RowVectorXd x3(2);
-  x3 << 1, .5; // Point (1,0.5)
+  x3 << 1, .5;  // Point (1,0.5)
   Eigen::RowVectorXd x4(2);
-  x4 << 0, 1.5; // Point (0,1.5)
+  x4 << 0, 1.5;  // Point (0,1.5)
   // Parametrized line segments forming the edges of the polygon
   parametricbem2d::ParametrizedLine line1(x1, x2);
   parametricbem2d::ParametrizedLine line2(x2, x3);
@@ -454,13 +457,13 @@ TEST(SingleLayer_0, DISABLED_CppHilbertComparison) {
   using PanelVector = parametricbem2d::PanelVector;
   // Corner points for the polygon
   Eigen::RowVectorXd x1(2);
-  x1 << 0, 0; // Point (0,0)
+  x1 << 0, 0;  // Point (0,0)
   Eigen::RowVectorXd x2(2);
-  x2 << 1, 0; // Point (1,0)
+  x2 << 1, 0;  // Point (1,0)
   Eigen::RowVectorXd x3(2);
-  x3 << 1, .5; // Point (1,0.5)
+  x3 << 1, .5;  // Point (1,0.5)
   Eigen::RowVectorXd x4(2);
-  x4 << 0, 1.5; // Point (0,1.5)
+  x4 << 0, 1.5;  // Point (0,1.5)
   // Parametrized line segments forming the edges of the polygon
   parametricbem2d::ParametrizedLine line1(x1, x2);
   parametricbem2d::ParametrizedLine line2(x2, x3);
@@ -506,13 +509,13 @@ TEST(DoubleLayer_1_0, DISABLED_PanelOrientedAssembly) {
   using PanelVector = parametricbem2d::PanelVector;
   // Corner points for the polygon
   Eigen::RowVectorXd x1(2);
-  x1 << 0, 0; // Point (0,0)
+  x1 << 0, 0;  // Point (0,0)
   Eigen::RowVectorXd x2(2);
-  x2 << 1, 0; // Point (1,0)
+  x2 << 1, 0;  // Point (1,0)
   Eigen::RowVectorXd x3(2);
-  x3 << 1, .5; // Point (1,0.5)
+  x3 << 1, .5;  // Point (1,0.5)
   Eigen::RowVectorXd x4(2);
-  x4 << 0, 1.5; // Point (0,1.5)
+  x4 << 0, 1.5;  // Point (0,1.5)
   // Parametrized line segments forming the edges of the polygon
   parametricbem2d::ParametrizedLine line1(x1, x2);
   parametricbem2d::ParametrizedLine line2(x2, x3);
@@ -548,13 +551,13 @@ TEST(DoubleLayer_1_0, DISABLED_CppHilbertComparison) {
   using PanelVector = parametricbem2d::PanelVector;
   // Corner points for the polygon
   Eigen::RowVectorXd x1(2);
-  x1 << 0, 0; // Point (0,0)
+  x1 << 0, 0;  // Point (0,0)
   Eigen::RowVectorXd x2(2);
-  x2 << 1, 0; // Point (1,0)
+  x2 << 1, 0;  // Point (1,0)
   Eigen::RowVectorXd x3(2);
-  x3 << 1, .5; // Point (1,0.5)
+  x3 << 1, .5;  // Point (1,0.5)
   Eigen::RowVectorXd x4(2);
-  x4 << 0, 1.5; // Point (0,1.5)
+  x4 << 0, 1.5;  // Point (0,1.5)
   // Parametrized line segments forming the edges of the polygon
   parametricbem2d::ParametrizedLine line1(x1, x2);
   parametricbem2d::ParametrizedLine line2(x2, x3);
@@ -602,13 +605,13 @@ TEST(DoubleLayer_0_0, DISABLED_PanelOrientedAssembly) {
   using PanelVector = parametricbem2d::PanelVector;
   // Corner points for the polygon
   Eigen::RowVectorXd x1(2);
-  x1 << 0, 0; // Point (0,0)
+  x1 << 0, 0;  // Point (0,0)
   Eigen::RowVectorXd x2(2);
-  x2 << 1, 0; // Point (1,0)
+  x2 << 1, 0;  // Point (1,0)
   Eigen::RowVectorXd x3(2);
-  x3 << 1, .5; // Point (1,0.5)
+  x3 << 1, .5;  // Point (1,0.5)
   Eigen::RowVectorXd x4(2);
-  x4 << 0, 1.5; // Point (0,1.5)
+  x4 << 0, 1.5;  // Point (0,1.5)
   // Parametrized line segments forming the edges of the polygon
   parametricbem2d::ParametrizedLine line1(x1, x2);
   parametricbem2d::ParametrizedLine line2(x2, x3);
@@ -644,13 +647,13 @@ TEST(DoubleLayer_0_0, DISABLED_CppHilbertComparison) {
   using PanelVector = parametricbem2d::PanelVector;
   // Corner points for the polygon
   Eigen::RowVectorXd x1(2);
-  x1 << 0, 0; // Point (0,0)
+  x1 << 0, 0;  // Point (0,0)
   Eigen::RowVectorXd x2(2);
-  x2 << 1, 0; // Point (1,0)
+  x2 << 1, 0;  // Point (1,0)
   Eigen::RowVectorXd x3(2);
-  x3 << 1, .5; // Point (1,0.5)
+  x3 << 1, .5;  // Point (1,0.5)
   Eigen::RowVectorXd x4(2);
-  x4 << 0, 1.5; // Point (0,1.5)
+  x4 << 0, 1.5;  // Point (0,1.5)
   // Parametrized line segments forming the edges of the polygon
   parametricbem2d::ParametrizedLine line1(x1, x2);
   parametricbem2d::ParametrizedLine line2(x2, x3);
@@ -723,9 +726,9 @@ TEST(ParametrizedCircularArc, Length) {
 TEST(ParametrizedLine, Length) {
   // Defining the endpoints for parametrized line segment
   Eigen::Vector2d x1;
-  x1 << 0, 1; // Point (0,1)
+  x1 << 0, 1;  // Point (0,1)
   Eigen::Vector2d x2;
-  x2 << 1, 1; // Point (1,0)
+  x2 << 1, 1;  // Point (1,0)
   parametricbem2d::ParametrizedLine curve(x1, x2);
   // Evaluating the length of the curve
   double length = curve.length();
@@ -736,13 +739,13 @@ TEST(Hypersingular_1, DISABLED_PanelOrientedAssembly) {
   using PanelVector = parametricbem2d::PanelVector;
   // Corner points for the polygon
   Eigen::RowVectorXd x1(2);
-  x1 << 0, 0; // Point (0,0)
+  x1 << 0, 0;  // Point (0,0)
   Eigen::RowVectorXd x2(2);
-  x2 << 1, 0; // Point (1,0)
+  x2 << 1, 0;  // Point (1,0)
   Eigen::RowVectorXd x3(2);
-  x3 << 1, .5; // Point (1,0.5)
+  x3 << 1, .5;  // Point (1,0.5)
   Eigen::RowVectorXd x4(2);
-  x4 << 0, 1.5; // Point (0,1.5)
+  x4 << 0, 1.5;  // Point (0,1.5)
   // Parametrized line segments forming the edges of the polygon
   parametricbem2d::ParametrizedLine line1(x1, x2);
   parametricbem2d::ParametrizedLine line2(x2, x3);
@@ -776,13 +779,13 @@ TEST(Hypersingular_1, DISABLED_CppHilbertComparison) {
   using PanelVector = parametricbem2d::PanelVector;
   // Corner points for the polygon
   Eigen::RowVectorXd x1(2);
-  x1 << 0, 0; // Point (0,0)
+  x1 << 0, 0;  // Point (0,0)
   Eigen::RowVectorXd x2(2);
-  x2 << 1, 0; // Point (1,0)
+  x2 << 1, 0;  // Point (1,0)
   Eigen::RowVectorXd x3(2);
-  x3 << 1, .5; // Point (1,0.5)
+  x3 << 1, .5;  // Point (1,0.5)
   Eigen::RowVectorXd x4(2);
-  x4 << 0, 1.5; // Point (0,1.5)
+  x4 << 0, 1.5;  // Point (0,1.5)
   // Parametrized line segments forming the edges of the polygon
   parametricbem2d::ParametrizedLine line1(x1, x2);
   parametricbem2d::ParametrizedLine line2(x2, x3);
@@ -828,13 +831,13 @@ TEST(MassMatrix00, DISABLED_CppHilbertComparison) {
   using PanelVector = parametricbem2d::PanelVector;
   // Corner points for the polygon
   Eigen::RowVectorXd x1(2);
-  x1 << 0, 0; // Point (0,0)
+  x1 << 0, 0;  // Point (0,0)
   Eigen::RowVectorXd x2(2);
-  x2 << 1, 0; // Point (1,0)
+  x2 << 1, 0;  // Point (1,0)
   Eigen::RowVectorXd x3(2);
-  x3 << 1, .5; // Point (1,0.5)
+  x3 << 1, .5;  // Point (1,0.5)
   Eigen::RowVectorXd x4(2);
-  x4 << 0, 1.5; // Point (0,1.5)
+  x4 << 0, 1.5;  // Point (0,1.5)
   // Parametrized line segments forming the edges of the polygon
   parametricbem2d::ParametrizedLine line1(x1, x2);
   parametricbem2d::ParametrizedLine line2(x2, x3);
@@ -881,13 +884,13 @@ TEST(MassMatrix11, DISABLED_CppHilbertComparison) {
   using PanelVector = parametricbem2d::PanelVector;
   // Corner points for the polygon
   Eigen::RowVectorXd x1(2);
-  x1 << 0, 0; // Point (0,0)
+  x1 << 0, 0;  // Point (0,0)
   Eigen::RowVectorXd x2(2);
-  x2 << 1, 0; // Point (1,0)
+  x2 << 1, 0;  // Point (1,0)
   Eigen::RowVectorXd x3(2);
-  x3 << 1, .5; // Point (1,0.5)
+  x3 << 1, .5;  // Point (1,0.5)
   Eigen::RowVectorXd x4(2);
-  x4 << 0, 1.5; // Point (0,1.5)
+  x4 << 0, 1.5;  // Point (0,1.5)
   // Parametrized line segments forming the edges of the polygon
   parametricbem2d::ParametrizedLine line1(x1, x2);
   parametricbem2d::ParametrizedLine line2(x2, x3);
@@ -934,13 +937,13 @@ TEST(MassMatrix01, DISABLED_CppHilbertComparison) {
   using PanelVector = parametricbem2d::PanelVector;
   // Corner points for the polygon
   Eigen::RowVectorXd x1(2);
-  x1 << 0, 0; // Point (0,0)
+  x1 << 0, 0;  // Point (0,0)
   Eigen::RowVectorXd x2(2);
-  x2 << 1, 0; // Point (1,0)
+  x2 << 1, 0;  // Point (1,0)
   Eigen::RowVectorXd x3(2);
-  x3 << 1, .5; // Point (1,0.5)
+  x3 << 1, .5;  // Point (1,0.5)
   Eigen::RowVectorXd x4(2);
-  x4 << 0, 1.5; // Point (0,1.5)
+  x4 << 0, 1.5;  // Point (0,1.5)
   // Parametrized line segments forming the edges of the polygon
   parametricbem2d::ParametrizedLine line1(x1, x2);
   parametricbem2d::ParametrizedLine line2(x2, x3);
@@ -1032,13 +1035,13 @@ TEST(ADNUMCSE_1_9, DISABLED_DirectFirstKind) {
   std::function<double(Eigen::VectorXd &, Eigen::VectorXd &, Eigen::VectorXd &)>
       TNu_pt =
           [&](Eigen::VectorXd &point, Eigen::VectorXd &a, Eigen::VectorXd &b) {
-            Eigen::VectorXd grad_u(2); // gradient of u
+            Eigen::VectorXd grad_u(2);  // gradient of u
             double X1 = point(0), X2 = point(1);
             grad_u << std::sin(X1 - X2) * std::cosh(X1 + X2) +
                           std::cos(X1 - X2) * std::sinh(X1 + X2),
                 std::sin(X1 - X2) * std::cosh(X1 + X2) -
                     std::cos(X1 - X2) * std::sinh(X1 + X2);
-            Eigen::VectorXd n(2); // normal vector
+            Eigen::VectorXd n(2);  // normal vector
             Eigen::VectorXd temp = (b - a);
             n(0) = temp(1);
             n(1) = -temp(0);
@@ -1130,7 +1133,7 @@ TEST(ADNUMCSE_1_9, DISABLED_DirectSecondKind) {
       parametricbem2d::dirichlet_bvp::direct_first_kind::solve(mesh, Td, order);
 
   std::cout << "dfk Tn: \n" << soldfk << std::endl;
-  std::cout << "dsk Tn: \n" <<  sol << std::endl;
+  std::cout << "dsk Tn: \n" << sol << std::endl;
 
   // Same trial and test spaces
   DiscontinuousSpace<0> trial_space;
@@ -1247,11 +1250,11 @@ TEST(NEUMANNBVP, DISABLED_DirectFirstKind) {
   PanelVector panels = mesh.getPanels();
   // Lambda function for Neumann Trace
   std::function<double(double, double)> Tn = [&](double x1, double x2) {
-    return x1/R; //cos(phi)
+    return x1 / R;  // cos(phi)
   };
   // Lambda function for Dirichlet Trace
   std::function<double(double, double)> Td = [&](double x, double y) {
-    return x; // R cos(phi)
+    return x;  // R cos(phi)
   };
   // Order of quadrature to be used
   unsigned order = 16;
@@ -1290,11 +1293,11 @@ TEST(NEUMANNBVP, DISABLED_DirectSecondKind) {
   PanelVector panels = mesh.getPanels();
   // Lambda function for Neumann Trace
   std::function<double(double, double)> Tn = [&](double x1, double x2) {
-    return x1/R; //cos(phi)
+    return x1 / R;  // cos(phi)
   };
   // Lambda function for Dirichlet Trace
   std::function<double(double, double)> Td = [&](double x, double y) {
-    return x; // R cos(phi)
+    return x;  // R cos(phi)
   };
   // Order of quadrature to be used
   unsigned order = 16;
@@ -1334,11 +1337,11 @@ TEST(NEUMANNBVP, DISABLED_IndirectFirstKind) {
   PanelVector panels = mesh.getPanels();
   // Lambda function for Neumann Trace
   std::function<double(double, double)> Tn = [&](double x1, double x2) {
-    return x1/R; //cos(phi)
+    return x1 / R;  // cos(phi)
   };
   // Lambda function for Dirichlet Trace
   std::function<double(double, double)> Td = [&](double x, double y) {
-    return x; // R cos(phi)
+    return x;  // R cos(phi)
   };
   // Order of quadrature to be used
   unsigned order = 16;
@@ -1377,11 +1380,11 @@ TEST(NEUMANNBVP, DISABLED_IndirectSecondKind) {
   PanelVector panels = mesh.getPanels();
   // Lambda function for Neumann Trace
   std::function<double(double, double)> Tn = [&](double x1, double x2) {
-    return x1/R; //cos(phi)
+    return x1 / R;  // cos(phi)
   };
   // Lambda function for Dirichlet Trace
   std::function<double(double, double)> Td = [&](double x, double y) {
-    return x; // R cos(phi)
+    return x;  // R cos(phi)
   };
   // Order of quadrature to be used
   unsigned order = 16;

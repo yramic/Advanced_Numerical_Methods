@@ -8,11 +8,6 @@
  * This code can be freely used for non-commercial purposes as long    *
  * as this header is left intact.                                      *
  ***********************************************************************/
-#include "include/kernel.hpp"
-#include "include/low_rank_app.hpp"
-#include "include/naive_mul.hpp"
-#include "include/point.hpp"
-
 #include <Eigen/Dense>
 #include <chrono>
 #include <cmath>
@@ -21,6 +16,11 @@
 #include <iostream>
 #include <string>
 
+#include "include/kernel.hpp"
+#include "include/low_rank_app.hpp"
+#include "include/naive_mul.hpp"
+#include "include/point.hpp"
+
 int main() {
   // Output filename
   std::string filename = "test_hmat_1d_error_bi.txt";
@@ -28,10 +28,10 @@ int main() {
   myfile.open(filename);
   myfile << std::setw(15) << "#n" << std::setw(15) << "exact(us)"
          << std::setw(15) << "approx(us)" << std::endl;
-  KernelCosine G(100.); // Kernel initialization
-  for (unsigned N : {1,  2,  3,  4,  5,  6,  7,  8,  9,  10}) {
+  KernelCosine G(100.);  // Kernel initialization
+  for (unsigned N : {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}) {
     // Number of collocation points
-    unsigned n = std::pow(2,N) * 10;
+    unsigned n = std::pow(2, N) * 10;
     // Number of iterations for calculating the time
     unsigned iter = 100;
     double time_approx = 0., time_exact = 0.;
@@ -39,7 +39,7 @@ int main() {
     Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(n, 0., 100.);
     // Vector to be multiplied
     Eigen::VectorXd c = Eigen::VectorXd::Random(n);
-    std::vector<Point> GPoints; // initializing Grid Points properties
+    std::vector<Point> GPoints;  // initializing Grid Points properties
     GPoints.reserve(n);
     int k = 0;
     for (int i = 0; i < n; ++i) {
@@ -64,7 +64,7 @@ int main() {
     for (unsigned i = 0; i < iter; ++i) {
       // Compute exact matrix-vector product using naive O(n^2) multiplication
       auto start1 = std::chrono::high_resolution_clock::now();
-      Eigen::VectorXd f_exact = prod(M, c); // Calculating the product
+      Eigen::VectorXd f_exact = prod(M, c);  // Calculating the product
       auto end1 = std::chrono::high_resolution_clock::now();
       auto time_diff1 =
           std::chrono::duration_cast<std::chrono::microseconds>(end1 - start1);
@@ -76,7 +76,8 @@ int main() {
       auto end2 = std::chrono::high_resolution_clock::now();
       auto time_diff2 =
           std::chrono::duration_cast<std::chrono::microseconds>(end2 - start2);
-      time_approx += time_diff2.count();;
+      time_approx += time_diff2.count();
+      ;
       // std::cout << "Number of matrix operations performed for exact matrix: "
       // << n*n << std::endl;
 

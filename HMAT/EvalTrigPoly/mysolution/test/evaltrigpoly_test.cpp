@@ -6,7 +6,8 @@
  * @copyright Developed at SAM, ETH Zurich
  */
 
-#include <gtest/gtest.h>
 #include "../evaltrigpoly.h"
+
+#include <gtest/gtest.h>
 
 namespace EvalTrigPoly::test {}  // namespace EvalTrigPoly::test

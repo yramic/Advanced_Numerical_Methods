@@ -193,8 +193,12 @@ class LLRClusterTree : public HMAT::ClusterTree<NODE> {
 
  public:
   // For the conciseness of access
-  Eigen::VectorXd &getSectVec(const NODE *node) { return clust_sect_vec[node->nodeNumber]; }
-  Eigen::VectorXd &getOmega(const NODE *node) { return clust_omega[node->nodeNumber]; }
+  Eigen::VectorXd &getSectVec(const NODE *node) {
+    return clust_sect_vec[node->nodeNumber];
+  }
+  Eigen::VectorXd &getOmega(const NODE *node) {
+    return clust_omega[node->nodeNumber];
+  }
   Eigen::MatrixXd &getV(const NODE *node) { return Vs[node->nodeNumber]; }
 
   const std::size_t q;  // rank of separable approximation on cluster boxes

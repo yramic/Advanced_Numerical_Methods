@@ -125,7 +125,8 @@ class CtNode {
     return (!(sons[0]) and !(sons[1]));
   }
   // Public data member: Pointers to two (binary tree!) sons
-  std::array<std::unique_ptr<CtNode>, 2> sons; // smart pointer, no need for destructor
+  std::array<std::unique_ptr<CtNode>, 2>
+      sons;  // smart pointer, no need for destructor
   // Public data member: Index set of the cluster
   std::vector<size_t> I;
   // Public data member: Offset indicating where local points are stored in
@@ -259,7 +260,7 @@ std::pair<int, int> ClusterTree<NODE>::buildRec(NODE *nptr,
     const std::vector<Point<dim>> low_pts(tpts.cbegin(), tpts.cbegin() + m);
     // First son gets ``lower half'' of sorted points
     nptr->sons[0].reset(createNode(low_pts, nptr->offset + nptr->noIdx(),
-                                     nptr->nodeNumber + 1, dir));
+                                   nptr->nodeNumber + 1, dir));
     if (!nptr->sons[0]) {
       throw(std::runtime_error("Cannot allocate first son"));
     }

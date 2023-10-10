@@ -109,8 +109,8 @@ TEST(KernMatLLRApprox, check_V) {
   ASSERT_TRUE(rec_check(T->root));
 }
 
-  TEST(KernMatLLRApprox, validateLLR) {
-    ASSERT_TRUE(KernMatLLRApprox::validateLLR(5));
-  }
-  
+TEST(KernMatLLRApprox, validateLLR) {
+  ASSERT_TRUE(KernMatLLRApprox::validateLLR(5));
+}
+
 }  // namespace KernMatLLRApprox::test

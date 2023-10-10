@@ -11,8 +11,10 @@
 
 #include "hypersingular.hpp"
 
-#include <limits>
 #include <math.h>
+
+#include <Eigen/Dense>
+#include <limits>
 #include <vector>
 
 #include "abstract_bem_space.hpp"
@@ -21,7 +23,6 @@
 #include "gauleg.hpp"
 #include "logweight_quadrature.hpp"
 #include "parametrized_mesh.hpp"
-#include <Eigen/Dense>
 
 namespace parametricbem2d {
 namespace hypersingular {
@@ -31,14 +32,14 @@ Eigen::MatrixXd InteractionMatrix(const AbstractParametrizedCurve &pi,
                                   const QuadRule &GaussQR) {
   double tol = std::numeric_limits<double>::epsilon();
 
-  if (&pi == &pi_p) // Same Panels case
+  if (&pi == &pi_p)  // Same Panels case
     return ComputeIntegralCoinciding(pi, pi_p, space, GaussQR);
 
   else if (fabs((pi(1) - pi_p(-1)).norm()) < tol ||
-           fabs((pi(-1) - pi_p(1)).norm()) < tol) // Adjacent Panels case
+           fabs((pi(-1) - pi_p(1)).norm()) < tol)  // Adjacent Panels case
     return ComputeIntegralAdjacent(pi, pi_p, space, GaussQR);
 
-  else // Disjoint panels case
+  else  // Disjoint panels case
     return ComputeIntegralGeneral(pi, pi_p, space, GaussQR);
 }
 
@@ -46,20 +47,20 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
                                           const AbstractParametrizedCurve &pi_p,
                                           const AbstractBEMSpace &space,
                                           const QuadRule &GaussQR) {
-  unsigned N = GaussQR.n; // Quadrature order for the GaussQR object. Same order
-                          // to be used for log weighted quadrature
-  int Q = space.getQ(); // No. of Reference Shape Functions in trial/test space
+  unsigned N = GaussQR.n;  // Quadrature order for the GaussQR object. Same
+                           // order to be used for log weighted quadrature
+  int Q = space.getQ();  // No. of Reference Shape Functions in trial/test space
   // Interaction matrix with size Q x Q
   Eigen::MatrixXd interaction_matrix(Q, Q);
   // Computing the (i,j)th matrix entry
   for (int i = 0; i < Q; ++i) {
     for (int j = 0; j < Q; ++j) {
       // Lambda expression for functions F and G in \f$\eqref{eq:Vidp}\f$
-      auto F = [&](double t) { // Function associated with panel pi_p
+      auto F = [&](double t) {  // Function associated with panel pi_p
         return space.evaluateShapeFunctionDot(j, t);
       };
 
-      auto G = [&](double s) { // Function associated with panel pi
+      auto G = [&](double s) {  // Function associated with panel pi
         return space.evaluateShapeFunctionDot(i, s);
       };
 
@@ -67,16 +68,16 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
       auto integrand1 = [&](double s, double t) {
         double sqrt_epsilon = std::sqrt(std::numeric_limits<double>::epsilon());
         double s_st;
-        if (fabs(s - t) > sqrt_epsilon) // Away from singularity
+        if (fabs(s - t) > sqrt_epsilon)  // Away from singularity
           // Simply evaluating the expression
           s_st = (pi(s) - pi_p(t)).squaredNorm() / (s - t) / (s - t);
-        else // Near singularity
+        else  // Near singularity
           // Using analytic limit for s - > t given in \f$\eqref{eq:Sdef}\f$
           s_st = pi.Derivative(0.5 * (t + s)).squaredNorm();
         return 0.5 * log(s_st) * F(t) * G(s);
       };
 
-      double i1 = 0., i2 = 0.; // The two integrals in \f$\eqref{eq:Isplit}\f$
+      double i1 = 0., i2 = 0.;  // The two integrals in \f$\eqref{eq:Isplit}\f$
 
       // Tensor product quadrature for double 1st integral in
       // \f$\eqref{eq:Isplit}\f$
@@ -124,9 +125,9 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
                                         const AbstractParametrizedCurve &pi_p,
                                         const AbstractBEMSpace &space,
                                         const QuadRule &GaussQR) {
-  unsigned N = GaussQR.n; // Quadrature order for the GaussQR object. Same order
-                          // to be used for log weighted quadrature
-  int Q = space.getQ(); // No. of Reference Shape Functions in trial/test space
+  unsigned N = GaussQR.n;  // Quadrature order for the GaussQR object. Same
+                           // order to be used for log weighted quadrature
+  int Q = space.getQ();  // No. of Reference Shape Functions in trial/test space
   // Interaction matrix with size Q x Q
   Eigen::MatrixXd interaction_matrix(Q, Q);
   // Computing the (i,j)th matrix entry
@@ -135,8 +136,8 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
       // Panel lengths for local arclength parametrization in
       // \f$\eqref{eq:ap}\f$. Actual values are not required so a length of 1 is
       // used for both the panels
-      double length_pi = 1.;   // Length for panel pi
-      double length_pi_p = 1.; // Length for panel pi_p
+      double length_pi = 1.;    // Length for panel pi
+      double length_pi_p = 1.;  // Length for panel pi_p
 
       // when transforming the parametrizations from [-1,1]->\Pi to local
       // arclength parametrizations [0,|\Pi|] -> \Pi, swap is used to ensure
@@ -146,7 +147,7 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
 
       // Lambda expressions for the functions F,G and D(r,phi) in
       // \f$\eqref{eq:Isplitapn}\f$
-      auto F = [&](double t_pr) { // Function associated with panel pi_p
+      auto F = [&](double t_pr) {  // Function associated with panel pi_p
         // Transforming the local arclength parameter to standard parameter
         // range [-1,1] using swap
         double t =
@@ -154,14 +155,14 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
         return space.evaluateShapeFunctionDot(j, t);
       };
 
-      auto G = [&](double s_pr) { // Function associated with panel pi
+      auto G = [&](double s_pr) {  // Function associated with panel pi
         // Transforming the local arclength parameter to standard parameter
         // range [-1,1] using swap
         double s = swap ? 2 * s_pr / length_pi - 1 : 1 - 2 * s_pr / length_pi;
         return space.evaluateShapeFunctionDot(i, s);
       };
 
-      auto D_r_phi = [&](double r, double phi) { // \f$\eqref{eq:Ddef}\f$
+      auto D_r_phi = [&](double r, double phi) {  // \f$\eqref{eq:Ddef}\f$
         double sqrt_epsilon = std::sqrt(std::numeric_limits<double>::epsilon());
         // Transforming to local arclength parameter range
         double s_pr = r * cos(phi);
@@ -172,16 +173,16 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
         // Transforming to standard parameter range [-1,1] using swap
         double t =
             swap ? 1 - 2 * t_pr / length_pi_p : 2 * t_pr / length_pi_p - 1;
-        if (r > sqrt_epsilon) // Away from singularity, simply use the formula
+        if (r > sqrt_epsilon)  // Away from singularity, simply use the formula
           return (pi(s) - pi_p(t)).squaredNorm() / r / r;
-        else // Near singularity, use analytically evaluated limit for r -> 0
+        else  // Near singularity, use analytically evaluated limit for r -> 0
           return 1 - sin(2 * phi) * pi.Derivative(s).dot(pi_p.Derivative(t));
       };
 
       // The two integrals in \f$\eqref{eq:Isplitapn}\f$ have to be further
       // split into two parts part 1 is where phi goes from 0 to alpha part 2 is
       // where phi goes from alpha to pi/2
-      double alpha = atan(length_pi_p / length_pi); // the split point
+      double alpha = atan(length_pi_p / length_pi);  // the split point
 
       // i_IJ -> Integral I, part J
       double i11 = 0., i21 = 0., i12 = 0., i22 = 0.;
@@ -273,9 +274,9 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
                                        const AbstractParametrizedCurve &pi_p,
                                        const AbstractBEMSpace &space,
                                        const QuadRule &GaussQR) {
-  unsigned N = GaussQR.n; // Quadrature order for the GaussQR object. Same order
-                          // to be used for log weighted quadrature
-  int Q = space.getQ(); // No. of Reference Shape Functions in trial/test space
+  unsigned N = GaussQR.n;  // Quadrature order for the GaussQR object. Same
+                           // order to be used for log weighted quadrature
+  int Q = space.getQ();  // No. of Reference Shape Functions in trial/test space
   // Interaction matrix with size Q x Q
   Eigen::MatrixXd interaction_matrix(Q, Q);
   // Computing the (i,j)th matrix entry
@@ -283,11 +284,11 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
     for (int j = 0; j < Q; ++j) {
       // Lambda expression for functions F and G in \f$\eqref{eq:titg}\f$ for
       // Single Layer BIO
-      auto F = [&](double t) { // Function associated with panel pi_p
+      auto F = [&](double t) {  // Function associated with panel pi_p
         return space.evaluateShapeFunctionDot(j, t);
       };
 
-      auto G = [&](double s) { // Function associated with panel pi
+      auto G = [&](double s) {  // Function associated with panel pi
         return space.evaluateShapeFunctionDot(i, s);
       };
 
@@ -344,5 +345,5 @@ Eigen::MatrixXd GalerkinMatrix(const ParametrizedMesh mesh,
   return output;
 }
 
-} // namespace hypersingular
-} // namespace parametricbem2d
+}  // namespace hypersingular
+}  // namespace parametricbem2d

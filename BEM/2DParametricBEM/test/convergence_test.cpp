@@ -1,43 +1,45 @@
 #include <stdlib.h>
+
+#include <Eigen/Dense>
+#include <Eigen/Sparse>
 #include <cassert>
 #include <cmath>
+#include <fstream>
 #include <iostream>
 #include <stdexcept>
-#include <utility>
 #include <string>
-#include <fstream>
+#include <utility>
 
-#include <Eigen/Sparse>
-#include <Eigen/Dense>
-#include "gtest/gtest.h"
+#include "BoundaryMesh.hpp"
+#include "abstract_bem_space.hpp"
 #include "buildK.hpp"
+#include "buildM.hpp"
 #include "buildV.hpp"
 #include "buildW.hpp"
-#include "buildM.hpp"
-#include "BoundaryMesh.hpp"
-#include "doubleLayerPotential.hpp"
-#include "singleLayerPotential.hpp"
-#include "abstract_bem_space.hpp"
 #include "continuous_space.hpp"
+#include "dirichlet.hpp"
 #include "discontinuous_space.hpp"
+#include "doubleLayerPotential.hpp"
 #include "double_layer.hpp"
+#include "gtest/gtest.h"
+#include "hypersingular.hpp"
 #include "integral_gauss.hpp"
+#include "neumann.hpp"
 #include "parametrized_circular_arc.hpp"
 #include "parametrized_fourier_sum.hpp"
 #include "parametrized_line.hpp"
 #include "parametrized_mesh.hpp"
 #include "parametrized_semi_circle.hpp"
+#include "singleLayerPotential.hpp"
 #include "single_layer.hpp"
-#include "hypersingular.hpp"
-#include "dirichlet.hpp"
-#include "neumann.hpp"
 
 int main() {
   std::string filename = "convergence.txt";
   std::ofstream output(filename);
-  output << std::setw(15) << "#order" << std::setw(15) << "error sl" << std::setw(15) << "error dl" << std::endl;
+  output << std::setw(15) << "#order" << std::setw(15) << "error sl"
+         << std::setw(15) << "error dl" << std::endl;
   // Convergence test for Single Layer Galerkin Matrix
-  double a = 0.01; // Side of the square
+  double a = 0.01;  // Side of the square
   using PanelVector = parametricbem2d::PanelVector;
   // Corner points for the square
   /*Eigen::RowVectorXd x1(2);
@@ -49,13 +51,13 @@ int main() {
   Eigen::RowVectorXd x4(2);
   x4 << -a/2, a/2; // Point (0,1.5)*/
   Eigen::RowVectorXd x1(2);
-  x1 << 0, -1.5; // Point (0,0)
+  x1 << 0, -1.5;  // Point (0,0)
   Eigen::RowVectorXd x2(2);
-  x2 << 1, 0.5; // Point (1,0)
+  x2 << 1, 0.5;  // Point (1,0)
   Eigen::RowVectorXd x3(2);
-  x3 << 0.1, .33; // Point (1,0.5)
+  x3 << 0.1, .33;  // Point (1,0.5)
   Eigen::RowVectorXd x4(2);
-  x4 << -1, -.1; // Point (0,1.5)
+  x4 << -1, -.1;  // Point (0,1.5)
   // Parametrized line segments forming the edges of the polygon
   parametricbem2d::ParametrizedLine line1(x1, x2);
   parametricbem2d::ParametrizedLine line2(x2, x3);
@@ -97,17 +99,16 @@ int main() {
   computeV(cpp_sl, boundarymesh, 0);
   Eigen::MatrixXd cpp_dl;
   computeK(cpp_dl, boundarymesh, 0);
-  for (unsigned order = 2 ; order < 500 ; ++order) {
-    Eigen::MatrixXd sl =
-        parametricbem2d::single_layer::GalerkinMatrix(parametrizedmesh, space,
-                                                         order);
-    double err_sl = (cpp_sl-sl).norm()/cpp_sl.norm();
+  for (unsigned order = 2; order < 500; ++order) {
+    Eigen::MatrixXd sl = parametricbem2d::single_layer::GalerkinMatrix(
+        parametrizedmesh, space, order);
+    double err_sl = (cpp_sl - sl).norm() / cpp_sl.norm();
 
     Eigen::MatrixXd dl = parametricbem2d::double_layer::GalerkinMatrix(
         parametrizedmesh, trial_space, test_space, order);
-    double err_dl = (cpp_dl-dl).norm()/cpp_dl.norm();
-    output << std::setw(15) << order << std::setw(15) << err_sl << std::setw(15) << err_dl << std::endl;
-
+    double err_dl = (cpp_dl - dl).norm() / cpp_dl.norm();
+    output << std::setw(15) << order << std::setw(15) << err_sl << std::setw(15)
+           << err_dl << std::endl;
   }
   output.close();
   return 0;
