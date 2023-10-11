@@ -24,12 +24,13 @@ int main() {
       double dp = p;
       if (p == 2) {
         std::cout << "p = " << p << std::setw(15) << "Max = " << std::scientific
-             << std::setprecision(3) << err_max << std::endl;
+                  << std::setprecision(3) << err_max << std::endl;
       } else {
         std::cout << "p = " << p << std::setw(15) << "Max = " << std::scientific
-             << std::setprecision(3) << err_max << std::setw(15) << " EOC = "
-             << std::log2(err_max_alt / err_max) / std::log2((dp + 1) / dp)
-             << std::endl;
+                  << std::setprecision(3) << err_max << std::setw(15)
+                  << " EOC = "
+                  << std::log2(err_max_alt / err_max) / std::log2((dp + 1) / dp)
+                  << std::endl;
       }
       err_max_alt = err_max;
     }
@@ -62,11 +63,11 @@ int main() {
       err_max = diff.cwiseAbs().maxCoeff();
       if (N == 16) {
         std::cout << "N = " << N << std::setw(15) << "Max = " << std::scientific
-             << std::setprecision(3) << err_max << std::endl;
+                  << std::setprecision(3) << err_max << std::endl;
       } else {
         std::cout << "N = " << N << std::setw(15) << "Max = " << std::scientific
-             << std::setprecision(3) << err_max << std::setw(15)
-             << " EOC = " << std::log2(err_max_alt / err_max) << std::endl;
+                  << std::setprecision(3) << err_max << std::setw(15)
+                  << " EOC = " << std::log2(err_max_alt / err_max) << std::endl;
       }
 
       err_max_alt = err_max;
@@ -85,7 +86,7 @@ int main() {
       err_max = diff.cwiseAbs().maxCoeff();
       if (N == 16) {
         std::cout << "N = " << N << std::setw(15) << "Max = " << std::scientific
-             << std::setprecision(3) << err_max << std::endl;
+                  << std::setprecision(3) << err_max << std::endl;
       } else {
         cout << "N = " << N << std::setw(15) << "Max = " << std::scientific
              << std::setprecision(3) << err_max << std::setw(15)

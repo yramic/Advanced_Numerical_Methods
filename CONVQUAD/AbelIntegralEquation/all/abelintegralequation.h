@@ -77,19 +77,18 @@ Eigen::VectorXd poly_spec_abel(const FUNC& y, std::size_t p, double tau) {
   // generate Gauss-Legendre points and weights
   const auto [gauss_pts_p, gauss_wht_p] = gauleg(0., 1., p);
 
-  // set-up the Galerkin matrix and rhs vector
+  // set up the Galerkin matrix and rhs vector
 
 #if SOLUTION
   // std::tgamma(1+j) == j! if j is integer
-  const Eigen::VectorXd gammaj1 = Eigen::VectorXd::NullaryExpr(
-      p + 1, [](Eigen::Index j) { return std::tgamma(j + 1); });
-  const Eigen::VectorXd gammaj3_2 = Eigen::VectorXd::NullaryExpr(
-      p + 1, [](Eigen::Index j) { return std::tgamma(j + 3. / 2.); });
+  const Eigen::VectorXd gamma_factor = Eigen::VectorXd::NullaryExpr(
+      p + 1, [](Eigen::Index j) { return std::tgamma(j + 1) / std::tgamma(j + 3. / 2.); });
   const double sqrt_pi = std::sqrt(M_PI);
 
   for (int i = 0; i <= p; i++) {
-    for (int j = 0; j <= p; j++)
-      A(i, j) = sqrt_pi * gammaj1[j] / ((1.5 + i + j) * gammaj3_2[j]);
+    for (int j = 0; j <= p; j++) {
+      A(i, j) = sqrt_pi * gamma_factor[j] / (1.5 + i + j);
+    }
 
     for (int k = 0; k < p; k++) {
       const double tk = gauss_pts_p(k);
