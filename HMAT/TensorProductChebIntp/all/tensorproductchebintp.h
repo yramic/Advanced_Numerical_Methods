@@ -40,9 +40,10 @@ std::vector<double> chebInterpEval1D(unsigned int q, FUNCTOR f,
   for (int k = 0; k < q; ++k, sgn *= -1) {
     t[k] =
         std::cos((2.0 * (k + 1) - 1.0) / (2 * q) * M_PI);  // \prbeqref{eq:chn}
-    lambda[k] = sgn * std::sin((2.0 * (k + 1) - 1.0) / (2 * q) *
-                               M_PI);  // \prbeqref{eq:bwf}
-    y[k] = f(t[k]);                    // $\cob{y_k}$
+    lambda[k] =
+        std::pow(2, q - 1) / q * sgn *
+        std::sin((2.0 * (k + 1) - 1.0) / (2 * q) * M_PI);  // \prbeqref{eq:bwf}
+    y[k] = f(t[k]);                                        // $\cob{y_k}$
   }
   // Loop over all evaluation points $\cob{x_i}$
   const std::vector<double>::size_type N = x.size();
@@ -90,7 +91,8 @@ std::vector<double> chebInterpEval2D(unsigned int q, FUNCTOR f,
   int sgn = 1;
   for (int k = 0; k < q; ++k, sgn *= -1) {
     t[k] = std::cos((2.0 * (k + 1) - 1.0) / (2 * q) * M_PI);
-    lambda[k] = sgn * std::sin((2.0 * (k + 1) - 1.0) / (2 * q) * M_PI);
+    lambda[k] = std::pow(2, q - 1) / q * sgn *
+                std::sin((2.0 * (k + 1) - 1.0) / (2 * q) * M_PI);
   }
   Eigen::MatrixXd y(q, q);  // Sampled function values
   for (int k = 0; k < q; ++k) {
@@ -131,7 +133,7 @@ std::vector<double> chebInterpEval2D(unsigned int q, FUNCTOR f,
       // Only enter if no division by zero occured
       if (nonodey) {
         // In the case of division by zero
-        if (std::abs(x[k][0] - t[j]) < 1e-9) {
+        if (std::abs(x[k][1] - t[j]) < 1e-9) {
           nonodey = false;
           nodey = j;       // Keep track of the index
           if (!nonodex) {  // Early termination in the case of second division

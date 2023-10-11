@@ -377,7 +377,7 @@
 #endif
 
 // Only use C++11 library features if the library provides them.
-#if GTEST_STDLIB_CXX11
+#if GTEST_Scd TDLIB_CXX11
 # define GTEST_HAS_STD_BEGIN_AND_END_ 1
 # define GTEST_HAS_STD_FORWARD_LIST_ 1
 # if !defined(_MSC_VER) || (_MSC_FULL_VER >= 190023824)

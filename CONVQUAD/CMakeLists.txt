@@ -8,4 +8,4 @@ get_custom_test_targets()
 
 add_subdirectory(LowTriangToeplitz)
 add_subdirectory(AbelIntegralEquation)
-
+add_subdirectory(FractionalHeatEquation)
