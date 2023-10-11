@@ -52,11 +52,11 @@ int main(int /*argc*/, char** /*argv*/) {
   std::cout << "Matrix x vector" << std::endl;
   Eigen::VectorXd x = Eigen::VectorXd::Constant(16, 1.0);
   Eigen::VectorXd y = KernMatLLRApprox::mvLLRPartMat(Mt, x);
-  std::cout << y << std::endl;
+
   // KernMatLLRApprox::tabulateConvergenceLLR(
   //     {10, 20, 40, 60, 80, 160, 320, 640, 1280}, {3, 4, 5, 6, 7});
 
-  // KernMatLLRApprox::runtimeMatVec(
-  //     {1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144});
+  KernMatLLRApprox::runtimeMatVec(
+      {1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144});
   return 0;
 }

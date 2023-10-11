@@ -131,7 +131,7 @@ class CtNode {
   std::vector<size_t> I;
   // Public data member: Offset indicating where local points are stored in
   // global vector
-  double offset;
+  int offset;
   // Public data member: Node number, to reference cluster-local data kept
   // elsewhere
   int nodeNumber;
@@ -171,6 +171,7 @@ class ClusterTree {
   // Recursive construction, return offset and node number of the last leaf
   virtual std::pair<int, int> buildRec(NODE *nptr, std::size_t minpts);
   // Node factory
+  // inside constructor
   virtual NODE *createNode(const std::vector<Point<dim>> &ptsN, int offset,
                            int nodeNumber, int dir) {
     // Append local collocation points to the end of global vector
@@ -238,6 +239,7 @@ std::ostream &operator<<(std::ostream &o, const ClusterTree<NODE> &T) {
   return o;
 }
 
+// ############### recursive lambda function
 /* SAM_LISTING_BEGIN_7 */
 template <class NODE>
 std::pair<int, int> ClusterTree<NODE>::buildRec(NODE *nptr,

@@ -202,6 +202,7 @@ class LLRClusterTree : public HMAT::ClusterTree<NODE> {
   Eigen::MatrixXd &getV(const NODE *node) { return Vs[node->nodeNumber]; }
 
   const std::size_t q;  // rank of separable approximation on cluster boxes
+  // big matrix
   std::vector<Eigen::MatrixXd>
       Vs;  // global vector of low-rank factors, each \cob{$\VV\in\bbR^{k,q}$}
   std::vector<Eigen::VectorXd>
@@ -226,6 +227,7 @@ void LLRClusterTree<NODE>::init(const std::vector<HMAT::Point<NODE::dim>> pts,
 
 // clang-format off
 /* SAM_LISTING_BEGIN_Z */
+// no template
 template <class NODE>
 void LLRClusterTree<NODE>::initVRec(NODE *node) {
   static_assert(NODE::dim == 1, "Implemented only for 1D");
@@ -235,7 +237,7 @@ void LLRClusterTree<NODE>::initVRec(NODE *node) {
   const double a = bbox.minc[0];
   const double b = bbox.maxc[0];
   // Resize Matrix V of this node
-  Vs[node->nodeNumber].resize(node->noIdx(), q);
+  getV(node).resize(node->noIdx(), q);
 #if SOLUTION
   // Compute Chebychev nodes $t_i$ and
   // baryccentric weights $\lambda_i$ for interval $\cintv{a,b}$
@@ -262,16 +264,16 @@ void LLRClusterTree<NODE>::initVRec(NODE *node) {
       // Avoid division by zero
       if (tx_diff[i] == 0.0) {
         on_node = true;
-        Vs[node->nodeNumber].row(j).setZero();
-        Vs[node->nodeNumber](j, i) = 1.0;  // $\cob{(\VV)_{j,:} = \Ve_{i}^{\top}}$ when hitting a node
+        getV(node).row(j).setZero();
+        getV(node)(j, i) = 1.0;  // $\cob{(\VV)_{j,:} = \Ve_{i}^{\top}}$ when hitting a node
         break;          // The $j$-th row of $\VV$ is complete already
       } else {
         const double txdl = lambda[i] / tx_diff[i];
-        Vs[node->nodeNumber](j, i) = txdl;
+        getV(node)(j, i) = txdl;
         tau += txdl;
       }
     }
-    if (!on_node) Vs[node->nodeNumber].row(j) /= tau;
+    if (!on_node) getV(node).row(j) /= tau;
   }
   if (node->sons[0])
     initVRec(node->sons[0].get());
