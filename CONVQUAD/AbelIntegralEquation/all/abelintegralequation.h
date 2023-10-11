@@ -81,8 +81,10 @@ Eigen::VectorXd poly_spec_abel(const FUNC& y, std::size_t p, double tau) {
 
 #if SOLUTION
   // std::tgamma(1+j) == j! if j is integer
-  const Eigen::VectorXd gamma_factor = Eigen::VectorXd::NullaryExpr(
-      p + 1, [](Eigen::Index j) { return std::tgamma(j + 1) / std::tgamma(j + 3. / 2.); });
+  const Eigen::VectorXd gamma_factor =
+      Eigen::VectorXd::NullaryExpr(p + 1, [](Eigen::Index j) {
+        return std::tgamma(j + 1) / std::tgamma(j + 3. / 2.);
+      });
   const double sqrt_pi = std::sqrt(M_PI);
 
   for (int i = 0; i <= p; i++) {
