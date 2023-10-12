@@ -33,11 +33,10 @@ TEST(LowTriangToeplitz, ltpSolve) {
   zero[0] = u[0];
   zero.tail(15) = Eigen::VectorXcd::Zero(15);
   const Eigen::MatrixXcd K = toeplitz(u, zero);
-  const Eigen::VectorXcd res = K.llt().solve(v);
+  const Eigen::VectorXcd res = K.triangularView<Eigen::Lower>().solve(v);
   const Eigen::VectorXcd stud_res = ltpSolve(u, v);
-  std::cout << res - stud_res << std::endl;
-  //std::cout << stud_res << std::endl;
-  ASSERT_NEAR((res - stud_res).real().norm(), 0.0, 1e-8);
+
+  ASSERT_NEAR((res - stud_res).norm(), 0.0, 1e-8);
 }
 
 }  // namespace LowTriangToeplitz::test

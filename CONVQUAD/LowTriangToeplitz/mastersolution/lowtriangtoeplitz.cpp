@@ -159,6 +159,7 @@ std::tuple<double, double, double> runtimes_ltpMult(unsigned int N) {
     s_ltp = std::min(s_ltp, ms_double.count());
   }
 
+
   return {s_dense, s_mv, s_ltp};
 }
 /* SAM_LISTING_END_1 */
