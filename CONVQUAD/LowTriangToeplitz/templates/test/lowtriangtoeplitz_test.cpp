@@ -12,31 +12,50 @@
 
 namespace LowTriangToeplitz::test {
 
-Eigen::VectorXcd ltpMultold(const Eigen::VectorXcd& f,
-                            const Eigen::VectorXcd& g) {
-  assert(f.size() == g.size() && "f and g vectors must have the same length!");
+// Test ltpMult()
+TEST(LowTriangToeplitz, test_ltpMult) {
+  // Test size
+  int size = 16;
+  // Random initialization
+  Eigen::VectorXcd f = Eigen::VectorXcd::Random(size);
+  Eigen::VectorXcd g = Eigen::VectorXcd::Random(size);
+  // Result vector
+  Eigen::VectorXcd rv = ltpMult(f, g);
+  // Build Toeplitz matrices from sequences
+  Eigen::MatrixXcd Mf, Mg, gt, rm;
+  Mf.setZero(size, size);
+  Mg.setZero(size, size);
+  rm.setZero(size, size);
+  for (int i = 0; i < size; i++) {
+    Mf.diagonal(-i) = f(i) * Eigen::VectorXcd::Ones(size - i);
+    Mg.diagonal(-i) = g(i) * Eigen::VectorXcd::Ones(size - i);
+    rm.diagonal(-i) = rv(i) * Eigen::VectorXcd::Ones(size - i);
+  }
+  // Ground truth
+  gt = Mf * Mg;
 
-  const std::size_t n = f.size();
-  return toepMatVecMult(f, Eigen::VectorXcd::Zero(n), g);
+  ASSERT_NEAR((gt - rm).real().norm(), 0.0, 1e-8);
 }
 
-TEST(LowTriangToeplitz, ltpMult) {
-  const Eigen::VectorXcd u = Eigen::VectorXcd::Random(10);
-  const Eigen::VectorXcd v = Eigen::VectorXcd::Random(10);
-  ASSERT_NEAR((ltpMultold(u, v) - ltpMult(u, v)).real().norm(), 0.0, 1e-8);
-}
+// Test ltpSolve()
+TEST(LowTriangToeplitz, test_ltpSolve) {
+  // Test size
+  int size = 16;
+  // Random initialization
+  Eigen::VectorXcd f = Eigen::VectorXcd::Random(size);
+  Eigen::VectorXcd y = Eigen::VectorXcd::Random(size);
+  // Result vector
+  Eigen::VectorXcd x = ltpSolve(f, y);
+  // Build Toeplitz matrices from sequences
+  Eigen::MatrixXcd Mf;
+  Mf.setZero(size, size);
+  for (int i = 0; i < size; i++) {
+    Mf.diagonal(-i) = f(i) * Eigen::VectorXcd::Ones(size - i);
+  }
+  // Ground truth
+  Eigen::VectorXcd gt = Mf.colPivHouseholderQr().solve(y);
 
-TEST(LowTriangToeplitz, ltpSolve) {
-  const Eigen::VectorXcd u = Eigen::VectorXcd::Random(16);
-  const Eigen::VectorXcd v = Eigen::VectorXcd::Random(16);
-  Eigen::VectorXcd zero(16);
-  zero[0] = u[0];
-  zero.tail(15) = Eigen::VectorXcd::Zero(15);
-  const Eigen::MatrixXcd K = toeplitz(u, zero);
-  const Eigen::VectorXcd res = K.triangularView<Eigen::Lower>().solve(v);
-  const Eigen::VectorXcd stud_res = ltpSolve(u, v);
-
-  ASSERT_NEAR((res - stud_res).norm(), 0.0, 1e-8);
+  ASSERT_NEAR((gt - x).real().norm(), 0.0, 1e-8);
 }
 
 }  // namespace LowTriangToeplitz::test

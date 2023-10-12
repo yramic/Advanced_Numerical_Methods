@@ -19,11 +19,10 @@ clang-format-job:
   script:
     - echo "Checking if the code is well formated"
     - clang-format --version
-    - $CI_PROJECT_DIR/scripts/ci/run-clang-format.py -r --clang-format-executable clang-format --color always $CI_PROJECT_DIR/HMAT
-    - $CI_PROJECT_DIR/scripts/ci/run-clang-format.py -r --clang-format-executable clang-format --color always $CI_PROJECT_DIR/CONVQUAD
+    - $CI_PROJECT_DIR/scripts/ci/run-clang-format.py -r --clang-format-executable clang-format --color always $CI_PROJECT_DIR/developers/
 
-# compilation with clang++
-compile-developers-job-clang:
+# compilation on macos
+compile-developers-job-mac:
   stage: build
   variables:
     COMPILER: "clang++"
@@ -31,25 +30,26 @@ compile-developers-job-clang:
     CXXFLAGS: "-Werror=#warnings"
     GIT_CHECKOUT: "true"
   tags:
-    - linux
+    - mac
   script:
-    - mkdir -p $CI_PROJECT_DIR/build_clang #-p builds if not there and does nothing otherwise
+    - mkdir -p $CI_PROJECT_DIR/build_mac #-p builds if not there and does nothing otherwise
 
-    - cd $CI_PROJECT_DIR/build_clang
+    - cd $CI_PROJECT_DIR/build_mac
     - export CXX=$COMPILER
     - echo $CXX
     - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_CXX_FLAGS_DEBUG="-g0" -DHUNTER_CONFIGURATION_TYPES=$BUILD_TYPE -Wdev
 
-    - echo "Building executables folder"
+    - echo "Building developer folder"
+    - cd developers
     - make -j 4
 
   cache:
-    key : developers-clang
+    key : developers-mac
     paths :
-      - $CI_PROJECT_DIR/build_clang/
+      - $CI_PROJECT_DIR/build_mac/developers/
 
 
-compile-developers-job-gpp:
+compile-developers-job-linux:
   stage: build
   variables:
     COMPILER: "g++"
@@ -60,50 +60,46 @@ compile-developers-job-gpp:
   tags:
     - linux
   script:
-    - mkdir -p $CI_PROJECT_DIR/build_gpp #-p builds if not there and does nothing otherwise
+    - mkdir -p $CI_PROJECT_DIR/build_linux #-p builds if not there and does nothing otherwise
 
-    - cd $CI_PROJECT_DIR/build_gpp
+    - cd $CI_PROJECT_DIR/build_linux
     - export CXX=$COMPILER
     - echo $CXX
 
     - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_CXX_FLAGS_DEBUG="-g0" -DHUNTER_CONFIGURATION_TYPES=$BUILD_TYPE -Wdev
-    - echo "Building executablese folder"
+    - echo "Building developer folder"
+    - cd developers
     - make -j 4
   cache:
-    key : developers-gpp
+    key : developers-linux
     paths :
-      - $CI_PROJECT_DIR/build_gpp/
+      - $CI_PROJECT_DIR/build_linux/developers/
 
-test-developer-job-clang:
+test-developer-job-mac:
+  stage: test
+  tags:
+    - mac
+  script:
+    - echo "Testing developer folder master solutions"
+    - cd $CI_PROJECT_DIR/build_mac
+    - chmod +x $CI_PROJECT_DIR/scripts/ci/test_developers.sh
+    - $CI_PROJECT_DIR/scripts/ci/test_developers.sh
+  cache:
+    key : developers-mac
+    paths :
+      - $CI_PROJECT_DIR/build_mac/developers/
+
+test-developer-job-linux:
   stage: test
   tags:
     - linux
   script:
-    - echo "Testing executables master solutions"
-    - cd $CI_PROJECT_DIR/build_clang
-
-    - chmod +x $CI_PROJECT_DIR/scripts/ci/test_HMAT.sh
-    - chmod +x $CI_PROJECT_DIR/scripts/ci/test_CONVQUAD.sh
-    - $CI_PROJECT_DIR/scripts/ci/test_HMAT.sh
-    - $CI_PROJECT_DIR/scripts/ci/test_CONVQUAD.sh
+    - echo "Testing developer folder master solutions"
+    - cd $CI_PROJECT_DIR/build_linux
+    - chmod +x $CI_PROJECT_DIR/scripts/ci/test_developers.sh
+    - $CI_PROJECT_DIR/scripts/ci/test_developers.sh
   cache:
-    key : developers-clang
+    key : developers-linux
     paths :
-      - $CI_PROJECT_DIR/build_clang
+      - $CI_PROJECT_DIR/build_linux/developers/
 
-test-developer-job-gpp:
-  stage: test
-  tags:
-    - linux
-  script:
-    - echo "Testing executables master solutions"
-    - cd $CI_PROJECT_DIR/build_gpp
-
-    - chmod +x $CI_PROJECT_DIR/scripts/ci/test_HMAT.sh
-    - chmod +x $CI_PROJECT_DIR/scripts/ci/test_CONVQUAD.sh
-    - $CI_PROJECT_DIR/scripts/ci/test_HMAT.sh
-    - $CI_PROJECT_DIR/scripts/ci/test_CONVQUAD.sh
-  cache:
-    key : developers-gpp
-    paths :
-      - $CI_PROJECT_DIR/build_gpp
