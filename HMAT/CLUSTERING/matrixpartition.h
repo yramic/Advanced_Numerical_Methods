@@ -97,7 +97,7 @@ bool BlockPartition<NODE, FFB, NFB>::adm(const NODE *nx, const NODE *ny,
   // Geometric admissibility condition, see \cref{eq:etadef}.
   const BBox<NODE::dim> Bx = nx->getBBox(), By = ny->getBBox();
   const double bb_dist = dist(Bx, By);
-  if (bb_dist == 0.0) return false;
+  if (bb_dist == 0.0) return false; 
   const double eta = std::max(Bx.diam(), By.diam()) / (2 * bb_dist);
   return (eta < eta0);
 }

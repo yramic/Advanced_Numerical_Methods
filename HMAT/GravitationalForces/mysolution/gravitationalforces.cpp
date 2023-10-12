@@ -160,9 +160,9 @@ std::pair<double, double> measureRuntimes(unsigned int n, unsigned int n_runs) {
   double ms_cluster =
       std::numeric_limits<double>::max();  // Time taken for clustering-based
                                            // evaluatiion
-// **********************************************************************
-// Code to be supplemented
-// **********************************************************************
+  // **********************************************************************
+  // Code to be supplemented
+  // **********************************************************************
   return {ms_exact, ms_cluster};
 }
 /* SAM_LISTING_END_8 */
