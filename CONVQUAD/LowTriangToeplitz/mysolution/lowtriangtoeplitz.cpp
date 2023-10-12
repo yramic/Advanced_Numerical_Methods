@@ -98,7 +98,6 @@ std::tuple<double, double, double> runtimes_ltpMult(unsigned int N) {
   // **********************************************************************
   // Code to be supplemented
   // **********************************************************************
-
   return {s_dense, s_mv, s_ltp};
 }
 /* SAM_LISTING_END_1 */
