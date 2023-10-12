@@ -309,9 +309,9 @@ std::pair<double, double> approxErrorLLR(BiDirChebPartMat1D<KERNEL> &llrcM) {
   const size_t m = llrcM.cols();
   Eigen::MatrixXd M(n, m);   // Exact kernel collocation matrix
   Eigen::MatrixXd Mt(n, m);  // Compressed matrix as dense matrix
-  // **********************************************************************
-  // TODO
-  // *********************************************************************
+      // **********************************************************************
+      // TODO
+      // *********************************************************************
   return {std::sqrt((M - Mt).squaredNorm() / (n * m)),
           std::sqrt(M.squaredNorm() / (n * m))};
 }

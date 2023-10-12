@@ -138,5 +138,4 @@ double errorestimate(unsigned int q, FUNCTOR f, const std::vector<double> &x,
   return error / N;
 }
 }  // namespace TensorProductChebIntp
-
 #endif  // TENSORPRODCHEB_H_

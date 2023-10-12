@@ -165,13 +165,11 @@ std::tuple<double, double, double> runtimes_ltpMult(unsigned int N) {
     // Taking the minimal measured time as the result
     s_ltp = std::min(s_ltp, ms_double.count());
   }
-
 #else
   // **********************************************************************
   // Code to be supplemented
   // **********************************************************************
 #endif
-
   return {s_dense, s_mv, s_ltp};
 }
 /* SAM_LISTING_END_1 */
@@ -191,6 +189,8 @@ Eigen::VectorXcd ltpSolve(const Eigen::VectorXcd& f,
          "Size of f must be a power of 2!");
 
   const std::size_t n = f.size();
+  Eigen::VectorXcd u(n);
+#if SOLUTION
   if (n == 1) {
     return y.cwiseQuotient(f);
   }
@@ -200,8 +200,13 @@ Eigen::VectorXcd ltpSolve(const Eigen::VectorXcd& f,
       y.tail(n / 2) -
       toepMatVecMult(f.tail(n / 2), f.segment(1, n / 2).reverse(), u_head);
   const Eigen::VectorXcd u_tail = ltpSolve(f.head(n / 2), t);
-  Eigen::VectorXcd u(n);
+
   u << u_head, u_tail;
+#else
+  // **********************************************************************
+  // Code to be supplemented
+  // **********************************************************************
+#endif
   return u;
 }
 /* SAM_LISTING_END_2 */
