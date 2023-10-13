@@ -11,62 +11,55 @@
 #ifndef BLOCK_NEARF_HPP
 #define BLOCK_NEARF_HPP
 
+#include <Eigen/Dense>
+
 #include "kernel.hpp"
 #include "node.hpp"
-#include <Eigen/Dense>
 
 /*!
  * \brief Helper class to compute near field block matrices
  */
-class BlockNearF
-{
-public:
-
-    /*!
+class BlockNearF {
+ public:
+  /*!
      * \brief Constructor
      * \param ndx XNode
      * \param ndy YNode
      */
-    BlockNearF(Node* xnode, Node* ynode);
+  BlockNearF(Node* xnode, Node* ynode);
 
-    /*!
+  /*!
      * \brief Constructor
      * \param ndx XNode
      * \param ndy YNode
      * \param G Kernel Function
      */
-    BlockNearF(Node* xnode, Node* ynode, Kernel* G);
+  BlockNearF(Node* xnode, Node* ynode, Kernel* G);
 
-    /*!
+  /*!
      * \brief return near field block matrix
      */
-    Eigen::MatrixXd getMatrix() const {
-        return C_;
-    }
+  Eigen::MatrixXd getMatrix() const { return C_; }
 
-    /*!
+  /*!
      * \brief compute near field block matrix
      * \return no. of 'operations' performed
      */
-    unsigned setMatrix(Kernel* G);
+  unsigned setMatrix(Kernel* G);
 
-    /*!
+  /*!
      * \brief return pointer to xnode
      */
-    Node* getXNode() {
-        return pair_.first;
-    }
+  Node* getXNode() { return pair_.first; }
 
-    /*!
+  /*!
      * \brief return pointer to ynode
      */
-    Node* getYNode() {
-        return pair_.second;
-    }
+  Node* getYNode() { return pair_.second; }
 
-private:
-    std::pair<Node*,Node*> pair_;
-    Eigen::MatrixXd C_; //!< near field block matrix
+ private:
+  std::pair<Node*, Node*> pair_;
+  Eigen::MatrixXd C_;  //!< near field block matrix
 };
 
-#endif // BLOCK_NEARF_HPP
+#endif  // BLOCK_NEARF_HPP

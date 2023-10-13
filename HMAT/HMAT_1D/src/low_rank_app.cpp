@@ -9,12 +9,7 @@
  * as this header is left intact.                                      *
  ***********************************************************************/
 #include "../include/low_rank_app.hpp"
-#include "../include/block_cluster.hpp"
-#include "../include/block_nearf.hpp"
-#include "../include/ctree.hpp"
-#include "../include/kernel.hpp"
-#include "../include/node.hpp"
-#include "../include/point.hpp"
+
 #include <Eigen/Dense>
 #include <chrono>
 #include <fstream>
@@ -22,13 +17,24 @@
 #include <iostream>
 #include <string>
 
+#include "../include/block_cluster.hpp"
+#include "../include/block_nearf.hpp"
+#include "../include/ctree.hpp"
+#include "../include/kernel.hpp"
+#include "../include/node.hpp"
+#include "../include/point.hpp"
+
 // constructor
 template <>
 LowRankApp<BlockCluster, Node>::LowRankApp(Kernel *kernel,
                                            const std::vector<Point> &GPoints,
                                            double eta, unsigned deg)
-    : kernel_(kernel), GPoints_(GPoints), HP_(GPoints, eta, deg), deg_(deg),
-      nops_(0), debug_(false) {
+    : kernel_(kernel),
+      GPoints_(GPoints),
+      HP_(GPoints, eta, deg),
+      deg_(deg),
+      nops_(0),
+      debug_(false) {
   // Recursive hierarchical partitioning to get Near/Far field boxes
   HP_.setNearFar();
 }
@@ -39,8 +45,13 @@ LowRankApp<BlockCluster, Node>::LowRankApp(Kernel *kernel,
                                            const std::vector<Point> &GPoints,
                                            double eta, unsigned deg,
                                            const std::string &filename)
-    : kernel_(kernel), GPoints_(GPoints), HP_(GPoints, eta, deg), deg_(deg),
-      nops_(0), debug_(true), myfile_(filename.c_str(), std::ios::app) {
+    : kernel_(kernel),
+      GPoints_(GPoints),
+      HP_(GPoints, eta, deg),
+      deg_(deg),
+      nops_(0),
+      debug_(true),
+      myfile_(filename.c_str(), std::ios::app) {
   // Recursive hierarchical partitioning to get Near/Far field boxes
   HP_.setNearFar();
 }
@@ -51,10 +62,10 @@ template <>
 void LowRankApp<BlockCluster, Node>::preProcess(std::vector<Node *> ff_v_x,
                                                 std::vector<Node *> ff_v_y,
                                                 const Eigen::VectorXd &c) {
-  for (auto &xnode : ff_v_x) { // iterate for all the far field xnodes
+  for (auto &xnode : ff_v_x) {  // iterate for all the far field xnodes
     nops_ += xnode->setV();
   }
-  for (auto &ynode : ff_v_y) { // iterate for all the far field ynodes
+  for (auto &ynode : ff_v_y) {  // iterate for all the far field ynodes
     nops_ += ynode->setV();
     nops_ += ynode->setVc(c);
   }
@@ -65,10 +76,10 @@ void LowRankApp<BlockCluster, Node>::preProcess(std::vector<Node *> ff_v_x,
 template <>
 void LowRankApp<BlockCluster, Node>::blockProcess(
     std::vector<BlockCluster *> ff_v) {
-  for (auto &pair : ff_v) { // iterate for all the pairs of far field nodes
-    nops_ +=
-        pair->setMatrix(kernel_); // here because needed for each pair of nodes,
-                                  // cannot be moved to pre-processing
+  for (auto &pair : ff_v) {  // iterate for all the pairs of far field nodes
+    nops_ += pair->setMatrix(
+        kernel_);  // here because needed for each pair of nodes,
+                   // cannot be moved to pre-processing
     nops_ += pair->setCVc();
   }
 }
@@ -77,7 +88,7 @@ void LowRankApp<BlockCluster, Node>::blockProcess(
 template <>
 void LowRankApp<BlockCluster, Node>::blockProcessClear(
     std::vector<BlockCluster *> ff_v) {
-  for (auto &pair : ff_v) { // iterate for all the pairs of far field nodes
+  for (auto &pair : ff_v) {  // iterate for all the pairs of far field nodes
     pair->getXNode()->resetCVc();
   }
 }
@@ -88,7 +99,7 @@ template <>
 void LowRankApp<BlockCluster, Node>::debugProcess(
     std::vector<BlockCluster *> ff_v) {
   double error_Frobenius = 0., error_max = 0.;
-  for (auto &pair : ff_v) { // iterate for all the pairs of far field nodes
+  for (auto &pair : ff_v) {  // iterate for all the pairs of far field nodes
     Eigen::MatrixXd block_approx = pair->getVCV();
     BlockNearF tmp(pair->getXNode(), pair->getYNode());
     tmp.setMatrix(kernel_);
@@ -104,7 +115,7 @@ void LowRankApp<BlockCluster, Node>::debugProcess(
 
   myfile_ << "error_Frobenius, " << GPoints_.size() << ", "
           << std::setprecision(10) << error_Frobenius / ff_v.size()
-          << std::endl; // average error w.r.t. all blocks
+          << std::endl;  // average error w.r.t. all blocks
   myfile_ << "error_max, " << GPoints_.size() << ", " << std::setprecision(10)
           << error_max << std::endl;
 }
@@ -114,14 +125,14 @@ void LowRankApp<BlockCluster, Node>::debugProcess(
 template <>
 void LowRankApp<BlockCluster, Node>::postProcess(std::vector<Node *> ff_v_x,
                                                  Eigen::VectorXd &f) {
-  for (auto &xnode : ff_v_x) { // iterate for all the far field xnodes
+  for (auto &xnode : ff_v_x) {  // iterate for all the far field xnodes
     Eigen::VectorXd CVc = xnode->getCVc_Node();
     Eigen::MatrixXd Vx = xnode->getV_Node();
     Eigen::VectorXd f_seg = Vx * CVc;
     nops_ += Vx.rows() * Vx.cols();
     for (int i = 0; i < xnode->getPoints().size(); i++) {
       f[xnode->getPoints()[i].getId()] +=
-          f_seg[i]; // add contribution of far field to ``f''
+          f_seg[i];  // add contribution of far field to ``f''
     }
   }
 }
@@ -131,7 +142,7 @@ void LowRankApp<BlockCluster, Node>::postProcess(std::vector<Node *> ff_v_x,
 template <>
 void LowRankApp<BlockCluster, Node>::calc_numb_approx_per_row(
     std::vector<BlockCluster *> ff_v, Eigen::VectorXd &f_approx_ff_contr) {
-  for (auto &pair : ff_v) { // iterate for all the pairs of far field nodes
+  for (auto &pair : ff_v) {  // iterate for all the pairs of far field nodes
     Node *xnode = pair->getXNode();
     Node *ynode = pair->getYNode();
     for (int i = 0; i < xnode->getPoints().size(); i++) {
@@ -161,7 +172,7 @@ template <>
 void LowRankApp<BlockCluster, Node>::nf_contribution(
     std::vector<BlockNearF *> nf_v, const Eigen::VectorXd &c,
     Eigen::VectorXd &f, Eigen::VectorXd &f_approx_nf_contr) {
-  for (auto &pair : nf_v) { // iterate for all the near field xnodes
+  for (auto &pair : nf_v) {  // iterate for all the near field xnodes
     Node *xnode = pair->getXNode();
     Node *ynode = pair->getYNode();
     nops_ += pair->setMatrix(kernel_);
@@ -170,7 +181,7 @@ void LowRankApp<BlockCluster, Node>::nf_contribution(
       for (int j = 0; j < ynode->getPoints().size(); j++) {
         f(xnode->getPoints()[i].getId()) +=
             C(i, j) * c(ynode->getPoints()[j]
-                            .getId()); // add near field contribution to ``f''
+                            .getId());  // add near field contribution to ``f''
         // The contributions of all near-field pairs involving 'xnode' can first
         // be summed ('blockProcess') and only then positioned in the right
         // entry of 'f' ('postProcess'), similarly to the near-field vector.
@@ -183,8 +194,8 @@ void LowRankApp<BlockCluster, Node>::nf_contribution(
 
 // approximate matrix-vector multiplication
 template <>
-Eigen::VectorXd
-LowRankApp<BlockCluster, Node>::mvProd(const Eigen::VectorXd &c) {
+Eigen::VectorXd LowRankApp<BlockCluster, Node>::mvProd(
+    const Eigen::VectorXd &c) {
   blockProcessClear(HP_.getFF());
   // Setting V and Vc for far field nodes
   preProcess(HP_.getFFxnds(), HP_.getFFynds(), c);

@@ -17,60 +17,49 @@
 /*!
 * \brief Class for point attributes
 */
-class Point
-{
-public:
-    /*!
+class Point {
+ public:
+  /*!
     * \brief Default Constructor
     */
-    Point():
-        x_(0),y_(0),id_(0),v_(0)
-    {}
-    /*!
+  Point() : x_(0), y_(0), id_(0), v_(0) {}
+  /*!
     * \brief Return x coordinate of this point
     */
-    double getX() const {
-        return x_;
-    }
-    /*!
+  double getX() const { return x_; }
+  /*!
     * \brief Return y coordinate of this point
     */
-    double getY() const {
-        return y_;
-    }
-    /*!
+  double getY() const { return y_; }
+  /*!
     * \brief Return id of this point
     */
-    unsigned getId() const {
-        return id_;
-    }
-    /*!
+  unsigned getId() const { return id_; }
+  /*!
     * \brief Return value of this point (for debugging)
     */
-    double getV() const {
-        return v_;
-    }
-    /*!
+  double getV() const { return v_; }
+  /*!
     * \brief Set x coordinate
     */
-    void setX(double x);
-    /*!
+  void setX(double x);
+  /*!
     * \brief Set y coordinate
     */
-    void setY(double y);
-    /*!
+  void setY(double y);
+  /*!
     * \brief Set id
     */
-    void setId(unsigned id);
-    /*!
+  void setId(unsigned id);
+  /*!
     * \brief Set value (for debugging)
     */
-    void setV(double v);
+  void setV(double v);
 
-private:
-    double x_,y_; //!< x, y coordinate of the point
-    unsigned id_; //!< id of the point
-    double v_;
+ private:
+  double x_, y_;  //!< x, y coordinate of the point
+  unsigned id_;   //!< id of the point
+  double v_;
 };
 
-#endif // POINT_HPP
+#endif  // POINT_HPP

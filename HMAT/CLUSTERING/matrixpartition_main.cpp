@@ -10,6 +10,7 @@
  ***********************************************************************/
 
 #include <memory>
+
 #include "matrixpartition.h"
 
 // Auxiliary function for building a matrix partitioning
@@ -37,14 +38,14 @@ matrixPartition1d(
   return bP;
 }
 
-
 /** Main program */
 int main(int /*argc*/, char** /*argv*/) {
   std::cout << "Construction of block cluster tree" << std::endl;
   // Construct 1D cluster tree based on equidistant points
   auto matpart = matrixPartition1d(16);
   // Output cluster tree
-  std::cout << "CLUSTER TREE" << std::endl << *(matpart.rowT->root) << std::endl;
+  std::cout << "CLUSTER TREE" << std::endl
+            << *(matpart.rowT->root) << std::endl;
   std::cout << matpart << "Part I: Normal termination" << std::endl;
   (void)HMAT::printGeometricPartition(matpart);
   exit(0);
