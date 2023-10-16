@@ -141,9 +141,9 @@ Eigen::Vector2d StarQuadTreeClustering::forceOnStar(unsigned int j,
 std::vector<double> forceError(const StarQuadTreeClustering &qt,
                                const std::vector<double> &etas) {
   std::vector<double> error(etas.size());  // For returning errors
-  // **********************************************************************
-  // Code to be supplemented
-  // **********************************************************************
+      // **********************************************************************
+      // Code to be supplemented
+      // **********************************************************************
   return error;
 }
 /* SAM_LISTING_END_7 */

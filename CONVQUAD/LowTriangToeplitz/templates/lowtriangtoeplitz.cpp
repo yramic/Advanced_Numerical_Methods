@@ -45,33 +45,6 @@ Eigen::VectorXcd pconvfft(const Eigen::VectorXcd& u,
   return fft.inv(tmp);
 }
 
-/* @brief Multiply a Toeplitz matrix with a vector, uses pconvfft
- * \param c Vector of entries of first column of the Toeplitz matrix
- * \param r Vector of entries of first row of the Toeplitz matrix
- * \param x Vector
- * \\return toeplitz(c,r)*x
- */
-Eigen::VectorXcd toepMatVecMult(const Eigen::VectorXcd& c,
-                                const Eigen::VectorXcd& r,
-                                const Eigen::VectorXcd& x) {
-  assert(c.size() == x.size() && r.size() == x.size() &&
-         "c, r, x have different lengths!");
-
-  const std::size_t n = c.size();
-  Eigen::VectorXcd cr_tmp(2 * n), x_tmp(2 * n);
-
-  cr_tmp.head(n) = c;
-  cr_tmp.tail(n) = Eigen::VectorXcd::Zero(n);
-  cr_tmp.tail(n - 1) = r.tail(n - 1).reverse();
-
-  x_tmp.head(n) = x;
-  x_tmp.tail(n) = Eigen::VectorXcd::Zero(n);
-
-  Eigen::VectorXcd y = pconvfft(cr_tmp, x_tmp);
-
-  return y.head(n);
-}
-
 /* @brief Multiply two lower triangular Toeplitz matrices
  * \param f Vector of entries of first lower triangular Toeplitz matrix
  * \param g Vector of entries of second lower triangular Toeplitz matrix
@@ -102,12 +75,34 @@ std::tuple<double, double, double> runtimes_ltpMult(unsigned int N) {
 }
 /* SAM_LISTING_END_1 */
 
+/* @brief Multiply a Toeplitz matrix with a vector, uses pconvfft
+ * \param c Vector of entries of first column of the Toeplitz matrix
+ * \param r Vector of entries of first row of the Toeplitz matrix
+ * \param x Vector
+ * \\return toeplitz(c,r)*x
+ */
+/* SAM_LISTING_BEGIN_2 */
+Eigen::VectorXcd toepMatVecMult(const Eigen::VectorXcd& c,
+                                const Eigen::VectorXcd& r,
+                                const Eigen::VectorXcd& x) {
+  assert(c.size() == x.size() && r.size() == x.size() &&
+         "c, r, x have different lengths!");
+
+  const std::size_t n = c.size();
+  Eigen::VectorXcd y(2 * n);
+  // **********************************************************************
+  // Code to be supplemented
+  // **********************************************************************
+  return y.head(n);
+}
+/* SAM_LISTING_END_2 */
+
 /* @brief Solve a linear problem involving a lower triangular Toeplitz matrix
  * \param f Vector of entries of lower triangular Toeplitz matrix
  * \param y Right-hand side of linear problem
  * \\return Solution of linear problem
  */
-/* SAM_LISTING_BEGIN_2 */
+/* SAM_LISTING_BEGIN_3 */
 Eigen::VectorXcd ltpSolve(const Eigen::VectorXcd& f,
                           const Eigen::VectorXcd& y) {
   assert(f.size() == y.size() && "f and y vectors must have the same length!");
@@ -130,9 +125,9 @@ Eigen::VectorXcd ltpSolve(const Eigen::VectorXcd& f,
   u << u_head, u_tail;
   return u;
 }
-/* SAM_LISTING_END_2 */
+/* SAM_LISTING_END_3 */
 
-/* SAM_LISTING_BEGIN_3 */
+/* SAM_LISTING_BEGIN_4 */
 std::pair<double, double> runtimes_ltpSolve(unsigned int N) {
   // Runtime of Eigen's triangular solver and ltpSolve() in seconds
   double s_tria, s_ltp;
@@ -142,7 +137,7 @@ std::pair<double, double> runtimes_ltpSolve(unsigned int N) {
   // **********************************************************************
   return {s_tria, s_ltp};
 }
-/* SAM_LISTING_END_3 */
+/* SAM_LISTING_END_4 */
 
 // check accuracy ltpMult
 void test_accuracy_ltpMult() {

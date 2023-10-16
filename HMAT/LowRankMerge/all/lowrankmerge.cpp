@@ -83,7 +83,6 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> low_rank_merge(
 
   // Return factors of $\tilde Z$
   return {Atilde, Btilde};
-
 #else
   // TODO: Compute {Atilde,Btilde} as in \eqref{eq:lrfac1}/\eqref{eq:lrfac2}
 
@@ -134,7 +133,6 @@ std::pair<double, double> test_low_rank_merge(size_t n) {
 
   // Return scaled Frobunius norm and maximum norm of approximation error
   return {err_Frob, err_max};
-
 #else
   // TODO: Compute {err_Frob,err_max}, approximation error in
   // scaled Frobunius norm and maximum norm
@@ -211,7 +209,6 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> adap_rank_merge(
 
   // Return factors of $\tilde Z$
   return {Atilde, Btilde};
-
 #else
   // TODO: Compute {Atilde,Btilde} as in \eqref{eq:lrfac1}/\eqref{eq:lrfac2}, given \eqref{eq:adaptrunc}
 
@@ -264,7 +261,6 @@ std::pair<double, size_t> test_adap_rank_merge(size_t n, double rtol) {
   // Return scaled Frobenius norm of approximation error and
   // the rank required to achieve the relative tolerance rtol
   return {err_Frob, AB.first.cols()};
-
 #else
   // TODO: Compute {err_Frob,p}, with p := no. of singular values larger than tolerance
 
