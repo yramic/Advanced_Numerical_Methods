@@ -112,17 +112,10 @@ Eigen::VectorXcd ltpSolve(const Eigen::VectorXcd& f,
          "Size of f must be a power of 2!");
 
   const std::size_t n = f.size();
-  if (n == 1) {
-    return y.cwiseQuotient(f);
-  }
-
-  const Eigen::VectorXcd u_head = ltpSolve(f.head(n / 2), y.head(n / 2));
-  const Eigen::VectorXcd t =
-      y.tail(n / 2) -
-      toepMatVecMult(f.tail(n / 2), f.segment(1, n / 2).reverse(), u_head);
-  const Eigen::VectorXcd u_tail = ltpSolve(f.head(n / 2), t);
   Eigen::VectorXcd u(n);
-  u << u_head, u_tail;
+  // **********************************************************************
+  // Code to be supplemented
+  // **********************************************************************
   return u;
 }
 /* SAM_LISTING_END_3 */
