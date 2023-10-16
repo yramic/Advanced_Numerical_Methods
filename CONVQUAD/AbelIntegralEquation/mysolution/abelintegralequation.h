@@ -83,9 +83,9 @@ VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau) {
 
   // set-up the Galerkin matrix and rhs vector
 
-// **********************************************************************
-// Your Solution here
-// **********************************************************************/
+  // **********************************************************************
+  // Your Solution here
+  // **********************************************************************/
 
   // linear system solve using QR decomposition
   VectorXd x = A.colPivHouseholderQr().solve(b);

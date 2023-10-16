@@ -1,7 +1,7 @@
 /**
  * @file kernmatllrapprox.h
  * @brief NPDE homework KernMatLLRApprox code
- * @author R. Hiptmair
+ * @author R. Hiptmair, Peiyuan Xie
  * @date September 2023
  * @copyright Developed at SAM, ETH Zurich
  */
@@ -61,81 +61,58 @@ bool checkMatrixPartition(
 
 /** Extended class for cluster trees for local low-rank approximation */
 /* SAM_LISTING_BEGIN_E */
-template <class NODE>
-class LLRClusterTree : public HMAT::ClusterTree<NODE> {
+class LLRClusterTree : public HMAT::ClusterTree<HMAT::CtNode<1>> {
  public:
   // Idle constructor just setting rank argument q
-  explicit LLRClusterTree(size_t _q) : q(_q) {}
-  // Actual constructor taking a sequence of points
-  void init(const std::vector<HMAT::Point<NODE::dim>> pts,
-            std::size_t minpts = 1);
-  virtual ~LLRClusterTree() = default;
+  explicit LLRClusterTree(size_t _q, const std::vector<HMAT::Point<1>> &pts,
+                          std::size_t minpts = 1)
+      : HMAT::ClusterTree<HMAT::CtNode<1>>(pts, minpts), q(_q) {
+    // Resize global vectors
+    Vs.resize(this->ptsT.size(), q);
+    clust_omega.resize(q, this->numNodes);
+    clust_sect_vec.resize(this->ptsT.size());
 
- protected:
-  // factory method for relevant type of node taking rank argument
-  virtual NODE *createNode(const std::vector<HMAT::Point<NODE::dim>> &ptsN,
-                           int offset, int nodeNumber, int dir) {
-    // Append local collocation points to the end of global vector
-    this->ptsT.insert(this->ptsT.end(), ptsN.begin(), ptsN.end());
-    // Build index set for each node
-    std::vector<size_t> idx;
-    for (const HMAT::Point<NODE::dim> &pt : ptsN) idx.push_back(pt.idx);
-    return new NODE(idx, offset, nodeNumber, dir);
+    // Recursive initialization of the low-rank factor matrices \cob{$\VV_w$}
+    std::function<void(HMAT::CtNode<1> * node)> initvrec =
+        [&](HMAT::CtNode<1> *node) -> void {
+      // Retrieve bounding box,
+      // \href{https://stackoverflow.com/questions/4643074/why-do-i-have-to-access-template-base-class-members-through-the-this-pointer}{explanation}
+      // for the this pointer
+      const HMAT::BBox<1> bbox = this->getBBox(node);
+      // Find interval correspoding to the bounding box of the current cluster
+      const double a = bbox.minc[0];
+      const double b = bbox.maxc[0];
+
+      // **********************************************************************
+      // TODO
+      // **********************************************************************
+    };
+    initvrec(this->root.get());
   }
-  // Initialization of the low-rank factor matrix \cob{$\VV_w$}
-  void initVRec(NODE *node);
+  virtual ~LLRClusterTree() = default;
 
  public:
   // For the conciseness of access
-  Eigen::VectorXd &getSectVec(const NODE *node) {
-    return clust_sect_vec[node->nodeNumber];
+  Eigen::VectorBlock<Eigen::VectorXd> getSectVec(const HMAT::CtNode<1> *node) {
+    return clust_sect_vec.segment(node->offset, node->noIdx());
   }
-  Eigen::VectorXd &getOmega(const NODE *node) {
-    return clust_omega[node->nodeNumber];
+  Eigen::MatrixXd::ColXpr getOmega(const HMAT::CtNode<1> *node) {
+    return clust_omega.col(node->nodeNumber);
   }
-  Eigen::MatrixXd &getV(const NODE *node) { return Vs[node->nodeNumber]; }
+  Eigen::Block<Eigen::MatrixXd> getV(const HMAT::CtNode<1> *node) {
+    return Vs.middleRows(node->offset, node->noIdx());
+  }
 
-  const std::size_t q;  // rank of separable approximation on cluster boxes
-  std::vector<Eigen::MatrixXd>
-      Vs;  // global vector of low-rank factors, each \cob{$\VV\in\bbR^{k,q}$}
-  std::vector<Eigen::VectorXd>
-      clust_omega;  // global vector for cluster-local linear algebra
-  std::vector<Eigen::VectorXd>
-      clust_sect_vec;  // temporary storage for cluster-associated vector
-                       // sections
+  // rank of separable approximation on cluster boxes big matrix
+  const std::size_t q;
+  // global matrix of low-rank factors, each \cob{$\VV\in\bbR^{k,q}$}
+  Eigen::MatrixXd Vs;
+  // global matrix for cluster-local linear algebra
+  Eigen::MatrixXd clust_omega;
+  // temporary storage for cluster-associated vector sections
+  Eigen::VectorXd clust_sect_vec;
 };
-
-template <class NODE>
-void LLRClusterTree<NODE>::init(const std::vector<HMAT::Point<NODE::dim>> pts,
-                                std::size_t minpts) {
-  HMAT::ClusterTree<NODE>::init(pts, minpts);
-  // Resize global vectors
-  Vs.resize(this->numNodes);
-  clust_omega.resize(this->numNodes);
-  clust_sect_vec.resize(this->numNodes);
-  // Recursive initialization of the low-rank factor matrices \cob{$\VV_w$}
-  initVRec(this->root.get());
-}
 /* SAM_LISTING_END_E */
-
-// clang-format off
-/* SAM_LISTING_BEGIN_Z */
-template <class NODE>
-void LLRClusterTree<NODE>::initVRec(NODE *node) {
-  static_assert(NODE::dim == 1, "Implemented only for 1D");
-  // Retrieve bounding box, \href{https://stackoverflow.com/questions/4643074/why-do-i-have-to-access-template-base-class-members-through-the-this-pointer}{explanation} for the this pointer
-  const HMAT::BBox<NODE::dim> bbox = this->getBBox(node);
-  // Find interval correspoding to the bounding box of the current cluster
-  const double a = bbox.minc[0];
-  const double b = bbox.maxc[0];
-  // Resize Matrix V of this node
-  Vs[node->nodeNumber].resize(node->noIdx(), q);
-// **********************************************************************
-// TODO
-// **********************************************************************
-}
-/* SAM_LISTING_END_Z */
-// clang-format on
 
 /** Extended class for block partition, knowing low-rank compression */
 /* SAM_LISTING_BEGIN_H */
@@ -230,8 +207,7 @@ class BiDirChebBlockPartition : public HMAT::BlockPartition<TREE> {
 // Special data type for local low-rank compression by one-dimensional
 // bi-directional Chebychev interpolation
 template <typename KERNEL>
-using BiDirChebPartMat1D =
-    BiDirChebBlockPartition<LLRClusterTree<HMAT::CtNode<1>>, KERNEL>;
+using BiDirChebPartMat1D = BiDirChebBlockPartition<LLRClusterTree, KERNEL>;
 
 // clang-format off
 // Matrix x Vector based on compressed kernel collocation matrix
@@ -270,9 +246,9 @@ std::pair<double, double> approxErrorLLR(BiDirChebPartMat1D<KERNEL> &llrcM) {
   const size_t m = llrcM.cols();
   Eigen::MatrixXd M(n, m);   // Exact kernel collocation matrix
   Eigen::MatrixXd Mt(n, m);  // Compressed matrix as dense matrix
-// **********************************************************************
-// TODO
-// *********************************************************************
+  // **********************************************************************
+  // TODO
+  // *********************************************************************
   return {std::sqrt((M - Mt).squaredNorm() / (n * m)),
           std::sqrt(M.squaredNorm() / (n * m))};
 }
@@ -292,9 +268,9 @@ unsigned int computeSparsityMeasure(const HMAT::BlockPartition<TREE> &blockpart,
   // Maximal node counts for row adn column clusters
   int xnode_maxcnt = 0;
   int ynode_maxcnt = 0;
-// **********************************************************************
-// YOUR CODE HERE
-// **********************************************************************
+  // **********************************************************************
+  // YOUR CODE HERE
+  // **********************************************************************
   return std::max(xnode_maxcnt, ynode_maxcnt);
 }
 /* SAM_LISTING_END_S */

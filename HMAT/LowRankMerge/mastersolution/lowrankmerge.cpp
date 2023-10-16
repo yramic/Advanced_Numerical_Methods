@@ -83,7 +83,6 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> low_rank_merge(
 
   // Return factors of $\tilde Z$
   return {Atilde, Btilde};
-
 }
 /* SAM_LISTING_END_0 */
 
@@ -127,7 +126,6 @@ std::pair<double, double> test_low_rank_merge(size_t n) {
 
   // Return scaled Frobunius norm and maximum norm of approximation error
   return {err_Frob, err_max};
-
 }
 /* SAM_LISTING_END_1 */
 
@@ -197,7 +195,6 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> adap_rank_merge(
 
   // Return factors of $\tilde Z$
   return {Atilde, Btilde};
-
 }
 /* SAM_LISTING_END_2 */
 
@@ -243,7 +240,6 @@ std::pair<double, size_t> test_adap_rank_merge(size_t n, double rtol) {
   // Return scaled Frobenius norm of approximation error and
   // the rank required to achieve the relative tolerance rtol
   return {err_Frob, AB.first.cols()};
-
 }
 /* SAM_LISTING_END_3 */
 

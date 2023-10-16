@@ -49,8 +49,7 @@ int main(int /*argc*/, char ** /*argv*/) {
       p.x[0] = static_cast<double>(n) / (npts - 1);
       pts.push_back(p);
     }
-    HMAT::ClusterTree<HMAT::CtNode<d>> T;
-    T.init(pts);
+    HMAT::ClusterTree<HMAT::CtNode<d>> T(pts);
     std::cout << "1D Cluster tree" << T << std::endl;
     printClusterTree(T, T.root);
   }
@@ -68,8 +67,7 @@ int main(int /*argc*/, char ** /*argv*/) {
         pts.push_back(p);
       }
     }
-    HMAT::ClusterTree<HMAT::CtNode<2>> T;
-    T.init(pts);
+    HMAT::ClusterTree<HMAT::CtNode<2>> T(pts);
     std::cout << "2D Cluster tree" << T << std::endl;
     printClusterTree(T, T.root);
   }

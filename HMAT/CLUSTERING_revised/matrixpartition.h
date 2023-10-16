@@ -2,7 +2,7 @@
  *                                                                     *
  * Code for Course "Advanced Numerical Methods for CSE"                *
  * (Prof. Dr. R. Hiptmair)                                             *
- * Author: R.H.                                                        *
+ * Author: R.H., Peiyuan Xie                                           *
  * Date: August 2023
  * (C) Seminar for Applied Mathematics, ETH Zurich                     *
  * This code can be freely used for non-commercial purposes as long    *

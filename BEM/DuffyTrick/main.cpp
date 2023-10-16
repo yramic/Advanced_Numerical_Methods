@@ -163,7 +163,7 @@ int main() {
   std::cout << "Test monomial P(x) = x**p" << std::endl;
   std::cout << std::endl;
   for (int p = 0; p <= 2 * N; p++) {
-    auto Pp = [p](Eigen::VectorXd x) {  return pow(x(0),  p); };
+    auto Pp = [p](Eigen::VectorXd x) { return pow(x(0), p); };
     double Q = integrate(QR1D, Pp);
     double I = 1. / (p + 1.);
     double Err = std::abs(I - Q);

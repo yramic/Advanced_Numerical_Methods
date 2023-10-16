@@ -1,7 +1,7 @@
 /**
  * @file kernmatllrapprox.h
  * @brief NPDE homework KernMatLLRApprox code
- * @author R. Hiptmair
+ * @author R. Hiptmair, Peiyuan Xie
  * @date September 2023
  * @copyright Developed at SAM, ETH Zurich
  */
@@ -154,118 +154,97 @@ bool checkMatrixPartition(
 
 /** Extended class for cluster trees for local low-rank approximation */
 /* SAM_LISTING_BEGIN_E */
-template <class NODE>
-class LLRClusterTree : public HMAT::ClusterTree<NODE> {
+class LLRClusterTree : public HMAT::ClusterTree<HMAT::CtNode<1>> {
  public:
   // Idle constructor just setting rank argument q
-  explicit LLRClusterTree(size_t _q) : q(_q) {}
-  // Actual constructor taking a sequence of points
-  void init(const std::vector<HMAT::Point<NODE::dim>> pts,
-            std::size_t minpts = 1);
-  virtual ~LLRClusterTree() = default;
+  explicit LLRClusterTree(size_t _q, const std::vector<HMAT::Point<1>> &pts,
+                          std::size_t minpts = 1)
+      : HMAT::ClusterTree<HMAT::CtNode<1>>(pts, minpts), q(_q) {
+    // Resize global vectors
+    Vs.resize(this->ptsT.size(), q);
+    clust_omega.resize(q, this->numNodes);
+    clust_sect_vec.resize(this->ptsT.size());
 
- protected:
-  // factory method for relevant type of node taking rank argument
-  virtual NODE *createNode(const std::vector<HMAT::Point<NODE::dim>> &ptsN,
-                           int offset, int nodeNumber, int dir) {
-    // Append local collocation points to the end of global vector
-    this->ptsT.insert(this->ptsT.end(), ptsN.begin(), ptsN.end());
-    // Build index set for each node
-    std::vector<size_t> idx;
-    for (const HMAT::Point<NODE::dim> &pt : ptsN) idx.push_back(pt.idx);
-    return new NODE(idx, offset, nodeNumber, dir);
+    // Recursive initialization of the low-rank factor matrices \cob{$\VV_w$}
+    std::function<void(HMAT::CtNode<1> * node)> initvrec =
+        [&](HMAT::CtNode<1> *node) -> void {
+      // Retrieve bounding box,
+      // \href{https://stackoverflow.com/questions/4643074/why-do-i-have-to-access-template-base-class-members-through-the-this-pointer}{explanation}
+      // for the this pointer
+      const HMAT::BBox<1> bbox = this->getBBox(node);
+      // Find interval correspoding to the bounding box of the current cluster
+      const double a = bbox.minc[0];
+      const double b = bbox.maxc[0];
+
+      // Compute Chebychev nodes $t_i$ and
+      // baryccentric weights $\lambda_i$ for interval $\cintv{a,b}$
+      Eigen::VectorXd lambda(q);  // barycentric weights
+      Eigen::VectorXd t(q);       // Chebychev nodes
+      const double fac = std::pow(4.0 / (b - a), q - 1) / q;
+      int sgn = 1;
+      for (int i = 0; i < q; i++, sgn *= -1) {
+        const double arg = (2.0 * i + 1.0) / (2 * q) * M_PI;
+        t[i] = a + 0.5 * (b - a) * (std::cos(arg) + 1.0);
+        lambda[i] = fac * sgn * std::sin(arg);  // \prbeqref{eq:bwf}
+      }
+      // Number of collocation points in cluster
+      const unsigned int nIw = node->noIdx();
+      // Traverse collocation points (in the interval $\cintv{a,b}$)
+      Eigen::VectorXd tx_diff(q);  // $t_i - \xi$
+      auto V = getV(node);
+      for (int j = 0; j < nIw; ++j) {
+        // Coordinate of current collocation point
+        const double xi = ((this->ptsT)[node->offset + j]).x[0];
+        double tau =
+            0.0;  // $\cob{\tau := \sum_{i=1}^{q} \frac{\lambda_i}{\xi-t_i}}$
+        bool on_node = false;
+        for (int i = 0; i < q; i++) {
+          tx_diff[i] = xi - t[i];
+          // Avoid division by zero
+          if (tx_diff[i] == 0.0) {
+            on_node = true;
+            V.row(j).setZero();
+            V(j, i) = 1.0;  // $\cob{(\VV)_{j,:} = \Ve_{i}^{\top}}$ when hitting
+                            // a node
+            break;          // The $j$-th row of $\VV$ is complete already
+          } else {
+            const double txdl = lambda[i] / tx_diff[i];
+            V(j, i) = txdl;
+            tau += txdl;
+          }
+        }
+        if (!on_node) V.row(j) /= tau;
+      }
+
+      if (node->sons[0]) initvrec(node->sons[0].get());
+      if (node->sons[1]) initvrec(node->sons[1].get());
+    };
+    initvrec(this->root.get());
   }
-  // Initialization of the low-rank factor matrix \cob{$\VV_w$}
-  void initVRec(NODE *node);
+  virtual ~LLRClusterTree() = default;
 
  public:
   // For the conciseness of access
-  Eigen::VectorXd &getSectVec(const NODE *node) {
-    return clust_sect_vec[node->nodeNumber];
+  Eigen::VectorBlock<Eigen::VectorXd> getSectVec(const HMAT::CtNode<1> *node) {
+    return clust_sect_vec.segment(node->offset, node->noIdx());
   }
-  Eigen::VectorXd &getOmega(const NODE *node) {
-    return clust_omega[node->nodeNumber];
+  Eigen::MatrixXd::ColXpr getOmega(const HMAT::CtNode<1> *node) {
+    return clust_omega.col(node->nodeNumber);
   }
-  Eigen::MatrixXd &getV(const NODE *node) { return Vs[node->nodeNumber]; }
+  Eigen::Block<Eigen::MatrixXd> getV(const HMAT::CtNode<1> *node) {
+    return Vs.middleRows(node->offset, node->noIdx());
+  }
 
-  const std::size_t q;  // rank of separable approximation on cluster boxes
-  std::vector<Eigen::MatrixXd>
-      Vs;  // global vector of low-rank factors, each \cob{$\VV\in\bbR^{k,q}$}
-  std::vector<Eigen::VectorXd>
-      clust_omega;  // global vector for cluster-local linear algebra
-  std::vector<Eigen::VectorXd>
-      clust_sect_vec;  // temporary storage for cluster-associated vector
-                       // sections
+  // rank of separable approximation on cluster boxes big matrix
+  const std::size_t q;
+  // global matrix of low-rank factors, each \cob{$\VV\in\bbR^{k,q}$}
+  Eigen::MatrixXd Vs;
+  // global matrix for cluster-local linear algebra
+  Eigen::MatrixXd clust_omega;
+  // temporary storage for cluster-associated vector sections
+  Eigen::VectorXd clust_sect_vec;
 };
-
-template <class NODE>
-void LLRClusterTree<NODE>::init(const std::vector<HMAT::Point<NODE::dim>> pts,
-                                std::size_t minpts) {
-  HMAT::ClusterTree<NODE>::init(pts, minpts);
-  // Resize global vectors
-  Vs.resize(this->numNodes);
-  clust_omega.resize(this->numNodes);
-  clust_sect_vec.resize(this->numNodes);
-  // Recursive initialization of the low-rank factor matrices \cob{$\VV_w$}
-  initVRec(this->root.get());
-}
 /* SAM_LISTING_END_E */
-
-// clang-format off
-/* SAM_LISTING_BEGIN_Z */
-template <class NODE>
-void LLRClusterTree<NODE>::initVRec(NODE *node) {
-  static_assert(NODE::dim == 1, "Implemented only for 1D");
-  // Retrieve bounding box, \href{https://stackoverflow.com/questions/4643074/why-do-i-have-to-access-template-base-class-members-through-the-this-pointer}{explanation} for the this pointer
-  const HMAT::BBox<NODE::dim> bbox = this->getBBox(node);
-  // Find interval correspoding to the bounding box of the current cluster
-  const double a = bbox.minc[0];
-  const double b = bbox.maxc[0];
-  // Resize Matrix V of this node
-  Vs[node->nodeNumber].resize(node->noIdx(), q);
-  // Compute Chebychev nodes $t_i$ and
-  // baryccentric weights $\lambda_i$ for interval $\cintv{a,b}$
-  Eigen::VectorXd lambda(q);  // barycentric weights
-  Eigen::VectorXd t(q);       // Chebychev nodes
-  const double fac = std::pow(4.0 / (b - a), q - 1) / q;
-  int sgn = 1;
-  for (int i = 0; i < q; i++, sgn *= -1) {
-    const double arg = (2.0 * i + 1.0) / (2 * q) * M_PI;
-    t[i] = a + 0.5 * (b - a) * (std::cos(arg) + 1.0);
-    lambda[i] = fac * sgn * std::sin(arg); // \prbeqref{eq:bwf}
-  }
-  // Number of collocation points in cluster
-  const unsigned int nIw = node->noIdx();
-  // Traverse collocation points (in the interval $\cintv{a,b}$)
-  Eigen::VectorXd tx_diff(q);  // $t_i - \xi$
-  for (int j = 0; j < nIw; ++j) {
-    // Coordinate of current collocation point
-    const double xi = ((this->ptsT)[node->offset + j]).x[0];
-    double tau = 0.0;  // $\cob{\tau := \sum_{i=1}^{q} \frac{\lambda_i}{\xi-t_i}}$
-    bool on_node = false;
-    for (int i = 0; i < q; i++) {
-      tx_diff[i] = xi - t[i];
-      // Avoid division by zero
-      if (tx_diff[i] == 0.0) {
-        on_node = true;
-        Vs[node->nodeNumber].row(j).setZero();
-        Vs[node->nodeNumber](j, i) = 1.0;  // $\cob{(\VV)_{j,:} = \Ve_{i}^{\top}}$ when hitting a node
-        break;          // The $j$-th row of $\VV$ is complete already
-      } else {
-        const double txdl = lambda[i] / tx_diff[i];
-        Vs[node->nodeNumber](j, i) = txdl;
-        tau += txdl;
-      }
-    }
-    if (!on_node) Vs[node->nodeNumber].row(j) /= tau;
-  }
-  if (node->sons[0])
-    initVRec(node->sons[0].get());
-  if (node->sons[1])
-    initVRec(node->sons[1].get());
-}
-/* SAM_LISTING_END_Z */
-// clang-format on
 
 /** Extended class for block partition, knowing low-rank compression */
 /* SAM_LISTING_BEGIN_H */
@@ -360,8 +339,7 @@ class BiDirChebBlockPartition : public HMAT::BlockPartition<TREE> {
 // Special data type for local low-rank compression by one-dimensional
 // bi-directional Chebychev interpolation
 template <typename KERNEL>
-using BiDirChebPartMat1D =
-    BiDirChebBlockPartition<LLRClusterTree<HMAT::CtNode<1>>, KERNEL>;
+using BiDirChebPartMat1D = BiDirChebBlockPartition<LLRClusterTree, KERNEL>;
 
 // clang-format off
 // Matrix x Vector based on compressed kernel collocation matrix
@@ -394,9 +372,9 @@ Eigen::VectorXd mvLLRPartMat(BiDirChebBlockPartition<TREE, KERNEL> &llrcmat,
       // Restriction of argument vector to column cluster, assuming contiguous indices in idxs
       llrcmat.colT->getSectVec(col_node) = x.segment(idxs.front(), idxs.size());
       // Compute $\cob{\vec{\omegabf}_{w}}$
-      Eigen::MatrixXd VT = llrcmat.colT->getV(col_node).transpose();
+      auto V = llrcmat.colT->getV(col_node);
       Eigen::VectorXd Rmu = llrcmat.colT->getSectVec(col_node);
-      llrcmat.colT->getOmega(col_node) = VT * Rmu;;
+      llrcmat.colT->getOmega(col_node) = V.transpose() * Rmu;
       // Recursion: visit entire cluster tree
       comp_omega_rec(col_node->sons[0].get());
       comp_omega_rec(col_node->sons[1].get());
@@ -406,8 +384,8 @@ Eigen::VectorXd mvLLRPartMat(BiDirChebBlockPartition<TREE, KERNEL> &llrcmat,
   // Final sentence in \lref{par:3p}: Clear local storage of row tree
   std::function<void(NODE * row_node)> clear_vec_rec = [&](NODE *row_node) -> void {
     if (row_node) {
-      llrcmat.rowT->getSectVec(row_node).setZero(row_node->noIdx());
-      llrcmat.rowT->getOmega(row_node).setZero(llrcmat.q);
+      llrcmat.rowT->getSectVec(row_node).setZero();
+      llrcmat.rowT->getOmega(row_node).setZero();
       clear_vec_rec(row_node->sons[0].get());
       clear_vec_rec(row_node->sons[1].get());
     }
@@ -434,7 +412,9 @@ Eigen::VectorXd mvLLRPartMat(BiDirChebBlockPartition<TREE, KERNEL> &llrcmat,
     if (row_node) {
       const std::vector<size_t> idxs = row_node->I;
       // $\cob{\rst{\Vx}{v} += \VU_{v}\vec{\zetabf}_{v}+\vec{\phibf}_{v}}$
-      llrcmat.rowT->getSectVec(row_node) += llrcmat.rowT->getV(row_node) * llrcmat.rowT->getOmega(row_node);
+      auto V = llrcmat.rowT->getV(row_node);
+      auto omega = llrcmat.rowT->getOmega(row_node);
+      llrcmat.rowT->getSectVec(row_node) += V * omega;
       // Expand from cluster $\cob{v}$, assuming contiguous indices in idxs
       y.segment(idxs.front(), idxs.size()) += llrcmat.rowT->getSectVec(row_node);
       // Recursion through row cluster tree

@@ -29,12 +29,8 @@ bool validateLLR(unsigned int q, double tol, double eta) {
     pts.push_back(p);
   }
   // Allocate cluster tree object (the same for both directions)
-  auto T_row =
-      std::make_shared<KernMatLLRApprox::LLRClusterTree<HMAT::CtNode<1>>>(q);
-  T_row->init(pts);
-  auto T_col =
-      std::make_shared<KernMatLLRApprox::LLRClusterTree<HMAT::CtNode<1>>>(q);
-  T_col->init(pts);
+  auto T_row = std::make_shared<KernMatLLRApprox::LLRClusterTree>(q, pts);
+  auto T_col = std::make_shared<KernMatLLRApprox::LLRClusterTree>(q, pts);
 
   // Loop over polynomials up to degree q and check whether for a polynomial
   // kernel the approximation error will vanish.
@@ -105,13 +101,9 @@ void tabulateConvergenceLLR(std::vector<unsigned int> &&n_vec,
 #if SOLUTION
       // Allocate cluster tree objects (the same for both directions)
       auto T_row =
-          std::make_shared<KernMatLLRApprox::LLRClusterTree<HMAT::CtNode<1>>>(
-              q_vec[q_idx]);
-      T_row->init(pts);
+          std::make_shared<KernMatLLRApprox::LLRClusterTree>(q_vec[q_idx], pts);
       auto T_col =
-          std::make_shared<KernMatLLRApprox::LLRClusterTree<HMAT::CtNode<1>>>(
-              q_vec[q_idx]);
-      T_col->init(pts);
+          std::make_shared<KernMatLLRApprox::LLRClusterTree>(q_vec[q_idx], pts);
       // Build local low-rank compressed matrix
       KernMatLLRApprox::BiDirChebPartMat1D<LogKernel> Mt(T_row, T_col, G,
                                                          q_vec[q_idx], eta);
@@ -165,12 +157,8 @@ void runtimeMatVec(std::vector<unsigned int> &&n_vec, unsigned int n_runs,
       pts.push_back(p);
     }
     // Allocate cluster tree objects (the same for both directions)
-    auto T_row =
-        std::make_shared<KernMatLLRApprox::LLRClusterTree<HMAT::CtNode<1>>>(q);
-    T_row->init(pts);
-    auto T_col =
-        std::make_shared<KernMatLLRApprox::LLRClusterTree<HMAT::CtNode<1>>>(q);
-    T_col->init(pts);
+    auto T_row = std::make_shared<KernMatLLRApprox::LLRClusterTree>(q, pts);
+    auto T_col = std::make_shared<KernMatLLRApprox::LLRClusterTree>(q, pts);
     // Build local low-rank compressed matrix
     KernMatLLRApprox::BiDirChebPartMat1D<LogKernel> Mt(T_row, T_col, G, q, eta);
 #if SOLUTION

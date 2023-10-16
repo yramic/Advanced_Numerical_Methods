@@ -32,8 +32,7 @@ std::vector<HMAT::Point<2>> initPoints(unsigned int npts) {
 }
 
 template <typename TRANSFORM = std::function<double(double)>>
-std::shared_ptr<KernMatLLRApprox::LLRClusterTree<HMAT::CtNode<1>>>
-make1DClusterTree(
+std::shared_ptr<KernMatLLRApprox::LLRClusterTree> make1DClusterTree(
     unsigned int q, unsigned int npts,
     TRANSFORM trf = [](double x) -> double { return x; }) {
   // Build cluster tree
@@ -44,17 +43,14 @@ make1DClusterTree(
     p.x[0] = trf(static_cast<double>(n) / (npts - 1));
     pts.push_back(p);
   }
-  auto T =
-      std::make_shared<KernMatLLRApprox::LLRClusterTree<HMAT::CtNode<1>>>(q);
-  T->init(pts);
+  auto T = std::make_shared<KernMatLLRApprox::LLRClusterTree>(q, pts);
   return T;
 }
 
 TEST(KernMatLLRApprox, check_clustertree) {
   std::cout << "TEST: check_clustertree" << std::endl;
   // Building a cluster tree for testing
-  HMAT::ClusterTree<HMAT::CtNode<2>> T;
-  T.init(initPoints(5));
+  HMAT::ClusterTree<HMAT::CtNode<2>> T(initPoints(5));
   std::cout << "TEST: check_clustertree: tree built" << std::endl;
   ASSERT_TRUE(KernMatLLRApprox::checkClusterTree(T));
 }
@@ -74,8 +70,7 @@ TEST(KernMatLLRApprox, check_matrixpartition) {
     p.x[0] = static_cast<double>(n) / (npts - 1);
     pts.push_back(p);
   }
-  auto T = std::make_shared<HMAT::ClusterTree<HMAT::CtNode<1>>>();
-  T->init(pts);
+  auto T = std::make_shared<HMAT::ClusterTree<HMAT::CtNode<1>>>(pts);
   // Build block cluster tree
   HMAT::BlockPartition<HMAT::ClusterTree<HMAT::CtNode<1>>> bP(T, T);
   bP.init(eta);  // Admissibility parameter eta = 2.00
@@ -89,7 +84,7 @@ TEST(KernMatLLRApprox, check_V) {
   std::function<bool(const HMAT::CtNode<1> *)> rec_check =
       [&](const HMAT::CtNode<1> *node) -> bool {
     if (node) {
-      const Eigen::MatrixXd &V{T->Vs[node->nodeNumber]};
+      auto V = T->getV(node);
       const Eigen::VectorXd row_sums = V.rowwise().sum();
       double dev = (row_sums - Eigen::VectorXd::Constant(V.rows(), 1.0)).norm();
       if (dev > 1.0E-10) {

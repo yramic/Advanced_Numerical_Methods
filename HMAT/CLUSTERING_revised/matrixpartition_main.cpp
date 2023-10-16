@@ -26,8 +26,7 @@ HMAT::BlockPartition<HMAT::ClusterTree<HMAT::CtNode<1>>> matrixPartition1d(
     p.x[0] = trf(static_cast<double>(n) / (npts - 1));
     pts.push_back(p);
   }
-  auto T = std::make_shared<HMAT::ClusterTree<HMAT::CtNode<1>>>();
-  T->init(pts);
+  auto T = std::make_shared<HMAT::ClusterTree<HMAT::CtNode<1>>>(pts);
 
   HMAT::BlockPartition<HMAT::ClusterTree<HMAT::CtNode<1>>> bP(T, T);
   bP.init(eta);  // Admissibility parameter eta = 0.5
