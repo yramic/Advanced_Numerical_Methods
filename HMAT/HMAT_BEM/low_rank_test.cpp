@@ -85,8 +85,8 @@ int main() {
   node.getRect();
   node.setV();
 
-  KernelGalerkin G;  // initialization of Galerkin kernel for 2d problem
-                     // -1/(2*pi)*log||x-y||
+  KernelGalerkin
+      G;  // initialization of Galerkin kernel for 2d problem -1/(2*pi)*log||x-y||
 
   BlockCluster bc(&node, &node);
   bc.setMatrix(&G);
@@ -106,69 +106,64 @@ int main() {
   std::cout << "CppHilbert:" << std::endl << M << std::endl;
 
   /*
-      // initialization of segments on a square
-      std::vector<Segment> segments;
-      segments.reserve(4*n); // 'n' segments per edge
-      std::srand(std::time(0)); // initializing segment properties randomly
-      double progress = 0.; double shift = 1./n;
-      for(unsigned i=0; i<n; ++i) {
-          {
-              Segment s;
-              s.setId(i*4);
-              Eigen::Vector2d a, b;
-              a << progress, 0.;
-              b << progress+shift, 0.;
-              s.setA(a);
-              s.setB(b);
-              segments.push_back(s);
-          }
-          {
-              Segment s;
-              s.setId(i*4+1);
-              Eigen::Vector2d a, b;
-              a << 0., progress;
-              b << 0., progress+shift;
-              s.setA(a);
-              s.setB(b);
-              segments.push_back(s);
-          }
-          {
-              Segment s;
-              s.setId(i*4+2);
-              Eigen::Vector2d a, b;
-              a << progress, 1.;
-              b << progress+shift, 1.;
-              s.setA(a);
-              s.setB(b);
-              segments.push_back(s);
-          }
-          {
-              Segment s;
-              s.setId(i*4+3);
-              Eigen::Vector2d a, b;
-              a << 1., progress;
-              b << 1., progress+shift;
-              s.setA(a);
-              s.setB(b);
-              segments.push_back(s);
-          }
-          progress += 1./n;
-      }
-      n = segments.size();
-  */
+    // initialization of segments on a square
+    std::vector<Segment> segments;
+    segments.reserve(4*n); // 'n' segments per edge
+    std::srand(std::time(0)); // initializing segment properties randomly
+    double progress = 0.; double shift = 1./n;
+    for(unsigned i=0; i<n; ++i) {
+        {
+            Segment s;
+            s.setId(i*4);
+            Eigen::Vector2d a, b;
+            a << progress, 0.;
+            b << progress+shift, 0.;
+            s.setA(a);
+            s.setB(b);
+            segments.push_back(s);
+        }
+        {
+            Segment s;
+            s.setId(i*4+1);
+            Eigen::Vector2d a, b;
+            a << 0., progress;
+            b << 0., progress+shift;
+            s.setA(a);
+            s.setB(b);
+            segments.push_back(s);
+        }
+        {
+            Segment s;
+            s.setId(i*4+2);
+            Eigen::Vector2d a, b;
+            a << progress, 1.;
+            b << progress+shift, 1.;
+            s.setA(a);
+            s.setB(b);
+            segments.push_back(s);
+        }
+        {
+            Segment s;
+            s.setId(i*4+3);
+            Eigen::Vector2d a, b;
+            a << 1., progress;
+            b << 1., progress+shift;
+            s.setA(a);
+            s.setB(b);
+            segments.push_back(s);
+        }
+        progress += 1./n;
+    }
+    n = segments.size();
+*/
   /*
-      // initialization of segments on a circle
-      std::vector<Segment> segments;
-      segments.reserve(n);
-      std::srand(std::time(0)); // initializing points properties randomly
-      for(unsigned i=0; i<n; ++i) {
-          Segment s;
-          s.setId(i);
-
-          double angle = M_PI*2/n;
-          Eigen::Vector2d a, b;
-          a << std::cos(angle* i),     std::sin(angle* i);
-          b << std::cos(angle*(i+1.)), std::sin(angle*(i+1.));
+    // initialization of segments on a circle
+    std::vector<Segment> segments;
+    segments.reserve(n);
+    std::srand(std::time(0)); // initializing points properties randomly
+    for(unsigned i=0; i<n; ++i) {
+        Segment s;
+        s.setId(i);
 
           s.setA(a);
           s.setB(b);

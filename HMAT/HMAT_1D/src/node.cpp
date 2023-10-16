@@ -31,10 +31,11 @@ void Node::setSons(int& id) {
   if (node_points_.size() > 1) {
     std::vector<Point>::iterator
         it;  // we assume that the points are in ascending order
-    it = node_points_.begin() +
-         (node_points_.size() + 1) / 2;  // set iterator in the middle of the
-                                         // vector of points in this node
-    std::vector<Point> lc, rc;           // left and right child´s vectors
+    it =
+        node_points_.begin() +
+        (node_points_.size() + 1) /
+            2;  // set iterator in the middle of the vector of points in this node
+    std::vector<Point> lc, rc;  // left and right child´s vectors
     lc.assign(node_points_.begin(),
               it);  // division of node´s points into it´s childs
     rc.assign(it, node_points_.end());
@@ -89,7 +90,7 @@ unsigned Node::setVc(const Eigen::VectorXd& c) {
 
 // update C*V*c restricted to node indices
 unsigned Node::setCVc(const Eigen::VectorXd& CVc) {
-  // CVc_node_.setZero();
+  //CVc_node_.setZero();
   CVc_node_ += CVc;
   return CVc_node_.size();  // return no. of 'operations' performed
 }

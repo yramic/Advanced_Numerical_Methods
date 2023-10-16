@@ -21,8 +21,7 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> low_rank_merge(
     const Eigen::MatrixXd &A1, const Eigen::MatrixXd &B1,
     const Eigen::MatrixXd &A2, const Eigen::MatrixXd &B2);
 
-/** @brief Compute errors between $\VZ$ and $\tilde{\VZ}$ in scaled Frobenius
- * and max norms.
+/** @brief Compute errors between $\VZ$ and $\tilde{\VZ}$ in scaled Frobenius and max norms.
  *
  * @param n Number of rows/columns of matrices $VK_1$ and $VK_2$ defined as in
  * \prbcref<prb:lrm:subprb:1>

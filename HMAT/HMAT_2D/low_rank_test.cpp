@@ -79,8 +79,8 @@ int main() {
   std::cin >> q;
   //    unsigned q = 2;
 
-  KernelGalerkin G(1.);  // initialization of Galerkin kernel for 2d problem
-                         // -1/(2*pi)*log||x-y||
+  KernelGalerkin G(
+      1.);  // initialization of Galerkin kernel for 2d problem -1/(2*pi)*log||x-y||
 
   // Compute exact matrix-vector product
 
@@ -97,14 +97,13 @@ int main() {
   std::chrono::duration<double> time_diff1 = end1 - start1;
 
 #ifdef local
-  // Compute approximated matrix-vector product, given admissibility constant
-  // 'eta'
+  // Compute approximated matrix-vector product, given admissibility constant 'eta'
 
   auto start2 = std::chrono::system_clock::now();
 
-  LowRankApp HMat(&G, points, eta,
-                  q);  // initialization of low rank approximation for BEM
-                       // approx for matrix multiplication
+  LowRankApp HMat(
+      &G, points, eta,
+      q);  // initialization of low rank approximation for BEM approx for matrix multiplication
   Eigen::VectorXd f_approx =
       HMat.mvProd(c);  // calculation of the low rank approximation
 
@@ -135,8 +134,7 @@ int main() {
 #endif
 
 #ifdef global
-  // Compute approximated matrix-vector product, given admissibility constant
-  // 'eta'
+  // Compute approximated matrix-vector product, given admissibility constant 'eta'
 
   auto start3 = std::chrono::system_clock::now();
 

@@ -12,8 +12,7 @@
 
 #include <cmath>
 
-// find the biggest edge of each Bounding Box and compare it with the biggest
-// node of the other Bounding Box
+// find the biggest edge of each Bounding Box and compare it with the biggest node of the other Bounding Box
 double AdmissibilityH::get_max(Node* a, Node* b) {
   double xa, ya, xb, yb, maxA, maxB;
   xa = std::abs(a->getX1() - a->getX2());

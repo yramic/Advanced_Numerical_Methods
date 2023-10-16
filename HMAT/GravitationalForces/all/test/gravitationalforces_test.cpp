@@ -46,8 +46,7 @@ TEST(GravitationalForces, MinDist) {
 }
 
 /////////////////////////
-// assumes up then right ordering of son nodes though other ordering are
-// possible
+// assumes up then right ordering of son nodes though other ordering are possible
 /////////////////////////
 TEST(GravitationalForces, QuadTree) {
   // Simple test for the QuadTree structure

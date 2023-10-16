@@ -65,15 +65,12 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode,
   if ((*ynode).getPPoints().size() <= 1 || (*xnode).getPPoints().size() <= 1) {
     NearField_.push_back(new BlockNearF(xnode, ynode));
   } else {
-    // if the cluster corresponding to *xnode and *ynode is admissible, we add
-    // them to the far field list of each one
+    // if the cluster corresponding to *xnode and *ynode is admissible, we add them to the far field list of each one
     if (adm.is_admissible(xnode, ynode, eta)) {
       FarField_.push_back(new BlockCluster(xnode, ynode));
       FarField_xnds_.push_back(xnode);
       FarField_ynds_.push_back(ynode);
-    } else {  // else we consider all the different combinations of the children
-              // of *xnode and *ynode and check whether their clusters are
-              // admissible
+    } else {  // else we consider all the different combinations of the children of *xnode and *ynode and check whether their clusters are admissible
       setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getTl_Child(), eta);
       setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getTr_Child(), eta);
       setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getBl_Child(), eta);
@@ -109,14 +106,11 @@ void HierarchicalPartitioning::setNearFar_recursion(Node* xnode, Node* ynode,
     NearField_.push_back(new BlockNearF(xnode, ynode));
     cmatrix((*ynode).getNodeID(), (*xnode).getNodeID())++;
   } else {
-    // if the cluster corresponding to *xnode and *ynode is admissible, we add
-    // them to the far field list of each one
+    // if the cluster corresponding to *xnode and *ynode is admissible, we add them to the far field list of each one
     if (adm.is_admissible(xnode, ynode, eta)) {
       FarField_.push_back(new BlockCluster(xnode, ynode));
       cmatrix((*xnode).getNodeID(), (*ynode).getNodeID())++;
-    } else {  // else we consider all the different combinations of the children
-              // of *xnode and *ynode and check whether their clusters are
-              // admissible
+    } else {  // else we consider all the different combinations of the children of *xnode and *ynode and check whether their clusters are admissible
       setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getTl_Child(), eta,
                            cmatrix);
       setNearFar_recursion((*xnode).getTl_Child(), (*ynode).getTr_Child(), eta,

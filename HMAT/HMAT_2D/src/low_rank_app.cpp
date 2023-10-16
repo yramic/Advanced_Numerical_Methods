@@ -64,8 +64,8 @@ void LowRankApp::preProcess(std::vector<Node*> ff_v_x,
   }
 }
 
-// block-processing: compute vector CVc for all far field pairs and store it
-// into xnode all vectors CVc of an xnode can already be summed together
+// block-processing: compute vector CVc for all far field pairs and store it into xnode
+// all vectors CVc of an xnode can already be summed together
 void LowRankApp::blockProcess(std::vector<BlockCluster*> ff_v) {
 #pragma omp parallel
   {
@@ -73,9 +73,9 @@ void LowRankApp::blockProcess(std::vector<BlockCluster*> ff_v) {
 #pragma omp for
     for (int i = 0; i < ff_v.size(); i++) {
       BlockCluster* pair = ff_v[i];
-      lsum +=
-          pair->setMatrix(kernel_);  // here because needed for each pair of
-                                     // nodes, cannot be moved to pre-processing
+      lsum += pair->setMatrix(
+          kernel_);  // here because needed for each pair of nodes,
+                     // cannot be moved to pre-processing
       lsum += pair->setCVc();
     }
 #pragma omp atomic
@@ -108,8 +108,7 @@ void LowRankApp::debugProcess(std::vector<BlockCluster*> ff_v) {
           << error_max << std::endl;
 }
 
-// post-processing: compute vector Vx*CVc for all far field xnodes and add it to
-// vector f in the right place
+// post-processing: compute vector Vx*CVc for all far field xnodes and add it to vector f in the right place
 void LowRankApp::postProcess(std::vector<Node*> ff_v_x, Eigen::VectorXd& f) {
 #pragma omp parallel
   {
@@ -131,8 +130,7 @@ void LowRankApp::postProcess(std::vector<Node*> ff_v_x, Eigen::VectorXd& f) {
   }
 }
 
-// count far-field ynodes contributing to each row of the approximate low-rank
-// matrix
+// count far-field ynodes contributing to each row of the approximate low-rank matrix
 void LowRankApp::calc_numb_approx_per_row(std::vector<BlockCluster*> ff_v,
                                           Eigen::VectorXd& f_approx_ff_contr) {
   for (auto& pair : ff_v) {  // iterate for all the pairs of far field nodes
@@ -174,9 +172,8 @@ void LowRankApp::nf_contribution(std::vector<BlockNearF*> nf_v,
         f(xnode->getPPoints()[i].getId()) +=
             C(i, j) * c(ynode->getPPoints()[j]
                             .getId());  // add near field contribution to ``f''
-        // The contributions of all near-field pairs involving 'xnode' can first
-        // be summed ('blockProcess') and only then positioned in the right
-        // entry of 'f' ('postProcess'), similarly to the near-field vector.
+        // The contributions of all near-field pairs involving 'xnode' can first be summed ('blockProcess')
+        // and only then positioned in the right entry of 'f' ('postProcess'), similarly to the near-field vector.
         ++f_approx_nf_contr(xnode->getPPoints()[i].getId());
         nops_ += C.rows() * C.cols();
       }
@@ -213,7 +210,7 @@ Eigen::VectorXd LowRankApp::mvProd(const Eigen::VectorXd& c) {
             << "% "
             << "Far Field Nodes: " << (double)far / (near + far) * 100. << "%"
             << std::endl;
-  // PPointsTree_.getRoot()->printree(0); // printing the tree for testing
+  //PPointsTree_.getRoot()->printree(0); // printing the tree for testing
 
   std::cout
       << "Number of matrix operations performed for low-rank approximation: "

@@ -215,8 +215,7 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> adap_rank_merge(
   return {Atilde, Btilde};
 
 #else
-  // TODO: Compute {Atilde,Btilde} as in \eqref{eq:lrfac1}/\eqref{eq:lrfac2},
-  // given \eqref{eq:adaptrunc}
+  // TODO: Compute {Atilde,Btilde} as in \eqref{eq:lrfac1}/\eqref{eq:lrfac2}, given \eqref{eq:adaptrunc}
 
   // Dummy solution, to be replaced
   return {Eigen::MatrixXd::Zero(3, 3), Eigen::MatrixXd::Zero(3, 3)};

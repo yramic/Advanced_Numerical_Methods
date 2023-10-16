@@ -19,8 +19,7 @@ extern "C" {
 
 #define equal_clusters
 
-// actual  constructor: creates the root of the Cluster Tree and the recursivly
-// creates the leaves
+// actual  constructor: creates the root of the Cluster Tree and the recursivly creates the leaves
 Node::Node(std::vector<Segment> segments, unsigned deg)
     : tl_child_(NULL),
       tr_child_(NULL),
@@ -49,8 +48,7 @@ void Node::getRect() {
 void Node::setSons() {
   if (!segments_.empty() &&
       segments_.size() >
-          1) {  // if there are points in the PPointsTree vector of points then
-                // they are equaly divided into the node´s children
+          1) {  // if there are points in the PPointsTree vector of points then they are equaly divided into the node´s children
 #ifdef equal_clusters
     // TODO
 #endif

@@ -81,18 +81,15 @@ int main() {
   unsigned d = 2;
   cTree test_tree(PPoints, d);                    // creating the tree
   std::vector<Point> tree_vector, tree_vector_t;  // dummy vectors
-  tree_vector_t =
-      DFS_traversing(test_tree.getRoot(),
-                     tree_vector);  // traversing the tree in DFS, so we know
-                                    // with what order should the node of the
-                                    // tree be printed given standard points
+  tree_vector_t = DFS_traversing(
+      test_tree.getRoot(),
+      tree_vector);  // traversing the tree in DFS, so we know with what order should the node of the tree be printed given standard points
   std::vector<int> dfs_points = {11, 13, 1,  15, 11, 1, 15, 13, 3, 2, 9,
                                  14, 9,  3,  14, 2,  4, 0,  5,  6, 4, 5,
                                  0,  6,  12, 8,  10, 7, 10, 12, 8, 7};
   bool correct = check(
       dfs_points,
-      tree_vector);  // function to check if the IDs of the points that are in
-                     // the vector are the same with the IDs we are looking for
+      tree_vector);  // function to check if the IDs of the points that are in the vector are the same with the IDs we are looking for
   if (correct)
     std::cout << "Correct" << std::endl;
   else

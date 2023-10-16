@@ -19,7 +19,7 @@ void setNodeIds(Node* x, int& id) {
   if (x == NULL) return;
   x->setNodeId(id);
   id++;
-  // std::cout << id << std::endl;
+  //std::cout << id << std::endl;
   setNodeIds(x->getTl_Child(), id);
   setNodeIds(x->getTr_Child(), id);
   setNodeIds(x->getBl_Child(), id);
@@ -47,14 +47,14 @@ int main() {
   unsigned d = 2;
   double eta = 2;
   HierarchicalPartitioning HP(PPoints, eta, d);
-  // cTree test_tree(PPoints, d);           // creating a tree
+  //cTree test_tree(PPoints, d);           // creating a tree
   int id = 0;
   setNodeIds(HP.getTx().getRoot(), id);  // setting ID in each node of the tree
   Eigen::MatrixXd cmatrix = Eigen::MatrixXd::Zero(
-      id + 1, id + 1);  // matrix that rows and columns represent the IDs of the
-                        // nodes that exist on the tree
-  HP.setNearFar(cmatrix);  // set the near and far field of each node and add 1
-                           // for every compression that is done in this process
-                           // in the referring cell of the matrix
+      id + 1,
+      id +
+          1);  // matrix that rows and columns represent the IDs of the nodes that exist on the tree
+  HP.setNearFar(
+      cmatrix);  // set the near and far field of each node and add 1 for every compression that is done in this process in the referring cell of the matrix
   std::cout << cmatrix << std::endl;
 }

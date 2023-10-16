@@ -22,13 +22,11 @@
 #include "../../include/uni-direct/block_cluster_Y.hpp"
 #include "../../include/uni-direct/node_Y.hpp"
 
-// add pairs of pointers to Node of the Cluster Tree in the Near and Far Field
-// Vectors of pairs
+// add pairs of pointers to Node of the Cluster Tree in the Near and Far Field Vectors of pairs
 template <>
 void HierarchicalPartitioning<BlockCluster_Y, Node_Y>::setNearFar_recursion(
     Node* xnode, Node* ynode, double eta) {
-  // if *xnode or *ynode is a leaf, we add the pair (*xnode,*ynode) to the near
-  // field vector
+  // if *xnode or *ynode is a leaf, we add the pair (*xnode,*ynode) to the near field vector
   if ((*xnode).getLChild() == NULL || (*ynode).getRChild() == NULL) {
     NearField_.push_back(new BlockNearF(xnode, ynode));
   } else {
@@ -36,15 +34,13 @@ void HierarchicalPartitioning<BlockCluster_Y, Node_Y>::setNearFar_recursion(
     double xr = (*xnode).getPoints().back().getX();
     double yl = (*ynode).getPoints().front().getX();
     double yr = (*ynode).getPoints().back().getX();
-    // if the cluster corresponding to *xnode and *ynode is admissible, we add
-    // the pair (*xnode,*ynode) to the far field vector
+    // if the cluster corresponding to *xnode and *ynode is admissible, we add the pair (*xnode,*ynode) to the far field vector
     if (is_admissible(xl, xr, yl, yr, eta)) {
       // the line above checks the admissibility condition (eta)
       FarField_.push_back(new BlockCluster_Y(xnode, ynode));
       FarField_xnds_.push_back(xnode);
       FarField_ynds_.push_back(ynode);
-    } else {  // else we consider the children of *xnode and *ynode and check
-              // whether their clusters are admissible
+    } else {  // else we consider the children of *xnode and *ynode and check whether their clusters are admissible
       setNearFar_recursion((*xnode).getLChild(), (*ynode).getLChild(), eta);
       setNearFar_recursion((*xnode).getRChild(), (*ynode).getLChild(), eta);
       setNearFar_recursion((*xnode).getLChild(), (*ynode).getRChild(), eta);

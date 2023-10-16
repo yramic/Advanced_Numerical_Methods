@@ -10,9 +10,6 @@
 #ifndef ABELINTEGRALEQUATION_H_
 #define ABELINTEGRALEQUATION_H_
 
-using namespace Eigen;
-using namespace std;
-
 namespace AbelIntegralEquation {
 /* @brief Compute Gaussian quadrature nodes and weights for n nodes over
  * interval [a,b] \param[in] a,b Interval [a,b] endpoints \param[in] n Number of
@@ -73,32 +70,30 @@ std::pair<Eigen::RowVectorXd, Eigen::RowVectorXd> gauleg(double a, double b,
  */
 /* SAM_LISTING_BEGIN_0 */
 template <typename FUNC>
-VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau) {
-  MatrixXd A = MatrixXd::Zero(p + 1, p + 1);
-  VectorXd b = VectorXd::Zero(p + 1);
+Eigen::VectorXd poly_spec_abel(const FUNC& y, std::size_t p, double tau) {
+  Eigen::MatrixXd A = MatrixXd::Zero(p + 1, p + 1);
+  Eigen::VectorXd b = Eigen::VectorXd::Zero(p + 1);
 
   // generate Gauss-Legendre points and weights
-  Eigen::RowVectorXd gauss_pts_p, gauss_wht_p;
-  std::tie(gauss_pts_p, gauss_wht_p) = gauleg(0., 1., p);
+  const auto [gauss_pts_p, gauss_wht_p] = gauleg(0., 1., p);
 
-  // set-up the Galerkin matrix and rhs vector
+  // set up the Galerkin matrix and rhs vector
 
   // **********************************************************************
   // Your Solution here
   // **********************************************************************/
 
   // linear system solve using QR decomposition
-  VectorXd x = A.colPivHouseholderQr().solve(b);
+  const Eigen::ColPivHouseholderQR<Eigen::MatrixXd> solver(A);
+  const Eigen::VectorXd x = solver.solve(b);
 
-  size_t N = round(1. / tau);
-  VectorXd grid = VectorXd::LinSpaced(N + 1, 0., 1.);
-  VectorXd u = VectorXd::Zero(N + 1);
+  const std::size_t N = std::round(1. / tau);
+  const Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N + 1, 0., 1.);
+  Eigen::VectorXd u = Eigen::VectorXd::Zero(N + 1);
 
   // generate solution at grid points
-  for (int i = 0; i <= N; i++) {
-    for (int j = 0; j <= p; j++) {
-      u(i) += x(j) * pow(grid(i), j);
-    }
+  for (int j = 0; j <= p; j++) {
+    u += x(j) * grid.array().pow(j).matrix();
   }
 
   return u;
@@ -112,23 +107,23 @@ VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau) {
  */
 /* SAM_LISTING_BEGIN_2 */
 template <typename FUNC>
-VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
-  VectorXd w(N + 1);
+Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
+  Eigen::VectorXd w(N + 1);
   w(0) = 1.;
   for (int l = 1; l < N + 1; ++l) {
     w(l) = w(l - 1) * (l - 0.5) / l;  // denominator is factorial
   }
-  w *= sqrt(M_PI / N);
+  w *= std::sqrt(M_PI / N);
 
   // Solve the convolution quadrature:
 
-  VectorXd grid = VectorXd::LinSpaced(N + 1, 0., 1.);
-  VectorXd y_N(N + 1);
+  Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N + 1, 0., 1.);
+  Eigen::VectorXd y_N(N + 1);
   for (int i = 0; i < N + 1; ++i) {
     y_N(i) = y(grid(i));
   }
-  MatrixXd T = toeplitz_triangular(w);
-  VectorXd u = T.triangularView<Lower>().solve(y_N);
+  Eigen::MatrixXd T = toeplitz_triangular(w);
+  Eigen::VectorXd u = T.triangularView<Lower>().solve(y_N);
   return u;
 }
 /* SAM_LISTING_END_2 */
@@ -141,31 +136,31 @@ VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
  */
 /* SAM_LISTING_BEGIN_3 */
 template <typename FUNC>
-VectorXd cq_bdf2_abel(const FUNC& y, size_t N) {
-  VectorXd w1(N + 1);
+Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N) {
+  Eigen::VectorXd w1(N + 1);
   w1(0) = 1.;
   for (int l = 1; l < N + 1; ++l) {
     w1(l) = w1(l - 1) * (l - 0.5) / l;  // denominator is factorial
   }
 
-  VectorXd w2 = w1;
+  Eigen::VectorXd w2 = w1;
   for (int l = 1; l < N + 1; ++l) {
     w2(l) /= pow(3, l);
   }
 
-  VectorXd w = myconv(w1, w2).head(N + 1).real();
-  w *= sqrt(M_PI / N) * sqrt(2. / 3.);
+  Eigen::VectorXd w = myconv(w1, w2).head(N + 1).real();
+  w *= std::sqrt(M_PI / N) * std::sqrt(2. / 3.);
 
   // Solve the convolution quadrature:
 
-  VectorXd grid = VectorXd::LinSpaced(N + 1, 0., 1.);
-  VectorXd y_N(N + 1);
+  Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N + 1, 0., 1.);
+  Eigen::VectorXd y_N(N + 1);
   for (int i = 0; i < N + 1; ++i) {
     y_N(i) = y(grid(i));
   }
 
-  MatrixXd T = toeplitz_triangular(w);
-  VectorXd u = T.triangularView<Lower>().solve(y_N);
+  Eigen::MatrixXd T = toeplitz_triangular(w);
+  Eigen::VectorXd u = T.triangularView<Lower>().solve(y_N);
 
   return u;
 }

@@ -72,8 +72,7 @@ Eigen::VectorXd PartMatrix<q>::operator*(const Eigen::VectorXd &v) const {
     // Obtain values of argument std::vector corresponding to y-points
     Eigen::VectorXd tmp(mB);
     for (int j = 0; j < mB; j++) tmp(j) = v(B.j_idx[j]);
-    // Multiply std::vector with low-rank matrix: Effort \cob{$\sharp I_k+\sharp
-    // J_k$}
+    // Multiply std::vector with low-rank matrix: Effort \cob{$\sharp I_k+\sharp J_k$}
     Eigen::VectorXd res(nB);
     res = B.U * (B.V.transpose() * tmp);
     // Accumlate result into components of result std::vector

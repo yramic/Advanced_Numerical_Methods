@@ -74,9 +74,8 @@ void LowRankApp<BlockCluster_Y, Node_Y>::blockProcess(
     std::vector<BlockCluster *> ff_v) {
   for (auto &pair : ff_v) {  // iterate for all the pairs of far field nodes
     BlockCluster_Y *pair_ = static_cast<BlockCluster_Y *>(pair);
-    nops_ +=
-        pair_->setMatrix(kernel_);  // here because needed for each pair of
-                                    // nodes, cannot be moved to pre-processing
+    nops_ += pair_->setMatrix(kernel_);  // here because needed for each pair of
+        // nodes, cannot be moved to pre-processing
     nops_ += pair_->setCVc();
   }
 }

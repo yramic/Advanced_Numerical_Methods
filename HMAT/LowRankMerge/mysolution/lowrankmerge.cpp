@@ -45,8 +45,7 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> adap_rank_merge(
   assert(A1.cols() == B1.cols() && A2.cols() == B2.cols() &&
          A1.cols() == A2.cols() && "All no.s of cols should be equal to q");
 
-  // TODO: Compute {Atilde,Btilde} as in \eqref{eq:lrfac1}/\eqref{eq:lrfac2},
-  // given \eqref{eq:adaptrunc}
+  // TODO: Compute {Atilde,Btilde} as in \eqref{eq:lrfac1}/\eqref{eq:lrfac2}, given \eqref{eq:adaptrunc}
 
   // Dummy solution, to be replaced
   return {Eigen::MatrixXd::Zero(3, 3), Eigen::MatrixXd::Zero(3, 3)};
@@ -55,8 +54,7 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> adap_rank_merge(
 
 /* SAM_LISTING_BEGIN_3 */
 std::pair<double, size_t> test_adap_rank_merge(size_t n, double rtol) {
-  // TODO: Compute {err_Frob,p}, with p := no. of singular values larger than
-  // tolerance
+  // TODO: Compute {err_Frob,p}, with p := no. of singular values larger than tolerance
 
   // Dummy solution, to be replaced
   return {0, 0};

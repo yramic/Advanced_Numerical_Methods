@@ -20,8 +20,7 @@ extern "C" {
 
 #define equal_clusters
 
-// actual  constructor: creates the root of the Cluster Tree and the recursivly
-// creates the leaves
+// actual  constructor: creates the root of the Cluster Tree and the recursivly creates the leaves
 Node::Node(std::vector<Segment> segments, unsigned deg)
     : tl_child_(NULL),
       tr_child_(NULL),
@@ -89,8 +88,7 @@ void Node::getRect() {
 void Node::setSons() {
   if (!segments_.empty() &&
       segments_.size() >
-          1) {  // if there are points in the PPointsTree vector of points then
-                // they are equaly divided into the node´s children
+          1) {  // if there are points in the PPointsTree vector of points then they are equaly divided into the node´s children
 #ifdef equal_clusters
     /* SAM_LISTING_BEGIN_0 */
     auto checkX = [](Segment a, Segment b) -> bool {
@@ -98,20 +96,20 @@ void Node::setSons() {
     };
     std::sort(segments_.begin(), segments_.end(), checkX);
     std::vector<Segment>::iterator it;
-    it = segments_.begin() +
-         (segments_.size() + 1) / 2;  // set iterator in the middle of the
-                                      // vector of points of this node
+    it =
+        segments_.begin() +
+        (segments_.size() + 1) /
+            2;  // set iterator in the middle of the vector of points of this node
     std::vector<Segment> l_segments,
-        r_segments;  // now sort l\_points and r\_points based on their
-                     // y-coordinates
+        r_segments;  // now sort l\_points and r\_points based on their y-coordinates
     l_segments.assign(segments_.begin(), it);
     r_segments.assign(it, segments_.end());
     auto checkY = [](Segment a, Segment b) -> bool {
       return a.getMean().y() < b.getMean().y();
     };
-    std::sort(l_segments.begin(), l_segments.end(),
-              checkY);  // sort left and right vectors into top and bottom based
-                        // on the y-coordinates
+    std::sort(
+        l_segments.begin(), l_segments.end(),
+        checkY);  // sort left and right vectors into top and bottom based on the y-coordinates
     std::sort(r_segments.begin(), r_segments.end(), checkY);
     std::vector<Segment> tl_segments, tr_segments, bl_segments,
         br_segments;  // creation of vectors of points of child nodes
@@ -123,9 +121,9 @@ void Node::setSons() {
     br_segments.assign(r_segments.begin(), it);
 
     if (!tl_segments.empty())
-      tl_child_ =
-          new Node(tl_segments, deg_);  // recursive construction of the Cluster
-                                        // Tree levels below root
+      tl_child_ = new Node(
+          tl_segments,
+          deg_);  // recursive construction of the Cluster Tree levels below root
     if (!tr_segments.empty()) tr_child_ = new Node(tr_segments, deg_);
     if (!bl_segments.empty()) bl_child_ = new Node(bl_segments, deg_);
     if (!br_segments.empty()) br_child_ = new Node(br_segments, deg_);
@@ -149,22 +147,21 @@ void Node::setSons() {
     }
     Eigen::MatrixXd M = A * A.transpose();
     Eigen::JacobiSVD<Eigen::MatrixXd> svdOfM(
-        M, Eigen::ComputeThinV);  // 'M' is square, so ComputeFullV and
-                                  // ComputeThinV are the same
+        M,
+        Eigen::
+            ComputeThinV);  // 'M' is square, so ComputeFullV and ComputeThinV are the same
     Eigen::MatrixXd V = svdOfM.matrixV();
     auto y = [](double x, double x1, double y1, double avgX,
                 double avgY) -> double { return avgY + (x - avgX) * y1 / x1; };
     std::vector<Segment> top_segments, bottom_segments, left_segments,
         right_segments;  // creation of vectors of points of child nodes
     for (unsigned i = 0; i < segments_.size(); ++i) {
-      double y1 = y(segments_[i].getMean().x(), V(0, 0), V(1, 0), avgX,
-                    avgY);  // y value of the line that is defined by the point
-                            // {avgX,avgY} and the vector corresponding to the
-                            // biggest eigen value
-      double y2 = y(segments_[i].getMean().x(), V(0, 1), V(1, 1), avgX,
-                    avgY);  // y value of the line that is defined by the point
-                            // {avgX,avgY} and the vector corresponding to the
-                            // second biggest eigen value
+      double y1 = y(
+          segments_[i].getMean().x(), V(0, 0), V(1, 0), avgX,
+          avgY);  // y value of the line that is defined by the point {avgX,avgY} and the vector corresponding to the biggest eigen value
+      double y2 = y(
+          segments_[i].getMean().x(), V(0, 1), V(1, 1), avgX,
+          avgY);  // y value of the line that is defined by the point {avgX,avgY} and the vector corresponding to the second biggest eigen value
       if (y2 <= segments_[i].getMean().y()) {
         if (y1 <= segments_[i].getMean().y()) {
           top_segments.push_back(segments_[i]);
@@ -181,9 +178,9 @@ void Node::setSons() {
     }
 
     if (!top_segments.empty())
-      tl_child_ =
-          new Node(top_segments, deg_);  // recursive construction of the
-                                         // Cluster Tree levels below root
+      tl_child_ = new Node(
+          top_segments,
+          deg_);  // recursive construction of the Cluster Tree levels below root
     if (!right_segments.empty()) tr_child_ = new Node(right_segments, deg_);
     if (!bottom_segments.empty()) bl_child_ = new Node(bottom_segments, deg_);
     if (!left_segments.empty()) br_child_ = new Node(left_segments, deg_);

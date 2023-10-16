@@ -19,8 +19,8 @@ Eigen::MatrixXcd toeplitz(const Eigen::VectorXcd& c,
   }
 
   // Initialization
-  std::size_t m = c.size();
-  std::size_t n = r.size();
+  const std::size_t m = c.size();
+  const std::size_t n = r.size();
   Eigen::MatrixXcd T(m, n);
 
   for (int i = 0; i < n; ++i) {
@@ -41,7 +41,7 @@ Eigen::MatrixXcd toeplitz(const Eigen::VectorXcd& c,
 Eigen::VectorXcd pconvfft(const Eigen::VectorXcd& u,
                           const Eigen::VectorXcd& x) {
   Eigen::FFT<double> fft;
-  Eigen::VectorXcd tmp = (fft.fwd(u)).cwiseProduct(fft.fwd(x));
+  const Eigen::VectorXcd tmp = (fft.fwd(u)).cwiseProduct(fft.fwd(x));
   return fft.inv(tmp);
 }
 
@@ -57,7 +57,7 @@ Eigen::VectorXcd toepMatVecMult(const Eigen::VectorXcd& c,
   assert(c.size() == x.size() && r.size() == x.size() &&
          "c, r, x have different lengths!");
 
-  std::size_t n = c.size();
+  const std::size_t n = c.size();
   Eigen::VectorXcd cr_tmp(2 * n), x_tmp(2 * n);
 
   cr_tmp.head(n) = c;
@@ -72,14 +72,6 @@ Eigen::VectorXcd toepMatVecMult(const Eigen::VectorXcd& c,
   return y.head(n);
 }
 
-Eigen::VectorXcd ltpMultold(const Eigen::VectorXcd& f,
-                            const Eigen::VectorXcd& g) {
-  assert(f.size() == g.size() && "f and g vectors must have the same length!");
-
-  std::size_t n = f.size();
-  return toepMatVecMult(f, Eigen::VectorXcd::Zero(n), g);
-}
-
 /* @brief Multiply two lower triangular Toeplitz matrices
  * \param f Vector of entries of first lower triangular Toeplitz matrix
  * \param g Vector of entries of second lower triangular Toeplitz matrix
@@ -88,7 +80,7 @@ Eigen::VectorXcd ltpMultold(const Eigen::VectorXcd& f,
 /* SAM_LISTING_BEGIN_0 */
 Eigen::VectorXcd ltpMult(const Eigen::VectorXcd& f, const Eigen::VectorXcd& g) {
   assert(f.size() == g.size() && "f and g vectors must have the same length!");
-  std::size_t n = f.size();
+  const std::size_t n = f.size();
   Eigen::VectorXcd res(n);
   // **********************************************************************
   // Your Solution here
@@ -106,7 +98,6 @@ std::tuple<double, double, double> runtimes_ltpMult(unsigned int N) {
   // **********************************************************************
   // Code to be supplemented
   // **********************************************************************
-
   return {s_dense, s_mv, s_ltp};
 }
 /* SAM_LISTING_END_1 */
@@ -125,16 +116,16 @@ Eigen::VectorXcd ltpSolve(const Eigen::VectorXcd& f,
   assert(log2(f.size()) == floor(log2(f.size())) &&
          "Size of f must be a power of 2!");
 
-  std::size_t n = f.size();
+  const std::size_t n = f.size();
   if (n == 1) {
     return y.cwiseQuotient(f);
   }
 
-  Eigen::VectorXcd u_head = ltpSolve(f.head(n / 2), y.head(n / 2));
-  Eigen::VectorXcd t =
+  const Eigen::VectorXcd u_head = ltpSolve(f.head(n / 2), y.head(n / 2));
+  const Eigen::VectorXcd t =
       y.tail(n / 2) -
       toepMatVecMult(f.tail(n / 2), f.segment(1, n / 2).reverse(), u_head);
-  Eigen::VectorXcd u_tail = ltpSolve(f.head(n / 2), t);
+  const Eigen::VectorXcd u_tail = ltpSolve(f.head(n / 2), t);
   Eigen::VectorXcd u(n);
   u << u_head, u_tail;
   return u;
@@ -155,24 +146,24 @@ std::pair<double, double> runtimes_ltpSolve(unsigned int N) {
 
 // check accuracy ltpMult
 void test_accuracy_ltpMult() {
-  std::size_t n = 4;
+  const std::size_t n = 4;
   Eigen::VectorXcd c1(n), c2(n), r1(n), r2(n), y(n);
   c1 << 1, 2, 3, 4;
   r1 << 1, 0, 0, 0;
   c2 << 5, 6, 7, 8;
   r2 << 5, 0, 0, 0;
-  Eigen::MatrixXcd T1 = toeplitz(c1, r1);
-  Eigen::MatrixXcd T2 = toeplitz(c2, r2);
+  const Eigen::MatrixXcd T1 = toeplitz(c1, r1);
+  const Eigen::MatrixXcd T2 = toeplitz(c2, r2);
 
   std::cout << "\nCheck that ltpMult is correct" << std::endl;
-  Eigen::VectorXcd c1c2 = ltpMult(c1, c2);
-  Eigen::MatrixXcd T1T2 = T1 * T2;
+  const Eigen::VectorXcd c1c2 = ltpMult(c1, c2);
+  const Eigen::MatrixXcd T1T2 = T1 * T2;
   std::cout << "Error = " << (c1c2 - T1T2.col(0)).norm() << std::endl;
 }
 
 // check accuracy ltpSolve
 void test_accuracy_ltpSolve() {
-  std::size_t n = 4;
+  const std::size_t n = 4;
   Eigen::VectorXcd c(n), r(n), y(n);
   c << 1, 2, 3, 4;
   r.setZero();
@@ -181,8 +172,8 @@ void test_accuracy_ltpSolve() {
   Eigen::MatrixXcd T = toeplitz(c, r);
 
   std::cout << "\nCheck that ltpSolve is correct" << std::endl;
-  Eigen::VectorXcd u_rec = ltpSolve(c, y);
-  Eigen::VectorXcd u_sol = T.triangularView<Eigen::Lower>().solve(y);
+  const Eigen::VectorXcd u_rec = ltpSolve(c, y);
+  const Eigen::VectorXcd u_sol = T.triangularView<Eigen::Lower>().solve(y);
   std::cout << "Error = " << (u_rec - u_sol).norm() << std::endl;
 }
 

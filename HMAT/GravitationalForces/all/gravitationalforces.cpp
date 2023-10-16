@@ -324,9 +324,8 @@ std::pair<double, double> measureRuntimes(unsigned int n, unsigned int n_runs) {
   std::vector<double> mass(n, 1.0);
   double ms_exact =
       std::numeric_limits<double>::max();  // Time measured for exact evaluation
-  double ms_cluster =
-      std::numeric_limits<double>::max();  // Time taken for clustering-based
-                                           // evaluatiion
+  double ms_cluster = std::numeric_limits<
+      double>::max();  // Time taken for clustering-based evaluatiion
 #if SOLUTION
   // Build quad tree of stars
   StarQuadTreeClustering qt(pos, mass);

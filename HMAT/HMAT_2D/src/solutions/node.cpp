@@ -18,8 +18,7 @@
 
 #define equal_clusters
 
-// actual  constructor: creates the root of the Cluster Tree and the recursivly
-// creates the leaves
+// actual  constructor: creates the root of the Cluster Tree and the recursivly creates the leaves
 Node::Node(std::vector<Point> Points, unsigned deg)
     : tl_child_(NULL),
       tr_child_(NULL),
@@ -77,24 +76,24 @@ void Node::getRect() {
 void Node::setSons() {
   if (!PPointsTree_.empty() &&
       PPointsTree_.size() >
-          1) {  // if there are points in the PPointsTree vector of points then
-                // they are equaly divided into the node´s children
+          1) {  // if there are points in the PPointsTree vector of points then they are equaly divided into the node´s children
 #ifdef equal_clusters
     /* SAM_LISTING_BEGIN_0 */
     auto checkX = [](Point a, Point b) -> bool { return a.getX() < b.getX(); };
     std::sort(PPointsTree_.begin(), PPointsTree_.end(), checkX);
     std::vector<Point>::iterator it;
-    it = PPointsTree_.begin() +
-         (PPointsTree_.size() + 1) / 2;     // set iterator in the middle of the
-                                            // vector of points of this node
-    std::vector<Point> l_points, r_points;  // now sort l\_points and r\_points
-                                            // based on their y-coordinates
+    it =
+        PPointsTree_.begin() +
+        (PPointsTree_.size() + 1) /
+            2;  // set iterator in the middle of the vector of points of this node
+    std::vector<Point> l_points,
+        r_points;  // now sort l\_points and r\_points based on their y-coordinates
     l_points.assign(PPointsTree_.begin(), it);
     r_points.assign(it, PPointsTree_.end());
     auto checkY = [](Point a, Point b) -> bool { return a.getY() < b.getY(); };
-    std::sort(l_points.begin(), l_points.end(),
-              checkY);  // sort left and right vectors into top and bottom based
-                        // on the y-coordinates
+    std::sort(
+        l_points.begin(), l_points.end(),
+        checkY);  // sort left and right vectors into top and bottom based on the y-coordinates
     std::sort(r_points.begin(), r_points.end(), checkY);
     std::vector<Point> tl_PPoints, tr_PPoints, bl_PPoints,
         br_PPoints;  // creation of vectors of points of child nodes
@@ -106,8 +105,9 @@ void Node::setSons() {
     br_PPoints.assign(r_points.begin(), it);
 
     if (!tl_PPoints.empty())
-      tl_child_ = new Node(tl_PPoints, deg_);  // recursive construction of the
-                                               // Cluster Tree levels below root
+      tl_child_ = new Node(
+          tl_PPoints,
+          deg_);  // recursive construction of the Cluster Tree levels below root
     if (!tr_PPoints.empty()) tr_child_ = new Node(tr_PPoints, deg_);
     if (!bl_PPoints.empty()) bl_child_ = new Node(bl_PPoints, deg_);
     if (!br_PPoints.empty()) br_child_ = new Node(br_PPoints, deg_);
@@ -129,22 +129,21 @@ void Node::setSons() {
     }
     Eigen::MatrixXd M = A * A.transpose();
     Eigen::JacobiSVD<Eigen::MatrixXd> svdOfM(
-        M, Eigen::ComputeThinV);  // 'M' is square, so ComputeFullV and
-                                  // ComputeThinV are the same
+        M,
+        Eigen::
+            ComputeThinV);  // 'M' is square, so ComputeFullV and ComputeThinV are the same
     Eigen::MatrixXd V = svdOfM.matrixV();
     auto y = [](double x, double x1, double y1, double avgX,
                 double avgY) -> double { return avgY + (x - avgX) * y1 / x1; };
     std::vector<Point> top_PPoints, bottom_PPoints, left_PPoints,
         right_PPoints;  // creation of vectors of points of child nodes
     for (unsigned i = 0; i < PPointsTree_.size(); ++i) {
-      double y1 = y(PPointsTree_[i].getX(), V(0, 0), V(1, 0), avgX,
-                    avgY);  // y value of the line that is defined by the point
-                            // {avgX,avgY} and the vector corresponding to the
-                            // biggest eigen value
-      double y2 = y(PPointsTree_[i].getX(), V(0, 1), V(1, 1), avgX,
-                    avgY);  // y value of the line that is defined by the point
-                            // {avgX,avgY} and the vector corresponding to the
-                            // second biggest eigen value
+      double y1 = y(
+          PPointsTree_[i].getX(), V(0, 0), V(1, 0), avgX,
+          avgY);  // y value of the line that is defined by the point {avgX,avgY} and the vector corresponding to the biggest eigen value
+      double y2 = y(
+          PPointsTree_[i].getX(), V(0, 1), V(1, 1), avgX,
+          avgY);  // y value of the line that is defined by the point {avgX,avgY} and the vector corresponding to the second biggest eigen value
       if (y2 <= PPointsTree_[i].getY()) {
         if (y1 <= PPointsTree_[i].getY()) {
           top_PPoints.push_back(PPointsTree_[i]);
@@ -161,9 +160,9 @@ void Node::setSons() {
     }
 
     if (!top_PPoints.empty())
-      tl_child_ =
-          new Node(top_PPoints, deg_);  // recursive construction of the Cluster
-                                        // Tree levels below root
+      tl_child_ = new Node(
+          top_PPoints,
+          deg_);  // recursive construction of the Cluster Tree levels below root
     if (!right_PPoints.empty()) tr_child_ = new Node(right_PPoints, deg_);
     if (!bottom_PPoints.empty()) bl_child_ = new Node(bottom_PPoints, deg_);
     if (!left_PPoints.empty()) br_child_ = new Node(left_PPoints, deg_);
@@ -227,42 +226,41 @@ unsigned Node::setV() {
 
   // Alternate way of computing V matrix
   /*
-      Eigen::MatrixXd VnodeX = Eigen::MatrixXd::Ones(ppts, (deg_+1));
-      Eigen::MatrixXd VnodeY = Eigen::MatrixXd::Ones(ppts, (deg_+1));
-      for(unsigned i=0; i<=ppts-1; ++i) {
-          for(unsigned j=0; j<=deg_; ++j) {
-              for(unsigned k=0; k<j; ++k) {
-                  VnodeX(i,j) *= PPointsTree_[i].getX() - tkx_[k];
-              }
-              // Skip "k == j"
-              for(unsigned k=j+1; k<=deg_; ++k) {
-                  VnodeX(i,j) *= PPointsTree_[i].getX() - tkx_[k];
-              }
-              VnodeX(i,j) *= wkx_(j);
-          }
-      }
-      for(unsigned i=0; i<=ppts-1; ++i) {
-          for(unsigned j=0; j<=deg_; ++j) {
-              for(unsigned k=0; k<j; ++k) {
-                  VnodeY(i,j) *= PPointsTree_[i].getY() - tky_[k];
-              }
-              // Skip "k == j"
-              for(unsigned k=j+1; k<=deg_; ++k) {
-                  VnodeY(i,j) *= PPointsTree_[i].getY() - tky_[k];
-              }
-              VnodeY(i,j) *= wky_(j);
-          }
-      }
+    Eigen::MatrixXd VnodeX = Eigen::MatrixXd::Ones(ppts, (deg_+1));
+    Eigen::MatrixXd VnodeY = Eigen::MatrixXd::Ones(ppts, (deg_+1));
+    for(unsigned i=0; i<=ppts-1; ++i) {
+        for(unsigned j=0; j<=deg_; ++j) {
+            for(unsigned k=0; k<j; ++k) {
+                VnodeX(i,j) *= PPointsTree_[i].getX() - tkx_[k];
+            }
+            // Skip "k == j"
+            for(unsigned k=j+1; k<=deg_; ++k) {
+                VnodeX(i,j) *= PPointsTree_[i].getX() - tkx_[k];
+            }
+            VnodeX(i,j) *= wkx_(j);
+        }
+    }
+    for(unsigned i=0; i<=ppts-1; ++i) {
+        for(unsigned j=0; j<=deg_; ++j) {
+            for(unsigned k=0; k<j; ++k) {
+                VnodeY(i,j) *= PPointsTree_[i].getY() - tky_[k];
+            }
+            // Skip "k == j"
+            for(unsigned k=j+1; k<=deg_; ++k) {
+                VnodeY(i,j) *= PPointsTree_[i].getY() - tky_[k];
+            }
+            VnodeY(i,j) *= wky_(j);
+        }
+    }
 
-      Eigen::MatrixXd V_node_new(ppts, (deg_+1)*(deg_+1));
-      for(unsigned i=0; i<=ppts-1; ++i) {
-          for(unsigned j=0; j<=deg_; ++j) {
-              V_node_new.block(i, j*(deg_+1), 1, deg_+1) = VnodeX(i,j) *
-     VnodeY.row(i);
-          }
-      }
-      V_node_ = V_node_new;
-  */
+    Eigen::MatrixXd V_node_new(ppts, (deg_+1)*(deg_+1));
+    for(unsigned i=0; i<=ppts-1; ++i) {
+        for(unsigned j=0; j<=deg_; ++j) {
+            V_node_new.block(i, j*(deg_+1), 1, deg_+1) = VnodeX(i,j) * VnodeY.row(i);
+        }
+    }
+    V_node_ = V_node_new;
+*/
   /* SAM_LISTING_END_3 */
   return ppts * (deg_ + 2) * (deg_ + 1) /
          2;  // return no. of 'operations' performed
