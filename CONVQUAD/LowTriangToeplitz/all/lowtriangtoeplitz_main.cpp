@@ -30,7 +30,7 @@ int main() {
             << std::setw(20) << "Runtime for tria" << std::left << std::setw(20)
             << "Runtime for ltp" << std::endl;
   std::ofstream f_solve(CURRENT_SOURCE_DIR "/runtime_solve.txt");
-  for (int p = 3; p < 10; p++)  // take too long for p > 10
+  for (int p = 5; p < 14; p++)  // take too long for p > 10
   {
     int N = pow(2, p);
     auto [tria, ltp] = LowTriangToeplitz::runtimes_ltpSolve(N);
