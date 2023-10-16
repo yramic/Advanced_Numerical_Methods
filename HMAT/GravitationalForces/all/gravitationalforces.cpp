@@ -48,9 +48,9 @@ std::vector<Eigen::Vector2d> initStarPositions(unsigned int n, double mindist) {
     }
   } while (pos.size() < n);
 #else
-// **********************************************************************
-// Code to be supplemented
-// **********************************************************************
+  // **********************************************************************
+  // Code to be supplemented
+  // **********************************************************************
 #endif
   return pos;
 }
@@ -81,9 +81,9 @@ std::vector<Eigen::Vector2d> computeForces_direct(
     forces[j] = acc * masses[j] / (4 * M_PI);
   }
 #else
-// **********************************************************************
-// Code to be supplemented
-// **********************************************************************
+  // **********************************************************************
+  // Code to be supplemented
+  // **********************************************************************
 #endif
   return forces;
 }
@@ -178,9 +178,9 @@ StarQuadTree::StarQuadTreeNode::StarQuadTreeNode(
           sub_indices[i], sub_boxes[i], tree));
   }
 #else
-// **********************************************************************
-// Code to be supplemented
-// **********************************************************************
+  // **********************************************************************
+  // Code to be supplemented
+  // **********************************************************************
 #endif
 }
 
@@ -240,9 +240,9 @@ bool StarQuadTreeClustering::isAdmissible(const StarQuadTreeNode &node,
   admissible =
       (dist > eta * diam);  // Admissibility condition \lref{eq:admstar}
 #else
-// **********************************************************************
-// Code to be supplemented
-// **********************************************************************
+  // **********************************************************************
+  // Code to be supplemented
+  // **********************************************************************
 #endif
   return admissible;
 }
@@ -280,9 +280,9 @@ Eigen::Vector2d StarQuadTreeClustering::forceOnStar(unsigned int j,
   // Multiply with forefactor in \prbeqref{eq:fjs}
   acc = (acc * starmasses_[j] / (4 * M_PI));
 #else
-// **********************************************************************
-// Code to be supplemented
-// **********************************************************************
+  // **********************************************************************
+  // Code to be supplemented
+  // **********************************************************************
 #endif
   return acc;
 }
@@ -307,9 +307,9 @@ std::vector<double> forceError(const StarQuadTreeClustering &qt,
         *std::max_element(normed_errors.begin(), normed_errors.end());
   }
 #else
-// **********************************************************************
-// Code to be supplemented
-// **********************************************************************
+      // **********************************************************************
+      // Code to be supplemented
+      // **********************************************************************
 #endif
   return error;
 }
@@ -360,9 +360,9 @@ std::pair<double, double> measureRuntimes(unsigned int n, unsigned int n_runs) {
   std::cout << "n = " << n << " : runtime forceOnStar[eta=" << eta
             << "]= " << ms_cluster << "ms\n";
 #else
-// **********************************************************************
-// Code to be supplemented
-// **********************************************************************
+  // **********************************************************************
+  // Code to be supplemented
+  // **********************************************************************
 #endif
   return {ms_exact, ms_cluster};
 }
