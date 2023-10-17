@@ -41,6 +41,7 @@ Eigen::MatrixXcd toeplitz(const Eigen::VectorXcd& c,
 Eigen::VectorXcd pconvfft(const Eigen::VectorXcd& u,
                           const Eigen::VectorXcd& x) {
   Eigen::FFT<double> fft;
+  // NumCSE Theorem 4.2.2.2
   const Eigen::VectorXcd tmp = (fft.fwd(u)).cwiseProduct(fft.fwd(x));
   return fft.inv(tmp);
 }
@@ -55,10 +56,13 @@ Eigen::VectorXcd ltpMult(const Eigen::VectorXcd& f, const Eigen::VectorXcd& g) {
   assert(f.size() == g.size() && "f and g vectors must have the same length!");
   const std::size_t n = f.size();
   Eigen::VectorXcd res(n);
+  // Using \prbcref<prb:ltp:tp3h1> and \prbcref<prb:ltp:tp3h2>
+  // Zero padding
   Eigen::VectorXcd f_long = Eigen::VectorXcd::Zero(2 * n);
   Eigen::VectorXcd g_long = Eigen::VectorXcd::Zero(2 * n);
   f_long.head(n) = f;
   g_long.head(n) = g;
+  // Periodic discrete convolution
   res = pconvfft(f_long, g_long).head(n);
   return res;
 }
@@ -73,16 +77,16 @@ std::tuple<double, double, double> runtimes_ltpMult(unsigned int N) {
   // Measure runtime several times
   const int num_repetitions = 6;
 
-  // Sequence of Toeplitz matrix
+  // Sequence of Toeplitz matrices
   Eigen::VectorXcd c(N), r(N), v(N);
+  // Initialization of the sequence of Toeplitz matrices
   c = Eigen::VectorXcd::Random(N);
   v = Eigen::VectorXcd::Constant(N, 1.0);
 
-  // Generate dense representation of c and v
+  // Generate dense representation of Toeplitz matrix
   r.setZero();
   r(0) = c(0);
   const Eigen::MatrixXcd T = toeplitz(c, r);
-
   r(0) = v(0);
   const Eigen::MatrixXcd V = toeplitz(v, r);
 
@@ -90,6 +94,7 @@ std::tuple<double, double, double> runtimes_ltpMult(unsigned int N) {
   s_dense = std::numeric_limits<double>::max();
   Eigen::MatrixXcd T_mult_V;
   for (int k = 0; k < num_repetitions; k++) {
+    // Use C++ chrono library to measure runtimes
     auto t1 = std::chrono::high_resolution_clock::now();
     T_mult_V = T * V;
     auto t2 = std::chrono::high_resolution_clock::now();
@@ -106,6 +111,7 @@ std::tuple<double, double, double> runtimes_ltpMult(unsigned int N) {
   s_mv = std::numeric_limits<double>::max();
   Eigen::VectorXcd T_mult_v;
   for (int k = 0; k < num_repetitions; k++) {
+    // Use C++ chrono library to measure runtimes
     auto t1 = std::chrono::high_resolution_clock::now();
     T_mult_v = T * v;
     auto t2 = std::chrono::high_resolution_clock::now();
@@ -121,6 +127,7 @@ std::tuple<double, double, double> runtimes_ltpMult(unsigned int N) {
   s_ltp = std::numeric_limits<double>::max();
   Eigen::VectorXcd c_conv_v;
   for (int k = 0; k < num_repetitions; k++) {
+    // Use C++ chrono library to measure runtimes
     auto t1 = std::chrono::high_resolution_clock::now();
     c_conv_v = ltpMult(c, v);
     auto t2 = std::chrono::high_resolution_clock::now();
@@ -152,13 +159,19 @@ Eigen::VectorXcd toepMatVecMult(const Eigen::VectorXcd& c,
   Eigen::VectorXcd y(2 * n);
   Eigen::VectorXcd cr_tmp(2 * n), x_tmp(2 * n);
 
+  // Using \prbcref<prb:ltp:tp5h1>
+  // Construct the sequence of Toeplitz matrix
   cr_tmp.head(n) = c;
   cr_tmp.tail(n) = Eigen::VectorXcd::Zero(n);
+  // Need to reverse the upper trangular sequence and
+  // add it to the end in case it is not a lower triangular matrix
   cr_tmp.tail(n - 1) = r.tail(n - 1).reverse();
 
   x_tmp.head(n) = x;
+  // Zero padding
   x_tmp.tail(n) = Eigen::VectorXcd::Zero(n);
 
+  // Periodic discrete convolution
   y = pconvfft(cr_tmp, x_tmp);
   return y.head(n);
 }
@@ -180,16 +193,22 @@ Eigen::VectorXcd ltpSolve(const Eigen::VectorXcd& f,
 
   const std::size_t n = f.size();
   Eigen::VectorXcd u(n);
+  // When it reduces to scalar
   if (n == 1) {
     return y.cwiseQuotient(f);
   }
 
+  // Solve by recursion
+  // Solve for the first half of $\Vu$
   const Eigen::VectorXcd u_head = ltpSolve(f.head(n / 2), y.head(n / 2));
+  // Update the right hand side by subtracting the product of the lower left part
+  // of Toeplitz matrix and the first half of $\Vu$
   const Eigen::VectorXcd t =
       y.tail(n / 2) -
       toepMatVecMult(f.tail(n / 2), f.segment(1, n / 2).reverse(), u_head);
+  // Solve for the second half of $\Vu$
   const Eigen::VectorXcd u_tail = ltpSolve(f.head(n / 2), t);
-
+  // Assemble results
   u << u_head, u_tail;
   return u;
 }
@@ -203,8 +222,9 @@ std::pair<double, double> runtimes_ltpSolve(unsigned int N) {
   // Measure runtime several times
   int num_repititions = 6;
 
-  // Sequence of Toeplitz matrix
+  // Sequence of Toeplitz matrix and vector
   Eigen::VectorXcd c(N), r(N), v(N);
+  // Initialization
   for (int i = 0; i < N; i++) {
     c(i) = i + 1;
   }
@@ -220,6 +240,7 @@ std::pair<double, double> runtimes_ltpSolve(unsigned int N) {
   Eigen::VectorXcd u_sol;
   s_tria = std::numeric_limits<double>::max();
   for (int k = 0; k < num_repititions; k++) {
+    // Use C++ chrono library to measure runtimes
     auto t1 = std::chrono::high_resolution_clock::now();
     u_sol = T.triangularView<Eigen::Lower>().solve(T_mult_v);
     auto t2 = std::chrono::high_resolution_clock::now();
@@ -235,6 +256,7 @@ std::pair<double, double> runtimes_ltpSolve(unsigned int N) {
   Eigen::VectorXcd u_rec;
   s_ltp = std::numeric_limits<double>::max();
   for (int k = 0; k < num_repititions; k++) {
+    // Use C++ chrono library to measure runtimes
     auto t1 = std::chrono::high_resolution_clock::now();
     u_rec = ltpSolve(c, T_mult_v);
     auto t2 = std::chrono::high_resolution_clock::now();

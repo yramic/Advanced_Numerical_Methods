@@ -3,21 +3,25 @@
 int main() {
   /* SAM_LISTING_BEGIN_1 */
   {
+    // Exact solution
     auto u = [](double t) { return 2. / M_PI * sqrt(t); };
     auto y = [](double t) { return t; };
 
     const double tau = 0.01;
     const std::size_t N = std::round(1. / tau);
     const Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N + 1, 0., 1.);
+    // Exact solution at grid points
     const Eigen::VectorXd u_ex = Eigen::VectorXd::NullaryExpr(
         N + 1, [&](Eigen::Index i) { return u(grid(i)); });
 
     std::cout << "\nSpectral Galerkin\n\n";
     double err_max, err_max_alt;
     for (int p = 2; p <= 10; ++p) {
+      // Solution using Galerkin discretization with a polynomial basis
       const Eigen::VectorXd u_app =
           AbelIntegralEquation::poly_spec_abel(y, p, tau);
       const Eigen::VectorXd diff = u_ex - u_app;
+      // Maximum norm of discretization error
       err_max = diff.cwiseAbs().maxCoeff();
       const double dp = p;
 
@@ -38,6 +42,7 @@ int main() {
   /* SAM_LISTING_BEGIN_4 */
 
   {
+    // Exact solution
     auto u = [](double t) { return 2. / M_PI * sqrt(t); };
     auto y = [](double t) { return t; };
 
@@ -45,11 +50,14 @@ int main() {
     cout << "\n\nConvolution Quadrature, Implicit Euler\n\n";
     for (int N = 16; N <= 2048; N <<= 1) {
       const Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N + 1, 0., 1.);
+      // Exact solution at grid points
       const Eigen::VectorXd u_ex = Eigen::VectorXd::NullaryExpr(
           N + 1, [&](Eigen::Index i) { return u(grid(i)); });
 
+      // Solution using convolution quadrature based on implicit Euler method
       const Eigen::VectorXd u_app = AbelIntegralEquation::cq_ieul_abel(y, N);
       const Eigen::VectorXd diff = u_ex - u_app;
+      // Maximum norm of discretization error
       err_max = diff.cwiseAbs().maxCoeff();
 
       std::cout << "N = " << N << std::setw(15) << "Max = " << std::scientific
@@ -65,13 +73,16 @@ int main() {
     std::cout << "\n\nConvolution Quadrature, BDF-2\n" << '\n';
     for (int N = 16; N <= 2048; N <<= 1) {
       Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N + 1, 0., 1.);
+      // Exact solution at grid points
       Eigen::VectorXd u_ex(N + 1);
       for (int i = 0; i < N + 1; ++i) {
         u_ex(i) = 2. / M_PI * sqrt(grid(i));
       }
 
+      // Solution using convolution quadrature based on BDF-2 method
       const Eigen::VectorXd u_app = AbelIntegralEquation::cq_bdf2_abel(y, N);
       const Eigen::VectorXd diff = u_ex - u_app;
+      // Maximum norm of discretization error
       err_max = diff.cwiseAbs().maxCoeff();
 
       std::cout << "N = " << N << std::setw(15) << "Max = " << std::scientific
