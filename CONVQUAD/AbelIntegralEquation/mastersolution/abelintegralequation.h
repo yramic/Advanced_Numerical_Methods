@@ -87,13 +87,16 @@ Eigen::VectorXd poly_spec_abel(const FUNC& y, std::size_t p, double tau) {
   const double sqrt_pi = std::sqrt(M_PI);
 
   for (int i = 0; i <= p; i++) {
+    // Set up Galerkin matrix according to \prbcref{ais:subprb:sg2}
     for (int j = 0; j <= p; j++) {
       A(i, j) = sqrt_pi * gamma_factor[j] / (1.5 + i + j);
     }
 
+    // Set up the rhs vector of the LSE with Gauss-Legendre quadrature
     for (int k = 0; k < p; k++) {
       const double tk = gauss_pts_p(k);
       const double wk = gauss_wht_p(k);
+      // Based on \prbeqref{eq:aieAent}
       b(i) += wk * std::pow(tk, i) * y(tk);
     }
   }
@@ -102,6 +105,7 @@ Eigen::VectorXd poly_spec_abel(const FUNC& y, std::size_t p, double tau) {
   const Eigen::ColPivHouseholderQR<Eigen::MatrixXd> solver(A);
   const Eigen::VectorXd x = solver.solve(b);
 
+  // generate points on the grid
   const std::size_t N = std::round(1. / tau);
   const Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N + 1, 0., 1.);
   Eigen::VectorXd u = Eigen::VectorXd::Zero(N + 1);
@@ -125,19 +129,23 @@ template <typename FUNC>
 Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
   Eigen::VectorXd w(N + 1);
   w(0) = 1.;
+  // Calculate weights of convolution quadrature based on \prbcref{ais:subprb:cq1}
   for (int l = 1; l < N + 1; ++l) {
     w(l) = w(l - 1) * (l - 0.5) / l;  // denominator is factorial
   }
   w *= std::sqrt(M_PI / N);
 
   // Solve the convolution quadrature:
-
+  // Generate points on the grid
   Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N + 1, 0., 1.);
+  // Set up the rhs vector of the LSE
   Eigen::VectorXd y_N(N + 1);
   for (int i = 0; i < N + 1; ++i) {
     y_N(i) = y(grid(i));
   }
+  // Set up the coefficient matrix
   Eigen::MatrixXd T = toeplitz_triangular(w);
+  // Solve the lse with Eigen's build-in triangular elimination solver
   Eigen::VectorXd u = T.triangularView<Lower>().solve(y_N);
   return u;
 }
@@ -154,6 +162,7 @@ template <typename FUNC>
 Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N) {
   Eigen::VectorXd w1(N + 1);
   w1(0) = 1.;
+  // Calculate weights of convolution quadrature based on \prbcref{ais:subprb:cq2}
   for (int l = 1; l < N + 1; ++l) {
     w1(l) = w1(l - 1) * (l - 0.5) / l;  // denominator is factorial
   }
@@ -167,14 +176,17 @@ Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N) {
   w *= std::sqrt(M_PI / N) * std::sqrt(2. / 3.);
 
   // Solve the convolution quadrature:
-
+  // Generate points on the grid
   Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N + 1, 0., 1.);
+  // Set up the rhs vector of the LSE
   Eigen::VectorXd y_N(N + 1);
   for (int i = 0; i < N + 1; ++i) {
     y_N(i) = y(grid(i));
   }
 
+  // Set up the coefficient matrix
   Eigen::MatrixXd T = toeplitz_triangular(w);
+  // Solve the lse with Eigen's build-in triangular elimination solver
   Eigen::VectorXd u = T.triangularView<Lower>().solve(y_N);
 
   return u;

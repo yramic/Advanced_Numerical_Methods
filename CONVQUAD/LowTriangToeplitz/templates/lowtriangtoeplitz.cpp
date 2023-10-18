@@ -41,6 +41,7 @@ Eigen::MatrixXcd toeplitz(const Eigen::VectorXcd& c,
 Eigen::VectorXcd pconvfft(const Eigen::VectorXcd& u,
                           const Eigen::VectorXcd& x) {
   Eigen::FFT<double> fft;
+  // NumCSE Theorem 4.2.2.2
   const Eigen::VectorXcd tmp = (fft.fwd(u)).cwiseProduct(fft.fwd(x));
   return fft.inv(tmp);
 }
