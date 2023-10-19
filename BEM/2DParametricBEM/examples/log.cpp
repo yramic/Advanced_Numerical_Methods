@@ -1,10 +1,10 @@
-#include <Eigen/Dense>
 #include <cmath>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <string>
 
+#include <Eigen/Dense>
 #include "integral_gauss.hpp"
 
 int main() {

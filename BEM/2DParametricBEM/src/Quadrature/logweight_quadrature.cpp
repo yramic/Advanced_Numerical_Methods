@@ -11,12 +11,11 @@
 #include "logweight_quadrature.hpp"
 
 #include <Eigen/Dense>
-
 #include "genLaguerreRule.hpp"
 
-static const int KIND = 5;  // To get Gauss-Laguerre quadrature rule
+static const int KIND = 5; // To get Gauss-Laguerre quadrature rule
 
-QuadRule getLogWeightQR(double a, int n) {
+QuadRule getLogWeightQR(double a, int n){
   // get Gauss-Laguerre quadrature points and weights
   double *w = new double[n];
   double *x = new double[n];
@@ -26,14 +25,14 @@ QuadRule getLogWeightQR(double a, int n) {
   logWeightQR.dim = 1;
   logWeightQR.n = n;
   // create matrix and vector for its points and weights
-  Eigen::MatrixXd points(n, 1);
+  Eigen::MatrixXd points(n,1);
   Eigen::VectorXd weights(n);
   // Generate them applying the required transformation
-  for (int i = 0; i < n; i++) {
+  for(int i=0; i<n; i++){
     // quadrature point becomes: $q = a e^{-x}$
-    points(i, 0) = a * exp(-x[i]);
+    points(i,0) = a*exp(-x[i]);
     // weight becomes $w = a(log(a)-x)w$
-    weights(i) = a * (log(a) - x[i]) * w[i];
+    weights(i) = a*(log(a)-x[i])*w[i];
   }
   logWeightQR.x = points;
   logWeightQR.w = weights;
