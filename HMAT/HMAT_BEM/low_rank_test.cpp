@@ -165,14 +165,9 @@ int main() {
         Segment s;
         s.setId(i);
 
-        double angle = M_PI*2/n;
-        Eigen::Vector2d a, b;
-        a << std::cos(angle* i),     std::sin(angle* i);
-        b << std::cos(angle*(i+1.)), std::sin(angle*(i+1.));
-
-        s.setA(a);
-        s.setB(b);
-        segments.push_back(s);
-    }
-*/
+          s.setA(a);
+          s.setB(b);
+          segments.push_back(s);
+      }
+  */
 }

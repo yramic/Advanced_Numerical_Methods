@@ -40,23 +40,23 @@ int main(int /*argc*/, char** /*argv*/) {
   KernMatLLRApprox::BiDirChebPartMat1D<Kernel> Mt(T_row, T_col, G, q, 2.0);
   /* SAM_LISTING_END_1 */
 
-  // Output row cluster tree (the column tree is the same)
-  std::cout << "CLUSTER TREE" << std::endl << *(Mt.rowT->root) << std::endl;
-  // Output block partition
-  std::cout << Mt;
+  // // Output row cluster tree (the column tree is the same)
+  // std::cout << "CLUSTER TREE" << std::endl << *(Mt.rowT->root) << std::endl;
+  // // Output block partition
+  // std::cout << Mt;
 
-  std::cout << "Computing sparsity measure" << std::endl;
-  unsigned int spm = KernMatLLRApprox::computeSparsityMeasure(Mt, &std::cout);
-  std::cout << "Sparsity measure = " << spm << std::endl;
+  // std::cout << "Computing sparsity measure" << std::endl;
+  // unsigned int spm = KernMatLLRApprox::computeSparsityMeasure(Mt,
+  // &std::cout); std::cout << "Sparsity measure = " << spm << std::endl;
 
   std::cout << "Matrix x vector" << std::endl;
   Eigen::VectorXd x = Eigen::VectorXd::Constant(16, 1.0);
   Eigen::VectorXd y = KernMatLLRApprox::mvLLRPartMat(Mt, x);
+  std::cout << y << std::endl;
+  // KernMatLLRApprox::tabulateConvergenceLLR(
+  //     {10, 20, 40, 60, 80, 160}, {3, 4, 5, 6});
 
-  KernMatLLRApprox::tabulateConvergenceLLR(
-      {10, 20, 40, 60, 80, 160, 320, 640, 1280}, {3, 4, 5, 6, 7});
-
-  KernMatLLRApprox::runtimeMatVec(
-      {1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144});
+  // KernMatLLRApprox::runtimeMatVec(
+  //     {1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144});
   return 0;
 }

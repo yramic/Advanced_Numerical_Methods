@@ -190,8 +190,8 @@ template <>
 Eigen::VectorXd LowRankApp<BlockCluster_Y, Node_Y>::mvProd(
     const Eigen::VectorXd &c) {
   blockProcessClear(HP_.getFF());
-  //nops_ = 0;
-  // Setting V and Vc for far field nodes
+  // nops_ = 0;
+  //  Setting V and Vc for far field nodes
   preProcess(HP_.getFFxnds(), HP_.getFFynds(), c);
   // Setting CVc for far field blocks
   blockProcess(HP_.getFF());
@@ -211,7 +211,8 @@ Eigen::VectorXd LowRankApp<BlockCluster_Y, Node_Y>::mvProd(
   // std::cout << "Near Field Contribution for each row" << std::endl;
   //  std::cout << f_approx_nf_contr << std::endl;
   // std::cout << "Near Field Nodes: " << near << " Far Field Nodes: " << far <<
-  // std::endl; std::cout << "Near Field Nodes: " << (double)near/(near+far)*100.
+  // std::endl; std::cout << "Near Field Nodes: " <<
+  // (double)near/(near+far)*100.
   // << "% " << "Far Field Nodes: " << (double)far/(near+far)*100. << "%" <<
   // std::endl;
 

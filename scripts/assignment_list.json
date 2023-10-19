@@ -6,6 +6,7 @@
   [
     "HMAT/GravitationalForces" ,
     "HMAT/KernMatLLRApprox",
+    "HMAT/KernMatLLRApprox_revised",
     "HMAT/LowRankMerge",
     "HMAT/TensorProductChebIntp",
     "HMAT/EvalTrigPoly",

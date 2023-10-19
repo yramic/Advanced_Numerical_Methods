@@ -207,8 +207,8 @@ Eigen::VectorXd LowRankApp<BlockCluster, Node>::mvProd(
 
   // compute far field contribution
   Eigen::VectorXd f_approx = Eigen::VectorXd::Zero(c.size());
-  //auto start = std::chrono::high_resolution_clock::now();
-  // Actual multiplication
+  // auto start = std::chrono::high_resolution_clock::now();
+  //  Actual multiplication
   postProcess(HP_.getFFxnds(), f_approx);
   // std::cout << "Far Field Contribution for each row" << std::endl;
   // std::cout << f_approx_ff_contr << std::endl;
@@ -217,12 +217,13 @@ Eigen::VectorXd LowRankApp<BlockCluster, Node>::mvProd(
   nf_contribution(HP_.getNF(), c, f_approx, f_approx_nf_contr);
   // std::cout << "Near Field Contribution for each row" << std::endl;
   // std::cout << f_approx_nf_contr << std::endl;
-  //auto end = std::chrono::high_resolution_clock::now();
-  //auto time_diff =
+  // auto end = std::chrono::high_resolution_clock::now();
+  // auto time_diff =
   //    std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-  //f_approx(0) = time_diff.count();
+  // f_approx(0) = time_diff.count();
   // std::cout << "Near Field Nodes: " << near << " Far Field Nodes: " << far <<
-  // std::endl; std::cout << "Near Field Nodes: " << (double)near/(near+far)*100.
+  // std::endl; std::cout << "Near Field Nodes: " <<
+  // (double)near/(near+far)*100.
   // << "% " << "Far Field Nodes: " << (double)far/(near+far)*100. << "%" <<
   // std::endl;
 

@@ -19,11 +19,11 @@
 #include "include/low_rank_app.hpp"
 #include "include/point.hpp"
 
-//#define random1
+// #define random1
 #define circle
 
 #define local
-//#define global
+// #define global
 
 int main() {
   // Input
