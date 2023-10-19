@@ -26,8 +26,8 @@ VectorXd conv_wght_bdf2(const FFUNC& F, size_t n, int p, double r = 1.0E-7) {
   // TODO: Compute the convolution weights for Laplace transform F
 }
 
-/* @brief Find the unknown function u at final time t = 1 in the evolution problem
- * using Galerkin discretization and convolution quadrature (BDF-2)
+/* @brief Find the unknown function u at final time t = 1 in the evolution
+ * problem using Galerkin discretization and convolution quadrature (BDF-2)
  * \param g Template function for the right-hand side
  * \param M Number of discretization intervals in time
  * \param N Number of discretization intervals in space
@@ -36,9 +36,11 @@ VectorXd conv_wght_bdf2(const FFUNC& F, size_t n, int p, double r = 1.0E-7) {
  */
 template <typename FUNC>
 VectorXd solve_IBVP(const FUNC& g, size_t M, size_t N, int p) {
-  // TODO: Find the unknown function u at final time t = 1 in the evolution problem
+  // TODO: Find the unknown function u at final time t = 1 in the evolution
+  // problem
 }
 
 int main() {
-  // TODO: Tabulate the H1-error of the Galerkin discretization + convolution quadrature
+  // TODO: Tabulate the H1-error of the Galerkin discretization + convolution
+  // quadrature
 }

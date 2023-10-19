@@ -11,10 +11,11 @@
 #include "adj_double_layer.hpp"
 
 #include <math.h>
-#include <vector>
-#include <limits>
 
 #include <Eigen/Dense>
+#include <limits>
+#include <vector>
+
 #include "abstract_bem_space.hpp"
 #include "abstract_parametrized_curve.hpp"
 #include "discontinuous_space.hpp"
@@ -39,5 +40,5 @@ Eigen::MatrixXd GalerkinMatrix(const ParametrizedMesh mesh,
                                                        trial_space, N);
 }
 
-} // namespace adj_double_layer
-} // namespace parametricbem2d
+}  // namespace adj_double_layer
+}  // namespace parametricbem2d

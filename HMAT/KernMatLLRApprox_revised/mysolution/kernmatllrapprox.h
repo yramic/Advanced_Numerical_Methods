@@ -83,9 +83,9 @@ class LLRClusterTree : public HMAT::ClusterTree<HMAT::CtNode<1>> {
       const double a = bbox.minc[0];
       const double b = bbox.maxc[0];
 
-// **********************************************************************
-// TODO
-// **********************************************************************
+      // **********************************************************************
+      // TODO
+      // **********************************************************************
     };
     initvrec(this->root.get());
   }
@@ -197,10 +197,10 @@ class BiDirChebBlockPartition : public HMAT::BlockPartition<TREE> {
   const std::size_t q;      // degree+1 of interpolating polynomial
   unsigned int ffb_cnt{0};  // Counter for far-field blocks
   unsigned int nfb_cnt{0};  // Counter for near-field blocks
-  // vector containing matrices C for every far field block
-  std::vector<Eigen::MatrixXd> Cs;
-  // vector containing matrices M for every near field block
-  std::vector<Eigen::MatrixXd> Mlocs;
+  std::vector<Eigen::MatrixXd>
+      Cs;  // vector containing matrices C for every far field block
+  std::vector<Eigen::MatrixXd>
+      Mlocs;  // vector containing matrices M for every near field block
 };
 /* SAM_LISTING_END_H */
 
@@ -230,9 +230,9 @@ Eigen::VectorXd mvLLRPartMat(BiDirChebBlockPartition<TREE, KERNEL> &llrcmat,
   assertm(x.size() == col_idxs.size(), "Wrong size of vector x");
   Eigen::VectorXd y(row_idxs.size());  // Return value
   y.setZero();
-    // **********************************************************************
-    // TODO
-    // **********************************************************************
+// **********************************************************************
+// TODO
+// **********************************************************************
   return y;
 }
 /* SAM_LISTING_END_U */
@@ -268,9 +268,9 @@ unsigned int computeSparsityMeasure(const HMAT::BlockPartition<TREE> &blockpart,
   // Maximal node counts for row adn column clusters
   int xnode_maxcnt = 0;
   int ynode_maxcnt = 0;
-// **********************************************************************
-// YOUR CODE HERE
-// **********************************************************************
+  // **********************************************************************
+  // YOUR CODE HERE
+  // **********************************************************************
   return std::max(xnode_maxcnt, ynode_maxcnt);
 }
 /* SAM_LISTING_END_S */

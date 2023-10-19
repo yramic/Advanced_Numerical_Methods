@@ -233,9 +233,9 @@ class LLRClusterTree : public HMAT::ClusterTree<HMAT::CtNode<1>> {
       if (node->sons[0]) initvrec(node->sons[0].get());
       if (node->sons[1]) initvrec(node->sons[1].get());
 #else
-      // **********************************************************************
-      // TODO
-      // **********************************************************************
+// **********************************************************************
+// TODO
+// **********************************************************************
 #endif
     };
     initvrec(this->root.get());
@@ -349,9 +349,9 @@ class BiDirChebBlockPartition : public HMAT::BlockPartition<TREE> {
   unsigned int ffb_cnt{0};  // Counter for far-field blocks
   unsigned int nfb_cnt{0};  // Counter for near-field blocks
   // vector containing matrices C for every far field block
-  std::vector<Eigen::MatrixXd> Cs;
+  std::vector<Eigen::MatrixXd> Cs;  
   // vector containing matrices M for every near field block
-  std::vector<Eigen::MatrixXd> Mlocs;
+  std::vector<Eigen::MatrixXd> Mlocs;  
 };
 /* SAM_LISTING_END_H */
 
@@ -444,9 +444,9 @@ Eigen::VectorXd mvLLRPartMat(BiDirChebBlockPartition<TREE, KERNEL> &llrcmat,
   };
   ass_y_rec(llrcmat.rowT->root.get());
 #else
-    // **********************************************************************
-    // TODO
-    // **********************************************************************
+// **********************************************************************
+// TODO
+// **********************************************************************
 #endif
   return y;
 }
@@ -479,9 +479,9 @@ std::pair<double, double> approxErrorLLR(BiDirChebPartMat1D<KERNEL> &llrcM) {
     Mt.col(j) = mvLLRPartMat(llrcM, x);
   }
 #else
-      // **********************************************************************
-      // TODO
-      // *********************************************************************
+// **********************************************************************
+// TODO
+// *********************************************************************
 #endif
   return {std::sqrt((M - Mt).squaredNorm() / (n * m)),
           std::sqrt(M.squaredNorm() / (n * m))};
@@ -560,9 +560,9 @@ unsigned int computeSparsityMeasure(const HMAT::BlockPartition<TREE> &blockpart,
     output(nodemap_col, out);
   }
 #else
-  // **********************************************************************
-  // YOUR CODE HERE
-  // **********************************************************************
+// **********************************************************************
+// YOUR CODE HERE
+// **********************************************************************
 #endif
   return std::max(xnode_maxcnt, ynode_maxcnt);
 }

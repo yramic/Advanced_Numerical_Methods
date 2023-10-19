@@ -23,7 +23,8 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> low_rank_merge(
 #if SOLUTION
   size_t m = B1.rows();
   size_t n = B1.cols();
-  // Find low-rank factors of B1 and B2 using QR decomposition as in (2.4.2.25) \cref{par:mergetrunc}
+  // Find low-rank factors of B1 and B2 using QR decomposition as in (2.4.2.25)
+  // \cref{par:mergetrunc}
   Eigen::HouseholderQR<Eigen::MatrixXd> QR1 = B1.householderQr();
   Eigen::HouseholderQR<Eigen::MatrixXd> QR2 = B2.householderQr();
 
@@ -154,7 +155,8 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> adap_rank_merge(
 #if SOLUTION
   size_t m = B1.rows();
   size_t n = B1.cols();
-  // Find low-rank factors of B1 and B2 using QR decomposition as in (2.4.2.25) \cref{par:mergetrunc}
+  // Find low-rank factors of B1 and B2 using QR decomposition as in (2.4.2.25)
+  // \cref{par:mergetrunc}
   Eigen::HouseholderQR<Eigen::MatrixXd> QR1 = B1.householderQr();
   Eigen::HouseholderQR<Eigen::MatrixXd> QR2 = B2.householderQr();
 
@@ -262,7 +264,8 @@ std::pair<double, size_t> test_adap_rank_merge(size_t n, double rtol) {
   // the rank required to achieve the relative tolerance rtol
   return {err_Frob, AB.first.cols()};
 #else
-  // TODO: Compute {err_Frob,p}, with p := no. of singular values larger than tolerance
+  // TODO: Compute {err_Frob,p}, with p := no. of singular values larger than
+  // tolerance
 
   // Dummy solution, to be replaced
   return {0, 0};

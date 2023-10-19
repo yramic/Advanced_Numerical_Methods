@@ -23,7 +23,8 @@ VectorXd conv_wght_ieu(const FFUNC& F, size_t n, int p, double r = 1.0E-7) {
 
   // integrate on circumference centered in (0,0) with radius r
 
-  // define integrand after transformation: $s = r \exp(2 \pi \varphi)$, where parameter is $\varphi$
+  // define integrand after transformation: $s = r \exp(2 \pi \varphi)$, where
+  // parameter is $\varphi$
   auto integrand = [](const FFUNC& F, double tau, complex<double> s, int l) {
     return s / pow(1. - tau * s, l + 1) * F(s);
   };
@@ -62,7 +63,8 @@ VectorXd conv_wght_bdf2(const FFUNC& F, size_t n, int p, double r = 1.0E-7) {
 
   // integrate on circumference centered in (0,0) with radius r
 
-  // define integrand after transformation: $s = r \exp(2 \pi \varphi)$, where parameter is $\varphi$
+  // define integrand after transformation: $s = r \exp(2 \pi \varphi)$, where
+  // parameter is $\varphi$
   auto integrand = [](const FFUNC& F, double tau, complex<double> s, int l) {
     return s / sqrt(1. + 2. * tau * s) *
            (1. / pow(2. + sqrt(1. + 2. * tau * s), l + 1) -
@@ -106,10 +108,10 @@ SparseMatrix<double> compute_matA(size_t N) {
 
   A.insert(0, 0) =
       1. / h + 1. / (h * h * pow(M_PI, 3)) *
-                   ((pow(M_PI * h, 2) - 2.) + 2. * cos(M_PI * h));  //A(0,0)
+                   ((pow(M_PI * h, 2) - 2.) + 2. * cos(M_PI * h));  // A(0,0)
   A.insert(N, N) = 1. / h + 1. / (h * h * pow(M_PI, 3)) *
                                 ((pow(M_PI * h, 2) - 2.) -
-                                 2. * cos(M_PI * (1 - h)));  //A(N,N)
+                                 2. * cos(M_PI * (1 - h)));  // A(N,N)
 
   for (int i = 1; i <= N; ++i) {
     if (i < N) {  // A(i,i)
@@ -131,8 +133,8 @@ SparseMatrix<double> compute_matA(size_t N) {
 /* SAM_LISTING_END_1 */
 #endif
 
-/* @brief Find the unknown function u at final time t = 1 in the evolution problem
- * using Galerkin discretization and convolution quadrature (BDF-2)
+/* @brief Find the unknown function u at final time t = 1 in the evolution
+ * problem using Galerkin discretization and convolution quadrature (BDF-2)
  * \param g Template function for the right-hand side
  * \param M Number of discretization intervals in time
  * \param N Number of discretization intervals in space
@@ -173,13 +175,14 @@ VectorXd solve_IBVP(const FUNC& g, size_t M, size_t N, int p) {
     phi(0) = -(complex<double>)g(i * tau);
 
     VectorXcd rhs = phi;
-    rhs(N) -= rhs_cq;              //rhs
+    rhs(N) -= rhs_cq;              // rhs
     u.col(i) = solver.solve(rhs);  // solution at $t = t_n$
   }
 
   return u.col(M).real();
 #else   // TEMPLATE
-  // TODO: Find the unknown function u at final time t = 1 in the evolution problem
+  // TODO: Find the unknown function u at final time t = 1 in the evolution
+  // problem
 #endif  // TEMPLATE
 }
 /* SAM_LISTING_END_2 */
@@ -230,7 +233,8 @@ int main() {
     cout << M << "\t" << scientific << setprecision(10) << error << endl;
   }
 #else   // TEMPLATE
-  // TODO: Tabulate the H1-error of the Galerkin discretization + convolution quadrature
+  // TODO: Tabulate the H1-error of the Galerkin discretization + convolution
+  // quadrature
 #endif  // TEMPLATE
         /* SAM_LISTING_END_3 */
 }

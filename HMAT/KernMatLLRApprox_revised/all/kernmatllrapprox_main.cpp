@@ -36,10 +36,10 @@ int main(int /*argc*/, char** /*argv*/) {
   KernMatLLRApprox::BiDirChebPartMat1D<Kernel> Mt(T_row, T_col, G, q, 2.0);
   /* SAM_LISTING_END_1 */
 
-  // Output row cluster tree (the column tree is the same)
-  std::cout << *(Mt.rowT) << std::endl;
-  // Output block partition
-  std::cout << Mt;
+  // // Output row cluster tree (the column tree is the same)
+  // std::cout << *(Mt.rowT) << std::endl;
+  // // Output block partition
+  // std::cout << Mt;
 
   std::cout << "Computing sparsity measure" << std::endl;
   unsigned int spm = KernMatLLRApprox::computeSparsityMeasure(Mt, &std::cout);
@@ -52,7 +52,7 @@ int main(int /*argc*/, char** /*argv*/) {
   KernMatLLRApprox::tabulateConvergenceLLR(
       {10, 20, 40, 60, 80, 160, 320, 640, 1280}, {3, 4, 5, 6, 7});
 
-  KernMatLLRApprox::runtimeMatVec(
-      {1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144});
+  // KernMatLLRApprox::runtimeMatVec(
+  //     {1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144});
   return 0;
 }

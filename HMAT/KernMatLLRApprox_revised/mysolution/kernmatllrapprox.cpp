@@ -97,9 +97,9 @@ void runtimeMatVec(std::vector<unsigned int> &&n_vec, unsigned int n_runs,
     auto T_col = std::make_shared<KernMatLLRApprox::LLRClusterTree>(q, pts);
     // Build local low-rank compressed matrix
     KernMatLLRApprox::BiDirChebPartMat1D<LogKernel> Mt(T_row, T_col, G, q, eta);
-// **********************************************************************
-// TO BE SUPPLEMENTED
-// **********************************************************************
+    // **********************************************************************
+    // TO BE SUPPLEMENTED
+    // **********************************************************************
   }
 }
 /* SAM_LISTING_END_3 */

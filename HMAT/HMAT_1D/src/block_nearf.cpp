@@ -20,11 +20,11 @@ BlockNearF::BlockNearF(Node* xnode, Node* ynode)
     : pair_(std::make_pair(xnode, ynode)) {}
 
 //// Constructor
-//BlockNearF::BlockNearF(Node* xnode, Node* ynode, Kernel G):
-//    pair_(std::make_pair(xnode,ynode)), G_(G)
+// BlockNearF::BlockNearF(Node* xnode, Node* ynode, Kernel G):
+//     pair_(std::make_pair(xnode,ynode)), G_(G)
 //{
-//    setMatrix();
-//}
+//     setMatrix();
+// }
 
 // compute near field block matrix
 unsigned BlockNearF::setMatrix(Kernel* G) {

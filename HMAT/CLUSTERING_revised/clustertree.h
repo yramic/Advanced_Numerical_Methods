@@ -111,16 +111,13 @@ class CtNode {
   constexpr static std::size_t dim = DIM;
   // Constructors taking a sequence of indices, offset, node number and sorting
   // direaction
-  explicit CtNode(const std::vector<size_t> _I, int &_offset, int _nodeNumer,
+  explicit CtNode(const std::vector<size_t> _I, int _offset, int _nodeNumer,
                   int _dir = 0)
       : I(std::move(_I)),
         sons{nullptr, nullptr},
         dir(_dir),
         offset(_offset),
-        nodeNumber(_nodeNumer) {
-    // Update offset
-    _offset += _I.size();
-  }
+        nodeNumber(_nodeNumer) {}
 
   // Number of indices owned by the cluster
   [[nodiscard]] std::size_t noIdx() const { return I.size(); }
@@ -129,8 +126,8 @@ class CtNode {
     return (!(sons[0]) and !(sons[1]));
   }
   // Public data member: Pointers to two (binary tree!) sons
-  std::array<std::unique_ptr<CtNode>, 2>
-      sons;  // smart pointer, no need for destructor
+  // smart pointer, no need for destructor
+  std::array<std::unique_ptr<CtNode>, 2> sons;
   // Public data member: Index set of the cluster
   std::vector<size_t> I;
   // Public data member: Offset indicating where local points are stored in
@@ -168,6 +165,7 @@ class ClusterTree {
     std::vector<size_t> idx;
     for (const Point<dim> &pt : pts) idx.push_back(pt.idx);
     root = std::make_unique<NODE>(idx, offset, numNodes++, 0);
+    offset += idx.size();
     if (!root) {
       throw(std::runtime_error("Cannot allocate root"));
     }
@@ -200,6 +198,7 @@ class ClusterTree {
         for (const Point<dim> &pt : low_pts) idx.push_back(pt.idx);
         // First son gets ``lower half'' of sorted points
         nptr->sons[0] = std::make_unique<NODE>(idx, offset, numNodes++, dir);
+        offset += idx.size();
         if (!nptr->sons[0]) {
           throw(std::runtime_error("Cannot allocate first son"));
         }
@@ -214,6 +213,7 @@ class ClusterTree {
         }
         // Second son get ``upper half'' of sorted points
         nptr->sons[1] = std::make_unique<NODE>(idx, offset, numNodes++, dir);
+        offset += idx.size();
         if (!nptr->sons[1]) {
           throw(std::runtime_error("Cannot allocate second son"));
         }
