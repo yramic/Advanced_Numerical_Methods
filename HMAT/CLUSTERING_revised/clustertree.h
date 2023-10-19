@@ -156,13 +156,16 @@ class ClusterTree {
   ClusterTree() : root(nullptr) {}
   ClusterTree(const std::vector<Point<dim>> &pts, std::size_t minpts = 1)
       : root(nullptr) {
+    // Data member of nodes to reference local data stored globally
     numNodes = 0;
+    int offset = 0;
     // Append local collocation points to the end of global vector
     ptsT.insert(ptsT.end(), pts.begin(), pts.end());
     // Build index set for root
     std::vector<size_t> idx;
     for (const Point<dim> &pt : pts) idx.push_back(pt.idx);
-    root = std::make_unique<NODE>(idx, 0, 0, 0);
+    root = std::make_unique<NODE>(idx, offset, numNodes++, 0);
+    offset += idx.size();
     if (!root) {
       throw(std::runtime_error("Cannot allocate root"));
     }
@@ -170,7 +173,6 @@ class ClusterTree {
       throw(std::runtime_error("minpts must be at least 1"));
     }
     // Recursive construction of child nodes
-    int offset;
     std::function<void(NODE * nptr)> buildrec = [&](NODE *nptr) -> void {
       const std::size_t n = nptr->noIdx();  // Number of held indices
       // Leaf, if minimal number of indices reached
@@ -195,8 +197,8 @@ class ClusterTree {
         idx.clear();
         for (const Point<dim> &pt : low_pts) idx.push_back(pt.idx);
         // First son gets ``lower half'' of sorted points
-        nptr->sons[0] = std::make_unique<NODE>(
-            idx, nptr->offset + nptr->noIdx(), nptr->nodeNumber + 1, dir);
+        nptr->sons[0] = std::make_unique<NODE>(idx, offset, numNodes++, dir);
+        offset += idx.size();
         if (!nptr->sons[0]) {
           throw(std::runtime_error("Cannot allocate first son"));
         }
@@ -210,17 +212,12 @@ class ClusterTree {
           idx.push_back(pt.idx);
         }
         // Second son get ``upper half'' of sorted points
-        nptr->sons[1] = std::make_unique<NODE>(idx, offset, numNodes, dir);
+        nptr->sons[1] = std::make_unique<NODE>(idx, offset, numNodes++, dir);
+        offset += idx.size();
         if (!nptr->sons[1]) {
           throw(std::runtime_error("Cannot allocate second son"));
         }
         buildrec(nptr->sons[1].get());  // recurse into 2nd son
-      } else {
-        numNodes =
-            nptr->nodeNumber +
-            1;  // node number of last leaf indicates total number of nodes
-        offset = nptr->offset +
-                 nptr->noIdx();  // needed to construct following nodes
       }
     };
     buildrec(root.get());
