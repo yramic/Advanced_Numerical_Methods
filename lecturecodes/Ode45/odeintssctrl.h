@@ -32,9 +32,8 @@ std::vector<std::pair<double, State>> odeintssctrl(
 
   // Main timestepping loop
   while ((states.back().first < T) && (h >= hmin)) {  // \Label[line]{ssctrl:2}
-    State yh =
-        Psihigh(h, y);  // high order discrete evolution
-                        // \Blue{$\widetilde{\Psibf}^h$}\Label[line]{ssctrl:3}
+    State yh = Psihigh(h, y);  // high order discrete evolution
+        // \Blue{$\widetilde{\Psibf}^h$}\Label[line]{ssctrl:3}
     State yH = Psilow(h, y);  // low order discrete evolution
                               // \Blue{${\Psibf}^h$}\Label[line]{ssctrl:4}
     double est = norm(

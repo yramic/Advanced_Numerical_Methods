@@ -361,14 +361,15 @@
 // 20110325, but maintenance releases in the 4.4 and 4.5 series followed
 // this date, so check for those versions by their date stamps.
 // https://gcc.gnu.org/onlinedocs/libstdc++/manual/abi.html#abi.versioning
-#if GTEST_LANG_CXX11 && (!defined(__GLIBCXX__) ||                              \
-                         (__GLIBCXX__ >= 20110325ul &&                         \
-                          /* GCC >= 4.6.0 */ /* Blacklist of patch releases of \
-                                                older branches: */             \
-                              __GLIBCXX__ != 20110416ul && /* GCC 4.4.6 */     \
-                          __GLIBCXX__ != 20120313ul &&     /* GCC 4.4.7 */     \
-                          __GLIBCXX__ != 20110428ul &&     /* GCC 4.5.3 */     \
-                          __GLIBCXX__ != 20120702ul))      /* GCC 4.5.4 */
+#if GTEST_LANG_CXX11 &&                                                    \
+    (!defined(__GLIBCXX__) ||                                              \
+     (__GLIBCXX__ >= 20110325ul &&                                         \
+      /* GCC >= 4.6.0 */               /* Blacklist of patch releases of \
+                                                older branches: */ \
+          __GLIBCXX__ != 20110416ul && /* GCC 4.4.6 */                     \
+      __GLIBCXX__ != 20120313ul &&     /* GCC 4.4.7 */                     \
+      __GLIBCXX__ != 20110428ul &&     /* GCC 4.5.3 */                     \
+      __GLIBCXX__ != 20120702ul))      /* GCC 4.5.4 */
 #define GTEST_STDLIB_CXX11 1
 #endif
 
@@ -1763,7 +1764,7 @@ class ThreadWithParam : public ThreadWithParamBase {
 
   GTEST_DISALLOW_COPY_AND_ASSIGN_(ThreadWithParam);
 };
-#endif  // !GTEST_OS_WINDOWS && GTEST_HAS_PTHREAD ||
+#endif  // !GTEST_OS_WINDOWS && GTEST_HAS_PTHREAD || \
         // GTEST_HAS_MUTEX_AND_THREAD_LOCAL_
 
 #if GTEST_HAS_MUTEX_AND_THREAD_LOCAL_

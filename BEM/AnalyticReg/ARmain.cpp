@@ -548,8 +548,8 @@ int main() {
     error(j) = fabs(solEval - g(T));
     std::cout << "Error on level " << j << ": " << error(j) << std::endl;
   }
-#else   // TEMPLATE
-        // TODO: Solve BIE for different Ns and compute error
+#else   // TEMPLATE                                           \
+        // TODO: Solve BIE for different Ns and compute error \
         // of the solution.
 #endif  // TEMPLATE
 

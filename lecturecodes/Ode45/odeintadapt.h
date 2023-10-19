@@ -37,9 +37,8 @@ std::vector<std::pair<double, State>> odeintadapt(
                 // \Label[line]{odeintadapt:3}
     State yH = Psilow(h, y);  // low order discrete evolution
                               // \Blue{${\Psibf}^h$} \Label[line]{odeintadapt:4}
-    double est =
-        norm(yH - yh);  // local error estimate
-                        // \Blue{$\mathrm{EST}_k$}\Label[line]{odeintadapt:5}
+    double est = norm(yH - yh);  // local error estimate
+        // \Blue{$\mathrm{EST}_k$}\Label[line]{odeintadapt:5}
 
     if (est <
         std::max(
