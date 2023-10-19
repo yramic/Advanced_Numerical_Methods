@@ -101,9 +101,18 @@ BBox<DIM>::BBox(const std::vector<Point<DIM>> pts) {
 /* SAM_LISTING_END_3 */
 
 /** @brief Data structure for the node of a binary cluster tree
-   A node of a cluster tree contains index set, node number and offset.
-   @tparam DIM dimension of ambient space
-*/
+ * A node of a cluster tree
+ * @tparam DIM dimension of ambient space
+ *
+ * An object of this class owns and index set, node number and offset.
+ * - node number is a unique and sonsecutive integer index for all nodes
+ *   of a cluster tree. Can be used for referencing data.
+ * - offset is an index pointing to the location of this node's data in an array
+ *   whose length is the sum of the length of the index sets contained in all
+ *   nodes of the cluster tree. It can be used for accessing data, of which each
+ * nodes holds as many items as it holds indices.
+ *
+ */
 /* SAM_LISTING_BEGIN_4 */
 template <int DIM>
 class CtNode {
@@ -152,28 +161,26 @@ class ClusterTree {
  public:
   using node_t = NODE;
   constexpr static std::size_t dim = NODE::dim;  // space dimension d
-  // Idle constructor
   ClusterTree() : root(nullptr) {}
+  // Constructor that recursively builds the cluster tree
   ClusterTree(const std::vector<Point<dim>> &pts, std::size_t minpts = 1)
       : root(nullptr) {
-    numNodes = 0;
-    // Append local collocation points to the end of global vector
-    ptsT.insert(ptsT.end(), pts.begin(), pts.end());
-    // Build index set for root
-    std::vector<size_t> idx;
-    for (const Point<dim> &pt : pts) idx.push_back(pt.idx);
-    root = std::make_unique<NODE>(idx, 0, 0, 0);
-    if (!root) {
-      throw(std::runtime_error("Cannot allocate root"));
-    }
     if (minpts < 1) {
       throw(std::runtime_error("minpts must be at least 1"));
     }
+    numNodes = 0;
+    // Append local collocation points to the end of global vector
+    ptsT.insert(ptsT.end(), pts.begin(), pts.end());
+    // Create root node (zero index and offset), first build index set for it
+    std::vector<size_t> idx;
+    for (const Point<dim> &pt : pts) idx.push_back(pt.idx);
+    root = std::make_unique<NODE>(idx, 0, 0, 0);
+    if (!root) throw(std::runtime_error("Cannot allocate root"));
     // Recursive construction of child nodes
-    int offset;
+    int offset;  
     std::function<void(NODE * nptr)> buildrec = [&](NODE *nptr) -> void {
       const std::size_t n = nptr->noIdx();  // Number of held indices
-      // Leaf, if minimal number of indices reached
+      // No leaf, if minimal number of indices reached
       if (n > minpts) {  // \Label[line]{brc:1}
         // Points have to be copied and sorted according to direction dir
         std::vector<Point<dim>> tpts(
@@ -191,7 +198,7 @@ class ClusterTree {
         const std::vector<Point<dim>> low_pts(tpts.cbegin(), tpts.cbegin() + m);
         // Append local collocation points to the end of global vector
         ptsT.insert(ptsT.end(), low_pts.begin(), low_pts.end());
-        // Build index set for child node
+        // Build index set for first child node: sons[0]
         idx.clear();
         for (const Point<dim> &pt : low_pts) idx.push_back(pt.idx);
         // First son gets ``lower half'' of sorted points
@@ -204,21 +211,22 @@ class ClusterTree {
         // Append local collocation points to the end of global vector
         const std::vector<Point<dim>> up_pts(tpts.cbegin() + m, tpts.cend());
         ptsT.insert(ptsT.end(), up_pts.begin(), up_pts.end());
-        // Build index set for child node
+        // Build index set for second child node; sons[1]
         idx.clear();
         for (const Point<dim> &pt : up_pts) {
           idx.push_back(pt.idx);
         }
-        // Second son get ``upper half'' of sorted points
+        // Second son gets ``upper half'' of sorted points
         nptr->sons[1] = std::make_unique<NODE>(idx, offset, numNodes, dir);
         if (!nptr->sons[1]) {
           throw(std::runtime_error("Cannot allocate second son"));
         }
         buildrec(nptr->sons[1].get());  // recurse into 2nd son
       } else {
-        numNodes =
-            nptr->nodeNumber +
-            1;  // node number of last leaf indicates total number of nodes
+	// The node is a leaf node holding only a few indices.
+	// Node number of last leaf indicates total number of nodes
+        numNodes = nptr->nodeNumber + 1;
+        
         offset = nptr->offset +
                  nptr->noIdx();  // needed to construct following nodes
       }
