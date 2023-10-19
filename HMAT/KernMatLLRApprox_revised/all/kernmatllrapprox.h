@@ -349,9 +349,9 @@ class BiDirChebBlockPartition : public HMAT::BlockPartition<TREE> {
   unsigned int ffb_cnt{0};  // Counter for far-field blocks
   unsigned int nfb_cnt{0};  // Counter for near-field blocks
   // vector containing matrices C for every far field block
-  std::vector<Eigen::MatrixXd> Cs;  
+  std::vector<Eigen::MatrixXd> Cs;
   // vector containing matrices M for every near field block
-  std::vector<Eigen::MatrixXd> Mlocs;  
+  std::vector<Eigen::MatrixXd> Mlocs;
 };
 /* SAM_LISTING_END_H */
 

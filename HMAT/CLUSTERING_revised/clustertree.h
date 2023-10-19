@@ -111,13 +111,16 @@ class CtNode {
   constexpr static std::size_t dim = DIM;
   // Constructors taking a sequence of indices, offset, node number and sorting
   // direaction
-  explicit CtNode(const std::vector<size_t> _I, int _offset, int _nodeNumer,
+  explicit CtNode(const std::vector<size_t> _I, int &_offset, int _nodeNumer,
                   int _dir = 0)
       : I(std::move(_I)),
         sons{nullptr, nullptr},
         dir(_dir),
         offset(_offset),
-        nodeNumber(_nodeNumer) {}
+        nodeNumber(_nodeNumer) {
+    // Update offset
+    _offset += _I.size();
+  }
 
   // Number of indices owned by the cluster
   [[nodiscard]] std::size_t noIdx() const { return I.size(); }
@@ -165,7 +168,6 @@ class ClusterTree {
     std::vector<size_t> idx;
     for (const Point<dim> &pt : pts) idx.push_back(pt.idx);
     root = std::make_unique<NODE>(idx, offset, numNodes++, 0);
-    offset += idx.size();
     if (!root) {
       throw(std::runtime_error("Cannot allocate root"));
     }
@@ -198,7 +200,6 @@ class ClusterTree {
         for (const Point<dim> &pt : low_pts) idx.push_back(pt.idx);
         // First son gets ``lower half'' of sorted points
         nptr->sons[0] = std::make_unique<NODE>(idx, offset, numNodes++, dir);
-        offset += idx.size();
         if (!nptr->sons[0]) {
           throw(std::runtime_error("Cannot allocate first son"));
         }
@@ -213,7 +214,6 @@ class ClusterTree {
         }
         // Second son get ``upper half'' of sorted points
         nptr->sons[1] = std::make_unique<NODE>(idx, offset, numNodes++, dir);
-        offset += idx.size();
         if (!nptr->sons[1]) {
           throw(std::runtime_error("Cannot allocate second son"));
         }
