@@ -197,10 +197,10 @@ class BiDirChebBlockPartition : public HMAT::BlockPartition<TREE> {
   const std::size_t q;      // degree+1 of interpolating polynomial
   unsigned int ffb_cnt{0};  // Counter for far-field blocks
   unsigned int nfb_cnt{0};  // Counter for near-field blocks
-  std::vector<Eigen::MatrixXd>
-      Cs;  // vector containing matrices C for every far field block
-  std::vector<Eigen::MatrixXd>
-      Mlocs;  // vector containing matrices M for every near field block
+  // vector containing matrices C for every far field block
+  std::vector<Eigen::MatrixXd> Cs;
+  // vector containing matrices M for every near field block
+  std::vector<Eigen::MatrixXd> Mlocs;
 };
 /* SAM_LISTING_END_H */
 
@@ -230,9 +230,9 @@ Eigen::VectorXd mvLLRPartMat(BiDirChebBlockPartition<TREE, KERNEL> &llrcmat,
   assertm(x.size() == col_idxs.size(), "Wrong size of vector x");
   Eigen::VectorXd y(row_idxs.size());  // Return value
   y.setZero();
-// **********************************************************************
-// TODO
-// **********************************************************************
+    // **********************************************************************
+    // TODO
+    // **********************************************************************
   return y;
 }
 /* SAM_LISTING_END_U */
@@ -246,9 +246,9 @@ std::pair<double, double> approxErrorLLR(BiDirChebPartMat1D<KERNEL> &llrcM) {
   const size_t m = llrcM.cols();
   Eigen::MatrixXd M(n, m);   // Exact kernel collocation matrix
   Eigen::MatrixXd Mt(n, m);  // Compressed matrix as dense matrix
-  // **********************************************************************
-  // TODO
-  // *********************************************************************
+      // **********************************************************************
+      // TODO
+      // *********************************************************************
   return {std::sqrt((M - Mt).squaredNorm() / (n * m)),
           std::sqrt(M.squaredNorm() / (n * m))};
 }

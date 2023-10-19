@@ -134,7 +134,7 @@ Eigen::VectorXd evlTriangToeplitz(
   // ************************************************************
   // TO BE SUPPLEMENTED
   // Use recursive lambda function, see
-  // https://gitlab.math.ethz.ch/NumCSE/NumCSE/-/blob/master/CppTutorial/lambdarecurse.cpp?ref_type=heads
+  // https://gitlab.math.ethz.ch/NumCSE/NumCSE/-/blob/master/CppTutorial/lambdarecurse.cpp
   // ************************************************************
   return mu_vecs.col(M);
 }
