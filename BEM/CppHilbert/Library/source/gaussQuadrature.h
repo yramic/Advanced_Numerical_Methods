@@ -14,6 +14,7 @@
 #ifndef GAUSS_QUADRATURE_H_GUARD
 #define GAUSS_QUADRATURE_H_GUARD
 
+
 /**
  *  The function returns quadrature points for x-direction (coordinate=0) or
  *  y-direction (coordinate=1).
@@ -25,6 +26,7 @@
  */
 const double* getGaussPointsT(int points, int coordinate);
 
+
 /**
  *  The function returns quadrature weights for gauss quadrature On the
  *  reference triangle conv{(0,0),(1,0),(0,1)} according to the size of the
@@ -35,6 +37,7 @@ const double* getGaussPointsT(int points, int coordinate);
  */
 const double* getGaussWeightsT(int points);
 
+
 /**
  *  The function returns quadrature points on the interval [-1,1] for the
  *  Gaussian quadrature rule of a given order. It does not create a copy of the
@@ -44,6 +47,7 @@ const double* getGaussWeightsT(int points);
  *          given order. The array contains exactly "order" elements.
  */
 const double* getGaussPoints(int order);
+
 
 /**
  *  The function returns quadrature weights for the Gaussian quadrature rule of
@@ -56,3 +60,4 @@ const double* getGaussPoints(int order);
 const double* getGaussWeights(int order);
 
 #endif
+

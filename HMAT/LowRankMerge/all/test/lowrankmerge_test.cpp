@@ -1,10 +1,10 @@
 /**
- * @file lowrankmerge_test.cpp
- * @brief NPDE homework LowRankMerge test code
- * @author
- * @date
- * @copyright Developed at SAM, ETH Zurich
- */
+* @file lowrankmerge_test.cpp
+* @brief NPDE homework LowRankMerge test code
+* @author
+* @date
+* @copyright Developed at SAM, ETH Zurich
+*/
 
 #include "../lowrankmerge.h"
 
