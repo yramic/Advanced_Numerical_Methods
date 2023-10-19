@@ -9,10 +9,10 @@
 #include "parametrized_circular_arc.hpp"
 
 #include <math.h>
+#include <utility>
 
 #include <Eigen/Dense>
-#include <utility>
-#define _USE_MATH_DEFINES  // for Pi
+#define _USE_MATH_DEFINES // for Pi
 
 namespace parametricbem2d {
 
@@ -74,4 +74,4 @@ double ParametrizedCircularArc::length() const {
   return radius_ * (phi_end_ - phi_start_);
 }
 
-}  // namespace parametricbem2d
+} // namespace parametricbem2d
