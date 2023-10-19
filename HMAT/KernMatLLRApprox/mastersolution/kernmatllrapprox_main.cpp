@@ -46,8 +46,8 @@ int main(int /*argc*/, char** /*argv*/) {
   // std::cout << Mt;
 
   // std::cout << "Computing sparsity measure" << std::endl;
-  // unsigned int spm = KernMatLLRApprox::computeSparsityMeasure(Mt,
-  // &std::cout); std::cout << "Sparsity measure = " << spm << std::endl;
+  // unsigned int spm = KernMatLLRApprox::computeSparsityMeasure(Mt, &std::cout);
+  // std::cout << "Sparsity measure = " << spm << std::endl;
 
   std::cout << "Matrix x vector" << std::endl;
   Eigen::VectorXd x = Eigen::VectorXd::Constant(16, 1.0);

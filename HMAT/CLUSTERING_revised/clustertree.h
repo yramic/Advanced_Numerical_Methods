@@ -126,8 +126,8 @@ class CtNode {
     return (!(sons[0]) and !(sons[1]));
   }
   // Public data member: Pointers to two (binary tree!) sons
-  // smart pointer, no need for destructor
-  std::array<std::unique_ptr<CtNode>, 2> sons;
+  std::array<std::unique_ptr<CtNode>, 2>
+      sons;  // smart pointer, no need for destructor
   // Public data member: Index set of the cluster
   std::vector<size_t> I;
   // Public data member: Offset indicating where local points are stored in
@@ -156,7 +156,6 @@ class ClusterTree {
   ClusterTree() : root(nullptr) {}
   ClusterTree(const std::vector<Point<dim>> &pts, std::size_t minpts = 1)
       : root(nullptr) {
-    // Data member of nodes to reference local data stored globally
     numNodes = 0;
     int offset = 0;
     // Append local collocation points to the end of global vector
@@ -218,7 +217,7 @@ class ClusterTree {
           throw(std::runtime_error("Cannot allocate second son"));
         }
         buildrec(nptr->sons[1].get());  // recurse into 2nd son
-      }
+      } 
     };
     buildrec(root.get());
   }

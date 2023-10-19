@@ -329,10 +329,10 @@ class BiDirChebBlockPartition : public HMAT::BlockPartition<TREE> {
   const std::size_t q;      // degree+1 of interpolating polynomial
   unsigned int ffb_cnt{0};  // Counter for far-field blocks
   unsigned int nfb_cnt{0};  // Counter for near-field blocks
-  std::vector<Eigen::MatrixXd>
-      Cs;  // vector containing matrices C for every far field block
-  std::vector<Eigen::MatrixXd>
-      Mlocs;  // vector containing matrices M for every near field block
+  // vector containing matrices C for every far field block
+  std::vector<Eigen::MatrixXd> Cs;
+  // vector containing matrices M for every near field block
+  std::vector<Eigen::MatrixXd> Mlocs;
 };
 /* SAM_LISTING_END_H */
 
@@ -373,7 +373,7 @@ Eigen::VectorXd mvLLRPartMat(BiDirChebBlockPartition<TREE, KERNEL> &llrcmat,
       llrcmat.colT->getSectVec(col_node) = x.segment(idxs.front(), idxs.size());
       // Compute $\cob{\vec{\omegabf}_{w}}$
       auto V = llrcmat.colT->getV(col_node);
-      Eigen::VectorXd Rmu = llrcmat.colT->getSectVec(col_node);
+      auto Rmu = llrcmat.colT->getSectVec(col_node);
       llrcmat.colT->getOmega(col_node) = V.transpose() * Rmu;
       // Recursion: visit entire cluster tree
       comp_omega_rec(col_node->sons[0].get());

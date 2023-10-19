@@ -1,7 +1,7 @@
 /***********************************************************************
  *                                                                     *
  * Code for Course "Advanced Numerical Methods for CSE"                *
- * (Prof. Dr. R. Hiptmair)                                             *
+ * (Prof. Dr. R. Hiptmair)                                             * 
  * Author: R.H.                                                        *
  * Date: Nov 18, 2017                                                  *
  * (C) Seminar for Applied Mathematics, ETH Zurich                     *
@@ -15,9 +15,8 @@
 using namespace std;
 using namespace Eigen;
 
-/** @brief Construction of Toeplitz matrix
-    Filling of a dense matrix with Teoplitz structure from generating sequence
- */
+/** @brief Construction of Toeplitz matrix 
+    Filling of a dense matrix with Teoplitz structure from generating sequence */
 /* SAM_LISTING_BEGIN_1 */
 template <typename VECTOR>
 MatrixXcd toeplitz(int m, int n, const VECTOR& u) {
@@ -59,9 +58,8 @@ VectorXcd pconv(const VectorXcd& u, const VectorXcd& x) {
 }
 /* SAM_LISTING_END_2 */
 
-/** @brief implementation of discrete convolution by reduction to periodic
-   convolution. Note that this function returns a vector twice as long as the
-   input vectors. */
+/** @brief implementation of discrete convolution by reduction to periodic convolution.
+    Note that this function returns a vector twice as long as the input vectors. */
 /* SAM_LISTING_BEGIN_3 */
 VectorXcd myconv(const VectorXcd& h, const VectorXcd& x) {
   const long n = h.size();
@@ -75,8 +73,7 @@ VectorXcd myconv(const VectorXcd& h, const VectorXcd& x) {
 /* SAM_LISTING_END_3 */
 
 /** @brief Straightforward implementation of discrete convolution.
-    Note that this function returns a vector twice as long as the input vectors.
- */
+    Note that this function returns a vector twice as long as the input vectors. */
 /* SAM_LISTING_BEGIN_4 */
 VectorXcd seqconv(const VectorXcd& h, const VectorXcd& x) {
   int n = h.size();

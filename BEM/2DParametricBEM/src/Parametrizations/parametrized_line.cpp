@@ -10,11 +10,11 @@
 #include "parametrized_line.hpp"
 
 #include <assert.h>
+#include <iostream>
 #include <math.h>
+#include <utility>
 
 #include <Eigen/Dense>
-#include <iostream>
-#include <utility>
 
 namespace parametricbem2d {
 using Point = typename ParametrizedLine::Point;
@@ -75,4 +75,4 @@ double ParametrizedLine::length() const {
   return (this->operator()(tmax) - this->operator()(tmin)).norm();
 }
 
-}  // namespace parametricbem2d
+} // namespace parametricbem2d

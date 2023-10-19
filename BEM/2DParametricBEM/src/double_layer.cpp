@@ -11,10 +11,8 @@
 
 #include "double_layer.hpp"
 
-#include <math.h>
-
-#include <Eigen/Dense>
 #include <limits>
+#include <math.h>
 #include <vector>
 
 #include "abstract_bem_space.hpp"
@@ -24,6 +22,7 @@
 #include "integral_gauss.hpp"
 #include "logweight_quadrature.hpp"
 #include "parametrized_mesh.hpp"
+#include <Eigen/Dense>
 
 namespace parametricbem2d {
 namespace double_layer {
@@ -34,15 +33,15 @@ Eigen::MatrixXd InteractionMatrix(const AbstractParametrizedCurve &pi,
                                   const QuadRule &GaussQR) {
   double tol = std::numeric_limits<double>::epsilon();
 
-  if (&pi == &pi_p)  // Same Panels case
+  if (&pi == &pi_p) // Same Panels case
     return ComputeIntegralCoinciding(pi, pi_p, trial_space, test_space,
                                      GaussQR);
 
   else if (fabs((pi(1) - pi_p(-1)).norm()) < tol ||
-           fabs((pi(-1) - pi_p(1)).norm()) < tol)  // Adjacent Panels case
+           fabs((pi(-1) - pi_p(1)).norm()) < tol) // Adjacent Panels case
     return ComputeIntegralAdjacent(pi, pi_p, trial_space, test_space, GaussQR);
 
-  else  // Disjoint panels case
+  else // Disjoint panels case
     return ComputeIntegralGeneral(pi, pi_p, trial_space, test_space, GaussQR);
 }
 
@@ -51,7 +50,7 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
                                           const AbstractBEMSpace &trial_space,
                                           const AbstractBEMSpace &test_space,
                                           const QuadRule &GaussQR) {
-  unsigned N = GaussQR.n;  // Quadrature order for the GaussQR object.
+  unsigned N = GaussQR.n; // Quadrature order for the GaussQR object.
   // The number of Reference Shape Functions in trial space
   int Qtrial = trial_space.getQ();
   // The number of Reference Shape Functions in test space
@@ -83,9 +82,9 @@ Eigen::MatrixXd ComputeIntegralCoinciding(const AbstractParametrizedCurve &pi,
         normal << tangent(1), -tangent(0);
         // Normalizing the normal vector
         normal = normal / normal.norm();
-        if (fabs(s - t) > sqrt_epsilon)  // Away from singularity
+        if (fabs(s - t) > sqrt_epsilon) // Away from singularity
           k = (pi(s) - pi_p(t)).dot(normal) / (pi(s) - pi_p(t)).squaredNorm();
-        else  // Near singularity
+        else // Near singularity
           // Limit evaluated analytically for s -> t
           k = 0.5 * pi.DoubleDerivative(t).dot(normal) /
               pi.Derivative(t).squaredNorm();
@@ -114,7 +113,7 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
                                         const AbstractBEMSpace &trial_space,
                                         const AbstractBEMSpace &test_space,
                                         const QuadRule &GaussQR) {
-  unsigned N = GaussQR.n;  // Quadrature order for the GaussQR object.
+  unsigned N = GaussQR.n; // Quadrature order for the GaussQR object.
   // The number of Reference Shape Functions in trial space
   int Qtrial = trial_space.getQ();
   // The number of Reference Shape Functions in test space
@@ -127,8 +126,8 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
       // Panel lengths for local arclength parametrization in
       // \f$\eqref{eq:ap}\f$. Actual values are not required so a length of 1 is
       // used for both the panels
-      double length_pi = 1.;    // Length for panel pi
-      double length_pi_p = 1.;  // Length for panel pi_p
+      double length_pi = 1.;   // Length for panel pi
+      double length_pi_p = 1.; // Length for panel pi_p
 
       // when transforming the parametrizations from [-1,1]->\Pi to local
       // arclength parametrizations [0,|\Pi|] -> \Pi, swap is used to ensure
@@ -138,7 +137,7 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
 
       // Lambda expressions for functions F,G and the integrand in
       // \f$\eqref{eq:Kitrf}\f$
-      auto F = [&](double t_pr) {  // Function associated with panel pi_p
+      auto F = [&](double t_pr) { // Function associated with panel pi_p
         // Transforming the local arclength parameter to standard parameter
         // range [-1,1] using swap
         double t =
@@ -147,7 +146,7 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
                pi_p.Derivative(t).norm();
       };
 
-      auto G = [&](double s_pr) {  // Function associated with panel pi
+      auto G = [&](double s_pr) { // Function associated with panel pi
         // Transforming the local arclength parameter to standard parameter
         // range [-1,1] using swap
         double s = swap ? 2 * s_pr / length_pi - 1 : 1 - 2 * s_pr / length_pi;
@@ -174,11 +173,11 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
         normal << tangent(1), -tangent(0);
         // Normalizing the normal vector
         normal = normal / normal.norm();
-        if (r > sqrt_epsilon)  // Away from singularity
+        if (r > sqrt_epsilon) // Away from singularity
           // Stable evaluation according to \f$\eqref{eq:Vbstab}\f$
           return r * (pi(s) - pi_p(t)).dot(normal) /
                  (pi(s) - pi_p(t)).squaredNorm();
-        else {  // near singularity
+        else { // near singularity
           // Transforming 0 to standard parameter range [-1,1] using swap
           double s0 = swap ? -1 : 1;
           double t0 = swap ? 1 : -1;
@@ -192,7 +191,7 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
       // The integral is split into two parts according to eq. 1.4.178
       // part 1 is where phi goes from 0 to alpha
       // part 2 is where phi goes from alpha to pi/2
-      double alpha = atan(length_pi_p / length_pi);  // the split point
+      double alpha = atan(length_pi_p / length_pi); // the split point
 
       // i_J -> part J of the integral
       double i1 = 0., i2 = 0.;
@@ -201,7 +200,7 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
         // Transforming gauss quadrature node into phi (0 to alpha)
         double phi = alpha / 2 * (1 + GaussQR.x(i));
         // Computing inner integral with fixed phi
-        double inner = 0.;  // inner integral
+        double inner = 0.; // inner integral
         // Upper limit for inner 'r' integral
         double rmax = length_pi / cos(phi);
         // Evaluating the inner 'r' integral
@@ -224,7 +223,7 @@ Eigen::MatrixXd ComputeIntegralAdjacent(const AbstractParametrizedCurve &pi,
         // Transforming gauss quadrature node into phi (alpha to pi/2)
         double phi =
             GaussQR.x(i) * (M_PI / 2. - alpha) / 2. + (M_PI / 2. + alpha) / 2.;
-        double inner = 0.;  // inner integral
+        double inner = 0.; // inner integral
         // Upper limit for inner 'r' integral
         double rmax = length_pi_p / sin(phi);
         // Evaluating the inner 'r' integral
@@ -258,10 +257,10 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
                                        const AbstractBEMSpace &trial_space,
                                        const AbstractBEMSpace &test_space,
                                        const QuadRule &GaussQR) {
-  unsigned N = GaussQR.n;  // Quadrature order for the GaussQR object.
+  unsigned N = GaussQR.n; // Quadrature order for the GaussQR object.
   // Calculating the quadrature order for stable evaluation of integrands for
   // disjoint panels as mentioned in \f$\ref{par:distpan}\f$
-  unsigned n0 = 5;  // Order for admissible cases
+  unsigned n0 = 5; // Order for admissible cases
   // Admissibility criteria
   double eta = 0.5;
   // Calculating the quadrature order
@@ -278,12 +277,12 @@ Eigen::MatrixXd ComputeIntegralGeneral(const AbstractParametrizedCurve &pi,
     for (int j = 0; j < Qtrial; ++j) {
       // Lambda expression for functions F and G in \f$\eqref{eq:titg}\f$ for
       // Double Layer BIO
-      auto F = [&](double t) {  // Function associated with panel pi_p
+      auto F = [&](double t) { // Function associated with panel pi_p
         return trial_space.evaluateShapeFunction(j, t) *
                pi_p.Derivative(t).norm();
       };
 
-      auto G = [&](double s) {  // Function associated with panel pi
+      auto G = [&](double s) { // Function associated with panel pi
         return test_space.evaluateShapeFunction(i, s) * pi.Derivative(s).norm();
       };
       // Lambda expression for \f$\hat{K}\f$ in \f$\eqref{eq:titg}\f$ for double
@@ -408,5 +407,5 @@ double Potential(const Eigen::Vector2d &x, const Eigen::VectorXd &coeffs,
   return coeffs.dot(potentials);
 }
 
-}  // namespace double_layer
-}  // namespace parametricbem2d
+} // namespace double_layer
+} // namespace parametricbem2d
