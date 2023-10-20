@@ -69,5 +69,5 @@ int main() {
   // TODO: Tabulate the H1-error of the Galerkin discretization + convolution
   // quadrature
 #endif  // TEMPLATE
-        /* SAM_LISTING_END_3 */
+  /* SAM_LISTING_END_3 */
 }
