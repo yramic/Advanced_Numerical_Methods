@@ -28,6 +28,8 @@ VectorXd cqweights_by_dft(const FFUNC& F, const DFUNC& delta, double tau,
 }
 /* SAM_LISTING_END_0 */
 
+
+
 /* @brief Find the unknown function u at final time t = 1 in the evolution problem
  * using Galerkin discretization and convolution quadrature (BDF-2)
  * \param g Template function for the right-hand side

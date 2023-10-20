@@ -154,7 +154,6 @@ VectorXd solve_IBVP(const FUNC& g, size_t M, size_t N, int p) {
   // Assume the final time to be $t=1$
   double tau = 1.0 / M;
   Eigen::VectorXd w = cqweights_by_dft(F, delta, tau, M);
-  std::cout << (wv - w).squaredNorm() << std::endl;
   // Aw <- A + lowToeplitz(w)*B; B(N,N) = 1, else B(i,j) = 0
   SparseMatrix<complex<double> > Aw = A.cast<complex<double> >();
   Aw.coeffRef(N, N) += w(0);
