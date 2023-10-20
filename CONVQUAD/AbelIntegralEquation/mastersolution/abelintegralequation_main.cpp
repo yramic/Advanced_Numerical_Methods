@@ -7,6 +7,7 @@ int main() {
     auto u = [](double t) { return 2. / M_PI * sqrt(t); };
     auto y = [](double t) { return t; };
 
+    // Generate points on the grid
     const double tau = 0.01;
     const std::size_t N = std::round(1. / tau);
     const Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N + 1, 0., 1.);
@@ -20,8 +21,8 @@ int main() {
       // Solution using Galerkin discretization with a polynomial basis
       const Eigen::VectorXd u_app =
           AbelIntegralEquation::poly_spec_abel(y, p, tau);
-      const Eigen::VectorXd diff = u_ex - u_app;
       // Maximum norm of discretization error
+      const Eigen::VectorXd diff = u_ex - u_app;
       err_max = diff.cwiseAbs().maxCoeff();
       const double dp = p;
 
@@ -49,6 +50,7 @@ int main() {
     double err_max, err_max_alt;
     cout << "\n\nConvolution Quadrature, Implicit Euler\n\n";
     for (int N = 16; N <= 2048; N <<= 1) {
+      // Generate points on the grid
       const Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N + 1, 0., 1.);
       // Exact solution at grid points
       const Eigen::VectorXd u_ex = Eigen::VectorXd::NullaryExpr(
@@ -56,8 +58,8 @@ int main() {
 
       // Solution using convolution quadrature based on implicit Euler method
       const Eigen::VectorXd u_app = AbelIntegralEquation::cq_ieul_abel(y, N);
-      const Eigen::VectorXd diff = u_ex - u_app;
       // Maximum norm of discretization error
+      const Eigen::VectorXd diff = u_ex - u_app;
       err_max = diff.cwiseAbs().maxCoeff();
 
       std::cout << "N = " << N << std::setw(15) << "Max = " << std::scientific
@@ -72,6 +74,7 @@ int main() {
 
     std::cout << "\n\nConvolution Quadrature, BDF-2\n" << '\n';
     for (int N = 16; N <= 2048; N <<= 1) {
+      // Generate points on the grid
       Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N + 1, 0., 1.);
       // Exact solution at grid points
       Eigen::VectorXd u_ex(N + 1);
@@ -81,8 +84,8 @@ int main() {
 
       // Solution using convolution quadrature based on BDF-2 method
       const Eigen::VectorXd u_app = AbelIntegralEquation::cq_bdf2_abel(y, N);
-      const Eigen::VectorXd diff = u_ex - u_app;
       // Maximum norm of discretization error
+      const Eigen::VectorXd diff = u_ex - u_app;
       err_max = diff.cwiseAbs().maxCoeff();
 
       std::cout << "N = " << N << std::setw(15) << "Max = " << std::scientific

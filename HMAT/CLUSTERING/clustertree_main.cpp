@@ -72,5 +72,24 @@ int main(int /*argc*/, char ** /*argv*/) {
     std::cout << "2D Cluster tree" << T << std::endl;
     printClusterTree(T, T.root);
   }
+  // {
+  //   std::cout << "\t >> 2D:" << std::endl;
+  //   std::vector<HMAT::Point<2>> pts;
+  //   const std::size_t npts_1d = 8;
+  //   for (int i = 0; i < npts_1d; ++i) {
+  //     for (int j = 0; j < npts_1d; ++j) {
+  //       HMAT::Point<2> p;
+  //       p.idx = i * npts_1d + j;
+  //       const double pos_x = static_cast<double>(i) / (npts_1d - 1);
+  //       const double pos_y = static_cast<double>(j) / (npts_1d - 1);
+  //       p.x = Eigen::Vector2d(pos_x * pos_x, pos_y * pos_y);
+  //       pts.push_back(p);
+  //     }
+  //   }
+  //   HMAT::ClusterTree<HMAT::CtNode<2>> T;
+  //   T.init(pts);
+  //   std::cout << "2D Cluster tree" << T << std::endl;
+  //   printClusterTree(T, T.root);
+  // }
   exit(0);
 }
