@@ -74,13 +74,14 @@ Eigen::VectorXd poly_spec_abel(const FUNC& y, std::size_t p, double tau) {
   Eigen::MatrixXd A = MatrixXd::Zero(p + 1, p + 1);
   Eigen::VectorXd b = Eigen::VectorXd::Zero(p + 1);
 
-  // generate Gauss-Legendre points and weights
+  // generate Gauss-Legendre quadrature points and weights
   const auto [gauss_pts_p, gauss_wht_p] = gauleg(0., 1., p);
 
   // set up the Galerkin matrix and rhs vector
 
 #if SOLUTION
-  // std::tgamma(1+j) == j! if j is integer
+  // Precompute factors related to gamma function
+  // Watch out for integer division
   const Eigen::VectorXd gamma_factor =
       Eigen::VectorXd::NullaryExpr(p + 1, [](Eigen::Index j) {
         return std::tgamma(j + 1) / std::tgamma(j + 3. / 2.);
@@ -88,12 +89,12 @@ Eigen::VectorXd poly_spec_abel(const FUNC& y, std::size_t p, double tau) {
   const double sqrt_pi = std::sqrt(M_PI);
 
   for (int i = 0; i <= p; i++) {
-    // Set up Galerkin matrix according to \prbcref{ais:subprb:sg2}
+    // Set up Galerkin matrix based on \prbcref{subprb:sg2}
     for (int j = 0; j <= p; j++) {
       A(i, j) = sqrt_pi * gamma_factor[j] / (1.5 + i + j);
     }
 
-    // Set up the rhs vector of the LSE with Gauss-Legendre quadrature
+    // Set up the rhs vector of the LSE based on Gauss-Legendre quadrature
     for (int k = 0; k < p; k++) {
       const double tk = gauss_pts_p(k);
       const double wk = gauss_wht_p(k);
@@ -135,7 +136,7 @@ template <typename FUNC>
 Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
   Eigen::VectorXd w(N + 1);
   w(0) = 1.;
-  // Calculate weights of convolution quadrature based on \prbcref{ais:subprb:cq1}
+  // Calculate weights of convolution quadrature based on \prbcref{subprb:cq1}
   for (int l = 1; l < N + 1; ++l) {
     w(l) = w(l - 1) * (l - 0.5) / l;  // denominator is factorial
   }
@@ -168,16 +169,19 @@ template <typename FUNC>
 Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N) {
   Eigen::VectorXd w1(N + 1);
   w1(0) = 1.;
-  // Calculate weights of convolution quadrature based on \prbcref{ais:subprb:cq2}
+  // Calculate weights of convolution quadrature based on \prbcref{subprb:cq2}
+  // Taylor series expansion of the first factor
   for (int l = 1; l < N + 1; ++l) {
     w1(l) = w1(l - 1) * (l - 0.5) / l;  // denominator is factorial
   }
 
+  // Taylor series expansion of the second factor
   Eigen::VectorXd w2 = w1;
   for (int l = 1; l < N + 1; ++l) {
     w2(l) /= pow(3, l);
   }
 
+  // Full expansion by Cauchy product
   Eigen::VectorXd w = myconv(w1, w2).head(N + 1).real();
   w *= std::sqrt(M_PI / N) * std::sqrt(2. / 3.);
 
