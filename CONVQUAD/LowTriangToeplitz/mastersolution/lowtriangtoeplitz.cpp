@@ -41,7 +41,8 @@ Eigen::MatrixXcd toeplitz(const Eigen::VectorXcd& c,
 Eigen::VectorXcd pconvfft(const Eigen::VectorXcd& u,
                           const Eigen::VectorXcd& x) {
   Eigen::FFT<double> fft;
-  // NumCSE Theorem 4.2.2.2
+  // Circulant matrix $(C)_{l,j}=p_{l-j}$, Fourier matrix $F_n$
+  // $C = F^{-1}_n diag(F_nu)F_n$   ref{eq:circmv}
   const Eigen::VectorXcd tmp = (fft.fwd(u)).cwiseProduct(fft.fwd(x));
   return fft.inv(tmp);
 }
@@ -56,13 +57,16 @@ Eigen::VectorXcd ltpMult(const Eigen::VectorXcd& f, const Eigen::VectorXcd& g) {
   assert(f.size() == g.size() && "f and g vectors must have the same length!");
   const std::size_t n = f.size();
   Eigen::VectorXcd res(n);
-  // Using \prbcref<prb:ltp:tp3h1> and \prbcref<prb:ltp:tp3h2>
+  // The sequence of the product matrix can be obtained through discrete convolution
+  // Discrete convolution can be treated as multiplication of circulant matrix, which
+  // can be represented by Fourier matrix ref{par:circul}
+
   // Zero padding
   Eigen::VectorXcd f_long = Eigen::VectorXcd::Zero(2 * n);
   Eigen::VectorXcd g_long = Eigen::VectorXcd::Zero(2 * n);
   f_long.head(n) = f;
   g_long.head(n) = g;
-  // Periodic discrete convolution
+  // Periodic discrete convolution using FFT
   res = pconvfft(f_long, g_long).head(n);
   return res;
 }
@@ -83,7 +87,7 @@ std::tuple<double, double, double> runtimes_ltpMult(unsigned int N) {
   c = Eigen::VectorXcd::Random(N);
   v = Eigen::VectorXcd::Constant(N, 1.0);
 
-  // Generate dense representation of Toeplitz matrix
+  // Generate dense representation of Toeplitz matrices
   r.setZero();
   r(0) = c(0);
   const Eigen::MatrixXcd T = toeplitz(c, r);
@@ -157,14 +161,15 @@ Eigen::VectorXcd toepMatVecMult(const Eigen::VectorXcd& c,
 
   const std::size_t n = c.size();
   Eigen::VectorXcd y(2 * n);
+  // The multiplication of a Toeplitz matrix with a vector can be reduced
+  // to the multiplication of circulant matrix with a vector ref{emp:tpmv},
+  // which can be computed by FFT as in ref{par:circul}
   Eigen::VectorXcd cr_tmp(2 * n), x_tmp(2 * n);
 
-  // Using \prbcref<prb:ltp:tp5h1>
-  // Construct the sequence of Toeplitz matrix
+  // Assemble the sequence of Toeplitz matrix
   cr_tmp.head(n) = c;
   cr_tmp.tail(n) = Eigen::VectorXcd::Zero(n);
-  // Need to reverse the upper trangular sequence and
-  // add it to the end in case it is not a lower triangular matrix
+  // Need to reverse the row sequence and add it to the end
   cr_tmp.tail(n - 1) = r.tail(n - 1).reverse();
 
   x_tmp.head(n) = x;
@@ -193,12 +198,12 @@ Eigen::VectorXcd ltpSolve(const Eigen::VectorXcd& f,
 
   const std::size_t n = f.size();
   Eigen::VectorXcd u(n);
-  // When it reduces to scalar
+  // When it reduces to scalar, solve directly
   if (n == 1) {
     return y.cwiseQuotient(f);
   }
 
-  // Solve by recursion
+  // Solve by recursion:
   // Solve for the first half of $\Vu$
   const Eigen::VectorXcd u_head = ltpSolve(f.head(n / 2), y.head(n / 2));
   // Update the right hand side by subtracting the product of the lower left part
@@ -207,6 +212,7 @@ Eigen::VectorXcd ltpSolve(const Eigen::VectorXcd& f,
       y.tail(n / 2) -
       toepMatVecMult(f.tail(n / 2), f.segment(1, n / 2).reverse(), u_head);
   // Solve for the second half of $\Vu$
+  // (upper left part of the matrix is identical to the lower right part)
   const Eigen::VectorXcd u_tail = ltpSolve(f.head(n / 2), t);
   // Assemble results
   u << u_head, u_tail;
@@ -222,9 +228,8 @@ std::pair<double, double> runtimes_ltpSolve(unsigned int N) {
   // Measure runtime several times
   int num_repititions = 6;
 
-  // Sequence of Toeplitz matrix and vector
+  // Initialization of Toeplitz matrix and vector
   Eigen::VectorXcd c(N), r(N), v(N);
-  // Initialization
   for (int i = 0; i < N; i++) {
     c(i) = i + 1;
   }
@@ -232,7 +237,7 @@ std::pair<double, double> runtimes_ltpSolve(unsigned int N) {
   r.setZero();
   r(0) = c(0);
 
-  // Generate dense representation of $c$ and RHS of LSE
+  // Generate dense representation of Toeplitz and rhs vector of LSE
   Eigen::MatrixXcd T = toeplitz(c, r);
   Eigen::VectorXcd T_mult_v = ltpMult(c, v);
 

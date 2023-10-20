@@ -4,9 +4,51 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
-
+#include <unsupported/Eigen/FFT>
 using namespace Eigen;
 using namespace std;
+
+/* @brief Compute the convolution quadrature weights for Laplace transform F
+ * \param F     Template function for the Laplace transform
+ * \param delta Template function determining the multistep method
+ * \param tau   Time step size  
+ * \param N     Number of time steps
+ * \\return convolution quadrature weights
+ */
+/* SAM_LISTING_BEGIN_0 */
+template <typename FFUNC, typename DFUNC>
+VectorXd cqweights_by_dft(const FFUNC& F, const DFUNC& delta, double tau,
+                          size_t N) {
+  Eigen::VectorXcd w = Eigen::VectorXd::Zero(N + 1);
+  // Setting $r = EPS^{\frac{1}{2N+2}}$, as discussed in Rem. 3.4.3.20
+  double r = std::pow(10, -16.0 / (2 * N + 2));
+#if SOLUTION
+  // Initialize vector for the evaluations in the Laplace domain
+  Eigen::VectorXcd f = Eigen::VectorXd::Zero(N + 1);
+  // Imaginary unit stored in imag
+  std::complex<double> imag = std::complex<double>(0, 1);
+  // Variable for the frequencies along the contour
+  std::complex<double> s_k;
+  for (int k = 0; k < N + 1; k++) {
+    // Integrate on circumference centered in (0,0) with radius r
+    s_k = delta(r * std::exp(2 * M_PI * imag * ((double)k) / (double)(N + 1))) /
+          tau;
+    f[k] = F(s_k);
+  }
+  // Integrate with trapezoidal rule at N+1 points
+  Eigen::FFT<double> fft;
+  w = fft.fwd(f) / (N + 1);
+  for (int k = 0; k < N + 1; k++) {
+    // Rescale by the radius of the circle, which arise from the z^l -factor in the integrand
+    w[k] = w[k] / std::pow(r, k);
+  }
+#else   // TEMPLATE
+  // TODO: Compute the convolution weights for Laplace transform F
+#endif  // TEMPLATE
+
+  return w.real();
+}
+/* SAM_LISTING_END_0 */
 
 #if SOLUTION
 /* @brief Compute the IE convolution weights for Laplace transform F
@@ -46,16 +88,19 @@ VectorXd conv_wght_ieu(const FFUNC& F, size_t n, int p, double r = 1.0E-7) {
 }
 #endif
 
-/* @brief Compute the BDF-2 convolution weights for Laplace transform F
+<<<<<<< HEAD:CONVQUAD/AbsorbingBoundaryCondition/all/absorbingboundarycondition.h
+=======
+    /* @brief Compute the BDF-2 convolution weights for Laplace transform F
  * \param F Template function for the Laplace transform
  * \param n Number of convolution weights, plus 1
  * \param p Order of quadrature rule
  * \param r Radius of circumference of integration (default = 1.0E-7)
  * \\return BDF-2 convolution weights
  */
-/* SAM_LISTING_BEGIN_0 */
-template <typename FFUNC>
-VectorXd conv_wght_bdf2(const FFUNC& F, size_t n, int p, double r = 1.0E-7) {
+    /* SAM_LISTING_BEGIN_0 */
+    template <typename FFUNC>
+    VectorXd conv_wght_bdf2(const FFUNC& F, size_t n, int p,
+                            double r = 1.0E-7) {
 #if SOLUTION
   double tau = 1. / n;
   VectorXcd w = VectorXd::Zero(n + 1);
@@ -91,6 +136,7 @@ VectorXd conv_wght_bdf2(const FFUNC& F, size_t n, int p, double r = 1.0E-7) {
 }
 /* SAM_LISTING_END_0 */
 
+>>>>>>> origin:CONVQUAD/AbsorbingBoundaryCondition/AbsorbingBoundaryCondition.cpp
 #if SOLUTION
 /* @brief Build the sparse symmetric tri-diagonal matrix
  * \param N Number of discretization intervals in space
@@ -143,6 +189,7 @@ SparseMatrix<double> compute_matA(size_t N) {
 template <typename FUNC>
 VectorXd solve_IBVP(const FUNC& g, size_t M, size_t N, int p) {
 #if SOLUTION
+  //auto F = [](complex<double> s) { return s / (std::exp(-s) + 1.); };
   auto F = [](complex<double> s) { return log(s) / (s * s + 1.); };
 
   // matrix A
@@ -150,16 +197,20 @@ VectorXd solve_IBVP(const FUNC& g, size_t M, size_t N, int p) {
   A = compute_matA(N);
 
   // convolution weights
-  VectorXd w = conv_wght_bdf2(F, M, p);
-
+  auto delta = [](std::complex<double> z) {
+    return 1.0 / 2.0 * z * z - 2.0 * z + 3.0 / 2.0;
+  };
+  // Assume the final time to be $t=1$
+  double tau = 1.0 / M;
+  Eigen::VectorXd w = cqweights_by_dft(F, delta, tau, M);
+  std::cout << (wv - w).squaredNorm() << std::endl;
   // Aw <- A + lowToeplitz(w)*B; B(N,N) = 1, else B(i,j) = 0
   SparseMatrix<complex<double> > Aw = A.cast<complex<double> >();
   Aw.coeffRef(N, N) += w(0);
   SparseLU<SparseMatrix<complex<double> > > solver;
   solver.compute(Aw);
-
   // run solver from t=0 -> t=1
-  double tau = 1. / M;
+  //double tau = 1. / M;
   MatrixXcd u = MatrixXcd::Zero(N + 1, M + 1);
   for (int i = 1; i <= M; ++i) {
     // rhs\_cq: from the convolution weights $l=0,1,\ldots,n-1$
@@ -184,6 +235,8 @@ VectorXd solve_IBVP(const FUNC& g, size_t M, size_t N, int p) {
 }
 /* SAM_LISTING_END_2 */
 
+<<<<<<< HEAD:CONVQUAD/AbsorbingBoundaryCondition/all/absorbingboundarycondition.h
+=======
 int main() {
   /* SAM_LISTING_BEGIN_3 */
 #if SOLUTION
@@ -232,5 +285,6 @@ int main() {
 #else   // TEMPLATE
   // TODO: Tabulate the H1-error of the Galerkin discretization + convolution quadrature
 #endif  // TEMPLATE
-        /* SAM_LISTING_END_3 */
+  /* SAM_LISTING_END_3 */
 }
+>>>>>>> origin:CONVQUAD/AbsorbingBoundaryCondition/AbsorbingBoundaryCondition.cpp
