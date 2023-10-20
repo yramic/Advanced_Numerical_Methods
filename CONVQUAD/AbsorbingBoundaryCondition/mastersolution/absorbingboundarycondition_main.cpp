@@ -64,5 +64,5 @@ int main() {
     error = sqrt(error / h_ref) / norm_u_ref;
     cout << M << "\t" << scientific << setprecision(10) << error << endl;
   }
-        /* SAM_LISTING_END_3 */
+  /* SAM_LISTING_END_3 */
 }
