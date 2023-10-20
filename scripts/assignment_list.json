@@ -11,6 +11,7 @@
     "HMAT/EvalTrigPoly",
     "CONVQUAD/LowTriangToeplitz",
     "CONVQUAD/AbelIntegralEquation",
-    "CONVQUAD/FractionalHeatEquation"
+    "CONVQUAD/FractionalHeatEquation",
+    "CONVQUAD/AbsorbingBoundaryCondition"
   ]
 }
