@@ -66,7 +66,7 @@ double comp_lmax_gaussSeidel(const Eigen::SparseMatrix<double> &X,
   double lambda_old = 1;
 
   int itr = 0;
-  // Power iteration 
+  // Power iteration
   do {
     lambda_old = lambda_new;
     v /= v.norm();
