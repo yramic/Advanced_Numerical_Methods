@@ -1,8 +1,0 @@
-{
-    "author" : "prbansal",
-    "email" : "pratyuksh.bansal@sam.math.ethz.ch",
-    "contributors" : "",
-
-    "name": "StationaryLinearIterations",
-    "all" : ["StationaryLinearIterations.cpp"]
-}
