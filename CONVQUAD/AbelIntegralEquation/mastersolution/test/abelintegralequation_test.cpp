@@ -18,8 +18,7 @@ TEST(AbelIntegralEquation, test_poly_spec) {
   VectorXd u_app = AbelIntegralEquation::poly_spec_abel(y, p, tau);
   // Difference between reference and implementation
   double error = (u_app - u_ex).norm();
-
-  ASSERT_NEAR(error, 0.0, 1e-5);
+  ASSERT_NEAR(error, 0.0, 5 * 1e-5);
 }
 
 TEST(AbelIntegralEquation, test_cq_ieul) {

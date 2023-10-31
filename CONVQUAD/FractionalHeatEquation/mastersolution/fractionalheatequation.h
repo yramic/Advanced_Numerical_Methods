@@ -94,6 +94,7 @@ Eigen::VectorXd evlMOT(
     RECORDER rec = [](const Eigen::Vector2d &mu_n) {}) {
   const unsigned int N = n * n;
   std::vector<Eigen::VectorXd> mu_vecs{M + 1, Eigen::VectorXd(N)};
+
   // ************************************************************
   // TO BE SUPPLEMENTED
   // ************************************************************
