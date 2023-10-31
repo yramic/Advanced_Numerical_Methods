@@ -41,11 +41,12 @@ VectorXd cqweights_by_dft(const FFUNC& F, const DFUNC& delta, double tau,
     // Rescale by the radius of the circle, which arise from the $z^l$ -factor in the integrand
     w[k] = w[k] / std::pow(r, k);
   }
-
+  // **********************************************************************
+  // Your Solution here
+  // **********************************************************************/
   return w.real();
 }
 /* SAM_LISTING_END_0 */
-
 
 /* @brief Build the sparse symmetric tri-diagonal matrix
  * \param N Number of discretization intervals in space
@@ -58,7 +59,7 @@ SparseMatrix<double> compute_matA(size_t N) {
 
   SparseMatrix<double> A(N + 1, N + 1);
   A.reserve(3 * N + 1);  // 3(N+1) - 2
-
+  // Inserting endpoints.
   A.insert(0, 0) =
       1. / h + 1. / (h * h * pow(M_PI, 3)) *
                    ((pow(M_PI * h, 2) - 2.) + 2. * cos(M_PI * h));  //A(0,0)
@@ -67,12 +68,14 @@ SparseMatrix<double> compute_matA(size_t N) {
                                  2. * cos(M_PI * (1 - h)));  //A(N,N)
 
   for (int i = 1; i <= N; ++i) {
-    if (i < N) {  // A(i,i)
+    if (i < N) {
+      // Inserting diagonal entries
       A.insert(i, i) =
           2. / h + 2. / (h * h * pow(M_PI, 3)) *
                        (2 * M_PI * h * sin(M_PI * grid(i)) +
                         cos(M_PI * grid(i + 1)) - cos(M_PI * grid(i - 1)));
     }
+    // Inserting sub- and super-diagonal entries
     // A(i-1,i) = A(i,i-1)
     A.insert(i - 1, i) = A.insert(i, i - 1) =
         -1. / h +
@@ -80,7 +83,6 @@ SparseMatrix<double> compute_matA(size_t N) {
             (2. * (cos(M_PI * grid(i - 1)) - cos(M_PI * grid(i))) -
              M_PI * h * (sin(M_PI * grid(i - 1)) + sin(M_PI * grid(i))));
   }
-
   return A;
 }
 /* SAM_LISTING_END_1 */
@@ -90,34 +92,29 @@ SparseMatrix<double> compute_matA(size_t N) {
  * \param g Template function for the right-hand side
  * \param M Number of discretization intervals in time
  * \param N Number of discretization intervals in space
- * \param p Order of quadrature rule
- * \\return Values of u at final time t = 1
+ * \param T Final Time
+ * \\return Values of u at final time t = T
  */
 /* SAM_LISTING_BEGIN_2 */
 template <typename FUNC>
-VectorXd solve_IBVP(const FUNC& g, size_t M, size_t N) {
-  //auto F = [](complex<double> s) { return s / (std::exp(-s) + 1.); };
+VectorXd solve_IBVP(const FUNC& g, size_t M, size_t N, double T) {
+  MatrixXcd u = MatrixXcd::Zero(N + 1, M + 1);
   auto F = [](complex<double> s) { return log(s) / (s * s + 1.); };
-
   // matrix A
   SparseMatrix<double> A(N + 1, N + 1);
   A = compute_matA(N);
-
   // convolution weights
   auto delta = [](std::complex<double> z) {
     return 1.0 / 2.0 * z * z - 2.0 * z + 3.0 / 2.0;
   };
-  // Assume the final time to be $t=1$
-  double tau = 1.0 / M;
+  double tau = T / M;
   Eigen::VectorXd w = cqweights_by_dft(F, delta, tau, M);
   // Aw <- A + lowToeplitz(w)*B; B(N,N) = 1, else B(i,j) = 0
   SparseMatrix<complex<double> > Aw = A.cast<complex<double> >();
   Aw.coeffRef(N, N) += w(0);
   SparseLU<SparseMatrix<complex<double> > > solver;
   solver.compute(Aw);
-  // run solver from t=0 -> t=1
-  //double tau = 1. / M;
-  MatrixXcd u = MatrixXcd::Zero(N + 1, M + 1);
+  // run solver from t=0 -> t=T
   for (int i = 1; i <= M; ++i) {
     // rhs\_cq: from the convolution weights $l=0,1,\ldots,n-1$
     complex<double> rhs_cq = 0.;
@@ -133,7 +130,6 @@ VectorXd solve_IBVP(const FUNC& g, size_t M, size_t N) {
     rhs(N) -= rhs_cq;              //rhs
     u.col(i) = solver.solve(rhs);  // solution at $t = t_n$
   }
-
   return u.col(M).real();
 }
 /* SAM_LISTING_END_2 */

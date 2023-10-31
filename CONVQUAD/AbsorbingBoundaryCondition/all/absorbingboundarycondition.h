@@ -20,6 +20,7 @@ template <typename FFUNC, typename DFUNC>
 VectorXd cqweights_by_dft(const FFUNC& F, const DFUNC& delta, double tau,
                           size_t M) {
   Eigen::VectorXcd w = Eigen::VectorXd::Zero(M + 1);
+#if SOLUTION
   // Setting $r = EPS^{\frac{1}{2M+2}}$, as discussed in Rem. 3.4.3.20
   double r = std::pow(10, -16.0 / (2 * M + 2));
   // Initialize vector for the evaluations in the Laplace domain
@@ -41,10 +42,12 @@ VectorXd cqweights_by_dft(const FFUNC& F, const DFUNC& delta, double tau,
     // Rescale by the radius of the circle, which arise from the $z^l$ -factor in the integrand
     w[k] = w[k] / std::pow(r, k);
   }
+  // **********************************************************************
+  // Your Solution here
+  // **********************************************************************/
   return w.real();
 }
 /* SAM_LISTING_END_0 */
-
 
 /* @brief Build the sparse symmetric tri-diagonal matrix
  * \param N Number of discretization intervals in space
@@ -57,8 +60,8 @@ SparseMatrix<double> compute_matA(size_t N) {
 
   SparseMatrix<double> A(N + 1, N + 1);
   A.reserve(3 * N + 1);  // 3(N+1) - 2
-  
-  #if SOLUTION
+#if SOLUTION
+  // Inserting endpoints.
   A.insert(0, 0) =
       1. / h + 1. / (h * h * pow(M_PI, 3)) *
                    ((pow(M_PI * h, 2) - 2.) + 2. * cos(M_PI * h));  //A(0,0)
@@ -67,7 +70,7 @@ SparseMatrix<double> compute_matA(size_t N) {
                                  2. * cos(M_PI * (1 - h)));  //A(N,N)
 
   for (int i = 1; i <= N; ++i) {
-    if (i < N) {  
+    if (i < N) {
       // Inserting diagonal entries
       A.insert(i, i) =
           2. / h + 2. / (h * h * pow(M_PI, 3)) *
@@ -82,11 +85,11 @@ SparseMatrix<double> compute_matA(size_t N) {
             (2. * (cos(M_PI * grid(i - 1)) - cos(M_PI * grid(i))) -
              M_PI * h * (sin(M_PI * grid(i - 1)) + sin(M_PI * grid(i))));
   }
-  #else
-  // **********************************************************************
-  // Your Solution here
-  // **********************************************************************/
-  #endif
+#else
+// **********************************************************************
+// Your Solution here
+// **********************************************************************/
+#endif
   return A;
 }
 /* SAM_LISTING_END_1 */
@@ -101,7 +104,7 @@ SparseMatrix<double> compute_matA(size_t N) {
  */
 /* SAM_LISTING_BEGIN_2 */
 template <typename FUNC>
-VectorXd solve_IBVP(const FUNC& g, size_t M, size_t N,double T) {
+VectorXd solve_IBVP(const FUNC& g, size_t M, size_t N, double T) {
   MatrixXcd u = MatrixXcd::Zero(N + 1, M + 1);
   auto F = [](complex<double> s) { return log(s) / (s * s + 1.); };
   // matrix A
@@ -113,7 +116,7 @@ VectorXd solve_IBVP(const FUNC& g, size_t M, size_t N,double T) {
   };
   double tau = T / M;
   Eigen::VectorXd w = cqweights_by_dft(F, delta, tau, M);
-  #if SOLUTION
+#if SOLUTION
   // Aw <- A + lowToeplitz(w)*B; B(N,N) = 1, else B(i,j) = 0
   SparseMatrix<complex<double> > Aw = A.cast<complex<double> >();
   Aw.coeffRef(N, N) += w(0);
@@ -135,11 +138,11 @@ VectorXd solve_IBVP(const FUNC& g, size_t M, size_t N,double T) {
     rhs(N) -= rhs_cq;              //rhs
     u.col(i) = solver.solve(rhs);  // solution at $t = t_n$
   }
-  #else
-  // **********************************************************************
-  // Your Solution here
-  // **********************************************************************/
-  #endif
+#else
+// **********************************************************************
+// Your Solution here
+// **********************************************************************/
+#endif
   return u.col(M).real();
 }
 /* SAM_LISTING_END_2 */
