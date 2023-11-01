@@ -40,8 +40,14 @@ Eigen::MatrixXcd toeplitz(const Eigen::VectorXcd& c,
  */
 Eigen::VectorXcd pconvfft(const Eigen::VectorXcd& u,
                           const Eigen::VectorXcd& x) {
-  Eigen::FFT<double> fft;
+  // Eigen::FFT<double> ... Object to perform FFT operations is created
+  Eigen::FFT<double> fft; 
+  // .fwd(x) ... Perform the forward FFT on the signal input x
+  // forward FFT: transforms time-domain signals into frequency-
+  // domain signals
+  // .cwiseProduct ... elementwise product of two input signals 
   Eigen::VectorXcd tmp = (fft.fwd(u)).cwiseProduct(fft.fwd(x));
+  // .inv ... transformation from the frequency domain to the time domain
   return fft.inv(tmp);
 }
 
@@ -91,7 +97,27 @@ Eigen::VectorXcd ltpMult(const Eigen::VectorXcd& f, const Eigen::VectorXcd& g) {
   std::size_t n = f.size();
   Eigen::VectorXcd res(n);
   // **********************************************************************
-  // Your Solution here
+  // Your Solution here PROBLEM 3-1C:
+
+  // Note: VectorXcd explained
+  // - X ... declares the dynamic size
+  // - c ... matrices of complex numbers
+  // - d ... real and imaginary parts are represented by doubles
+
+  // The sequence of the product matrix can be obtained through discrete convolution
+  // Discrete convolution can be treated as multiplication of circulant matrix, which
+  // can be represented by Fourier matrix refpar:circul
+
+  // First step according to Remark 4.1.4.15 is the need for a zero padding!
+  Eigen::VectorXcd f_long = Eigen::VectorXcd::Zero(2*n); // Increased f!
+  Eigen::VectorXcd g_long = Eigen::VectorXcd::Zero(2*n); // Increased g!
+
+  f_long.head(n) = f; // Assign first n elements!
+  g_long.head(n) = g;
+
+  // Now the Periodic Discrete Convolution can be computed
+  // For further information look at the function pconvfft()
+  res = pconvfft(f_long, g_long).head(n);
   // **********************************************************************
   return res;
 }
@@ -104,7 +130,72 @@ std::tuple<double, double, double> runtimes_ltpMult(unsigned int N) {
   double s_dense, s_mv, s_ltp;
 
   // **********************************************************************
-  // Code to be supplemented
+  // Code to be supplemented PROBLEM 3-1D:
+  
+  // As done previously we will do the computation several times to have a
+  // better approximation of the runtime duration!
+  int n_run{6}; // 6 runs for each Operation!
+
+  // First, we want to compute LOWER triangular Toeplitz matrices:
+  // Hence, the row vector consists out of zeros and the column vector out
+  // of random numbers:
+  Eigen::VectorXcd r_vec(N), c1_vec(N), c2_vec(N);
+  r_vec.setZero();
+  c1_vec = Eigen::VectorXcd::Random(N);
+  c2_vec = Eigen::VectorXcd::Constant(N, 1.0);
+
+  // For the Teoplitz Matrix since it is set up with the first row represented
+  // by r and the first column represented by c, the following condition:
+  // r(0) == c(0) needs to be fullfilled!
+  r_vec(0) = c1_vec(0);
+  Eigen::MatrixXcd T_1 = toeplitz(c1_vec, r_vec);
+  r_vec(0) = c2_vec(0);
+  Eigen::MatrixXcd T_2 = toeplitz(c2_vec, r_vec);
+
+  // 1) Matrix x Matrix:
+
+  // Initially, we don't have a measured value, so we need to set s_dense 
+  // to a very large number as a placeholder!
+  s_dense = std::numeric_limits<double>::max(); // max possible value
+
+  Eigen::MatrixXcd Test_MxM;
+  for (int i{0}; i < n_run; ++i) {
+    auto t_0 = std::chrono::high_resolution_clock::now();
+    Test_MxM = T_1 * T_2;
+    auto t_1 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> ms_dur = (t_1 - t_0);
+    // Minimal measured Time:
+    // Note: .count() is necessary since two doubles need to be compared!
+    s_dense = (ms_dur.count() < s_dense) ? ms_dur.count() : s_dense;
+  }
+
+  // 2) Matrix x Vector
+
+  // Same approach here!
+  s_mv = std::numeric_limits<double>::max();
+
+  Eigen::VectorXcd Test_MxV;
+  for (int i{0}; i < n_run; ++i) {
+    auto t_0 = std::chrono::high_resolution_clock::now();
+    Test_MxV = T_1 * c2_vec;
+    auto t_1 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> ms_dur = (t_1 - t_0);
+    s_mv = (ms_dur.count() < s_mv) ? ms_dur.count() : s_mv;
+  }
+
+  // 3) Usage of ltpMult (Vector x Vector)
+
+  // Same approach here again!
+  s_ltp = std::numeric_limits<double>::max();
+
+  Eigen::VectorXcd Test_VxV;
+  for (int i{0}; i < n_run; ++i) {
+    auto t_0 = std::chrono::high_resolution_clock::now();
+    Test_VxV = ltpMult(c1_vec, c2_vec);
+    auto t_1 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> ms_dur = (t_1 - t_0);
+    s_ltp = (ms_dur.count() < s_ltp) ? ms_dur.count() : s_ltp;
+  }
   // **********************************************************************
 
   return {s_dense, s_mv, s_ltp};
