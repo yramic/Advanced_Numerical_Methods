@@ -237,6 +237,43 @@ Eigen::Vector2d StarQuadTreeClustering::forceOnStar(unsigned int j,
   acc.setZero();
 // **********************************************************************
 // Code to be supplemented for 2-1e:
+  /* 
+  The basic idea here is that for a given star j we build a recursive 
+  lambda function that starts from the root and goes through all children 
+  (4 each time). At each step we need to check if a given cluster Tree node
+  is admissible or not. If it is admissible we can now the center of gravity
+  as well as the total mass of this admissible sub cluster and use it for 
+  calculation!
+  */
+  // Recursive function with void (Output) and StarQuadTreeNode pointer (Input)
+  std::function<void(const StarQuadTreeNode *)> rec_func = 
+      [&](const StarQuadTreeNode *node){
+        // Check first if the node is a null pointer (has no stars in it)
+        if (node == nullptr) {return; } // return nothing!
+        // Next we want to check if an underlying cluster is a leaf (contains 1 star)
+        // or if it is admissible then we can add this to acc!
+        if ( isAdmissible(*node, starpos_[j], eta) or (node->isLeaf()) ) {
+          // Note: the Multiplication of m_j/(4*pi) can be done in the end!
+          const Eigen::Vector2d diff_masspos = (node->center - starpos_[j]);
+          const double dist = diff_masspos.norm();
+          // Note: Division through 0 should be avoided!
+          if (dist > 1.0E-10) {
+            // Note: dist^3 wasn't in the exercise slides! Wrong formula!
+            acc += diff_masspos * node->mass / std::pow(dist, 3);
+          }
+        } else { // If not admissible and no leaf go further to the next level
+          // Hence, we need to check the admissibility for all 4 children!
+          rec_func(node->sons_[0].get());
+          rec_func(node->sons_[1].get());
+          rec_func(node->sons_[2].get());
+          rec_func(node->sons_[3].get());
+        }
+      };
+  // activate function with the root and start recursion!
+  rec_func(this->root_.get());
+
+  // In the end we need to multiply acc with m_j/(4*pi):
+  acc *= (starmasses_[j] / (4 * M_PI));
 // **********************************************************************
   return acc;
 }
@@ -248,6 +285,20 @@ std::vector<double> forceError(const StarQuadTreeClustering &qt,
   std::vector<double> error(etas.size());  // For returning errors
 // **********************************************************************
 // Code to be supplemented for 2-1f:
+  std::vector<Eigen::Vector2d> f_exact {
+    computeForces_direct(qt.starpos_, qt.starmasses_)}; // Exact force values
+  
+  std::vector<double> e_normed(qt.n); // normed values should be stored here!
+
+  for (unsigned int i{0}; i < etas.size(); ++i) {
+    for (unsigned int j{0}; j < qt.n; j++) {
+      // This gives back the approximated solution for the j th star
+      const Eigen::Vector2d f_approx {qt.forceOnStar(j, etas[i])};
+      e_normed[j] = (f_approx - f_exact[j]).norm();
+    }
+    // Now we need to find the max element of the vector with every star!
+    error[i] = *std::max_element(e_normed.begin(), e_normed.end());
+  }
 // **********************************************************************
   return error;
 }
@@ -263,7 +314,36 @@ std::pair<double, double> measureRuntimes(unsigned int n, unsigned int n_runs) {
   double ms_exact = std::numeric_limits<double>::max();    // Time measured for exact evaluation
   double ms_cluster = std::numeric_limits<double>::max();  // Time taken for clustering-based evaluatiion
 // **********************************************************************
-// Code to be supplemented
+// PROBLEM 2-1g:
+
+  // Build the Quadtree with star positions and masses
+  StarQuadTreeClustering qt(pos, mass);
+  // According to the problem eta should be set to 0.5
+  const double eta {0.5};
+
+  std::vector<Eigen::Vector2d> forces(n); // Forces should be stored here!
+
+  // 1) Direct Force calculation (Runtime: O(n^2))
+  for (unsigned int t{0}; t < n_runs; ++t) {
+    auto t0 = std::chrono::high_resolution_clock::now();
+    forces = computeForces_direct(qt.starpos_, qt.starmasses_);
+    auto t1 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> dur = (t1 - t0);
+    // Minimal Runtime:
+    ms_exact = (dur.count() < ms_exact) ? dur.count() : ms_exact;
+  }
+
+  // 2) Cluster based approximation (Runtime: O(n*log(n))
+  for (unsigned int t{0}; t < n_runs; ++t) {
+    auto t0 = std::chrono::high_resolution_clock::now();
+    for (unsigned int idx{0}; idx < n; ++idx) {
+      forces[idx] = qt.forceOnStar(idx, eta);
+    }
+    auto t1 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> dur = (t1 - t0);
+    // Minimal Runtime:
+    ms_cluster = (dur.count() < ms_cluster) ? dur.count() : ms_cluster;
+  }
 // **********************************************************************
   return {ms_exact, ms_cluster};
 }
