@@ -1,6 +1,11 @@
 #ifndef ABC_H_
 #define ABC_H_
 
+
+#ifndef ABC_H_
+#define ABC_H_
+
+
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 #include <Eigen/SparseLU>
@@ -163,7 +168,5 @@ VectorXd solve_IBVP(const FUNC& g, size_t M, size_t N, double T) {
   return u.col(M).real();
 }
 /* SAM_LISTING_END_2 */
-
 }  // namespace AbsorbingBoundaryCondition
-
-#endif
+#endif  // Macro ABC_H_
