@@ -10,13 +10,15 @@
 #include <iomanip>
 #include <iostream>
 #include <unsupported/Eigen/FFT>
+
 using namespace Eigen;
 using namespace std;
 
+namespace AbsorbingBoundaryCondition {
 /* @brief Compute the convolution quadrature weights for Laplace transform F
  * \param F     Template function for the Laplace transform
  * \param delta Template function determining the multistep method
- * \param tau   Time step size  
+ * \param tau   Time step size
  * \param M     Number of time steps
  * \\return convolution quadrature weights
  */
@@ -43,19 +45,17 @@ VectorXd cqweights_by_dft(const FFUNC& F, const DFUNC& delta, double tau,
   Eigen::FFT<double> fft;
   w = fft.fwd(f) / (M + 1);
   for (int k = 0; k < M + 1; k++) {
-    // Rescale by the radius of the circle, which arise from the $z^l$ -factor in the integrand
+    // Rescale by the radius of the circle, which arise from the $z^l$ -factor
+    // in the integrand
     w[k] = w[k] / std::pow(r, k);
   }
-  // **********************************************************************
-  // Your Solution here
-  // **********************************************************************/
   return w.real();
 }
 /* SAM_LISTING_END_0 */
 
 /* @brief Build the sparse symmetric tri-diagonal matrix
- * \param N Number of discretization intervals in space
- * \\return SparseMatrix A
+ * @param N Number of discretization intervals in space
+ * @return SparseMatrix A
  */
 /* SAM_LISTING_BEGIN_1 */
 SparseMatrix<double> compute_matA(size_t N) {
@@ -67,10 +67,10 @@ SparseMatrix<double> compute_matA(size_t N) {
   // Inserting endpoints.
   A.insert(0, 0) =
       1. / h + 1. / (h * h * pow(M_PI, 3)) *
-                   ((pow(M_PI * h, 2) - 2.) + 2. * cos(M_PI * h));  //A(0,0)
+                   ((pow(M_PI * h, 2) - 2.) + 2. * cos(M_PI * h));  // A(0,0)
   A.insert(N, N) = 1. / h + 1. / (h * h * pow(M_PI, 3)) *
                                 ((pow(M_PI * h, 2) - 2.) -
-                                 2. * cos(M_PI * (1 - h)));  //A(N,N)
+                                 2. * cos(M_PI * (1 - h)));  // A(N,N)
 
   for (int i = 1; i <= N; ++i) {
     if (i < N) {
@@ -92,8 +92,8 @@ SparseMatrix<double> compute_matA(size_t N) {
 }
 /* SAM_LISTING_END_1 */
 
-/* @brief Find the unknown function u at final time t = 1 in the evolution problem
- * using Galerkin discretization and convolution quadrature (BDF-2)
+/* @brief Find the unknown function u at final time t = 1 in the evolution
+ * problem using Galerkin discretization and convolution quadrature (BDF-2)
  * \param g Template function for the right-hand side
  * \param M Number of discretization intervals in time
  * \param N Number of discretization intervals in space
@@ -132,9 +132,13 @@ VectorXd solve_IBVP(const FUNC& g, size_t M, size_t N, double T) {
     phi(0) = -(complex<double>)g(i * tau);
 
     VectorXcd rhs = phi;
-    rhs(N) -= rhs_cq;              //rhs
+    rhs(N) -= rhs_cq;              // rhs
     u.col(i) = solver.solve(rhs);  // solution at $t = t_n$
   }
   return u.col(M).real();
 }
 /* SAM_LISTING_END_2 */
+
+}  // namespace AbsorbingBoundaryCondition
+
+#endif
