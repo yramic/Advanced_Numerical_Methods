@@ -10,6 +10,7 @@
 #include <Eigen/Sparse>
 #include <Eigen/SparseLU>
 #include <cmath>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <unsupported/Eigen/FFT>
@@ -54,9 +55,9 @@ VectorXd cqweights_by_dft(const FFUNC& F, const DFUNC& delta, double tau,
     w[k] = w[k] / std::pow(r, k);
   }
 #else
-// **********************************************************************
-// Your Solution here
-// **********************************************************************/
+  // **********************************************************************
+  // Your Solution here
+  // **********************************************************************/
 #endif
   return w.real();
 }
@@ -135,6 +136,9 @@ VectorXd solve_IBVP(const FUNC& g, size_t M, size_t N, double T) {
   Aw.coeffRef(N, N) += w(0);
   SparseLU<SparseMatrix<complex<double> > > solver;
   solver.compute(Aw);
+  // For visualization
+  ofstream f_ref;
+  if (M == 4096 && N == 4096) f_ref.open(CURRENT_BINARY_DIR "/u_ref.txt");
   // run solver from t=0 -> t=T
   for (int i = 1; i <= M; ++i) {
     // rhs\_cq: from the convolution weights $l=0,1,\ldots,n-1$
@@ -150,6 +154,11 @@ VectorXd solve_IBVP(const FUNC& g, size_t M, size_t N, double T) {
     VectorXcd rhs = phi;
     rhs(N) -= rhs_cq;              // rhs
     u.col(i) = solver.solve(rhs);  // solution at $t = t_n$
+  }
+  // For visualization
+  if (f_ref.is_open()) {
+    f_ref << u.real();
+    f_ref.close();
   }
 #else
 // **********************************************************************

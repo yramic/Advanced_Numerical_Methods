@@ -65,5 +65,9 @@ int main() {
     error = sqrt(error / h_ref) / norm_u_ref;
     cout << M << "\t" << scientific << setprecision(10) << error << endl;
   }
+
+  // Call python script
+  std::system("python3 " CURRENT_SOURCE_DIR "/plot.py " CURRENT_BINARY_DIR
+              "/u_ref.txt " CURRENT_BINARY_DIR "/u.png");
   /* SAM_LISTING_END_3 */
 }

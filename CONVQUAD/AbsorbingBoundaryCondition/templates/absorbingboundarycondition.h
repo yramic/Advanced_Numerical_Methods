@@ -10,6 +10,7 @@
 #include <Eigen/Sparse>
 #include <Eigen/SparseLU>
 #include <cmath>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <unsupported/Eigen/FFT>
@@ -30,16 +31,16 @@ template <typename FFUNC, typename DFUNC>
 VectorXd cqweights_by_dft(const FFUNC& F, const DFUNC& delta, double tau,
                           size_t M) {
   Eigen::VectorXcd w = Eigen::VectorXd::Zero(M + 1);
-// **********************************************************************
-// Your Solution here
-// **********************************************************************/
+  // **********************************************************************
+  // Your Solution here
+  // **********************************************************************/
   return w.real();
 }
 /* SAM_LISTING_END_0 */
 
 /* @brief Build the sparse symmetric tri-diagonal matrix
- * @param N Number of discretization intervals in space
- * @return SparseMatrix A
+ * \param N Number of discretization intervals in space
+ * \\return SparseMatrix A
  */
 /* SAM_LISTING_BEGIN_1 */
 SparseMatrix<double> compute_matA(size_t N) {
@@ -55,8 +56,8 @@ SparseMatrix<double> compute_matA(size_t N) {
 }
 /* SAM_LISTING_END_1 */
 
-/* @brief Find the unknown function u at final time t = 1 in the evolution
- * problem using Galerkin discretization and convolution quadrature (BDF-2)
+/* @brief Find the unknown function u at final time t = 1 in the evolution problem
+ * using Galerkin discretization and convolution quadrature (BDF-2)
  * \param g Template function for the right-hand side
  * \param M Number of discretization intervals in time
  * \param N Number of discretization intervals in space
