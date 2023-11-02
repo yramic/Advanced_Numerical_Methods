@@ -64,13 +64,22 @@ Eigen::VectorXcd toepMatVecMult(const Eigen::VectorXcd& c,
          "c, r, x have different lengths!");
 
   std::size_t n = c.size();
+  // The multiplication of a Toeplitz matrix with a vector can be reduced
+  // We want a multiplication of a circulant matrix with a vector
+  // This is because we can use then FFT!
   Eigen::VectorXcd cr_tmp(2 * n), x_tmp(2 * n);
 
-  cr_tmp.head(n) = c;
+  // Assemble the sequence of Toeplitz Matrix:
+  // First elements have the entries of the columnvector c
+  cr_tmp.head(n) = c; 
+  // last elements set to 0 from N to N^2-1
   cr_tmp.tail(n) = Eigen::VectorXcd::Zero(n);
+  // Now we take the row vector r and plug them in, in reversed order 
   cr_tmp.tail(n - 1) = r.tail(n - 1).reverse();
 
+  // Set the values to x from 0 to N-1
   x_tmp.head(n) = x;
+  // Zero Padding for values from N to N^2-1
   x_tmp.tail(n) = Eigen::VectorXcd::Zero(n);
 
   Eigen::VectorXcd y = pconvfft(cr_tmp, x_tmp);
@@ -217,6 +226,7 @@ Eigen::VectorXcd ltpSolve(const Eigen::VectorXcd& f,
          "Size of f must be a power of 2!");
 
   std::size_t n = f.size();
+  // When the problem reduces to a scalar, solve directly!
   if (n == 1) {
     return y.cwiseQuotient(f);
   }
@@ -238,7 +248,57 @@ std::pair<double, double> runtimes_ltpSolve(unsigned int N) {
   double s_tria, s_ltp;
 
   // **********************************************************************
-  // Code to be supplemented
+  // Problem 3-1f:
+
+  // runtimes:
+  const int runs {6};
+
+  // Generate Toeplitz Matrix and Vector:
+  Eigen::VectorXcd c(N), r(N), v(N);
+  // Note: c... column, r... row, v... vector
+  for (unsigned int i{0}; i < N; ++i) {
+    if (i == 0) {
+      c(i) = 1;
+    }
+    c(i) = 1/i;
+  }
+  r.setZero();
+  r(0) = c(0); // Condition for the Toeplitz Matrix!
+  v = Eigen::VectorXcd::Constant(N, 1.0);
+
+  // Build the actual Toeplitz Matrix:
+  Eigen::MatrixXcd T = toeplitz(c, r);
+  // Build the right hand side vector:
+  Eigen::VectorXcd v_rhs = ltpMult(c, v);
+
+  // Vector for the solutions:
+  Eigen::VectorXcd sol_direct(N);
+  Eigen::VectorXcd sol_ltp(N);
+
+  // Initialize s_tria and s_ltp:
+  s_tria = std::numeric_limits<double>::max();
+  s_ltp = std::numeric_limits<double>::max();
+
+  // 1) Runtime estimation for direct lower triangular method:
+  for (unsigned int i{0}; i < runs; ++i) {
+    auto t0 = std::chrono::high_resolution_clock::now();
+    sol_direct = T.triangularView<Eigen::Lower>().solve(v_rhs);
+    auto t1 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> dur = t1 - t0;
+    s_tria = (dur.count() < s_tria) ? dur.count() : s_tria; 
+  }
+
+  // 2) Runtime estimation for ltp method:
+  for (unsigned int i {0}; i < runs; ++i) {
+    auto t0 = std::chrono::high_resolution_clock::now();
+    sol_ltp = ltpSolve(c, v_rhs);
+    auto t1 = std::chrono::high_resolution_clock::now();
+
+    std::chrono::duration<double> dur = t1 - t0;
+    s_ltp = (dur.count() < s_ltp) ? dur.count() : s_ltp;
+  }
+
+
   // **********************************************************************
   return {s_tria, s_ltp};
 }
