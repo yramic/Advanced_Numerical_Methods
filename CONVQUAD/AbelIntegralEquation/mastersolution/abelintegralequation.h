@@ -128,6 +128,7 @@ Eigen::VectorXd poly_spec_abel(const FUNC& y, std::size_t p, double tau) {
 /* SAM_LISTING_BEGIN_2 */
 template <typename FUNC>
 Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
+  Eigen::VectorXd u(N + 1);
   Eigen::VectorXd w(N + 1);
   w(0) = 1.;
   // Calculate weights of convolution quadrature based on \prbcref{subprb:cq1}
@@ -147,7 +148,7 @@ Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
   // Set up the coefficient matrix
   Eigen::MatrixXd T = toeplitz_triangular(w);
   // Solve the lse with Eigen's build-in triangular elimination solver
-  Eigen::VectorXd u = T.triangularView<Lower>().solve(y_N);
+  u = T.triangularView<Lower>().solve(y_N);
   return u;
 }
 /* SAM_LISTING_END_2 */
@@ -161,6 +162,7 @@ Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
 /* SAM_LISTING_BEGIN_3 */
 template <typename FUNC>
 Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N) {
+  Eigen::VectorXd u(N + 1);
   Eigen::VectorXd w1(N + 1);
   w1(0) = 1.;
   // Calculate weights of convolution quadrature based on \prbcref{subprb:cq2}
@@ -168,17 +170,14 @@ Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N) {
   for (int l = 1; l < N + 1; ++l) {
     w1(l) = w1(l - 1) * (l - 0.5) / l;  // denominator is factorial
   }
-
   // Taylor series expansion of the second factor
   Eigen::VectorXd w2 = w1;
   for (int l = 1; l < N + 1; ++l) {
     w2(l) /= pow(3, l);
   }
-
   // Full expansion by Cauchy product
   Eigen::VectorXd w = myconv(w1, w2).head(N + 1).real();
   w *= std::sqrt(M_PI / N) * std::sqrt(2. / 3.);
-
   // Solve the convolution quadrature:
   // Generate points on the grid
   Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N + 1, 0., 1.);
@@ -187,12 +186,10 @@ Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N) {
   for (int i = 0; i < N + 1; ++i) {
     y_N(i) = y(grid(i));
   }
-
   // Set up the coefficient matrix
   Eigen::MatrixXd T = toeplitz_triangular(w);
   // Solve the lse with Eigen's build-in triangular elimination solver
-  Eigen::VectorXd u = T.triangularView<Lower>().solve(y_N);
-
+  u = T.triangularView<Lower>().solve(y_N);
   return u;
 }
 /* SAM_LISTING_END_3 */
