@@ -24,7 +24,8 @@ TEST(FractionalHeatEquation, cqWeights) {
     //return 1.0 / 2.0 * z * z - 2.0 * z + 3.0 / 2.0;
   };
   Eigen::VectorXd w_tr =
-      AbsorbingBoundaryCondition::cqweights_by_dft(F, delta, tau, M);
+      cqweights_by_dft(F, delta, tau, M);
+      //AbsorbingBoundaryCondition::cqweights_by_dft(F, delta, tau, M);
   std::cout << w_tr - w_ex << std::endl;
   ASSERT_NEAR((w_tr - w_ex).norm(), 0, 1E-8);
 }

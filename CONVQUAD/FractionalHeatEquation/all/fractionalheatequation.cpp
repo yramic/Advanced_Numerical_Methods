@@ -12,7 +12,20 @@
 #include <memory>
 
 namespace FractionalHeatEquation {
+std::vector<Eigen::Vector2d> generateGrid(unsigned n){
+  std::vector<Eigen::Vector2d>  gridpoints{n*n, Eigen::Vector2d()}; 
+  double h = 1.0/(n+1);
+  int rown = 0;
+  for (int yind = 1;yind<n+1;yind++ ){
+    for (int xind = 1; xind<n+1; xind++, rown++){
+      Eigen::Vector2d tmp;
+      tmp << xind*h, yind*h;
+      gridpoints[rown] = tmp;
 
+    }
+  }
+  return gridpoints;
+}
 unsigned int SqrtsMplusA::solve_cnt{0};
 unsigned int SqrtsMplusA::ludec_cnt{0};
 
@@ -32,6 +45,8 @@ SqrtsMplusA::SqrtsMplusA(unsigned int n, std::complex<double> s)
     }
   }
 }
+
+
 
 /* SAM_LISTING_BEGIN_1 */
 Eigen::VectorXd cqWeights(unsigned int M, double tau) {

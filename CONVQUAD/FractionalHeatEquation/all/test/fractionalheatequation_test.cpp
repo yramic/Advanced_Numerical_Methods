@@ -14,6 +14,11 @@
 
 namespace FractionalHeatEquation::test {
 
+TEST(FractionalHeatEquation,generateGrid){
+std::vector<Eigen::Vector2d> gridpoints =  generateGrid(2);
+ASSERT_NEAR(gridpoints[0][0],1.0/(3), 1E-12 );
+}
+
 TEST(FractionalHeatEquation, cqWeights) {
   size_t M = 5;
   double tau = 0.1;
@@ -24,7 +29,8 @@ TEST(FractionalHeatEquation, cqWeights) {
     //return 1.0 / 2.0 * z * z - 2.0 * z + 3.0 / 2.0;
   };
   Eigen::VectorXd w_tr =
-      AbsorbingBoundaryCondition::cqweights_by_dft(F, delta, tau, M);
+      cqweights_by_dft(F, delta, tau, M);
+      //AbsorbingBoundaryCondition::cqweights_by_dft(F, delta, tau, M);
   std::cout << w_tr - w_ex << std::endl;
   ASSERT_NEAR((w_tr - w_ex).norm(), 0, 1E-8);
 }

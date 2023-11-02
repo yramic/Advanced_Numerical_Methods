@@ -9,8 +9,9 @@
 #include "fractionalheatequation.h"
 
 int main(int /*argc*/, char** /*argv*/) {
-  Eigen::VectorXd w = FractionalHeatEquation::cqWeights(5, 0.1);
-  std::cout << "Running code for ADVNCSE HW FractionalHeatEquation" << std::endl
-            << w;
+  FractionalHeatEquation::SqrtsMplusA Amat(2, std::complex<double>(1,1));
+
+  std::cout << "Running code for ADVNCSE HW FractionalHeatEquation" << std::endl;
+       //     << Amat.p_matrix_;
   return 0;
 }
