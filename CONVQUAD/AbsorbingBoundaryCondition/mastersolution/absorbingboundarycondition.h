@@ -1,3 +1,8 @@
+
+#ifndef ABC_H_
+#define ABC_H_
+
+
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 #include <Eigen/SparseLU>
