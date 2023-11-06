@@ -70,12 +70,12 @@ void gaussSeidel(const Eigen::SparseMatrix<double> &A,
     std::cerr << "Did not converge to tol: " << TOL
               << "in maximal number of iterations: " << iter << std::endl;
   }
-}
 #else
   // **********************************************************************
   // Code to be supplemented
   // **********************************************************************
 #endif
+}
 /* SAM_LISTING_END_2 */
 
 /* SAM_LISTING_BEGIN_4 */

@@ -33,6 +33,7 @@ void gaussSeidel(const Eigen::SparseMatrix<double> &A,
   // **********************************************************************
   // Code to be supplemented
   // **********************************************************************
+}
 /* SAM_LISTING_END_2 */
 
 /* SAM_LISTING_BEGIN_4 */
