@@ -16,8 +16,9 @@ void test_cqweights() {
   };
   double tau = 0.1;
   size_t N = 10;
-  Eigen::VectorXd w = cqweights_by_dft(F, delta, tau, N);
-  //std::cout << tau*w <<std::endl;
+  Eigen::VectorXd w =
+      AbsorbingBoundaryCondition::cqweights_by_dft(F, delta, tau, N);
+  // std::cout << tau*w <<std::endl;
 }
 
 int main() {

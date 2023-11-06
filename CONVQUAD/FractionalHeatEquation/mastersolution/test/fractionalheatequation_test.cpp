@@ -1,7 +1,7 @@
 /**
  * @file fractionalheatequation_test.cc
  * @brief NPDE homework FractionalHeatEquation test code
- * @author Dr. Jörg Nick
+ * @author Jörg Nick
  * @date October 2023
  * @copyright Developed at SAM, ETH Zurich
  */
@@ -10,7 +10,29 @@
 
 #include <gtest/gtest.h>
 
+#include "../../../AbsorbingBoundaryCondition/mastersolution/absorbingboundarycondition.h"
+
 namespace FractionalHeatEquation::test {
+
+TEST(FractionalHeatEquation, generateGrid) {
+  std::vector<Eigen::Vector2d> gridpoints = generateGrid(2);
+  ASSERT_NEAR(gridpoints[0][0], 1.0 / (3), 1E-12);
+}
+
+TEST(FractionalHeatEquation, cqWeights) {
+  size_t M = 5;
+  double tau = 0.1;
+  Eigen::VectorXd w_ex = cqWeights(M, tau);
+  auto F = [](std::complex<double> s) { return std::pow(s, 0.5); };
+  auto delta = [](std::complex<double> z) {
+    return 1.0 - z;
+    //return 1.0 / 2.0 * z * z - 2.0 * z + 3.0 / 2.0;
+  };
+  Eigen::VectorXd w_tr = cqweights_by_dft(F, delta, tau, M);
+  //AbsorbingBoundaryCondition::cqweights_by_dft(F, delta, tau, M);
+  std::cout << w_tr - w_ex << std::endl;
+  ASSERT_NEAR((w_tr - w_ex).norm(), 0, 1E-8);
+}
 
 TEST(FractionalHeatEquation, SqrtsMPlusA) {
   const int n = 3;
