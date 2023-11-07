@@ -1,7 +1,7 @@
 /**
  * @file fractionalheatequation.h
  * @brief NPDE homework FractionalHeatEquation code
- * @author Jörg Nick
+ * @author Jörg Nick, Bob Schreiner
  * @date October 2023
  * @copyright Developed at SAM, ETH Zurich
  */
@@ -18,6 +18,7 @@
 #include <memory>
 #include <stdexcept>
 #include <unsupported/Eigen/FFT>
+#include <unsupported/Eigen/KroneckerProduct>
 #define assertm(exp, msg) assert(((void)msg, exp))
 
 namespace FractionalHeatEquation {
@@ -94,7 +95,7 @@ template <typename SOURCEFN,
           typename RECORDER = std::function<void(const Eigen::VectorXd &)>>
 Eigen::VectorXd evlMOT(
     SOURCEFN &&f, unsigned int n, double T, unsigned int M,
-    RECORDER rec = [](const Eigen::Vector2d &mu_n) {}) {
+    RECORDER rec = [](const Eigen::VectorXd &mu_n) {}) {
   const unsigned int N = n * n;
   std::vector<Eigen::VectorXd> mu_vecs{M + 1, Eigen::VectorXd(N)};
   double tau = T * 1.0 / M;
@@ -125,7 +126,7 @@ class ToeplitzOp {
 };
 /* SAM_LISTING_END_4 */
 
-/** @brief Solve fully discrete evolution my recursive algorithm for triangular
+/** @brief Solve fully discrete evolution by recursive algorithm for triangular
    Toeplitz system */
 /* SAM_LISTING_BEGIN_3 */
 template <typename SOURCEFN,
@@ -136,7 +137,20 @@ Eigen::VectorXd evlTriangToeplitz(
   const unsigned int N = n * n;
   const unsigned int M = std::pow(2, L) - 1;
   Eigen::MatrixXd mu_vecs(N, M + 1);
-  Eigen::VectorXd cq_weights(M + 1);
+  const double tau = T * 1.0 / M;
+  const double h = 1.0 / (n + 1);
+  Eigen::VectorXd cq_weights = cqWeights(M+1, tau);
+  // Initialise matrix to invert at every timestep, gridpoints and rhs
+  SqrtsMplusA A(n, std::complex<double>(std::pow(cq_weights[0], 2), 0.0));
+  //Generate rhs vector
+  std::vector<Eigen::Vector2d> gridpoints = generateGrid(n);
+  Eigen::MatrixXd rhs(N,(M+1));
+  for (int time_ind = 0; time_ind < M + 1; time_ind++) {
+      // Evaluate rhs
+      for (int space_ind = 0; space_ind < N; space_ind++) {
+          rhs(space_ind,time_ind) = f(time_ind * tau, gridpoints[space_ind]);
+      }
+  }
   // ************************************************************
   // TO BE SUPPLEMENTED
   // Use recursive lambda function, see
@@ -146,7 +160,7 @@ Eigen::VectorXd evlTriangToeplitz(
 }
 /* SAM_LISTING_END_3 */
 
-/** @brief Solve fully discrete evolution my all-steps-in-one forward CQ */
+/** @brief Solve fully discrete evolution by all-steps-in-one forward CQ */
 /* SAM_LISTING_BEGIN_X */
 template <typename SOURCEFN,
           typename RECORDER = std::function<void(const Eigen::VectorXd &)>>
@@ -164,7 +178,8 @@ Eigen::VectorXd evlASAOCQ(
   // Initialise array for the whole right hand side (all timepoints)
   Eigen::MatrixXd phi(N, M + 1);
   // Initialise array for the right hand side at a single timepoint
-  Eigen::MatrixXd phi_slice(N);
+  //Eigen::MatrixXd phi_slice(N);
+  Eigen::VectorXd phi_slice(N); //TODO: Check this
   // Set radius of integral contour
   double r = std::pow(10, -16.0 / (2 * M + 2));
   // Set gridpoints
@@ -174,13 +189,14 @@ Eigen::VectorXd evlASAOCQ(
     for (int space_ind = 0; space_ind < N; space_ind++) {
       phi_slice[space_ind] = f(time_ind * tau, gridpoints[space_ind]);
     }
-    phi[time_ind] = std::pow(r, time_ind) * phi_slice;
+    //phi.col(time_ind) = std::pow(r, time_ind) * phi_slice; //TODO: check this
+    phi.col(time_ind) = std::pow(r, time_ind) * phi_slice;
   }
   // Transform the right-hand side from the time domain into the frequency domain
   Eigen::MatrixXcd phi_hat(N, M + 1);
   Eigen::FFT<double> fft;
   for (int space_ind = 0; space_ind < N; space_ind++) {
-    Eigen::VectorXcd in = phi.row(space_ind);
+    Eigen::VectorXcd in = phi.row(space_ind).template cast<std::complex<double>>();
     Eigen::VectorXcd out(N);
     out = fft.fwd(in);
     phi_hat.row(space_ind) = out;
@@ -207,7 +223,7 @@ Eigen::VectorXd evlASAOCQ(
     Eigen::VectorXcd in = mu_hat.row(space_ind);
     Eigen::VectorXcd out(N);
     out = fft.inv(in);
-    mu_vecs.row(space_ind) = out;
+    mu_vecs.row(space_ind) = out.real();
   }
   // Rescaling of the numerical solution
   for (int time_ind = 0; time_ind < M + 1; time_ind++) {
