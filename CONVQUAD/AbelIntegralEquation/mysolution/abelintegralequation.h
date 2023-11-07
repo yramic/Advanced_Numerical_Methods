@@ -74,7 +74,7 @@ Eigen::VectorXd poly_spec_abel(const FUNC& y, std::size_t p, double tau) {
   Eigen::MatrixXd A = MatrixXd::Zero(p + 1, p + 1);
   Eigen::VectorXd b = Eigen::VectorXd::Zero(p + 1);
 
-  // generate Gauss-Legendre points and weights
+  // generate Gauss-Legendre quadrature points and weights
   const auto [gauss_pts_p, gauss_wht_p] = gauleg(0., 1., p);
 
   // set up the Galerkin matrix and rhs vector
@@ -109,26 +109,10 @@ Eigen::VectorXd poly_spec_abel(const FUNC& y, std::size_t p, double tau) {
 /* SAM_LISTING_BEGIN_2 */
 template <typename FUNC>
 Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
-  Eigen::VectorXd w(N + 1);
-  w(0) = 1.;
-  // Calculate weights of convolution quadrature based on \prbcref{ais:subprb:cq1}
-  for (int l = 1; l < N + 1; ++l) {
-    w(l) = w(l - 1) * (l - 0.5) / l;  // denominator is factorial
-  }
-  w *= std::sqrt(M_PI / N);
-
-  // Solve the convolution quadrature:
-  // Generate points on the grid
-  Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N + 1, 0., 1.);
-  // Set up the rhs vector of the LSE
-  Eigen::VectorXd y_N(N + 1);
-  for (int i = 0; i < N + 1; ++i) {
-    y_N(i) = y(grid(i));
-  }
-  // Set up the coefficient matrix
-  Eigen::MatrixXd T = toeplitz_triangular(w);
-  // Solve the lse with Eigen's build-in triangular elimination solver
-  Eigen::VectorXd u = T.triangularView<Lower>().solve(y_N);
+  Eigen::VectorXd u(N + 1);
+// **********************************************************************
+// Your Solution here
+// **********************************************************************/
   return u;
 }
 /* SAM_LISTING_END_2 */
@@ -142,35 +126,10 @@ Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
 /* SAM_LISTING_BEGIN_3 */
 template <typename FUNC>
 Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N) {
-  Eigen::VectorXd w1(N + 1);
-  w1(0) = 1.;
-  // Calculate weights of convolution quadrature based on \prbcref{ais:subprb:cq2}
-  for (int l = 1; l < N + 1; ++l) {
-    w1(l) = w1(l - 1) * (l - 0.5) / l;  // denominator is factorial
-  }
-
-  Eigen::VectorXd w2 = w1;
-  for (int l = 1; l < N + 1; ++l) {
-    w2(l) /= pow(3, l);
-  }
-
-  Eigen::VectorXd w = myconv(w1, w2).head(N + 1).real();
-  w *= std::sqrt(M_PI / N) * std::sqrt(2. / 3.);
-
-  // Solve the convolution quadrature:
-  // Generate points on the grid
-  Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N + 1, 0., 1.);
-  // Set up the rhs vector of the LSE
-  Eigen::VectorXd y_N(N + 1);
-  for (int i = 0; i < N + 1; ++i) {
-    y_N(i) = y(grid(i));
-  }
-
-  // Set up the coefficient matrix
-  Eigen::MatrixXd T = toeplitz_triangular(w);
-  // Solve the lse with Eigen's build-in triangular elimination solver
-  Eigen::VectorXd u = T.triangularView<Lower>().solve(y_N);
-
+  Eigen::VectorXd u(N + 1);
+// **********************************************************************
+// Your Solution here
+// **********************************************************************/
   return u;
 }
 /* SAM_LISTING_END_3 */

@@ -7,6 +7,7 @@ int main() {
     auto u = [](double t) { return 2. / M_PI * sqrt(t); };
     auto y = [](double t) { return t; };
 
+    // Generate points on the grid
     const double tau = 0.01;
     const std::size_t N = std::round(1. / tau);
     const Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N + 1, 0., 1.);
