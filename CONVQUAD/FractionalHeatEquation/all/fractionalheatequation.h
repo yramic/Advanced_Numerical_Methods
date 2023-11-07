@@ -213,8 +213,7 @@ Eigen::VectorXd evlASAOCQ(
   std::complex<double> imag(0, 1);
   for (int freq_ind = 0; freq_ind < M + 1; freq_ind++) {
     s_l = delta(r * std::exp(2 * M_PI * imag * ((double)freq_ind) /
-                             (double)(M + 1))) /
-          tau;
+                             (double)(M + 1))) / tau;
     // Applying the time-harmonic operator $G(s_l)^{-1}= (\sqrt{s_l}M+A)^{-1}$
     SqrtsMplusA slMplusA(n, s_l);
     Eigen::VectorXcd phi_hat_slice(N);
