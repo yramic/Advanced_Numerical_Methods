@@ -170,7 +170,7 @@ Eigen::VectorXd evlTriangToeplitz(
   for (int time_ind = 0; time_ind < M + 1; time_ind++) {
       // Evaluate rhs
       for (int space_ind = 0; space_ind < N; space_ind++) {
-          rhs(space_ind,time_ind) = f(time_ind * tau, gridpoints[space_ind]);
+          rhs(space_ind,time_ind) = h*h*f(time_ind * tau, gridpoints[space_ind]);
       }
   }
 #if SOLUTION
@@ -216,6 +216,7 @@ Eigen::VectorXd evlASAOCQ(
   const unsigned int N = n * n;
   const unsigned int M = std::pow(2, L) - 1;
   double tau = T * 1.0 / M;
+  double h = 1.0/(n+1.0);
   auto delta = [](std::complex<double> z) {
     return 1.0 / 2.0 * z * z - 2.0 * z + 3.0 / 2.0;
   };
@@ -235,7 +236,7 @@ Eigen::VectorXd evlASAOCQ(
     for (int space_ind = 0; space_ind < N; space_ind++) {
       phi_slice[space_ind] = f(time_ind * tau, gridpoints[space_ind]);
     }
-    //phi.col(time_ind) = std::pow(r, time_ind) * phi_slice; //TODO: check this
+    //phi[time_ind] = std::pow(r, time_ind) * phi_slice; //TODO: check this
     phi.col(time_ind) = std::pow(r, time_ind) * phi_slice;
   }
   // Transform the right-hand side from the time domain into the frequency domain
