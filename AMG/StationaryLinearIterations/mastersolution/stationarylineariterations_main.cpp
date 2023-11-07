@@ -24,7 +24,6 @@ int main(int /*argc*/, char** /*argv*/) {
 
   std::ofstream out(CURRENT_SOURCE_DIR "/convergence.csv");
   out << "c,n,lambda(X)" << std::endl;
-#if SOLUTION
   for (unsigned c = 0; c < c_max; ++c) {
     for (unsigned l = 1; l < l_max; ++l) {
       results(c, l) =
@@ -35,11 +34,6 @@ int main(int /*argc*/, char** /*argv*/) {
       out << c << "," << std::pow(2, l) << "," << results(c, l) << std::endl;
     }
   }
-#else
-  // **********************************************************************
-  // Code to be supplemented
-  // **********************************************************************
-#endif
   out.close();
   // Call python script
   std::system("python3 " CURRENT_SOURCE_DIR "/plot.py " CURRENT_SOURCE_DIR
