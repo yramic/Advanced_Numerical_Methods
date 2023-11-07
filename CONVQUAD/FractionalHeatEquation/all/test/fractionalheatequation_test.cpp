@@ -1,7 +1,7 @@
 /**
  * @file fractionalheatequation_test.cc
  * @brief NPDE homework FractionalHeatEquation test code
- * @author Jörg Nick
+ * @author Jörg Nick, Bob Schreiner
  * @date October 2023
  * @copyright Developed at SAM, ETH Zurich
  */

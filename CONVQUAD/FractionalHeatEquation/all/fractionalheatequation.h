@@ -119,6 +119,7 @@ Eigen::VectorXd evlMOT(
     // Solve timestep
     //mu_vecs[time_ind] = w0MplusA.solve(rhs);
     mu_vecs[time_ind] = w0MplusA.solve(rhs).real(); //TODO: Check if this is correct
+    std::cout<<w0MplusA.solve(rhs).real()<<std::endl;
     rec(mu_vecs[time_ind]);
   }
 #else
@@ -161,7 +162,7 @@ Eigen::VectorXd evlTriangToeplitz(
   Eigen::MatrixXd mu_vecs(N, M + 1);
   const double tau = T * 1.0 / M;
   const double h = 1.0 / (n + 1);
-  Eigen::VectorXd cq_weights = cqWeights(M+1, tau);
+  Eigen::VectorXd cq_weights = cqWeights(M, tau);
   // Initialise matrix to invert at every timestep, gridpoints and rhs
   SqrtsMplusA A(n, std::complex<double>(std::pow(cq_weights[0], 2), 0.0));
   //Generate rhs vector
@@ -170,7 +171,7 @@ Eigen::VectorXd evlTriangToeplitz(
   for (int time_ind = 0; time_ind < M + 1; time_ind++) {
       // Evaluate rhs
       for (int space_ind = 0; space_ind < N; space_ind++) {
-          rhs(space_ind,time_ind) = f(time_ind * tau, gridpoints[space_ind]);
+          rhs(space_ind,time_ind) = h*h*f(time_ind * tau, gridpoints[space_ind]);
       }
   }
 #if SOLUTION
@@ -214,10 +215,12 @@ Eigen::VectorXd evlASAOCQ(
     SOURCEFN &&f, unsigned int n, double T, unsigned int L,
     RECORDER rec = [](const Eigen::VectorXd &mu_n) {}) {
   const unsigned int N = n * n;
+  double h = 1.0/(n+1);
   const unsigned int M = std::pow(2, L) - 1;
   double tau = T * 1.0 / M;
   auto delta = [](std::complex<double> z) {
-    return 1.0 / 2.0 * z * z - 2.0 * z + 3.0 / 2.0;
+    return 1.0 - z;
+    //return 1.0 / 2.0 * z * z - 2.0 * z + 3.0 / 2.0;
   };
   // Initialize the numerical solution. This implementation is, for the sake of clarity, not memory-efficient.
   Eigen::MatrixXd mu_vecs(N, M + 1);
@@ -236,14 +239,14 @@ Eigen::VectorXd evlASAOCQ(
       phi_slice[space_ind] = f(time_ind * tau, gridpoints[space_ind]);
     }
     //phi.col(time_ind) = std::pow(r, time_ind) * phi_slice; //TODO: check this
-    phi.col(time_ind) = std::pow(r, time_ind) * phi_slice;
+    phi.col(time_ind) = std::pow(r, time_ind) * h * h * phi_slice;
   }
   // Transform the right-hand side from the time domain into the frequency domain
   Eigen::MatrixXcd phi_hat(N, M + 1);
   Eigen::FFT<double> fft;
   for (int space_ind = 0; space_ind < N; space_ind++) {
     Eigen::VectorXcd in = phi.row(space_ind).template cast<std::complex<double>>();
-    Eigen::VectorXcd out(N);
+    Eigen::VectorXcd out(M+1);
     out = fft.fwd(in);
     phi_hat.row(space_ind) = out;
   }
@@ -253,8 +256,9 @@ Eigen::VectorXd evlASAOCQ(
   std::complex<double> s_l;
   std::complex<double> imag(0, 1);
   for (int freq_ind = 0; freq_ind < M + 1; freq_ind++) {
-    s_l = delta(r * std::exp(2 * M_PI * imag * ((double)freq_ind) /
+    s_l = delta(r * std::exp(-2 * M_PI * imag * ((double)freq_ind) /
                              (double)(M + 1))) / tau;
+    std::cout<<s_l<<std::endl;
     // Applying the time-harmonic operator $G(s_l)^{-1}= (\sqrt{s_l}M+A)^{-1}$
     SqrtsMplusA slMplusA(n, s_l);
     Eigen::VectorXcd phi_hat_slice(N);
