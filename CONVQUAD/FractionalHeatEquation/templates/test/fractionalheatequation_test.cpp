@@ -13,6 +13,21 @@
 #include "../../../AbsorbingBoundaryCondition/mastersolution/absorbingboundarycondition.h"
 
 namespace FractionalHeatEquation::test {
+TEST(FractionalHeatEquation, cqTest) {
+  double T = 1.0;
+  int L = 5;
+  double tau;
+  int n = 3;
+  std::function<double(double, Eigen::Vector2d)> f =
+      [](double t, Eigen::Vector2d x) { return t * t * t; };
+  Eigen::VectorXd mu_MOT =
+      FractionalHeatEquation::evlMOT(f, n, T, std::pow(2, L) - 1);
+  Eigen::VectorXd mu_Toep =
+      FractionalHeatEquation::evlTriangToeplitz(f, n, T, L);
+  Eigen::VectorXd mu_ASAO = FractionalHeatEquation::evlASAOCQ(f, n, T, L);
+  ASSERT_NEAR((mu_MOT - mu_ASAO).norm(), 0, 1E-11);
+  ASSERT_NEAR((mu_MOT - mu_Toep).norm(), 0, 1E-15);
+}
 
 TEST(FractionalHeatEquation, generateGrid) {
   std::vector<Eigen::Vector2d> gridpoints = generateGrid(2);
@@ -30,8 +45,6 @@ TEST(FractionalHeatEquation, cqWeights) {
   };
   Eigen::VectorXd w_tr =
       AbsorbingBoundaryCondition::cqweights_by_dft(F, delta, tau, M);
-  //AbsorbingBoundaryCondition::cqweights_by_dft(F, delta, tau, M);
-  std::cout << w_tr - w_ex << std::endl;
   ASSERT_NEAR((w_tr - w_ex).norm(), 0, 1E-8);
 }
 
@@ -48,15 +61,15 @@ TEST(FractionalHeatEquation, SqrtsMPlusA) {
     v[i] = 1.0;
     mat_d.col(i) = mat.eval(v);
   }
-  std::cout << "n = " << n << ", matrix = " << std::endl << mat_d << std::endl;
+  //std::cout << "n = " << n << ", matrix = " << std::endl << mat_d << std::endl;
 
   for (int i = 0; i < 10; ++i) {
     v = Eigen::VectorXd::Random(n * n);
     EXPECT_NEAR((mat.eval(mat.solve(v)) - v).norm(), 0.0, 1.0E-10);
   }
-  std::cout << FractionalHeatEquation::SqrtsMplusA::solve_cnt << " solves, "
-            << FractionalHeatEquation::SqrtsMplusA::ludec_cnt
-            << " lu decompositions" << std::endl;
+  //std::cout << FractionalHeatEquation::SqrtsMplusA::solve_cnt << " solves, "
+  //          << FractionalHeatEquation::SqrtsMplusA::ludec_cnt
+  //          << " lu decompositions" << std::endl;
 }
 
 TEST(FHE, Toeplitzop) {
@@ -65,9 +78,9 @@ TEST(FHE, Toeplitzop) {
   Eigen::MatrixXd T_mat(4, 4);
   T_mat << 4, 3, 2, 1, 5, 4, 3, 2, 6, 5, 4, 3, 7, 6, 5, 4;
   Eigen::VectorXd x = (Eigen::VectorXd(4) << 0.5, 2.5, 3.5, 7.5).finished();
-  std::cout << "Teoplitz matrix = " << std::endl << T_mat << std::endl;
-  std::cout << "T_mat * x = " << (T_mat * x).transpose() << std::endl;
-  std::cout << "T.eval(x) = " << T.eval(x).transpose() << std::endl;
+  //std::cout << "Teoplitz matrix = " << std::endl << T_mat << std::endl;
+  //std::cout << "T_mat * x = " << (T_mat * x).transpose() << std::endl;
+  //std::cout << "T.eval(x) = " << T.eval(x).transpose() << std::endl;
   EXPECT_NEAR((T_mat * x - T.eval(x)).norm(), 0.0, 10E-10);
 }
 

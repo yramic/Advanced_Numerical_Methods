@@ -23,7 +23,7 @@
 
 namespace FractionalHeatEquation {
 
-/** @brief Encoding sparse matrix \sqrt(s)*M + A  */
+/** @brief Encoding sparse matrix $\sqrt(s)*M + A$  */
 /* SAM_LISTING_BEGIN_1 */
 class SqrtsMplusA {
  public:
@@ -117,9 +117,7 @@ Eigen::VectorXd evlMOT(
     rhs *= h * h;
     // Solve timestep
     //mu_vecs[time_ind] = w0MplusA.solve(rhs);
-    mu_vecs[time_ind] =
-        w0MplusA.solve(rhs).real();  //TODO: Check if this is correct
-    std::cout << w0MplusA.solve(rhs).real() << std::endl;
+    mu_vecs[time_ind] = w0MplusA.solve(rhs).real();
     rec(mu_vecs[time_ind]);
   }
   return mu_vecs.back();
@@ -205,7 +203,7 @@ Eigen::VectorXd evlTriangToeplitz(
 /* SAM_LISTING_END_3 */
 
 /** @brief Solve fully discrete evolution by all-steps-in-one forward CQ */
-/* SAM_LISTING_BEGIN_X */
+/* SAM_LISTING_BEGIN_5 */
 template <typename SOURCEFN,
           typename RECORDER = std::function<void(const Eigen::VectorXd &)>>
 Eigen::VectorXd evlASAOCQ(
@@ -224,7 +222,6 @@ Eigen::VectorXd evlASAOCQ(
   // Initialise array for the whole right hand side (all timepoints)
   Eigen::MatrixXd phi(N, M + 1);
   // Initialise array for the right hand side at a single timepoint
-  //Eigen::MatrixXd phi_slice(N);
   Eigen::VectorXd phi_slice(N);  //TODO: Check this
   // Set radius of integral contour
   double r = std::pow(10, -16.0 / (2 * M + 2));
@@ -235,7 +232,6 @@ Eigen::VectorXd evlASAOCQ(
     for (int space_ind = 0; space_ind < N; space_ind++) {
       phi_slice[space_ind] = f(time_ind * tau, gridpoints[space_ind]);
     }
-    //phi.col(time_ind) = std::pow(r, time_ind) * phi_slice; //TODO: check this
     phi.col(time_ind) = std::pow(r, time_ind) * h * h * phi_slice;
   }
   // Transform the right-hand side from the time domain into the frequency domain
@@ -257,7 +253,6 @@ Eigen::VectorXd evlASAOCQ(
     s_l = delta(r * std::exp(-2 * M_PI * imag * ((double)freq_ind) /
                              (double)(M + 1))) /
           tau;
-    std::cout << s_l << std::endl;
     // Applying the time-harmonic operator $G(s_l)^{-1}= (\sqrt{s_l}M+A)^{-1}$
     SqrtsMplusA slMplusA(n, s_l);
     Eigen::VectorXcd phi_hat_slice(N);
@@ -277,12 +272,9 @@ Eigen::VectorXd evlASAOCQ(
   for (int time_ind = 0; time_ind < M + 1; time_ind++) {
     mu_vecs.col(time_ind) *= std::pow(r, -time_ind);
   }
-  // ************************************************************
-  // TO BE SUPPLEMENTED
-  // ************************************************************
   return mu_vecs.col(M);
 }
-/* SAM_LISTING_END_X */
+/* SAM_LISTING_END_5 */
 
 }  // namespace FractionalHeatEquation
 
