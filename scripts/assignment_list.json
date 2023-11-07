@@ -13,6 +13,7 @@
     "CONVQUAD/LowTriangToeplitz",
     "CONVQUAD/AbelIntegralEquation",
     "CONVQUAD/FractionalHeatEquation",
-    "CONVQUAD/AbsorbingBoundaryCondition"
+    "CONVQUAD/AbsorbingBoundaryCondition",
+    "AMG/StationaryLinearIterations"
   ]
 }
