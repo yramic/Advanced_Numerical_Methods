@@ -188,7 +188,7 @@ Eigen::VectorXd evlTriangToeplitz(
           //Solve lower left part with fft
           ToeplitzOp T(h*h*weights.tail(local_M-1));
           for (unsigned l = 0; l<N; ++l) {
-              mu.row(l).tail(local_M/2) = phi.row(l).tail(local_M/2) - T.eval(mu.row(l).head(local_M/2)).transpose();
+              phi.row(l).tail(local_M/2) = phi.row(l).tail(local_M/2) - T.eval(mu.row(l).head(local_M/2)).transpose();
           }
           //Solve lower right part recursively
           mu.rightCols(local_M / 2) = recursive_solve(L - 1, weights.head(local_M / 2), mu.rightCols(local_M / 2),phi.rightCols(local_M / 2));
