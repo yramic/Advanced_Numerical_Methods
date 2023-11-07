@@ -16,14 +16,17 @@ int main(int /*argc*/, char** /*argv*/) {
   double T = 1.0;
   int L = 5;
   double tau;
-  int n = 4;
-  std::function<double(double, Eigen::Vector2d)> f = [](double t , Eigen::Vector2d x){return t*t*t;};
-  Eigen::VectorXd mu_MOT = FractionalHeatEquation::evlMOT(f, n , T , std::pow(2,L)-1);
-  Eigen::VectorXd mu_Toep = FractionalHeatEquation::evlTriangToeplitz(f, n , T ,L);
-  Eigen::VectorXd mu_ASAO = FractionalHeatEquation::evlASAOCQ(f, n , T ,L);
-  std::cout<< "mu_MOT: \n" << mu_MOT <<std::endl << std::endl;
-  std::cout<< "mu_Toep: \n" << mu_Toep <<std::endl << std::endl ;
-  std::cout<< "mu_ASAO: \n" << mu_ASAO <<std::endl << std::endl;
+  int n = 3;
+  std::function<double(double, Eigen::Vector2d)> f =
+      [](double t, Eigen::Vector2d x) { return t * t * t; };
+  Eigen::VectorXd mu_MOT =
+      FractionalHeatEquation::evlMOT(f, n, T, std::pow(2, L) - 1);
+  Eigen::VectorXd mu_Toep =
+      FractionalHeatEquation::evlTriangToeplitz(f, n, T, L);
+  Eigen::VectorXd mu_ASAO = FractionalHeatEquation::evlASAOCQ(f, n, T, L);
+  std::cout << "mu_MOT: \n" << mu_MOT << std::endl << std::endl;
+  std::cout << "mu_Toep: \n" << mu_Toep << std::endl << std::endl;
+  std::cout << "mu_ASAO: \n" << mu_ASAO << std::endl << std::endl;
   //     << Amat.p_matrix_;
   return 0;
 }

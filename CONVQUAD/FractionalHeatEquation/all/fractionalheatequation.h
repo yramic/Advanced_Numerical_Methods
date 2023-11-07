@@ -118,8 +118,9 @@ Eigen::VectorXd evlMOT(
     rhs *= h * h;
     // Solve timestep
     //mu_vecs[time_ind] = w0MplusA.solve(rhs);
-    mu_vecs[time_ind] = w0MplusA.solve(rhs).real(); //TODO: Check if this is correct
-    std::cout<<w0MplusA.solve(rhs).real()<<std::endl;
+    mu_vecs[time_ind] =
+        w0MplusA.solve(rhs).real();  //TODO: Check if this is correct
+    std::cout << w0MplusA.solve(rhs).real() << std::endl;
     rec(mu_vecs[time_ind]);
   }
 #else
@@ -167,35 +168,45 @@ Eigen::VectorXd evlTriangToeplitz(
   SqrtsMplusA A(n, std::complex<double>(std::pow(cq_weights[0], 2), 0.0));
   //Generate rhs vector
   std::vector<Eigen::Vector2d> gridpoints = generateGrid(n);
-  Eigen::MatrixXd rhs(N,(M+1));
+  Eigen::MatrixXd rhs(N, (M + 1));
   for (int time_ind = 0; time_ind < M + 1; time_ind++) {
-      // Evaluate rhs
-      for (int space_ind = 0; space_ind < N; space_ind++) {
-          rhs(space_ind,time_ind) = h*h*f(time_ind * tau, gridpoints[space_ind]);
-      }
+    // Evaluate rhs
+    for (int space_ind = 0; space_ind < N; space_ind++) {
+      rhs(space_ind, time_ind) =
+          h * h * f(time_ind * tau, gridpoints[space_ind]);
+    }
   }
 #if SOLUTION
-  std::function<Eigen::MatrixXd(unsigned, Eigen::VectorXd,Eigen::MatrixXd,Eigen::MatrixXd)> recursive_solve = [&](unsigned L, Eigen::VectorXd weights, Eigen::MatrixXd mu, Eigen::MatrixXd phi){
-      assert(mu.size() == phi.size());
-      if(L==0) {
-          const Eigen::VectorXcd phi_comp = phi.template cast<std::complex<double>>();
+  std::function<Eigen::MatrixXd(unsigned, Eigen::VectorXd, Eigen::MatrixXd,
+                                Eigen::MatrixXd)>
+      recursive_solve = [&](unsigned L, Eigen::VectorXd weights,
+                            Eigen::MatrixXd mu, Eigen::MatrixXd phi) {
+        assert(mu.size() == phi.size());
+        if (L == 0) {
+          const Eigen::VectorXcd phi_comp =
+              phi.template cast<std::complex<double>>();
           mu = (A.solve(phi_comp)).real();
-      }
-      else {
+        } else {
           const unsigned local_M = mu.cols();
           //Solve upper left part recursively
-          mu.leftCols(local_M/2) = recursive_solve(L - 1, weights.head(local_M/2), mu.leftCols(local_M / 2), phi.leftCols(local_M / 2));
+          mu.leftCols(local_M / 2) = recursive_solve(
+              L - 1, weights.head(local_M / 2), mu.leftCols(local_M / 2),
+              phi.leftCols(local_M / 2));
           //Solve lower left part with fft
-          ToeplitzOp T(h*h*weights.tail(local_M-1));
-          for (unsigned l = 0; l<N; ++l) {
-              phi.row(l).tail(local_M/2) = phi.row(l).tail(local_M/2) - T.eval(mu.row(l).head(local_M/2)).transpose();
+          ToeplitzOp T(h * h * weights.tail(local_M - 1));
+          for (unsigned l = 0; l < N; ++l) {
+            phi.row(l).tail(local_M / 2) =
+                phi.row(l).tail(local_M / 2) -
+                T.eval(mu.row(l).head(local_M / 2)).transpose();
           }
           //Solve lower right part recursively
-          mu.rightCols(local_M / 2) = recursive_solve(L - 1, weights.head(local_M / 2), mu.rightCols(local_M / 2),phi.rightCols(local_M / 2));
-      }
-      return mu;
-  };
-  mu_vecs= recursive_solve(L, cq_weights, mu_vecs, rhs);
+          mu.rightCols(local_M / 2) = recursive_solve(
+              L - 1, weights.head(local_M / 2), mu.rightCols(local_M / 2),
+              phi.rightCols(local_M / 2));
+        }
+        return mu;
+      };
+  mu_vecs = recursive_solve(L, cq_weights, mu_vecs, rhs);
 #else
   // ************************************************************
   // TO BE SUPPLEMENTED
@@ -215,7 +226,7 @@ Eigen::VectorXd evlASAOCQ(
     SOURCEFN &&f, unsigned int n, double T, unsigned int L,
     RECORDER rec = [](const Eigen::VectorXd &mu_n) {}) {
   const unsigned int N = n * n;
-  double h = 1.0/(n+1);
+  double h = 1.0 / (n + 1);
   const unsigned int M = std::pow(2, L) - 1;
   double tau = T * 1.0 / M;
   auto delta = [](std::complex<double> z) {
@@ -228,7 +239,7 @@ Eigen::VectorXd evlASAOCQ(
   Eigen::MatrixXd phi(N, M + 1);
   // Initialise array for the right hand side at a single timepoint
   //Eigen::MatrixXd phi_slice(N);
-  Eigen::VectorXd phi_slice(N); //TODO: Check this
+  Eigen::VectorXd phi_slice(N);  //TODO: Check this
   // Set radius of integral contour
   double r = std::pow(10, -16.0 / (2 * M + 2));
   // Set gridpoints
@@ -245,8 +256,9 @@ Eigen::VectorXd evlASAOCQ(
   Eigen::MatrixXcd phi_hat(N, M + 1);
   Eigen::FFT<double> fft;
   for (int space_ind = 0; space_ind < N; space_ind++) {
-    Eigen::VectorXcd in = phi.row(space_ind).template cast<std::complex<double>>();
-    Eigen::VectorXcd out(M+1);
+    Eigen::VectorXcd in =
+        phi.row(space_ind).template cast<std::complex<double>>();
+    Eigen::VectorXcd out(M + 1);
     out = fft.fwd(in);
     phi_hat.row(space_ind) = out;
   }
@@ -257,8 +269,9 @@ Eigen::VectorXd evlASAOCQ(
   std::complex<double> imag(0, 1);
   for (int freq_ind = 0; freq_ind < M + 1; freq_ind++) {
     s_l = delta(r * std::exp(-2 * M_PI * imag * ((double)freq_ind) /
-                             (double)(M + 1))) / tau;
-    std::cout<<s_l<<std::endl;
+                             (double)(M + 1))) /
+          tau;
+    std::cout << s_l << std::endl;
     // Applying the time-harmonic operator $G(s_l)^{-1}= (\sqrt{s_l}M+A)^{-1}$
     SqrtsMplusA slMplusA(n, s_l);
     Eigen::VectorXcd phi_hat_slice(N);
