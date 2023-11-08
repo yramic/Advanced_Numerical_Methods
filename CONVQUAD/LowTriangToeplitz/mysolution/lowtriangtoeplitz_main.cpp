@@ -49,9 +49,9 @@ int main() {
   f_solve.close();
 
   // Call python script
-  std::system("python3 " CURRENT_SOURCE_DIR "/plot.py " CURRENT_SOURCE_DIR
-              "/runtime_mult.txt " CURRENT_SOURCE_DIR
-              "/runtime_solve.txt " CURRENT_SOURCE_DIR "/runtime.png");
+  // std::system("python3 " CURRENT_SOURCE_DIR "/plot.py " CURRENT_SOURCE_DIR
+  //             "/runtime_mult.txt " CURRENT_SOURCE_DIR
+  //             "/runtime_solve.txt " CURRENT_SOURCE_DIR "/runtime.png");
 
   return 0;
 }
