@@ -44,14 +44,18 @@ Eigen::SparseMatrix<double> poissonMatrix(unsigned int n) {
 }
 /* SAM_LISTING_END_1 */
 
-Eigen::SparseMatrix<double, Eigen::RowMajor> prolongationMatrix(
-    unsigned int M, bool bilinear) {
+/* SAM_LISTING_BEGIN_2 */
+Eigen::SparseMatrix<double, Eigen::RowMajor> prolongationMatrix(unsigned int M,
+                                                                bool bilinear) {
   assertm(((M > 3) and (M % 2 == 0)), "prolongationMatrix: M must be even!");
   const unsigned int N = (M - 1) * (M - 1);  // No of inter nodes of fine grid
   const unsigned int m =
       M / 2;  // Number of cells in each direction of coarse grid
   const unsigned int n =
       (m - 1) * (m - 1);  // No of interior nodes of fine grid
+  // Sparse matrix in CCS format
+  Eigen::SparseMatrix<double, Eigen::RowMajor> P(N, n);
+#if SOLUTION
   // define vector of triplets and reserve memory
   std::vector<triplet> P_trp;  // For temporary COO format
   // Conversion of node positions to indices: lexikographic ordering
@@ -78,28 +82,49 @@ Eigen::SparseMatrix<double, Eigen::RowMajor> prolongationMatrix(
       P_trp.emplace_back(idxh(i, j + 1), idx_H, 0.5);
       P_trp.emplace_back(idxh(i, j - 1), idx_H, 0.5);
       if (bilinear) {
-      P_trp.emplace_back(idxh(i + 1, j + 1), idx_H, 0.25);
-      P_trp.emplace_back(idxh(i + 1, j - 1), idx_H, 0.25);
-      P_trp.emplace_back(idxh(i - 1, j + 1), idx_H, 0.25);
-      P_trp.emplace_back(idxh(i - 1, j - 1), idx_H, 0.25);
-      }
-      else {
-      P_trp.emplace_back(idxh(i + 1, j + 1), idx_H, 0.5);
-      P_trp.emplace_back(idxh(i - 1, j - 1), idx_H, 0.5);
+        P_trp.emplace_back(idxh(i + 1, j + 1), idx_H, 0.25);
+        P_trp.emplace_back(idxh(i + 1, j - 1), idx_H, 0.25);
+        P_trp.emplace_back(idxh(i - 1, j + 1), idx_H, 0.25);
+        P_trp.emplace_back(idxh(i - 1, j - 1), idx_H, 0.25);
+      } else {
+        P_trp.emplace_back(idxh(i + 1, j + 1), idx_H, 0.5);
+        P_trp.emplace_back(idxh(i - 1, j - 1), idx_H, 0.5);
       }
     }
   }
-  // create the sparse matrix in CCS format
-  Eigen::SparseMatrix<double> P(N, n);
+  // Initialize CCS matrix from COO format
   P.setFromTriplets(P_trp.begin(), P_trp.end());
+#else
+  // **********************************************************************
+  // To be supplemented
+  // **********************************************************************
+#endif
   return P;
 }
+/* SAM_LISTING_END_2 */
 
-Eigen::SparseMatrix<double> buildAH(const Eigen::SparseMatrix<double> &A,
-                                    const Eigen::SparseMatrix<double> &P) {
+/* SAM_LISTING_BEGIN_3 */
+Eigen::SparseMatrix<double> buildAH_eigen(
+    const Eigen::SparseMatrix<double> &A,
+    const Eigen::SparseMatrix<double, Eigen::RowMajor> &P) {
   Eigen::SparseMatrix<double> AH;
   AH = P.transpose() * A * P;
   return AH;
 }
+/* SAM_LISTING_END_3 */
+
+/* SAM_LISTING_BEGIN_4 */
+Eigen::SparseMatrix<double> buildAH(
+    const Eigen::SparseMatrix<double> &A,
+    const Eigen::SparseMatrix<double, Eigen::RowMajor> &P) {
+  #if SOLUTION
+
+  #else
+  // **********************************************************************
+  // To be supplemented
+  // **********************************************************************
+  #endif
+}
+/* SAM_LISTING_END_4 */
 
 }  // namespace GalerkinConstruction
