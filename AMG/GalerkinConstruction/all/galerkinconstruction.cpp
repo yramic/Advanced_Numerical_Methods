@@ -117,13 +117,13 @@ Eigen::SparseMatrix<double> buildAH_eigen(
 Eigen::SparseMatrix<double> buildAH(
     const Eigen::SparseMatrix<double> &A,
     const Eigen::SparseMatrix<double, Eigen::RowMajor> &P) {
-  #if SOLUTION
+#if SOLUTION
 
-  #else
-  // **********************************************************************
-  // To be supplemented
-  // **********************************************************************
-  #endif
+#else
+// **********************************************************************
+// To be supplemented
+// **********************************************************************
+#endif
 }
 /* SAM_LISTING_END_4 */
 
