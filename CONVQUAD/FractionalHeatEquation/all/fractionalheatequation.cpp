@@ -11,6 +11,7 @@
 #include <cassert>
 #include <memory>
 
+/* SAM_LISTING_BEGIN_9 */
 namespace FractionalHeatEquation {
 std::vector<Eigen::Vector2d> generateGrid(unsigned n) {
   std::vector<Eigen::Vector2d> gridpoints{n * n, Eigen::Vector2d()};
@@ -25,6 +26,8 @@ std::vector<Eigen::Vector2d> generateGrid(unsigned n) {
   }
   return gridpoints;
 }
+/* SAM_LISTING_END_9 */
+  
 unsigned int SqrtsMplusA::solve_cnt{0};
 unsigned int SqrtsMplusA::ludec_cnt{0};
 
@@ -50,11 +53,10 @@ Eigen::VectorXd cqWeights(unsigned int M, double tau) {
   Eigen::VectorXd w(M + 1);
 
   w(0) = std::pow(tau, -0.5);
-  // Calculate weights of convolution quadrature based on \prbcref{subprb:cq1}
+  // Calculate weights of convolution quadrature based on \prbcref{eq:smuw}
   for (int l = 1; l < M + 1; ++l) {
     w(l) = w(l - 1) * (-1) * (0.5 - (l - 1)) / l;  // denominator is factorial
   }
-
   return w;
 }
 /* SAM_LISTING_END_1 */

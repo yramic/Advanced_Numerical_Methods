@@ -96,10 +96,12 @@ template <typename SOURCEFN,
 Eigen::VectorXd evlMOT(
     SOURCEFN &&f, unsigned int n, double T, unsigned int M,
     RECORDER rec = [](const Eigen::VectorXd &mu_n) {}) {
-  const unsigned int N = n * n;
-  std::vector<Eigen::VectorXd> mu_vecs{M + 1, Eigen::VectorXd(N)};
-  double tau = T * 1.0 / M;
-  double h = 1.0 / (n + 1);
+  const unsigned int N = n * n; // Number of FE d.o.f.s
+  // Vector storing all the states; big memory consumption 
+  std::vector<Eigen::VectorXd> mu_vecs{M + 1, Eigen::VectorXd(N)}; 
+  double tau = T * 1.0 / M; // timestep size 
+  double h = 1.0 / (n + 1); // meshwidth
+  // See \prbcref{sp:1}
   Eigen::VectorXd w = cqWeights(M, tau);
 // **********************************************************************
 // Your Solution here

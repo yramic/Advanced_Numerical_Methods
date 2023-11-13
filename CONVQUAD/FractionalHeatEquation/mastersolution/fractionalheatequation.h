@@ -96,10 +96,12 @@ template <typename SOURCEFN,
 Eigen::VectorXd evlMOT(
     SOURCEFN &&f, unsigned int n, double T, unsigned int M,
     RECORDER rec = [](const Eigen::VectorXd &mu_n) {}) {
-  const unsigned int N = n * n;
-  std::vector<Eigen::VectorXd> mu_vecs{M + 1, Eigen::VectorXd(N)};
-  double tau = T * 1.0 / M;
-  double h = 1.0 / (n + 1);
+  const unsigned int N = n * n; // Number of FE d.o.f.s
+  // Vector storing all the states; big memory consumption 
+  std::vector<Eigen::VectorXd> mu_vecs{M + 1, Eigen::VectorXd(N)}; 
+  double tau = T * 1.0 / M; // timestep size 
+  double h = 1.0 / (n + 1); // meshwidth
+  // See \prbcref{sp:1}
   Eigen::VectorXd w = cqWeights(M, tau);
   // Initialise matrix to invert at every timestep, gridpoints and rhs
   SqrtsMplusA w0MplusA(n, std::complex<double>(std::pow(w[0], 2), 0.0));
@@ -115,8 +117,10 @@ Eigen::VectorXd evlMOT(
       rhs += -w[time_ind - l] * mu_vecs[l];
     }
     rhs *= h * h;
-    // Solve timestep
-    mu_vecs[time_ind] = w0MplusA.solve(rhs).real();
+    // Next timestep according to \prbeqref{eq:qcd1}
+    mu_vecs[time_ind] =
+        w0MplusA.solve(rhs).real();  //TODO: Check if this is correct
+    std::cout << w0MplusA.solve(rhs).real() << std::endl;
     rec(mu_vecs[time_ind]);
   }
   return mu_vecs.back();
