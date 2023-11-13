@@ -27,7 +27,7 @@ std::vector<Eigen::Vector2d> generateGrid(unsigned n) {
   return gridpoints;
 }
 /* SAM_LISTING_END_9 */
-  
+
 unsigned int SqrtsMplusA::solve_cnt{0};
 unsigned int SqrtsMplusA::ludec_cnt{0};
 
