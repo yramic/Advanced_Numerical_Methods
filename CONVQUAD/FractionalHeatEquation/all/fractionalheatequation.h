@@ -121,7 +121,6 @@ Eigen::VectorXd evlMOT(
     // Next timestep according to \prbeqref{eq:qcd1}
     mu_vecs[time_ind] =
         w0MplusA.solve(rhs).real();  //TODO: Check if this is correct
-    std::cout << w0MplusA.solve(rhs).real() << std::endl;
     rec(mu_vecs[time_ind]);
   }
 #else
