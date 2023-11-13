@@ -96,10 +96,12 @@ template <typename SOURCEFN,
 Eigen::VectorXd evlMOT(
     SOURCEFN &&f, unsigned int n, double T, unsigned int M,
     RECORDER rec = [](const Eigen::VectorXd &mu_n) {}) {
-  const unsigned int N = n * n;
-  std::vector<Eigen::VectorXd> mu_vecs{M + 1, Eigen::VectorXd(N)};
-  double tau = T * 1.0 / M;
-  double h = 1.0 / (n + 1);
+  const unsigned int N = n * n; // Number of FE d.o.f.s
+  // Vector storing all the states; big memory consumption 
+  std::vector<Eigen::VectorXd> mu_vecs{M + 1, Eigen::VectorXd(N)}; 
+  double tau = T * 1.0 / M; // timestep size 
+  double h = 1.0 / (n + 1); // meshwidth
+  // See \prbcref{sp:1}
   Eigen::VectorXd w = cqWeights(M, tau);
 // **********************************************************************
 // Your Solution here
@@ -181,7 +183,6 @@ Eigen::VectorXd evlASAOCQ(
   // Initialise array for the whole right hand side (all timepoints)
   Eigen::MatrixXd phi(N, M + 1);
   // Initialise array for the right hand side at a single timepoint
-  //Eigen::MatrixXd phi_slice(N);
   Eigen::VectorXd phi_slice(N);  //TODO: Check this
   // Set radius of integral contour
   double r = std::pow(10, -16.0 / (2 * M + 2));
@@ -192,7 +193,6 @@ Eigen::VectorXd evlASAOCQ(
     for (int space_ind = 0; space_ind < N; space_ind++) {
       phi_slice[space_ind] = f(time_ind * tau, gridpoints[space_ind]);
     }
-    //phi.col(time_ind) = std::pow(r, time_ind) * phi_slice; //TODO: check this
     phi.col(time_ind) = std::pow(r, time_ind) * h * h * phi_slice;
   }
   // Transform the right-hand side from the time domain into the frequency domain

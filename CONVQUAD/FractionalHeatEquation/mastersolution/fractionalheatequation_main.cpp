@@ -27,6 +27,11 @@ int main(int /*argc*/, char** /*argv*/) {
   std::cout << "mu_MOT: \n" << mu_MOT << std::endl << std::endl;
   std::cout << "mu_Toep: \n" << mu_Toep << std::endl << std::endl;
   std::cout << "mu_ASAO: \n" << mu_ASAO << std::endl << std::endl;
-  //     << Amat.p_matrix_;
+/* SAM_LISTING_BEGIN_0 */
+// **************************
+// Code for runtime mesaurement     
+// **************************
+/* SAM_LISTING_END_0 */
+  
   return 0;
 }
