@@ -36,7 +36,7 @@ VectorXd cqweights_by_dft(const FFUNC& F, const DFUNC& delta, double tau,
   std::complex<double> s_k;
   for (int k = 0; k < M + 1; k++) {
     // Integrate on circumference centered in (0,0) with radius r
-    s_k = delta(r * std::exp(-2 * M_PI * imag * ((double)k) / (double)(M + 1))) /
+    s_k = delta(r * std::exp(2 * M_PI * imag * ((double)k) / (double)(M + 1))) /
           tau;
     f[k] = F(s_k);
   }

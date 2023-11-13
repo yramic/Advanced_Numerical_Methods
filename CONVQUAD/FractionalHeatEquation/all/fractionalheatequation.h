@@ -23,7 +23,7 @@
 
 namespace FractionalHeatEquation {
 
-/** @brief Encoding sparse matrix \sqrt(s)*M + A  */
+/** @brief Encoding sparse matrix $\sqrt(s)*M + A$  */
 /* SAM_LISTING_BEGIN_1 */
 class SqrtsMplusA {
  public:
@@ -220,22 +220,23 @@ Eigen::VectorXd evlTriangToeplitz(
 /* SAM_LISTING_END_3 */
 
 /** @brief Solve fully discrete evolution by all-steps-in-one forward CQ */
-/* SAM_LISTING_BEGIN_X */
+/* SAM_LISTING_BEGIN_5 */
 template <typename SOURCEFN,
           typename RECORDER = std::function<void(const Eigen::VectorXd &)>>
 Eigen::VectorXd evlASAOCQ(
     SOURCEFN &&f, unsigned int n, double T, unsigned int L,
     RECORDER rec = [](const Eigen::VectorXd &mu_n) {}) {
   const unsigned int N = n * n;
-  double h = 1.0 / (n + 1);
   const unsigned int M = std::pow(2, L) - 1;
   double tau = T * 1.0 / M;
+  double h = 1.0 / (n + 1.0);
   auto delta = [](std::complex<double> z) {
     return 1.0 - z;
     //return 1.0 / 2.0 * z * z - 2.0 * z + 3.0 / 2.0;
   };
   // Initialize the numerical solution. This implementation is, for the sake of clarity, not memory-efficient.
   Eigen::MatrixXd mu_vecs(N, M + 1);
+#if SOLUTION
   // Initialise array for the whole right hand side (all timepoints)
   Eigen::MatrixXd phi(N, M + 1);
   // Initialise array for the right hand side at a single timepoint
@@ -270,7 +271,6 @@ Eigen::VectorXd evlASAOCQ(
     s_l = delta(r * std::exp(-2 * M_PI * imag * ((double)freq_ind) /
                              (double)(M + 1))) /
           tau;
-    std::cout << s_l << std::endl;
     // Applying the time-harmonic operator $G(s_l)^{-1}= (\sqrt{s_l}M+A)^{-1}$
     SqrtsMplusA slMplusA(n, s_l);
     Eigen::VectorXcd phi_hat_slice(N);
@@ -290,12 +290,14 @@ Eigen::VectorXd evlASAOCQ(
   for (int time_ind = 0; time_ind < M + 1; time_ind++) {
     mu_vecs.col(time_ind) *= std::pow(r, -time_ind);
   }
-  // ************************************************************
-  // TO BE SUPPLEMENTED
-  // ************************************************************
+#else
+  // **********************************************************************
+  // Your Solution here
+  // **********************************************************************/
+#endif
   return mu_vecs.col(M);
 }
-/* SAM_LISTING_END_X */
+/* SAM_LISTING_END_5 */
 
 }  // namespace FractionalHeatEquation
 

@@ -23,7 +23,7 @@
 
 namespace FractionalHeatEquation {
 
-/** @brief Encoding sparse matrix \sqrt(s)*M + A  */
+/** @brief Encoding sparse matrix $\sqrt(s)*M + A$  */
 /* SAM_LISTING_BEGIN_1 */
 class SqrtsMplusA {
  public:
@@ -164,82 +164,28 @@ Eigen::VectorXd evlTriangToeplitz(
 /* SAM_LISTING_END_3 */
 
 /** @brief Solve fully discrete evolution by all-steps-in-one forward CQ */
-/* SAM_LISTING_BEGIN_X */
+/* SAM_LISTING_BEGIN_5 */
 template <typename SOURCEFN,
           typename RECORDER = std::function<void(const Eigen::VectorXd &)>>
 Eigen::VectorXd evlASAOCQ(
     SOURCEFN &&f, unsigned int n, double T, unsigned int L,
     RECORDER rec = [](const Eigen::VectorXd &mu_n) {}) {
   const unsigned int N = n * n;
-  double h = 1.0 / (n + 1);
   const unsigned int M = std::pow(2, L) - 1;
   double tau = T * 1.0 / M;
+  double h = 1.0 / (n + 1.0);
   auto delta = [](std::complex<double> z) {
     return 1.0 - z;
     //return 1.0 / 2.0 * z * z - 2.0 * z + 3.0 / 2.0;
   };
   // Initialize the numerical solution. This implementation is, for the sake of clarity, not memory-efficient.
   Eigen::MatrixXd mu_vecs(N, M + 1);
-  // Initialise array for the whole right hand side (all timepoints)
-  Eigen::MatrixXd phi(N, M + 1);
-  // Initialise array for the right hand side at a single timepoint
-  Eigen::VectorXd phi_slice(N);  //TODO: Check this
-  // Set radius of integral contour
-  double r = std::pow(10, -16.0 / (2 * M + 2));
-  // Set gridpoints
-  std::vector<Eigen::Vector2d> gridpoints = generateGrid(n);
-  for (int time_ind = 0; time_ind < M + 1; time_ind++) {
-    // Evaluate rhs
-    for (int space_ind = 0; space_ind < N; space_ind++) {
-      phi_slice[space_ind] = f(time_ind * tau, gridpoints[space_ind]);
-    }
-    phi.col(time_ind) = std::pow(r, time_ind) * h * h * phi_slice;
-  }
-  // Transform the right-hand side from the time domain into the frequency domain
-  Eigen::MatrixXcd phi_hat(N, M + 1);
-  Eigen::FFT<double> fft;
-  for (int space_ind = 0; space_ind < N; space_ind++) {
-    Eigen::VectorXcd in =
-        phi.row(space_ind).template cast<std::complex<double>>();
-    Eigen::VectorXcd out(M + 1);
-    out = fft.fwd(in);
-    phi_hat.row(space_ind) = out;
-  }
-  // Initializing the frequency domain numerical solution
-  Eigen::MatrixXcd mu_hat(N, M + 1);
-  // Complex variable containing the imaginary unit and the discrete frequencies
-  std::complex<double> s_l;
-  std::complex<double> imag(0, 1);
-  for (int freq_ind = 0; freq_ind < M + 1; freq_ind++) {
-    s_l = delta(r * std::exp(-2 * M_PI * imag * ((double)freq_ind) /
-                             (double)(M + 1))) /
-          tau;
-    std::cout << s_l << std::endl;
-    // Applying the time-harmonic operator $G(s_l)^{-1}= (\sqrt{s_l}M+A)^{-1}$
-    SqrtsMplusA slMplusA(n, s_l);
-    Eigen::VectorXcd phi_hat_slice(N);
-    Eigen::VectorXcd mu_hat_slice(N);
-    phi_hat_slice = phi_hat.col(freq_ind);
-    mu_hat_slice = slMplusA.solve(phi_hat_slice);
-    mu_hat.col(freq_ind) = mu_hat_slice;
-  }
-  // Transform the numerical solution from the frequency domain to the time domain
-  for (int space_ind = 0; space_ind < N; space_ind++) {
-    Eigen::VectorXcd in = mu_hat.row(space_ind);
-    Eigen::VectorXcd out(N);
-    out = fft.inv(in);
-    mu_vecs.row(space_ind) = out.real();
-  }
-  // Rescaling of the numerical solution
-  for (int time_ind = 0; time_ind < M + 1; time_ind++) {
-    mu_vecs.col(time_ind) *= std::pow(r, -time_ind);
-  }
-  // ************************************************************
-  // TO BE SUPPLEMENTED
-  // ************************************************************
+  // **********************************************************************
+  // Your Solution here
+  // **********************************************************************/
   return mu_vecs.col(M);
 }
-/* SAM_LISTING_END_X */
+/* SAM_LISTING_END_5 */
 
 }  // namespace FractionalHeatEquation
 

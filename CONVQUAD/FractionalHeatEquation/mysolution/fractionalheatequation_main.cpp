@@ -6,19 +6,17 @@
  * @ copyright Developed at SAM, ETH Zurich
  */
 
+#include <chrono>
+#include <fstream>
+
 #include "fractionalheatequation.h"
 
+/* SAM_LISTING_BEGIN_0 */
 int main(int /*argc*/, char** /*argv*/) {
-  FractionalHeatEquation::SqrtsMplusA Amat(2, std::complex<double>(1, 1));
-
-  std::cout << "Running code for ADVNCSE HW FractionalHeatEquation"
-            << std::endl;
-  double T = 1.0;
-  int L = 5;
-  double tau;
-  int n = 3;
-  std::function<double(double, Eigen::Vector2d)> f =
-      [](double t, Eigen::Vector2d x) { return t * t * t; };
+// **********************************************************************
+// Your Solution here
+// **********************************************************************/
+=======
   Eigen::VectorXd mu_MOT =
       FractionalHeatEquation::evlMOT(f, n, T, std::pow(2, L) - 1);
   Eigen::VectorXd mu_Toep =
@@ -33,5 +31,7 @@ int main(int /*argc*/, char** /*argv*/) {
 // **************************
 /* SAM_LISTING_END_0 */
   
+>>>>>>> 9f23489a85abae1a4183f950200f027aadd5db8b
   return 0;
 }
+/* SAM_LISTING_END_0 */
