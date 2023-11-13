@@ -6,13 +6,14 @@
  * @ copyright Developed at SAM, ETH Zurich
  */
 
+#include <chrono>
 #include <fstream>
 
 #include "fractionalheatequation.h"
 
+/* SAM_LISTING_BEGIN_0 */
 int main(int /*argc*/, char** /*argv*/) {
   FractionalHeatEquation::SqrtsMplusA Amat(2, std::complex<double>(1, 1));
-
   std::cout << "Running code for ADVNCSE HW FractionalHeatEquation"
             << std::endl;
   const double T = 1.0;
@@ -82,3 +83,4 @@ int main(int /*argc*/, char** /*argv*/) {
               "/runtimes.csv " CURRENT_SOURCE_DIR "/runtimes.png");
   return 0;
 }
+/* SAM_LISTING_END_0 */

@@ -117,7 +117,6 @@ Eigen::VectorXd evlMOT(
     }
     rhs *= h * h;
     // Solve timestep
-    //mu_vecs[time_ind] = w0MplusA.solve(rhs);
     mu_vecs[time_ind] = w0MplusA.solve(rhs).real();
     rec(mu_vecs[time_ind]);
   }

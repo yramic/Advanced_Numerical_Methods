@@ -6,13 +6,15 @@
  * @ copyright Developed at SAM, ETH Zurich
  */
 
+#include <chrono>
 #include <fstream>
 
 #include "fractionalheatequation.h"
 
+/* SAM_LISTING_BEGIN_0 */
 int main(int /*argc*/, char** /*argv*/) {
+#if SOLUTION
   FractionalHeatEquation::SqrtsMplusA Amat(2, std::complex<double>(1, 1));
-
   std::cout << "Running code for ADVNCSE HW FractionalHeatEquation"
             << std::endl;
   const double T = 1.0;
@@ -80,5 +82,11 @@ int main(int /*argc*/, char** /*argv*/) {
   // Call python script
   std::system("python3 " CURRENT_SOURCE_DIR "/plot.py " CURRENT_SOURCE_DIR
               "/runtimes.csv " CURRENT_SOURCE_DIR "/runtimes.png");
+#else
+// **********************************************************************
+// Your Solution here
+// **********************************************************************/
+#endif
   return 0;
 }
+/* SAM_LISTING_END_0 */
