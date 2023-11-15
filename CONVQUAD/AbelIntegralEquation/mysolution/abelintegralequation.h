@@ -84,7 +84,24 @@ VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau) {
   // set-up the Galerkin matrix and rhs vector
 
 // **********************************************************************
-// Your Solution here
+// PROBLEM 3-2f:
+
+  // We take the solution of 3-2e and now we need to implement it here.
+  // Note that for the gamma function std::tgamma can be used!
+  for (int i{0}; i <= p; ++i) {
+    for (int j{0}; j <= p; ++j) {
+      // Set up for the Galerkin Matrix based on subproblem 3-2e:
+      A(i,j) = std::sqrt(M_PI) * std::tgamma(j + 1) / ((i + j + 3./2.) * std::tgamma(j + 3./2.));
+    }
+    // Next: set up of the rhs vector of the LSE based on Gauss-Legendre quadrature
+    for (int k{0}; k < p; ++k) {
+      const double t_k = gauss_pts_p[k]; 
+      const double w_k = gauss_wht_p[k];
+      // Now based on the formula 3.2.9, also note that b here is equivalent to phi!
+      b(i) += w_k * std::pow(t_k, i) * y(t_k);
+    }
+  }
+
 // **********************************************************************/
 
   // linear system solve using QR decomposition
