@@ -75,6 +75,7 @@ int main() {
     // Get the Maximum Norm:
     const Eigen::VectorXd diff = (u_ex - u_approx).cwiseAbs(); // Absolute values
     err_cq_max = *std::max_element(diff.data(), diff.data() + diff.size()); // Find the max value
+    
     std::cout << "N = " << N << std::setw(15) << "Max = " << std::scientific
               << std::setprecision(3) << err_cq_max << std::setw(15);
     
@@ -82,11 +83,6 @@ int main() {
       std::cout << "EOC = " << std::log2(err_cq_max_prior / err_cq_max);
     }
     std::cout << std::endl;
-
-    std::cout << "################## TEST ######################" << std::endl;
-    std::cout << u_approx[0] << std::endl;
-    std::cout << u_ex[0] << std::endl;
-    std::cout << "################## TEST ######################" << std::endl;
 
     err_cq_max_prior = err_cq_max;
   }
@@ -103,18 +99,17 @@ int main() {
     }
     // Solution using CQ based on BDF-2 Method
     const Eigen::VectorXd u_approx = AbelIntegralEquation::cq_bdf2_abel(y, N);
-    // std::cout << u_approx[0] << std::endl;
-    // std::cout << u_ex[0] << std::endl;
-  //   // Maximum Norm of discretization error:
-  //   const Eigen::VectorXd diff = (u_ex - u_approx).cwiseAbs();
-  //   err_cq_max = *std::max(diff.data(), diff.data() + diff.size());
-  //   std::cout << "N = " << N << std::setw(15) << "Max = " << std::scientific
-  //             << std::setprecision(3) << err_cq_max << std::setw(15);
-  //   if (N > 16) {
-  //     std::cout << "EOC = " << std::log2(err_cq_max_prior / err_cq_max);
-  //   }
-  //   std::cout << std::endl;
-  //   err_cq_max_prior = err_cq_max; // Update!
+    // Maximum Norm of discretization error:
+    const Eigen::VectorXd diff = (u_ex - u_approx).cwiseAbs();
+    err_cq_max = *std::max(diff.data(), diff.data() + diff.size());
+
+    std::cout << "N = " << N << std::setw(15) << "Max = " << std::scientific
+              << std::setprecision(3) << err_cq_max << std::setw(15);
+    if (N > 16) {
+      std::cout << "EOC = " << std::log2(err_cq_max_prior / err_cq_max);
+    }
+    std::cout << std::endl;
+    err_cq_max_prior = err_cq_max; // Update!
   }
 }
   
