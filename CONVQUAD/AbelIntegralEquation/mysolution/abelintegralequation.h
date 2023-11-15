@@ -93,7 +93,8 @@ VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau) {
       // Set up for the Galerkin Matrix based on subproblem 3-2e:
       A(i,j) = std::sqrt(M_PI) * std::tgamma(j + 1) / ((i + j + 3./2.) * std::tgamma(j + 3./2.));
     }
-    // Next: set up of the rhs vector of the LSE based on Gauss-Legendre quadrature
+    // Next: set up of the rhs vector of the LSE (Linear System of Equations) based on 
+    // Gauss-Legendre quadrature
     for (int k{0}; k < p; ++k) {
       const double t_k = gauss_pts_p[k]; 
       const double w_k = gauss_wht_p[k];
@@ -129,23 +130,32 @@ VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau) {
  */
 /* SAM_LISTING_BEGIN_2 */
 template <typename FUNC>
-VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
-  VectorXd w(N + 1);
-  w(0) = 1.;
-  for (int l = 1; l < N + 1; ++l) {
-    w(l) = w(l - 1) * (l - 0.5) / l;  // denominator is factorial
+Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
+  Eigen::VectorXd u(N + 1);
+// **********************************************************************
+// PROBLEM 3-2j:
+// Convolution Quadrature Implicit Euler
+// Calculation weights of Convolution Quadrature based on 3-2h!
+  Eigen::VectorXd w(N + 1);
+  w(0) = 1; // Initial Value (Fromula 3-2h)
+  // Note: achieved through Taylor Series Expansion!
+  for (int l{1}; l < N + 1; ++l) {
+    w(l) = w(l - 1) * (static_cast<double>(l) - 0.5) / static_cast<double>(l);
   }
-  w *= sqrt(M_PI / N);
-
-  // Solve the convolution quadrature:
-
-  VectorXd grid = VectorXd::LinSpaced(N + 1, 0., 1.);
-  VectorXd y_N(N + 1);
-  for (int i = 0; i < N + 1; ++i) {
+  // Note that the sqrt(tau * pi) where tau = 1/N is missing:
+  w *= M_PI / N;
+  // Now: To solve the CQ Grid Points have to be defined first!
+  Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N+1, 0., 1.);
+  // Set up the RHS Vector of the LSE (Linear System of Equations)
+  Eigen::VectorXd y_N(N + 1);
+  for (int i{0}; i < N + 1; ++i) {
     y_N(i) = y(grid(i));
   }
-  MatrixXd T = toeplitz_triangular(w);
-  VectorXd u = T.triangularView<Lower>().solve(y_N);
+  // Set up the coefficient Matrix:
+  Eigen::MatrixXd T = toeplitz_triangular(w);
+  // Solve the Linear System Equation with Eigen's build in triangular solver!
+  u = T.triangularView<Lower>().solve(y_N);
+// **********************************************************************/
   return u;
 }
 /* SAM_LISTING_END_2 */
@@ -158,32 +168,39 @@ VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
  */
 /* SAM_LISTING_BEGIN_3 */
 template <typename FUNC>
-VectorXd cq_bdf2_abel(const FUNC& y, size_t N) {
-  VectorXd w1(N + 1);
-  w1(0) = 1.;
-  for (int l = 1; l < N + 1; ++l) {
-    w1(l) = w1(l - 1) * (l - 0.5) / l;  // denominator is factorial
+Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N) {
+  Eigen::VectorXd u(N + 1);
+// **********************************************************************
+// PROBLEM 3-2k:
+// Note: Calculations rely on the subproblem 3-2i !
+  Eigen::VectorXd w_1(N + 1); // First Factor
+  Eigen::VectorXd w_2(N + 1); // Second Factor
+  // Same approach for the computation of the weights as in example 3-2j
+  // Taylor Series Expansion
+  w_1(0) = w_2(0) = 1;
+  for (int i{1}; i < N + 1; ++i) {
+    w_1(i) = w_1(i - 1) * (static_cast<double>(i) - 0.5) / static_cast<double>(i);
+    w_2(i) = w_1(i) / std::pow(3, i);
   }
+  // Full Expansion by Cauchy Product:
+  // The weights can be computed by a discrete convolution of the coefficients
+  // of the two Taylor Series Expansions.
+  Eigen::VectorXd w = myconv(w_1, w_2).head(N+1).real();
+  // Note that the sqrt(2/3) and sqrt(pi/N) has to be included
+  w *= std::sqrt(2./3.) * std::sqrt(M_PI/N);
 
-  VectorXd w2 = w1;
-  for (int l = 1; l < N + 1; ++l) {
-    w2(l) /= pow(3, l);
-  }
-
-  VectorXd w = myconv(w1, w2).head(N + 1).real();
-  w *= sqrt(M_PI / N) * sqrt(2. / 3.);
-
-  // Solve the convolution quadrature:
-
-  VectorXd grid = VectorXd::LinSpaced(N + 1, 0., 1.);
-  VectorXd y_N(N + 1);
-  for (int i = 0; i < N + 1; ++i) {
+  // Again a Grid is required to solve the LSE (Linear System of Equations)
+  Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N + 1, 0., 1.);
+  // Also again setting up the rhs vector of the LSE
+  Eigen::VectorXd y_N(N + 1);
+  for (int i{0}; i < N + 1; ++i) {
     y_N(i) = y(grid(i));
   }
-
-  MatrixXd T = toeplitz_triangular(w);
-  VectorXd u = T.triangularView<Lower>().solve(y_N);
-
+  // Set up the coefficient matrix
+  Eigen::MatrixXd T = toeplitz_triangular(w);
+  // Also here the LSE gets solved with Eigen's built in triangular eliminator solver:
+  u = T.triangularView<Lower>().solve(y_N);
+// **********************************************************************/
   return u;
 }
 /* SAM_LISTING_END_3 */
