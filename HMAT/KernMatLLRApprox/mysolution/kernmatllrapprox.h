@@ -303,6 +303,7 @@ void InterpNode<DIM>::initV() {
   // Find interval correspoding to the bounding box of the current cluster
   const double a = bbox.minc[0];
   const double b = bbox.maxc[0];
+<<<<<<< HEAD
 // **********************************************************************
 // TODO Problem 2.4e:
   // 1) After we retrieved the intervall of the boundary box [a, b], we 
@@ -337,6 +338,11 @@ void InterpNode<DIM>::initV() {
   }
 
 // **********************************************************************
+=======
+    // **********************************************************************
+    // TODO
+    // **********************************************************************
+>>>>>>> origin/master
 }
 /* SAM_LISTING_END_Z */
 // clang-format on
@@ -398,6 +404,7 @@ BiDirChebInterpBlock<NODE, KERNEL>::BiDirChebInterpBlock(
  NODE &_nx, NODE &_ny, KERNEL _Gfun, std::size_t _q)
     : HMAT::IndexBlock<NODE>(_nx, _ny), G(std::move(_Gfun)), q(_q), C(_q, _q) {
   static_assert(NODE::dim == 1, "Only implemented in 1D");
+<<<<<<< HEAD
 // **********************************************************************
 // TODO Problem 2.4f:
 // First I need to define a, b and c, d the dimension of the bounding boxes
@@ -421,6 +428,11 @@ for (int k{0}; k<q; ++k) {
   }
 }
 // **********************************************************************
+=======
+    // **********************************************************************
+    // TODO
+    // **********************************************************************
+>>>>>>> origin/master
 }
 /* SAM_LISTING_END_B */
 // clang-format on
@@ -451,6 +463,7 @@ NearFieldBlock<NODE, KERNEL>::NearFieldBlock(NODE &_nx, NODE &_ny, KERNEL _Gfun)
       G(std::move(_Gfun)),
       Mloc(_nx.pts.size(), _ny.pts.size()) {
   static_assert(NODE::dim == 1, "Only implemented in 1D");
+<<<<<<< HEAD
 // Direct initialization of near field kernel collocation matrix
 // **********************************************************************
 // TODO Problem 2.4g:
@@ -462,6 +475,11 @@ for (std::size_t i{0}; i < _nx.pts.size(); ++i) {
   }
 }
 // **********************************************************************
+=======
+  // **********************************************************************
+  // TODO
+  // **********************************************************************
+>>>>>>> origin/master
 }
 /* SAM_LISTING_END_Q */
 
@@ -616,6 +634,7 @@ std::pair<double, double> approxErrorLLR(BiDirChebPartMat1D<KERNEL> &llrcM) {
   const size_t m = llrcM.cols();
   Eigen::MatrixXd M(n, m);   // Exact kernel collocation matrix
   Eigen::MatrixXd Mt(n, m);  // Compressed matrix as dense matrix
+<<<<<<< HEAD
 // **********************************************************************
   auto row_pts {(llrcM.rowT->root)->pts}; // All points from the row Tree
   auto col_pts {(llrcM.colT->root)->pts}; // All points from the column Tree
@@ -637,6 +656,11 @@ std::pair<double, double> approxErrorLLR(BiDirChebPartMat1D<KERNEL> &llrcM) {
     Mt.col(i) = mvLLRPartMat(llrcM, x); // Matrix x Vector operation
   }
 // *********************************************************************
+=======
+      // **********************************************************************
+      // TODO
+      // *********************************************************************
+>>>>>>> origin/master
   return {std::sqrt((M - Mt).squaredNorm() / (n * m)),
           std::sqrt(M.squaredNorm() / (n * m))};
 }
@@ -658,6 +682,7 @@ unsigned int computeSparsityMeasure(
   int xnode_maxcnt = 0;
   int ynode_maxcnt = 0;
   // **********************************************************************
+<<<<<<< HEAD
   // YOUR CODE HERE for Problem 2.4h:
 
   // Implementation to see if something got added!
@@ -745,6 +770,10 @@ unsigned int computeSparsityMeasure(
   // std::cout << "The size of the hashmap col is: " << nodemap_col.size() << std::endl;
 
 // **********************************************************************
+=======
+  // YOUR CODE HERE
+  // **********************************************************************
+>>>>>>> origin/master
   return std::max(xnode_maxcnt, ynode_maxcnt);
 }
 /* SAM_LISTING_END_S */

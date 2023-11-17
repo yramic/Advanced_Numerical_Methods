@@ -195,6 +195,7 @@ void runtimeMatVec(std::vector<unsigned int> &&n_vec, unsigned int n_runs,
     T_col->init(pts);
     // Build local low-rank compressed matrix
     KernMatLLRApprox::BiDirChebPartMat1D<LogKernel> Mt(T_row, T_col, G, q, eta);
+<<<<<<< HEAD
 // **********************************************************************
 // TO BE SUPPLEMENTED PROBLEM 2-4M:
   const size_t nrows {Mt.rows()};
@@ -215,6 +216,11 @@ void runtimeMatVec(std::vector<unsigned int> &&n_vec, unsigned int n_runs,
 
   std::cout << "n: " << n << "; Runtime: " << duration << " ms" << std::endl;
 // **********************************************************************
+=======
+    // **********************************************************************
+    // TO BE SUPPLEMENTED
+    // **********************************************************************
+>>>>>>> origin/master
   }
 }
 /* SAM_LISTING_END_3 */

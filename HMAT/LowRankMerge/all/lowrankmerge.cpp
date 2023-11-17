@@ -40,7 +40,7 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> low_rank_merge(
   // "qr(A,0)", which does not compute these extra entries. With the code above,
   // Eigen is smart enough not to compute the discarded vectors.
 
-  // Build $\hat Z$ from $A_i$ and $R_i$ 
+  // Build $\hat Z$ from $A_i$ and $R_i$
   Eigen::MatrixXd Z(A1.rows(), R1.rows() + R2.rows());
   Z << A1 * R1.transpose(), A2 * R2.transpose();
 
@@ -51,18 +51,18 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> low_rank_merge(
 
   // Only consider first q singular values
   Eigen::MatrixXd S;
-  S.setZero(A1.cols(), A1.cols());  
+  S.setZero(A1.cols(), A1.cols());
   S.diagonal() = s.head(A1.cols());
 
   // Only consider first q columns of U and V
-  Eigen::MatrixXd U = SVD.matrixU().leftCols(A1.cols());  
+  Eigen::MatrixXd U = SVD.matrixU().leftCols(A1.cols());
   Eigen::MatrixXd V = SVD.matrixV().leftCols(A1.cols());
 
   // Split V to be compatible with Q1 and Q2 in compressed format
-  Eigen::MatrixXd V1 = Eigen::MatrixXd::Identity(m, std::min(m, n)) * 
-                        V.topRows(std::min(m, n));
-  Eigen::MatrixXd V2 = Eigen::MatrixXd::Identity(m, std::min(m, n)) * 
-                        V.bottomRows(std::min(m, n));
+  Eigen::MatrixXd V1 =
+      Eigen::MatrixXd::Identity(m, std::min(m, n)) * V.topRows(std::min(m, n));
+  Eigen::MatrixXd V2 = Eigen::MatrixXd::Identity(m, std::min(m, n)) *
+                       V.bottomRows(std::min(m, n));
 
   // About SVD decomposition with Eigen:
   // With Eigen::JacobiSVD you can ask for thin $\VU$ or $\VV$ to be computed.
@@ -78,26 +78,24 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> low_rank_merge(
   // Compute $\tilde B$ while avoiding recovering Q as a dense matrix
   Eigen::MatrixXd Btilde1 = QR1.householderQ() * V1;
   Eigen::MatrixXd Btilde2 = QR2.householderQ() * V2;
-  Eigen::MatrixXd Btilde(Btilde1.rows()+Btilde2.rows(), Btilde1.cols());
+  Eigen::MatrixXd Btilde(Btilde1.rows() + Btilde2.rows(), Btilde1.cols());
   Btilde << Btilde1, Btilde2;
 
   // Return factors of $\tilde Z$
   return {Atilde, Btilde};
-
 #else
   // TODO: Compute {Atilde,Btilde} as in \eqref{eq:lrfac1}/\eqref{eq:lrfac2}
 
   // Dummy solution
-  return {Eigen::MatrixXd::Zero(3,3), Eigen::MatrixXd::Zero(3,3)};
+  return {Eigen::MatrixXd::Zero(3, 3), Eigen::MatrixXd::Zero(3, 3)};
 #endif
 }
 /* SAM_LISTING_END_0 */
 
 /* SAM_LISTING_BEGIN_1 */
 std::pair<double, double> test_low_rank_merge(size_t n) {
-
 #if SOLUTION
-  double nf = static_cast<double>(n); // convert data type
+  double nf = static_cast<double>(n);  // convert data type
   // Build $K_1$, $K_2$ and $Z$ defined in \prbcref{subprb:1}
   Eigen::MatrixXd X1(n, n), X2(n, n);
   for (int i = 0.; i < n; ++i) {
@@ -123,8 +121,8 @@ std::pair<double, double> test_low_rank_merge(size_t n) {
   }
 
   // Call the function implemented in \prbcref<prb:lrm:subprb:2>
-  std::pair<Eigen::MatrixXd, Eigen::MatrixXd> AB = low_rank_merge(
-      A1, B1, A2, B2);
+  std::pair<Eigen::MatrixXd, Eigen::MatrixXd> AB =
+      low_rank_merge(A1, B1, A2, B2);
 
   // Compute low-rank approximation error
   Eigen::MatrixXd Ztilde = AB.first * AB.second.transpose();
@@ -135,9 +133,8 @@ std::pair<double, double> test_low_rank_merge(size_t n) {
 
   // Return scaled Frobunius norm and maximum norm of approximation error
   return {err_Frob, err_max};
-
 #else
-  // TODO: Compute {err_Frob,err_max}, approximation error in 
+  // TODO: Compute {err_Frob,err_max}, approximation error in
   // scaled Frobunius norm and maximum norm
 
   // Dummy solution
@@ -196,10 +193,10 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> adap_rank_merge(
   Eigen::MatrixXd V = SVD.matrixV().leftCols(p);
 
   // Split V to be compatible with Q1 and Q2 in compressed format
-  Eigen::MatrixXd V1 = Eigen::MatrixXd::Identity(m, std::min(m, n)) *
-                        V.topRows(std::min(m, n));
-  Eigen::MatrixXd V2 = Eigen::MatrixXd::Identity(m, std::min(m, n)) * 
-                        V.bottomRows(std::min(m, n));
+  Eigen::MatrixXd V1 =
+      Eigen::MatrixXd::Identity(m, std::min(m, n)) * V.topRows(std::min(m, n));
+  Eigen::MatrixXd V2 = Eigen::MatrixXd::Identity(m, std::min(m, n)) *
+                       V.bottomRows(std::min(m, n));
 
   // Compute $\tilde A$ as in \eqref{eq:lrfac1}
   Eigen::MatrixXd Atilde = U * S;
@@ -207,28 +204,26 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> adap_rank_merge(
   // Compute $\tilde B$ while avoiding recovering Q as a dense matrix
   Eigen::MatrixXd Btilde1 = QR1.householderQ() * V1;
   Eigen::MatrixXd Btilde2 = QR2.householderQ() * V2;
-  Eigen::MatrixXd Btilde(Btilde1.rows()+Btilde2.rows(), Btilde1.cols());
+  Eigen::MatrixXd Btilde(Btilde1.rows() + Btilde2.rows(), Btilde1.cols());
   Btilde << Btilde1, Btilde2;
 
   // Return factors of $\tilde Z$
   return {Atilde, Btilde};
-
 #else
   // TODO: Compute {Atilde,Btilde} as in \eqref{eq:lrfac1}/\eqref{eq:lrfac2}, given \eqref{eq:adaptrunc}
-  
+
   // Dummy solution, to be replaced
-  return {Eigen::MatrixXd::Zero(3,3), Eigen::MatrixXd::Zero(3,3)};
+  return {Eigen::MatrixXd::Zero(3, 3), Eigen::MatrixXd::Zero(3, 3)};
 #endif
 }
 /* SAM_LISTING_END_2 */
 
 /* SAM_LISTING_BEGIN_3 */
 std::pair<double, size_t> test_adap_rank_merge(size_t n, double rtol) {
-
 #if SOLUTION
   // Make  sure that trigonometric functions receive float arguments
   // "Hidden integer arithmetic" is a trap of C/C++
-  const double nf = static_cast<double>(n); 
+  const double nf = static_cast<double>(n);
   // Build $K_1$, $K_2$ and $Z$ defined in \prbcref{prb:lrm:subprb:1}
   Eigen::MatrixXd X1(n, n), X2(n, n);
   for (int i = 0.; i < n; ++i) {
@@ -254,19 +249,18 @@ std::pair<double, size_t> test_adap_rank_merge(size_t n, double rtol) {
   }
 
   // Call the function from \prbcref{subprb:4}
-  std::pair<Eigen::MatrixXd, Eigen::MatrixXd> AB = adap_rank_merge(
-      A1, B1, A2, B2, rtol, __DBL_MIN__);  
+  std::pair<Eigen::MatrixXd, Eigen::MatrixXd> AB =
+      adap_rank_merge(A1, B1, A2, B2, rtol, __DBL_MIN__);
 
   // Compute low-rank approximation error
   Eigen::MatrixXd Ztilde = AB.first * AB.second.transpose();
   Eigen::MatrixXd diff = Z - Ztilde;
-  
-  double err_Frob = diff.norm() / n; // scaled Frobenius norm
 
-  // Return scaled Frobenius norm of approximation error and 
+  double err_Frob = diff.norm() / n;  // scaled Frobenius norm
+
+  // Return scaled Frobenius norm of approximation error and
   // the rank required to achieve the relative tolerance rtol
   return {err_Frob, AB.first.cols()};
-
 #else
   // TODO: Compute {err_Frob,p}, with p := no. of singular values larger than tolerance
 

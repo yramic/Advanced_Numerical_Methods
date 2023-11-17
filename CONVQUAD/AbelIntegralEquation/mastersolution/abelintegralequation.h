@@ -10,9 +10,6 @@
 #ifndef ABELINTEGRALEQUATION_H_
 #define ABELINTEGRALEQUATION_H_
 
-using namespace Eigen;
-using namespace std;
-
 namespace AbelIntegralEquation {
 /* @brief Compute Gaussian quadrature nodes and weights for n nodes over
  * interval [a,b] \param[in] a,b Interval [a,b] endpoints \param[in] n Number of
@@ -73,41 +70,50 @@ std::pair<Eigen::RowVectorXd, Eigen::RowVectorXd> gauleg(double a, double b,
  */
 /* SAM_LISTING_BEGIN_0 */
 template <typename FUNC>
-VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau) {
-  MatrixXd A = MatrixXd::Zero(p + 1, p + 1);
-  VectorXd b = VectorXd::Zero(p + 1);
+Eigen::VectorXd poly_spec_abel(const FUNC& y, std::size_t p, double tau) {
+  Eigen::MatrixXd A = MatrixXd::Zero(p + 1, p + 1);
+  Eigen::VectorXd b = Eigen::VectorXd::Zero(p + 1);
 
-  // generate Gauss-Legendre points and weights
-  Eigen::RowVectorXd gauss_pts_p, gauss_wht_p;
-  std::tie(gauss_pts_p, gauss_wht_p) = gauleg(0., 1., p);
+  // generate Gauss-Legendre quadrature points and weights
+  const auto [gauss_pts_p, gauss_wht_p] = gauleg(0., 1., p);
 
-  // set-up the Galerkin matrix and rhs vector
+  // set up the Galerkin matrix and rhs vector
+
+  // Precompute factors related to gamma function
+  // Watch out for integer division
+  const Eigen::VectorXd gamma_factor =
+      Eigen::VectorXd::NullaryExpr(p + 1, [](Eigen::Index j) {
+        return std::tgamma(j + 1) / std::tgamma(j + 3. / 2.);
+      });
+  const double sqrt_pi = std::sqrt(M_PI);
 
   for (int i = 0; i <= p; i++) {
-    for (int j = 0; j <= p; j++)
-      A(i, j) = 2. * sqrt(M_PI) * tgamma(1 + j) /
-                ((3. + 2. * i + 2. * j) *
-                 tgamma(3. / 2. + j));  // tgamma(1+j) == j! if j is integer
+    // Set up Galerkin matrix based on \prbcref{subprb:sg2}
+    for (int j = 0; j <= p; j++) {
+      A(i, j) = sqrt_pi * gamma_factor[j] / (1.5 + i + j);
+    }
 
+    // Set up the rhs vector of the LSE based on Gauss-Legendre quadrature
     for (int k = 0; k < p; k++) {
-      double tk = gauss_pts_p(k);
-      double wk = gauss_wht_p(k);
-      b(i) += wk * pow(tk, i) * y(tk);
+      const double tk = gauss_pts_p(k);
+      const double wk = gauss_wht_p(k);
+      // Based on \prbeqref{eq:aieAent}
+      b(i) += wk * std::pow(tk, i) * y(tk);
     }
   }
 
   // linear system solve using QR decomposition
-  VectorXd x = A.colPivHouseholderQr().solve(b);
+  const Eigen::ColPivHouseholderQR<Eigen::MatrixXd> solver(A);
+  const Eigen::VectorXd x = solver.solve(b);
 
-  size_t N = round(1. / tau);
-  VectorXd grid = VectorXd::LinSpaced(N + 1, 0., 1.);
-  VectorXd u = VectorXd::Zero(N + 1);
+  // generate points on the grid
+  const std::size_t N = std::round(1. / tau);
+  const Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N + 1, 0., 1.);
+  Eigen::VectorXd u = Eigen::VectorXd::Zero(N + 1);
 
   // generate solution at grid points
-  for (int i = 0; i <= N; i++) {
-    for (int j = 0; j <= p; j++) {
-      u(i) += x(j) * pow(grid(i), j);
-    }
+  for (int j = 0; j <= p; j++) {
+    u += x(j) * grid.array().pow(j).matrix();
   }
 
   return u;
@@ -121,23 +127,28 @@ VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau) {
  */
 /* SAM_LISTING_BEGIN_2 */
 template <typename FUNC>
-VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
-  VectorXd w(N + 1);
+Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
+  Eigen::VectorXd u(N + 1);
+  Eigen::VectorXd w(N + 1);
   w(0) = 1.;
+  // Calculate weights of convolution quadrature based on \prbcref{subprb:cq1}
   for (int l = 1; l < N + 1; ++l) {
     w(l) = w(l - 1) * (l - 0.5) / l;  // denominator is factorial
   }
-  w *= sqrt(M_PI / N);
+  w *= std::sqrt(M_PI / N);
 
   // Solve the convolution quadrature:
-
-  VectorXd grid = VectorXd::LinSpaced(N + 1, 0., 1.);
-  VectorXd y_N(N + 1);
+  // Generate points on the grid
+  Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N + 1, 0., 1.);
+  // Set up the rhs vector of the LSE
+  Eigen::VectorXd y_N(N + 1);
   for (int i = 0; i < N + 1; ++i) {
     y_N(i) = y(grid(i));
   }
-  MatrixXd T = toeplitz_triangular(w);
-  VectorXd u = T.triangularView<Lower>().solve(y_N);
+  // Set up the coefficient matrix
+  Eigen::MatrixXd T = toeplitz_triangular(w);
+  // Solve the lse with Eigen's build-in triangular elimination solver
+  u = T.triangularView<Lower>().solve(y_N);
   return u;
 }
 /* SAM_LISTING_END_2 */
@@ -150,32 +161,35 @@ VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
  */
 /* SAM_LISTING_BEGIN_3 */
 template <typename FUNC>
-VectorXd cq_bdf2_abel(const FUNC& y, size_t N) {
-  VectorXd w1(N + 1);
+Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N) {
+  Eigen::VectorXd u(N + 1);
+  Eigen::VectorXd w1(N + 1);
   w1(0) = 1.;
+  // Calculate weights of convolution quadrature based on \prbcref{subprb:cq2}
+  // Taylor series expansion of the first factor
   for (int l = 1; l < N + 1; ++l) {
     w1(l) = w1(l - 1) * (l - 0.5) / l;  // denominator is factorial
   }
-
-  VectorXd w2 = w1;
+  // Taylor series expansion of the second factor
+  Eigen::VectorXd w2 = w1;
   for (int l = 1; l < N + 1; ++l) {
     w2(l) /= pow(3, l);
   }
-
-  VectorXd w = myconv(w1, w2).head(N + 1).real();
-  w *= sqrt(M_PI / N) * sqrt(2. / 3.);
-
+  // Full expansion by Cauchy product
+  Eigen::VectorXd w = myconv(w1, w2).head(N + 1).real();
+  w *= std::sqrt(M_PI / N) * std::sqrt(2. / 3.);
   // Solve the convolution quadrature:
-
-  VectorXd grid = VectorXd::LinSpaced(N + 1, 0., 1.);
-  VectorXd y_N(N + 1);
+  // Generate points on the grid
+  Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N + 1, 0., 1.);
+  // Set up the rhs vector of the LSE
+  Eigen::VectorXd y_N(N + 1);
   for (int i = 0; i < N + 1; ++i) {
     y_N(i) = y(grid(i));
   }
-
-  MatrixXd T = toeplitz_triangular(w);
-  VectorXd u = T.triangularView<Lower>().solve(y_N);
-
+  // Set up the coefficient matrix
+  Eigen::MatrixXd T = toeplitz_triangular(w);
+  // Solve the lse with Eigen's build-in triangular elimination solver
+  u = T.triangularView<Lower>().solve(y_N);
   return u;
 }
 /* SAM_LISTING_END_3 */

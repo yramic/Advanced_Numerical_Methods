@@ -1,13 +1,13 @@
 /**
  * @file fractionalheatequation.h
  * @brief NPDE homework FractionalHeatEquation code
- * @author Jörg Nick
+ * @author Jörg Nick, Bob Schreiner
  * @date October 2023
  * @copyright Developed at SAM, ETH Zurich
  */
 
-#ifndef FHE_H_
-#define FHE_H_
+#ifndef FRACTIONALHEATEQUATION_H_
+#define FRACTIONALHEATEQUATION_H_
 
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
@@ -18,11 +18,12 @@
 #include <memory>
 #include <stdexcept>
 #include <unsupported/Eigen/FFT>
+#include <unsupported/Eigen/KroneckerProduct>
 #define assertm(exp, msg) assert(((void)msg, exp))
 
 namespace FractionalHeatEquation {
 
-/** @brief Encoding sparse matrix \sqrt(s)*M + A  */
+/** @brief Encoding sparse matrix $\sqrt(s)*M + A$  */
 /* SAM_LISTING_BEGIN_1 */
 class SqrtsMplusA {
  public:
@@ -85,18 +86,26 @@ Eigen::VectorXcd SqrtsMplusA::solve(
 /** @brief Compute CQ weights for IE-CQ and F(s) = sqrt(s) */
 Eigen::VectorXd cqWeights(unsigned int M, double tau);
 
-/** @brief Solve fully discrete evolution my MOT */
+/** @brief Generate uniform grid of square with n elements along the edge.*/
+std::vector<Eigen::Vector2d> generateGrid(unsigned n);
+
+/** @brief Solve fully discrete evolution by MOT */
 /* SAM_LISTING_BEGIN_2 */
 template <typename SOURCEFN,
           typename RECORDER = std::function<void(const Eigen::VectorXd &)>>
 Eigen::VectorXd evlMOT(
     SOURCEFN &&f, unsigned int n, double T, unsigned int M,
-    RECORDER rec = [](const Eigen::Vector2d &mu_n) {}) {
-  const unsigned int N = n * n;
+    RECORDER rec = [](const Eigen::VectorXd &mu_n) {}) {
+  const unsigned int N = n * n;  // Number of FE d.o.f.s
+  // Vector storing all the states; big memory consumption
   std::vector<Eigen::VectorXd> mu_vecs{M + 1, Eigen::VectorXd(N)};
-  // ************************************************************
-  // TO BE SUPPLEMENTED
-  // ************************************************************
+  double tau = T * 1.0 / M;  // timestep size
+  double h = 1.0 / (n + 1);  // meshwidth
+  // See \prbcref{sp:1}
+  Eigen::VectorXd w = cqWeights(M, tau);
+// **********************************************************************
+// Your Solution here
+// **********************************************************************/
   return mu_vecs.back();
 }
 /* SAM_LISTING_END_2 */
@@ -119,7 +128,7 @@ class ToeplitzOp {
 };
 /* SAM_LISTING_END_4 */
 
-/** @brief Solve fully discrete evolution my recursive algorithm for triangular
+/** @brief Solve fully discrete evolution by recursive algorithm for triangular
    Toeplitz system */
 /* SAM_LISTING_BEGIN_3 */
 template <typename SOURCEFN,
@@ -130,32 +139,53 @@ Eigen::VectorXd evlTriangToeplitz(
   const unsigned int N = n * n;
   const unsigned int M = std::pow(2, L) - 1;
   Eigen::MatrixXd mu_vecs(N, M + 1);
-  Eigen::VectorXd cq_weights(M + 1);
+  const double tau = T * 1.0 / M;
+  const double h = 1.0 / (n + 1);
+  Eigen::VectorXd cq_weights = cqWeights(M, tau);
+  // Initialise matrix to invert at every timestep, gridpoints and rhs
+  SqrtsMplusA A(n, std::complex<double>(std::pow(cq_weights[0], 2), 0.0));
+  //Generate rhs vector
+  std::vector<Eigen::Vector2d> gridpoints = generateGrid(n);
+  Eigen::MatrixXd rhs(N, (M + 1));
+  for (int time_ind = 0; time_ind < M + 1; time_ind++) {
+    // Evaluate rhs
+    for (int space_ind = 0; space_ind < N; space_ind++) {
+      rhs(space_ind, time_ind) =
+          h * h * f(time_ind * tau, gridpoints[space_ind]);
+    }
+  }
   // ************************************************************
   // TO BE SUPPLEMENTED
   // Use recursive lambda function, see
-  // https://gitlab.math.ethz.ch/NumCSE/NumCSE/-/blob/master/CppTutorial/lambdarecurse.cpp?ref_type=heads
+  // https://gitlab.math.ethz.ch/NumCSE/NumCSE/-/blob/master/CppTutorial/lambdarecurse.cpp
   // ************************************************************
   return mu_vecs.col(M);
 }
 /* SAM_LISTING_END_3 */
 
-/** @brief Solve fully discrete evolution my all-steps-in-one forward CQ */
-/* SAM_LISTING_BEGIN_X */
+/** @brief Solve fully discrete evolution by all-steps-in-one forward CQ */
+/* SAM_LISTING_BEGIN_5 */
 template <typename SOURCEFN,
           typename RECORDER = std::function<void(const Eigen::VectorXd &)>>
 Eigen::VectorXd evlASAOCQ(
     SOURCEFN &&f, unsigned int n, double T, unsigned int L,
-    RECORDER rec = [](const Eigen::Vector2d &mu_n) {}) {
+    RECORDER rec = [](const Eigen::VectorXd &mu_n) {}) {
   const unsigned int N = n * n;
   const unsigned int M = std::pow(2, L) - 1;
+  double tau = T * 1.0 / M;
+  double h = 1.0 / (n + 1.0);
+  auto delta = [](std::complex<double> z) {
+    return 1.0 - z;
+    //return 1.0 / 2.0 * z * z - 2.0 * z + 3.0 / 2.0;
+  };
+  // Initialize the numerical solution. This implementation is, for the sake of clarity, not memory-efficient.
   Eigen::MatrixXd mu_vecs(N, M + 1);
-  // ************************************************************
-  // TO BE SUPPLEMENTED
-  // ************************************************************
+  // **********************************************************************
+  // Your Solution here
+  // **********************************************************************/
   return mu_vecs.col(M);
 }
-/* SAM_LISTING_END_X */
+/* SAM_LISTING_END_5 */
 
 }  // namespace FractionalHeatEquation
 

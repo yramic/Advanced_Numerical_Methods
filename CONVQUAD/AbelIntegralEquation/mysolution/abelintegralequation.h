@@ -10,9 +10,6 @@
 #ifndef ABELINTEGRALEQUATION_H_
 #define ABELINTEGRALEQUATION_H_
 
-using namespace Eigen;
-using namespace std;
-
 namespace AbelIntegralEquation {
 /* @brief Compute Gaussian quadrature nodes and weights for n nodes over
  * interval [a,b] \param[in] a,b Interval [a,b] endpoints \param[in] n Number of
@@ -73,16 +70,16 @@ std::pair<Eigen::RowVectorXd, Eigen::RowVectorXd> gauleg(double a, double b,
  */
 /* SAM_LISTING_BEGIN_0 */
 template <typename FUNC>
-VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau) {
-  MatrixXd A = MatrixXd::Zero(p + 1, p + 1);
-  VectorXd b = VectorXd::Zero(p + 1);
+Eigen::VectorXd poly_spec_abel(const FUNC& y, std::size_t p, double tau) {
+  Eigen::MatrixXd A = MatrixXd::Zero(p + 1, p + 1);
+  Eigen::VectorXd b = Eigen::VectorXd::Zero(p + 1);
 
-  // generate Gauss-Legendre points and weights
-  Eigen::RowVectorXd gauss_pts_p, gauss_wht_p;
-  std::tie(gauss_pts_p, gauss_wht_p) = gauleg(0., 1., p);
+  // generate Gauss-Legendre quadrature points and weights
+  const auto [gauss_pts_p, gauss_wht_p] = gauleg(0., 1., p);
 
-  // set-up the Galerkin matrix and rhs vector
+  // set up the Galerkin matrix and rhs vector
 
+<<<<<<< HEAD
 // **********************************************************************
 // PROBLEM 3-2f:
 
@@ -104,19 +101,24 @@ VectorXd poly_spec_abel(const FUNC& y, size_t p, double tau) {
   }
 
 // **********************************************************************/
+=======
+  // **********************************************************************
+  // Your Solution here
+  // **********************************************************************/
+>>>>>>> origin/master
 
   // linear system solve using QR decomposition
-  VectorXd x = A.colPivHouseholderQr().solve(b);
+  const Eigen::ColPivHouseholderQR<Eigen::MatrixXd> solver(A);
+  const Eigen::VectorXd x = solver.solve(b);
 
-  size_t N = round(1. / tau);
-  VectorXd grid = VectorXd::LinSpaced(N + 1, 0., 1.);
-  VectorXd u = VectorXd::Zero(N + 1);
+  // generate points on the grid
+  const std::size_t N = std::round(1. / tau);
+  const Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(N + 1, 0., 1.);
+  Eigen::VectorXd u = Eigen::VectorXd::Zero(N + 1);
 
   // generate solution at grid points
-  for (int i = 0; i <= N; i++) {
-    for (int j = 0; j <= p; j++) {
-      u(i) += x(j) * pow(grid(i), j);
-    }
+  for (int j = 0; j <= p; j++) {
+    u += x(j) * grid.array().pow(j).matrix();
   }
 
   return u;
@@ -133,6 +135,7 @@ template <typename FUNC>
 Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
   Eigen::VectorXd u(N + 1);
 // **********************************************************************
+<<<<<<< HEAD
 // PROBLEM 3-2j:
 // Convolution Quadrature Implicit Euler
 // Calculation weights of Convolution Quadrature based on 3-2h!
@@ -155,6 +158,9 @@ Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
   Eigen::MatrixXd T = toeplitz_triangular(w);
   // Solve the Linear System Equation with Eigen's build in triangular solver!
   u = T.triangularView<Lower>().solve(y_N);
+=======
+// Your Solution here
+>>>>>>> origin/master
 // **********************************************************************/
   return u;
 }
@@ -171,6 +177,7 @@ template <typename FUNC>
 Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N) {
   Eigen::VectorXd u(N + 1);
 // **********************************************************************
+<<<<<<< HEAD
 // PROBLEM 3-2k:
 // Note: Calculations rely on the subproblem 3-2i !
   Eigen::VectorXd w_1(N + 1); // First Factor
@@ -200,6 +207,9 @@ Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N) {
   Eigen::MatrixXd T = toeplitz_triangular(w);
   // Also here the LSE gets solved with Eigen's built in triangular eliminator solver:
   u = T.triangularView<Lower>().solve(y_N);
+=======
+// Your Solution here
+>>>>>>> origin/master
 // **********************************************************************/
   return u;
 }

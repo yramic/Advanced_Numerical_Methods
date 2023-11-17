@@ -24,9 +24,9 @@ std::vector<Eigen::Vector2d> initStarPositions(unsigned int n, double mindist) {
   }
   // Vector for returning positions
   std::vector<Eigen::Vector2d> pos;
-// **********************************************************************
-// Code to be supplemented
-// **********************************************************************
+  // **********************************************************************
+  // Code to be supplemented
+  // **********************************************************************
   return pos;
 }
 /* SAM_LISTING_END_1 */
@@ -40,9 +40,9 @@ std::vector<Eigen::Vector2d> computeForces_direct(
           "Mismatch of sizes of masspositions and masses vectors");
   // Forces will be stored in this array
   std::vector<Eigen::Vector2d> forces(n);
-// **********************************************************************
-// Code to be supplemented
-// **********************************************************************
+  // **********************************************************************
+  // Code to be supplemented
+  // **********************************************************************
   return forces;
 }
 /* SAM_LISTING_END_2 */
@@ -75,9 +75,9 @@ StarQuadTree::StarQuadTreeNode::StarQuadTreeNode(
     StarQuadTree &tree)
     : star_idx_(star_idx), bbox_(bbox), mass(0.0), center({0, 0}) {
   assertm(star_idx_.size() > 0, "Can't create a node without stars...");
-// **********************************************************************
-// Code to be supplemented
-// **********************************************************************
+  // **********************************************************************
+  // Code to be supplemented
+  // **********************************************************************
 }
 
 /* SAM_LISTING_END_X */
@@ -118,9 +118,9 @@ bool StarQuadTreeClustering::isAdmissible(const StarQuadTreeNode &node,
                                           Eigen::Vector2d p, double eta) const {
   // Implements admissibility condition \lref{eq:admstar}
   bool admissible;
-// **********************************************************************
-// Code to be supplemented
-// **********************************************************************
+  // **********************************************************************
+  // Code to be supplemented
+  // **********************************************************************
   return admissible;
 }
 /* SAM_LISTING_END_5 */
@@ -130,9 +130,9 @@ Eigen::Vector2d StarQuadTreeClustering::forceOnStar(unsigned int j,
                                                     double eta) const {
   Eigen::Vector2d acc;  // For summation of force
   acc.setZero();
-// **********************************************************************
-// Code to be supplemented
-// **********************************************************************
+  // **********************************************************************
+  // Code to be supplemented
+  // **********************************************************************
   return acc;
 }
 /* SAM_LISTING_END_6 */
@@ -141,9 +141,9 @@ Eigen::Vector2d StarQuadTreeClustering::forceOnStar(unsigned int j,
 std::vector<double> forceError(const StarQuadTreeClustering &qt,
                                const std::vector<double> &etas) {
   std::vector<double> error(etas.size());  // For returning errors
-// **********************************************************************
-// Code to be supplemented
-// **********************************************************************
+      // **********************************************************************
+      // Code to be supplemented
+      // **********************************************************************
   return error;
 }
 /* SAM_LISTING_END_7 */
@@ -155,11 +155,13 @@ std::pair<double, double> measureRuntimes(unsigned int n, unsigned int n_runs) {
   std::vector<Eigen::Vector2d> pos = GravitationalForces::initStarPositions(n);
   // All stars have equal (unit) mass
   std::vector<double> mass(n, 1.0);
-  double ms_exact = std::numeric_limits<double>::max();    // Time measured for exact evaluation
-  double ms_cluster = std::numeric_limits<double>::max();  // Time taken for clustering-based evaluatiion
-// **********************************************************************
-// Code to be supplemented
-// **********************************************************************
+  double ms_exact =
+      std::numeric_limits<double>::max();  // Time measured for exact evaluation
+  double ms_cluster = std::numeric_limits<
+      double>::max();  // Time taken for clustering-based evaluatiion
+  // **********************************************************************
+  // Code to be supplemented
+  // **********************************************************************
   return {ms_exact, ms_cluster};
 }
 /* SAM_LISTING_END_8 */

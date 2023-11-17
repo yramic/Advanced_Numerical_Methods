@@ -6,11 +6,14 @@
   [
     "HMAT/GravitationalForces" ,
     "HMAT/KernMatLLRApprox",
+    "HMAT/KernMatLLRApprox_revised",
     "HMAT/LowRankMerge",
     "HMAT/TensorProductChebIntp",
     "HMAT/EvalTrigPoly",
     "CONVQUAD/LowTriangToeplitz",
     "CONVQUAD/AbelIntegralEquation",
-    "CONVQUAD/FractionalHeatEquation"
+    "CONVQUAD/FractionalHeatEquation",
+    "CONVQUAD/AbsorbingBoundaryCondition",
+    "AMG/StationaryLinearIterations"
   ]
 }

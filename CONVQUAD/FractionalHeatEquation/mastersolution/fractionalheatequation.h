@@ -1,13 +1,13 @@
 /**
  * @file fractionalheatequation.h
  * @brief NPDE homework FractionalHeatEquation code
- * @author Jörg Nick
+ * @author Jörg Nick, Bob Schreiner
  * @date October 2023
  * @copyright Developed at SAM, ETH Zurich
  */
 
-#ifndef FHE_H_
-#define FHE_H_
+#ifndef FRACTIONALHEATEQUATION_H_
+#define FRACTIONALHEATEQUATION_H_
 
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
@@ -18,11 +18,12 @@
 #include <memory>
 #include <stdexcept>
 #include <unsupported/Eigen/FFT>
+#include <unsupported/Eigen/KroneckerProduct>
 #define assertm(exp, msg) assert(((void)msg, exp))
 
 namespace FractionalHeatEquation {
 
-/** @brief Encoding sparse matrix \sqrt(s)*M + A  */
+/** @brief Encoding sparse matrix $\sqrt(s)*M + A$  */
 /* SAM_LISTING_BEGIN_1 */
 class SqrtsMplusA {
  public:
@@ -85,18 +86,43 @@ Eigen::VectorXcd SqrtsMplusA::solve(
 /** @brief Compute CQ weights for IE-CQ and F(s) = sqrt(s) */
 Eigen::VectorXd cqWeights(unsigned int M, double tau);
 
-/** @brief Solve fully discrete evolution my MOT */
+/** @brief Generate uniform grid of square with n elements along the edge.*/
+std::vector<Eigen::Vector2d> generateGrid(unsigned n);
+
+/** @brief Solve fully discrete evolution by MOT */
 /* SAM_LISTING_BEGIN_2 */
 template <typename SOURCEFN,
           typename RECORDER = std::function<void(const Eigen::VectorXd &)>>
 Eigen::VectorXd evlMOT(
     SOURCEFN &&f, unsigned int n, double T, unsigned int M,
-    RECORDER rec = [](const Eigen::Vector2d &mu_n) {}) {
-  const unsigned int N = n * n;
+    RECORDER rec = [](const Eigen::VectorXd &mu_n) {}) {
+  const unsigned int N = n * n;  // Number of FE d.o.f.s
+  // Vector storing all the states; big memory consumption
   std::vector<Eigen::VectorXd> mu_vecs{M + 1, Eigen::VectorXd(N)};
-  // ************************************************************
-  // TO BE SUPPLEMENTED
-  // ************************************************************
+  double tau = T * 1.0 / M;  // timestep size
+  double h = 1.0 / (n + 1);  // meshwidth
+  // See \prbcref{sp:1}
+  Eigen::VectorXd w = cqWeights(M, tau);
+  // Initialise matrix to invert at every timestep, gridpoints and rhs
+  SqrtsMplusA w0MplusA(n, std::complex<double>(std::pow(w[0], 2), 0.0));
+  std::vector<Eigen::Vector2d> gridpoints = generateGrid(n);
+  Eigen::VectorXd rhs(N);
+  for (int time_ind = 0; time_ind < M + 1; time_ind++) {
+    // Evaluate rhs
+    for (int space_ind = 0; space_ind < N; space_ind++) {
+      rhs[space_ind] = f(time_ind * tau, gridpoints[space_ind]);
+    }
+    // Add memory tail from convolution
+    for (int l = 0; l < time_ind; l++) {
+      rhs += -w[time_ind - l] * mu_vecs[l];
+    }
+    rhs *= h * h;
+    // Next timestep according to \prbeqref{eq:qcd1}
+    mu_vecs[time_ind] =
+        w0MplusA.solve(rhs).real();  //TODO: Check if this is correct
+    std::cout << w0MplusA.solve(rhs).real() << std::endl;
+    rec(mu_vecs[time_ind]);
+  }
   return mu_vecs.back();
 }
 /* SAM_LISTING_END_2 */
@@ -119,7 +145,7 @@ class ToeplitzOp {
 };
 /* SAM_LISTING_END_4 */
 
-/** @brief Solve fully discrete evolution my recursive algorithm for triangular
+/** @brief Solve fully discrete evolution by recursive algorithm for triangular
    Toeplitz system */
 /* SAM_LISTING_BEGIN_3 */
 template <typename SOURCEFN,
@@ -130,32 +156,128 @@ Eigen::VectorXd evlTriangToeplitz(
   const unsigned int N = n * n;
   const unsigned int M = std::pow(2, L) - 1;
   Eigen::MatrixXd mu_vecs(N, M + 1);
-  Eigen::VectorXd cq_weights(M + 1);
-  // ************************************************************
-  // TO BE SUPPLEMENTED
-  // Use recursive lambda function, see
-  // https://gitlab.math.ethz.ch/NumCSE/NumCSE/-/blob/master/CppTutorial/lambdarecurse.cpp?ref_type=heads
-  // ************************************************************
+  const double tau = T * 1.0 / M;
+  const double h = 1.0 / (n + 1);
+  Eigen::VectorXd cq_weights = cqWeights(M, tau);
+  // Initialise matrix to invert at every timestep, gridpoints and rhs
+  SqrtsMplusA A(n, std::complex<double>(std::pow(cq_weights[0], 2), 0.0));
+  //Generate rhs vector
+  std::vector<Eigen::Vector2d> gridpoints = generateGrid(n);
+  Eigen::MatrixXd rhs(N, (M + 1));
+  for (int time_ind = 0; time_ind < M + 1; time_ind++) {
+    // Evaluate rhs
+    for (int space_ind = 0; space_ind < N; space_ind++) {
+      rhs(space_ind, time_ind) =
+          h * h * f(time_ind * tau, gridpoints[space_ind]);
+    }
+  }
+  std::function<Eigen::MatrixXd(unsigned, Eigen::VectorXd, Eigen::MatrixXd,
+                                Eigen::MatrixXd)>
+      recursive_solve = [&](unsigned L, Eigen::VectorXd weights,
+                            Eigen::MatrixXd mu, Eigen::MatrixXd phi) {
+        assert(mu.size() == phi.size());
+        if (L == 0) {
+          const Eigen::VectorXcd phi_comp =
+              phi.template cast<std::complex<double>>();
+          mu = (A.solve(phi_comp)).real();
+        } else {
+          const unsigned local_M = mu.cols();
+          //Solve upper left part recursively
+          mu.leftCols(local_M / 2) = recursive_solve(
+              L - 1, weights.head(local_M / 2), mu.leftCols(local_M / 2),
+              phi.leftCols(local_M / 2));
+          //Solve lower left part with fft
+          ToeplitzOp T(h * h * weights.tail(local_M - 1));
+          for (unsigned l = 0; l < N; ++l) {
+            phi.row(l).tail(local_M / 2) =
+                phi.row(l).tail(local_M / 2) -
+                T.eval(mu.row(l).head(local_M / 2)).transpose();
+          }
+          //Solve lower right part recursively
+          mu.rightCols(local_M / 2) = recursive_solve(
+              L - 1, weights.head(local_M / 2), mu.rightCols(local_M / 2),
+              phi.rightCols(local_M / 2));
+        }
+        return mu;
+      };
+  mu_vecs = recursive_solve(L, cq_weights, mu_vecs, rhs);
   return mu_vecs.col(M);
 }
 /* SAM_LISTING_END_3 */
 
-/** @brief Solve fully discrete evolution my all-steps-in-one forward CQ */
-/* SAM_LISTING_BEGIN_X */
+/** @brief Solve fully discrete evolution by all-steps-in-one forward CQ */
+/* SAM_LISTING_BEGIN_5 */
 template <typename SOURCEFN,
           typename RECORDER = std::function<void(const Eigen::VectorXd &)>>
 Eigen::VectorXd evlASAOCQ(
     SOURCEFN &&f, unsigned int n, double T, unsigned int L,
-    RECORDER rec = [](const Eigen::Vector2d &mu_n) {}) {
+    RECORDER rec = [](const Eigen::VectorXd &mu_n) {}) {
   const unsigned int N = n * n;
   const unsigned int M = std::pow(2, L) - 1;
+  double tau = T * 1.0 / M;
+  double h = 1.0 / (n + 1.0);
+  auto delta = [](std::complex<double> z) {
+    return 1.0 - z;
+    //return 1.0 / 2.0 * z * z - 2.0 * z + 3.0 / 2.0;
+  };
+  // Initialize the numerical solution. This implementation is, for the sake of clarity, not memory-efficient.
   Eigen::MatrixXd mu_vecs(N, M + 1);
-  // ************************************************************
-  // TO BE SUPPLEMENTED
-  // ************************************************************
+  // Initialise array for the whole right hand side (all timepoints)
+  Eigen::MatrixXd phi(N, M + 1);
+  // Initialise array for the right hand side at a single timepoint
+  Eigen::VectorXd phi_slice(N);  //TODO: Check this
+  // Set radius of integral contour
+  double r = std::pow(10, -16.0 / (2 * M + 2));
+  // Set gridpoints
+  std::vector<Eigen::Vector2d> gridpoints = generateGrid(n);
+  for (int time_ind = 0; time_ind < M + 1; time_ind++) {
+    // Evaluate rhs
+    for (int space_ind = 0; space_ind < N; space_ind++) {
+      phi_slice[space_ind] = f(time_ind * tau, gridpoints[space_ind]);
+    }
+    phi.col(time_ind) = std::pow(r, time_ind) * h * h * phi_slice;
+  }
+  // Transform the right-hand side from the time domain into the frequency domain
+  Eigen::MatrixXcd phi_hat(N, M + 1);
+  Eigen::FFT<double> fft;
+  for (int space_ind = 0; space_ind < N; space_ind++) {
+    Eigen::VectorXcd in =
+        phi.row(space_ind).template cast<std::complex<double>>();
+    Eigen::VectorXcd out(M + 1);
+    out = fft.fwd(in);
+    phi_hat.row(space_ind) = out;
+  }
+  // Initializing the frequency domain numerical solution
+  Eigen::MatrixXcd mu_hat(N, M + 1);
+  // Complex variable containing the imaginary unit and the discrete frequencies
+  std::complex<double> s_l;
+  std::complex<double> imag(0, 1);
+  for (int freq_ind = 0; freq_ind < M + 1; freq_ind++) {
+    s_l = delta(r * std::exp(-2 * M_PI * imag * ((double)freq_ind) /
+                             (double)(M + 1))) /
+          tau;
+    // Applying the time-harmonic operator $G(s_l)^{-1}= (\sqrt{s_l}M+A)^{-1}$
+    SqrtsMplusA slMplusA(n, s_l);
+    Eigen::VectorXcd phi_hat_slice(N);
+    Eigen::VectorXcd mu_hat_slice(N);
+    phi_hat_slice = phi_hat.col(freq_ind);
+    mu_hat_slice = slMplusA.solve(phi_hat_slice);
+    mu_hat.col(freq_ind) = mu_hat_slice;
+  }
+  // Transform the numerical solution from the frequency domain to the time domain
+  for (int space_ind = 0; space_ind < N; space_ind++) {
+    Eigen::VectorXcd in = mu_hat.row(space_ind);
+    Eigen::VectorXcd out(N);
+    out = fft.inv(in);
+    mu_vecs.row(space_ind) = out.real();
+  }
+  // Rescaling of the numerical solution
+  for (int time_ind = 0; time_ind < M + 1; time_ind++) {
+    mu_vecs.col(time_ind) *= std::pow(r, -time_ind);
+  }
   return mu_vecs.col(M);
 }
-/* SAM_LISTING_END_X */
+/* SAM_LISTING_END_5 */
 
 }  // namespace FractionalHeatEquation
 
