@@ -68,7 +68,7 @@ int main() {
     // Exact solution at grid points
     Eigen::VectorXd u_ex(N + 1);
     for (int i = 0; i < N + 1; ++i) {
-      u_ex(i) = u(grid(i));
+      u_ex(i) = 2./ M_PI * std::sqrt(grid(i));
     }
     // Solution for Convolution Quadrature based on implicit Euler method
     const Eigen::VectorXd u_approx = AbelIntegralEquation::cq_ieul_abel(y, N);
@@ -95,7 +95,7 @@ int main() {
     // Exact solution at grid points
     Eigen::VectorXd u_ex(N + 1);
     for (int i = 0; i < N + 1; ++i) {
-      u_ex(i) = u(grid(i));
+      u_ex(i) = 2./M_PI * std::sqrt(grid(N));
     }
     // Solution using CQ based on BDF-2 Method
     const Eigen::VectorXd u_approx = AbelIntegralEquation::cq_bdf2_abel(y, N);
