@@ -79,7 +79,6 @@ Eigen::VectorXd poly_spec_abel(const FUNC& y, std::size_t p, double tau) {
 
   // set up the Galerkin matrix and rhs vector
 
-<<<<<<< HEAD
 // **********************************************************************
 // PROBLEM 3-2f:
 
@@ -101,11 +100,6 @@ Eigen::VectorXd poly_spec_abel(const FUNC& y, std::size_t p, double tau) {
   }
 
 // **********************************************************************/
-=======
-  // **********************************************************************
-  // Your Solution here
-  // **********************************************************************/
->>>>>>> origin/master
 
   // linear system solve using QR decomposition
   const Eigen::ColPivHouseholderQR<Eigen::MatrixXd> solver(A);
@@ -135,7 +129,6 @@ template <typename FUNC>
 Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
   Eigen::VectorXd u(N + 1);
 // **********************************************************************
-<<<<<<< HEAD
 // PROBLEM 3-2j:
 // Convolution Quadrature Implicit Euler
 // Calculation weights of Convolution Quadrature based on 3-2h!
@@ -158,9 +151,6 @@ Eigen::VectorXd cq_ieul_abel(const FUNC& y, size_t N) {
   Eigen::MatrixXd T = toeplitz_triangular(w);
   // Solve the Linear System Equation with Eigen's build in triangular solver!
   u = T.triangularView<Lower>().solve(y_N);
-=======
-// Your Solution here
->>>>>>> origin/master
 // **********************************************************************/
   return u;
 }
@@ -177,7 +167,6 @@ template <typename FUNC>
 Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N) {
   Eigen::VectorXd u(N + 1);
 // **********************************************************************
-<<<<<<< HEAD
 // PROBLEM 3-2k:
 // Note: Calculations rely on the subproblem 3-2i !
   Eigen::VectorXd w_1(N + 1); // First Factor
@@ -207,9 +196,6 @@ Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N) {
   Eigen::MatrixXd T = toeplitz_triangular(w);
   // Also here the LSE gets solved with Eigen's built in triangular eliminator solver:
   u = T.triangularView<Lower>().solve(y_N);
-=======
-// Your Solution here
->>>>>>> origin/master
 // **********************************************************************/
   return u;
 }

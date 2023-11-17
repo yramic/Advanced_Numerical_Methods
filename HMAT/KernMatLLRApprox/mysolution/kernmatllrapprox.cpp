@@ -195,32 +195,26 @@ void runtimeMatVec(std::vector<unsigned int> &&n_vec, unsigned int n_runs,
     T_col->init(pts);
     // Build local low-rank compressed matrix
     KernMatLLRApprox::BiDirChebPartMat1D<LogKernel> Mt(T_row, T_col, G, q, eta);
-<<<<<<< HEAD
 // **********************************************************************
 // TO BE SUPPLEMENTED PROBLEM 2-4M:
-  const size_t nrows {Mt.rows()};
-  const size_t ncols {Mt.cols()};
+    const size_t nrows {Mt.rows()};
+    const size_t ncols {Mt.cols()};
 
-  Eigen::VectorXd x(ncols), y(nrows);
-  x = Eigen::VectorXd::Ones(ncols);
+    Eigen::VectorXd x(ncols), y(nrows);
+    x = Eigen::VectorXd::Ones(ncols);
 
-  double duration {0};
-  for (unsigned int i{0}; i < n_runs; ++i) {
-    auto t1 = std::chrono::high_resolution_clock::now();
-    y = mvLLRPartMat(Mt, x);
-    auto t2 = std::chrono::high_resolution_clock::now();
-    // Getting the number of miliseconds:
-    std::chrono::duration<double,std::milli> ms_double = t2 - t1;
-    duration = ( (duration == 0) ? ms_double.count() : std::min(duration, ms_double.count())); 
-  }
+    double duration {0};
+    for (unsigned int i{0}; i < n_runs; ++i) {
+      auto t1 = std::chrono::high_resolution_clock::now();
+      y = mvLLRPartMat(Mt, x);
+      auto t2 = std::chrono::high_resolution_clock::now();
+      // Getting the number of miliseconds:
+      std::chrono::duration<double,std::milli> ms_double = t2 - t1;
+      duration = ( (duration == 0) ? ms_double.count() : std::min(duration, ms_double.count())); 
+    }
 
   std::cout << "n: " << n << "; Runtime: " << duration << " ms" << std::endl;
 // **********************************************************************
-=======
-    // **********************************************************************
-    // TO BE SUPPLEMENTED
-    // **********************************************************************
->>>>>>> origin/master
   }
 }
 /* SAM_LISTING_END_3 */

@@ -40,7 +40,6 @@ Eigen::MatrixXcd toeplitz(const Eigen::VectorXcd& c,
  */
 Eigen::VectorXcd pconvfft(const Eigen::VectorXcd& u,
                           const Eigen::VectorXcd& x) {
-<<<<<<< HEAD
   // Eigen::FFT<double> ... Object to perform FFT operations is created
   Eigen::FFT<double> fft; 
   // .fwd(x) ... Perform the forward FFT on the signal input x
@@ -96,15 +95,6 @@ Eigen::VectorXcd ltpMultold(const Eigen::VectorXcd& f,
   return toepMatVecMult(f, Eigen::VectorXcd::Zero(n), g);
 }
 
-=======
-  Eigen::FFT<double> fft;
-  // Circulant matrix $(C)_{l,j}=p_{l-j}$, Fourier matrix $F_n$
-  // $C = F^{-1}_n diag(F_nu)F_n$   ref{eq:circmv}
-  const Eigen::VectorXcd tmp = (fft.fwd(u)).cwiseProduct(fft.fwd(x));
-  return fft.inv(tmp);
-}
-
->>>>>>> origin/master
 /* @brief Multiply two lower triangular Toeplitz matrices
  * \param f Vector of entries of first lower triangular Toeplitz matrix
  * \param g Vector of entries of second lower triangular Toeplitz matrix
@@ -256,7 +246,6 @@ Eigen::VectorXcd ltpSolve(const Eigen::VectorXcd& f,
   assert(log2(f.size()) == floor(log2(f.size())) &&
          "Size of f must be a power of 2!");
 
-<<<<<<< HEAD
   std::size_t n = f.size();
   // When the problem reduces to a scalar, solve directly!
   if (n == 1) {
@@ -268,13 +257,7 @@ Eigen::VectorXcd ltpSolve(const Eigen::VectorXcd& f,
       y.tail(n / 2) -
       toepMatVecMult(f.tail(n / 2), f.segment(1, n / 2).reverse(), u_head);
   Eigen::VectorXcd u_tail = ltpSolve(f.head(n / 2), t);
-=======
-  const std::size_t n = f.size();
->>>>>>> origin/master
   Eigen::VectorXcd u(n);
-  // **********************************************************************
-  // Code to be supplemented
-  // **********************************************************************
   return u;
 }
 /* SAM_LISTING_END_3 */
