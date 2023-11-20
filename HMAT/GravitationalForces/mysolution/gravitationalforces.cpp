@@ -24,7 +24,6 @@ std::vector<Eigen::Vector2d> initStarPositions(unsigned int n, double mindist) {
   }
   // Vector for returning positions
   std::vector<Eigen::Vector2d> pos;
-<<<<<<< HEAD
 // **********************************************************************
 
 // int counter {1}; // I want to count how many Iterations the code takes to reach a solution
@@ -57,11 +56,6 @@ do {
   // counter++;
 
 // **********************************************************************
-=======
-  // **********************************************************************
-  // Code to be supplemented
-  // **********************************************************************
->>>>>>> origin/master
   return pos;
 }
 /* SAM_LISTING_END_1 */
@@ -75,7 +69,6 @@ std::vector<Eigen::Vector2d> computeForces_direct(
           "Mismatch of sizes of masspositions and masses vectors");
   // Forces will be stored in this array
   std::vector<Eigen::Vector2d> forces(n);
-<<<<<<< HEAD
 // **********************************************************************
   Eigen::Vector2d acc;
   for (unsigned int j = 0; j < n; j++) {
@@ -92,11 +85,6 @@ std::vector<Eigen::Vector2d> computeForces_direct(
     forces[j] = acc * masses[j] / (4 * M_PI);
   }
 // **********************************************************************
-=======
-  // **********************************************************************
-  // Code to be supplemented
-  // **********************************************************************
->>>>>>> origin/master
   return forces;
 }
 
@@ -130,7 +118,6 @@ StarQuadTree::StarQuadTreeNode::StarQuadTreeNode(
     StarQuadTree &tree)
     : star_idx_(star_idx), bbox_(bbox), mass(0.0), center({0, 0}) {
   assertm(star_idx_.size() > 0, "Can't create a node without stars...");
-<<<<<<< HEAD
 // **********************************************************************
 // Code to be supplemented
 for (unsigned int i{0}; i < star_idx_.size(); i++) {
@@ -182,11 +169,6 @@ for (int i : {0, 1, 2, 3}) {
   }
 }
 // **********************************************************************
-=======
-  // **********************************************************************
-  // Code to be supplemented
-  // **********************************************************************
->>>>>>> origin/master
 }
 
 /* SAM_LISTING_END_X */
@@ -227,7 +209,6 @@ bool StarQuadTreeClustering::isAdmissible(const StarQuadTreeNode &node,
                                           Eigen::Vector2d p, double eta) const {
   // Implements admissibility condition \lref{eq:admstar}
   bool admissible;
-<<<<<<< HEAD
 // **********************************************************************
 // Code to be supplemented for 2-1d:
 // Diameter:
@@ -245,11 +226,6 @@ bool StarQuadTreeClustering::isAdmissible(const StarQuadTreeNode &node,
 
   admissible = (dist > eta * diam);
 // **********************************************************************
-=======
-  // **********************************************************************
-  // Code to be supplemented
-  // **********************************************************************
->>>>>>> origin/master
   return admissible;
 }
 /* SAM_LISTING_END_5 */
@@ -259,7 +235,6 @@ Eigen::Vector2d StarQuadTreeClustering::forceOnStar(unsigned int j,
                                                     double eta) const {
   Eigen::Vector2d acc;  // For summation of force
   acc.setZero();
-<<<<<<< HEAD
 // **********************************************************************
 // Code to be supplemented for 2-1e:
   /* 
@@ -300,11 +275,6 @@ Eigen::Vector2d StarQuadTreeClustering::forceOnStar(unsigned int j,
   // In the end we need to multiply acc with m_j/(4*pi):
   acc *= (starmasses_[j] / (4 * M_PI));
 // **********************************************************************
-=======
-  // **********************************************************************
-  // Code to be supplemented
-  // **********************************************************************
->>>>>>> origin/master
   return acc;
 }
 /* SAM_LISTING_END_6 */
@@ -313,7 +283,6 @@ Eigen::Vector2d StarQuadTreeClustering::forceOnStar(unsigned int j,
 std::vector<double> forceError(const StarQuadTreeClustering &qt,
                                const std::vector<double> &etas) {
   std::vector<double> error(etas.size());  // For returning errors
-<<<<<<< HEAD
 // **********************************************************************
 // Code to be supplemented for 2-1f:
   std::vector<Eigen::Vector2d> f_exact {
@@ -331,11 +300,6 @@ std::vector<double> forceError(const StarQuadTreeClustering &qt,
     error[i] = *std::max_element(e_normed.begin(), e_normed.end());
   }
 // **********************************************************************
-=======
-      // **********************************************************************
-      // Code to be supplemented
-      // **********************************************************************
->>>>>>> origin/master
   return error;
 }
 /* SAM_LISTING_END_7 */
@@ -347,7 +311,6 @@ std::pair<double, double> measureRuntimes(unsigned int n, unsigned int n_runs) {
   std::vector<Eigen::Vector2d> pos = GravitationalForces::initStarPositions(n);
   // All stars have equal (unit) mass
   std::vector<double> mass(n, 1.0);
-<<<<<<< HEAD
   double ms_exact = std::numeric_limits<double>::max();    // Time measured for exact evaluation
   double ms_cluster = std::numeric_limits<double>::max();  // Time taken for clustering-based evaluatiion
 // **********************************************************************
@@ -382,15 +345,6 @@ std::pair<double, double> measureRuntimes(unsigned int n, unsigned int n_runs) {
     ms_cluster = (dur.count() < ms_cluster) ? dur.count() : ms_cluster;
   }
 // **********************************************************************
-=======
-  double ms_exact =
-      std::numeric_limits<double>::max();  // Time measured for exact evaluation
-  double ms_cluster = std::numeric_limits<
-      double>::max();  // Time taken for clustering-based evaluatiion
-  // **********************************************************************
-  // Code to be supplemented
-  // **********************************************************************
->>>>>>> origin/master
   return {ms_exact, ms_cluster};
 }
 /* SAM_LISTING_END_8 */

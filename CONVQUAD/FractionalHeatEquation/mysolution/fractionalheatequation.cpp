@@ -51,12 +51,15 @@ SqrtsMplusA::SqrtsMplusA(unsigned int n, std::complex<double> s)
 /* SAM_LISTING_BEGIN_1 */
 Eigen::VectorXd cqWeights(unsigned int M, double tau) {
   Eigen::VectorXd w(M + 1);
-
+  // *************************************************************************
+  // PROBLEM 3-4a:
+  // Note that this part was already implemented!
   w(0) = std::pow(tau, -0.5);
   // Calculate weights of convolution quadrature based on \prbcref{eq:smuw}
   for (int l = 1; l < M + 1; ++l) {
     w(l) = w(l - 1) * (-1) * (0.5 - (l - 1)) / l;  // denominator is factorial
   }
+  // *************************************************************************
   return w;
 }
 /* SAM_LISTING_END_1 */
