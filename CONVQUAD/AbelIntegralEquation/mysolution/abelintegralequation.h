@@ -183,6 +183,7 @@ Eigen::VectorXd cq_bdf2_abel(const FUNC& y, size_t N) {
   // of the two Taylor Series Expansions.
   Eigen::VectorXd w = myconv(w_1, w_2).head(N+1).real();
   // Note that the sqrt(2/3) and sqrt(pi/N) has to be included
+  // Tau = 1/N hence it is sqrt(pi/N) since the part sqrt(pi * tau) has to be added!
   w *= std::sqrt(2./3.) * std::sqrt(M_PI/N);
 
   // Again a Grid is required to solve the LSE (Linear System of Equations)
