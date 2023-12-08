@@ -117,13 +117,30 @@ Eigen::SparseMatrix<double> buildAH_eigen(
 Eigen::SparseMatrix<double> buildAH(
     const Eigen::SparseMatrix<double> &A,
     const Eigen::SparseMatrix<double, Eigen::RowMajor> &P) {
+  Eigen::SparseMatrix<double> AH(P.cols(), P.cols());
 #if SOLUTION
-
+  // define vector of triplets and reserve memory
+  std::vector<Eigen::Triplet<double>> AH_trp{};  // For temporary COO format
+  // For both A and P the inner dimensions are rows
+  for (int k = 0; k < A.outerSize(); ++k)  // loop over columns of A
+    for (Eigen::SparseMatrix<double>::InnerIterator l(A, k); l;
+         ++l)  // loop over rows of A
+      for (Eigen::SparseMatrix<double, Eigen::RowMajor>::InnerIterator j(
+               P, l.row());
+           j; ++j)  // loop over rows of P
+        for (Eigen::SparseMatrix<double, Eigen::RowMajor>::InnerIterator i(P,
+                                                                           k);
+             i; ++i)  // loop over rows of P
+          AH_trp.emplace_back(i.col(), j.col(),
+                              j.value() * i.value() * l.value());
+  // Initialize CCS matrix from COO format
+  AH.setFromTriplets(AH_trp.begin(), AH_trp.end());
 #else
 // **********************************************************************
 // To be supplemented
 // **********************************************************************
 #endif
+  return AH;
 }
 /* SAM_LISTING_END_4 */
 

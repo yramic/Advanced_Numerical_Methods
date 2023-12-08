@@ -9,12 +9,13 @@
 #ifndef GC_H_
 #define GC_H_
 
-#include <Eigen/Core>
-#include <Eigen/SparseCore>
+#include <Eigen/Dense>
+#include <Eigen/Sparse>
 #include <cassert>
 #include <iomanip>
 #include <iostream>
 #include <vector>
+#include <chrono>
 
 #define assertm(exp, msg) assert(((void)msg, exp))
 
@@ -56,7 +57,38 @@ Eigen::SparseMatrix<double> buildAH(
 template <typename SEQ>
 void tabulateRuntimes(SEQ &&M_vals) {
 #if SOLUTION
+  // Take the minimum over several runs as runtime
+  int n_runs = 5;
+  std::cout << "M\tEigen\t\tMine" << std::endl;
 
+  for (auto M : M_vals) {
+    // Obtain the fine-grid matrix
+    const Eigen::SparseMatrix<double> Ah = poissonMatrix(M);
+    // Generate the prolongation matrix
+    const Eigen::SparseMatrix<double, Eigen::RowMajor> P =
+        prolongationMatrix(M, true);
+    // Measure runtime of Eigen's multiplication of sparse matrices
+    double ms_eigen = std::numeric_limits<double>::max();
+    for (int r = 0; r < n_runs; r++) {
+      auto t1_eigen = std::chrono::high_resolution_clock::now();
+      const Eigen::SparseMatrix<double> AH_eigen = buildAH_eigen(Ah, P);
+      auto t2_eigen = std::chrono::high_resolution_clock::now();
+      std::chrono::duration<double, std::milli> ms_double = t2_eigen - t1_eigen;
+      ms_eigen = std::min(ms_eigen, ms_double.count());
+    }
+
+    // Measure runtime of \prbcref{sp:2a}
+    double ms_mine = std::numeric_limits<double>::max();
+    for (int r = 0; r < n_runs; r++) {
+      auto t1_mine = std::chrono::high_resolution_clock::now();
+      const Eigen::SparseMatrix<double> AH_mine = buildAH(Ah, P);
+      auto t2_mine = std::chrono::high_resolution_clock::now();
+      std::chrono::duration<double, std::milli> ms_double = t2_mine - t1_mine;
+      ms_mine = std::min(ms_mine, ms_double.count());
+    }
+
+    std::cout << M << "\t" << ms_eigen << "\t\t" << ms_mine << std::endl;
+  }
 #else
 // **********************************************************************
 // To be supplemented

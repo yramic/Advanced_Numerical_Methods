@@ -96,9 +96,9 @@ double comp_lmax_gaussSeidel(const Eigen::SparseMatrix<double> &X,
     lambda_new = v.norm();
   } while (std::abs(lambda_new - lambda_old) > TOL * lambda_new);
 #else
-    // **********************************************************************
-    // Code to be supplemented
-    // **********************************************************************
+  // **********************************************************************
+  // Code to be supplemented
+  // **********************************************************************
 #endif
   return lambda_new;
 }
@@ -116,10 +116,10 @@ double gaussSeidelRate(unsigned int n, double c, double TOL) {
   const double lambda_max = comp_lmax_gaussSeidel(X, TOL);
   return lambda_max;
 #else
-    // **********************************************************************
-    // Code to be supplemented
-    // **********************************************************************
-    return 0;
+  // **********************************************************************
+  // Code to be supplemented
+  // **********************************************************************
+  return 0;
 #endif
 }
 /* SAM_LISTING_END_3 */

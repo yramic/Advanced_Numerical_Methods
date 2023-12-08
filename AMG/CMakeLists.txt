@@ -2,3 +2,4 @@
 add_subdirectory(MFMG)
 add_subdirectory(StationaryLinearIterations)
 add_subdirectory(GalerkinConstruction)
+add_subdirectory(CFSplit)
