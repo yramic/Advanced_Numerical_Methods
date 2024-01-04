@@ -20,7 +20,13 @@ GridFunction DirichletBVPMultiGridSolver::applyGridOperator(
   const double h = 1.0 / (M + 1);
   GridFunction eta = Eigen::MatrixXd::Zero(M + 2, M + 2);
   // ************************************************************
-  // Code to be supplemented
+  // PROBLEM 4-2C:
+  for (unsigned int i{1}; i < M+1; ++i) {
+    for (unsigned int j{1}; j < M+1; ++j) {
+      eta(i, j) = (4.0 + c_ * std::pow(h,2.0)) * mu(i,j) - 
+                  mu(i-1,j) - mu(i,j-1) - mu(i+1,j) -mu(i,j+1);
+    }
+  } 
   // ************************************************************
   return eta;
 }
@@ -44,7 +50,43 @@ GridFunction DirichletBVPMultiGridSolver::directSolve(
   A2.reserve(Eigen::VectorXi::Constant(A2.cols(), 5));
   T.reserve(Eigen::VectorXi::Constant(T.cols(), 3));
   // ************************************************************
-  // Code to be supplemented
+  // PROBLEM 4-2D:
+  // First we need to define T properly! This cone be done with
+  // T.insert()
+  // Define the first row:
+  T.insert(0,0) = 2.0 + 0.5*c_*std::pow(h,2.0);
+  T.insert(0,1) = -1;
+  // Define the last row:
+  T.insert(M-1,M-1) = 2.0 + 0.5*c_*std::pow(h,2.0);
+  T.insert(M-1,M-2) = -1;
+  // Now we can run a Loop and define the tridiagonal elements of T:
+  for (unsigned int i{1}; i < M-1; ++i) {
+    T.insert(i,i) = 2.0 + 0.5*c_*std::pow(h,2.0);
+    T.insert(i,i-1) = -1;
+    T.insert(i,i+1) = -1;
+  }
+
+  // Next we want to define the Matrix A, which can be done with
+  // the Kronecker Product!
+
+  Eigen::KroneckerProductSparse kron_1(T, 
+        Eigen::MatrixXd::Identity(T.rows(), T.cols()));
+  Eigen::KroneckerProductSparse kron_2(
+        Eigen::MatrixXd::Identity(T.rows(), T.cols()), T);
+  
+  // Now we can Assign these results to A1 and A2:
+  kron_1.evalTo(A1);
+  kron_2.evalTo(A2);
+
+  A = A1 + A2;
+
+  // Now we have everything we need for the Sparse Solver and we
+  // can finally compute the result directly on the coarsest grid:
+  Eigen::SparseLU<Eigen::SparseMatrix<double>> sparse_solver;
+  sparse_solver.analyzePattern(A);
+  sparse_solver.factorize(A);
+  assert(sparse_solver.info() == Eigen::Success);
+  sol = sparse_solver.solve(phi_v);
   // ************************************************************
   GridFunction sol_g = Eigen::MatrixXd::Zero(M + 2, M + 2);
   sol_g.block(1, 1, M, M) = Eigen::MatrixXd::Map(sol.data(), M, M);
@@ -58,7 +100,13 @@ void DirichletBVPMultiGridSolver::sweepGaussSeidel(
   const unsigned int M = std::pow(2, level) - 1;
   const double h = 1.0 / (M + 1);
   // ************************************************************
-  // Code to be supplemented
+  // PROBLEM 4-2e:
+  for (unsigned int i{1}; i < M+1; ++i) {
+    for (unsigned int j{1}; j < M+1; ++j) {
+      mu(i,j) = (phi(i,j) + (mu(i-1,j) + mu(i,j-1) + mu(i+1,j) + 
+                mu(i,j+1))) / (4 + c_ * std::pow(h, 2.0));
+    }
+  }
   // ************************************************************
 }
 /* SAM_LISTING_END_3 */
@@ -69,7 +117,8 @@ GridFunction DirichletBVPMultiGridSolver::residual(
   const unsigned int M = std::pow(2, level) - 1;
   GridFunction res(M + 2, M + 2);
   // ************************************************************
-  // Code to be supplemented
+  // PROBLEM 4-2F:
+  res = (phi - applyGridOperator(level, mu));
   // ************************************************************
   return res;
 }
@@ -83,7 +132,27 @@ GridFunction DirichletBVPMultiGridSolver::prolongate(
   GridFunction zeta((M + 2), (M + 2));
   zeta.setZero();
   // ************************************************************
-  // Code to be supplemented
+  // PROBLEM 4-2G:
+  // A nested for loop is requried:
+  for (unsigned int i{1}; i < M+1; ++i) {
+    for (unsigned int j{1}; j < M+1; ++j) {
+      // Now I want to check the 4 cases:
+      // Case 1: if i,j == even:
+      if ((i % 2 == 0) and (j % 2 == 0)) 
+        zeta(i,j) = gamma(i/2, j/2);
+      // Case 2: if i == even, j == odd:
+      if ((i % 2 == 0) and (j % 2 != 0))
+        zeta(i,j) = 0.5 * (gamma(i/2, (j+1)/2) + gamma(i/2, (j-1)/2));
+      // Case 3: if i == odd, j == even
+      if((i % 2 != 0) and (j % 2 == 0))
+        zeta(i,j) = 0.5 * (gamma((i-1)/2, j/2) + gamma((i+1)/2, j/2));
+      // Case 4: if i,j == odd:
+      if ((i % 2 != 0) and (j % 2 != 0)) {
+        zeta(i,j) = 0.25 * (gamma((i-1)/2, (j-1)/2) + gamma((i-1)/2, (j+1)/2) +
+                            gamma((i+1)/2, (j-1)/2) + gamma((i+1)/2, (j+1)/2));
+      }
+    }
+  }
   // ************************************************************
   return zeta;
 }
@@ -97,7 +166,16 @@ GridFunction DirichletBVPMultiGridSolver::restrict(
   GridFunction sigma((M + 2), (M + 2));
   sigma.setZero();
   // ************************************************************
-  // Code to be supplemented
+  // PROBLEM 4-2H:
+  for (unsigned int i{1}; i < M+1; ++i) {
+    for (unsigned int j{1}; j < M+1; ++j) {
+      sigma(i,j) = rho(2*i, 2*j);
+      sigma(i,j) += 0.5 * (rho(2*i,2*j-1) + rho(2*i, 2*j+1) + 
+                           rho(2*i-1, 2*j) + rho(2*i+1, 2*j));
+      sigma(i,j) += 0.25 * (rho(2*i-1, 2*j-1) + rho(2*i-1, 2*j+1) + 
+                            rho(2*i+1, 2*j-1) + rho(2*i+1, 2*j+1));
+    }
+  }
   // ************************************************************
   return sigma;
 }
@@ -115,7 +193,39 @@ GridFunction DirichletBVPMultiGridSolver::multigridIteration(
   phi_vec.push_back(phi);
 
   // ************************************************************
-  // Code to be supplemented
+  // PROBLEM 4-2I:
+  unsigned counter {0};
+  // We go from level l to level 0 where we use a direct solver
+  // Hence, the forloop will go actually backward starting from
+  // l and ending at level 1, because level 0 needs to be solved
+  // directly as mentioned:
+  for (unsigned int l {L_}; l > L0; --l) {
+    // Pre-Smoothing:
+    sweepGaussSeidel(l, mu_vec.back(), phi_vec.back());
+    // Compute the residual:
+    residual_vec.push_back(
+      residual(l, mu_vec.back(), phi_vec.back())
+    );
+    // Restirct resiudal:
+    phi_vec.push_back(
+      restrict(l, residual_vec.back())
+    );
+    // Add zero grid function to mu:
+    GridFunction zero {phi_vec.back()};
+    zero.setZero();
+    mu_vec.push_back(zero);
+    ++counter;
+  }
+  // At Level L0 we do a direct solver:
+  mu_vec.push_back(directSolve(L0, phi_vec.back()));
+  // Now Prolongate and do a post smoothening:
+  for (unsigned int l{L0}; l < L_; ++l) {
+    // Prolongate mu:
+    mu_vec[counter - 1] += prolongate(l+1, mu_vec[counter]);
+    // Post Smoothening:
+    sweepGaussSeidel(l+1, mu_vec[counter-1], phi_vec[counter-1]);
+    --counter;
+  }
   // ************************************************************
   return mu_vec[0];
 }
